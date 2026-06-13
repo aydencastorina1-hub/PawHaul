@@ -14,13 +14,12 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   font-family: 'Nunito', sans-serif;
   background: white;
   color: var(--black);
-  overflow-x: hidden;
   cursor: default;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1685,6 +1684,7 @@ footer {
 .mobile-bottom-nav {
   display: none;
   position: fixed;
+  top: auto;
   bottom: 0; left: 0; right: 0;
   background: white;
   border-top: 1px solid #EBEBEB;
