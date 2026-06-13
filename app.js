@@ -456,31 +456,31 @@ function addBundleToCart() {
   showToast('🐾 Bundle added to cart!');
 }
 
-// ==================== MOBILE NAV SYNC ====================
-var pageNavMap = { home: 0, shop: 1, product: 1, cart: 2, wishlist: 2, about: 3, contact: 3 };
-
+// ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
 showPage = function(page, filter) {
   _origShowPage(page, filter);
-  var navBtns = document.querySelectorAll('.mob-nav-btn');
-  navBtns.forEach(function(b) { b.classList.remove('active'); });
-  var idx = pageNavMap[page];
-  if (idx !== undefined && navBtns[idx]) navBtns[idx].classList.add('active');
-  // Show/hide sticky ATC bar
+  closeMobileMenu();
   var atcBar = document.getElementById('stickyAtcBar');
   if (atcBar) atcBar.style.display = (page === 'product' && window.innerWidth <= 900) ? 'flex' : 'none';
 };
 
-function updateMobCartBadge() {
-  var dot = document.getElementById('mobCartDot');
-  if (!dot) return;
-  var total = cart.reduce(function(s, i) { return s + i.qty; }, 0);
-  dot.textContent = total;
-  dot.style.display = total > 0 ? 'flex' : 'none';
+// ==================== HAMBURGER MENU ====================
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobMenu');
+  var overlay = document.getElementById('mobMenuOverlay');
+  var burger = document.getElementById('hamburger');
+  if (!menu) return;
+  var isOpen = menu.classList.contains('open');
+  menu.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  burger.classList.toggle('open', !isOpen);
 }
 
-var _origUpdateCartCount = updateCartCount;
-updateCartCount = function() {
-  _origUpdateCartCount();
-  updateMobCartBadge();
-};
+function closeMobileMenu() {
+  var menu = document.getElementById('mobMenu');
+  if (!menu) return;
+  menu.classList.remove('open');
+  document.getElementById('mobMenuOverlay').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+}
