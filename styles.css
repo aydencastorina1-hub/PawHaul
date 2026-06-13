@@ -1529,6 +1529,96 @@ footer {
 }
 
 
+/* ==================== NAV CENTER & SEARCH ==================== */
+.nav-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.nav-search-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--black);
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.nav-search-btn:active { background: var(--light-gray); }
+
+.nav-search-bar {
+  display: none;
+  position: fixed;
+  top: 60px; left: 0; right: 0;
+  background: white;
+  z-index: 901;
+  padding: 10px 4%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  flex-direction: column;
+  gap: 0;
+}
+.nav-search-bar.open { display: flex; }
+
+.nav-search-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--light-gray);
+  border-radius: 50px;
+  padding: 10px 16px;
+}
+.nav-search-input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--black);
+  outline: none;
+}
+.nav-search-input::placeholder { color: #aaa; }
+.nav-search-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--gray);
+  padding: 0 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.search-results {
+  border-top: 1px solid transparent;
+  margin-top: 0;
+}
+.search-results:not(:empty) { margin-top: 8px; border-top-color: #F0F0F0; }
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 4px;
+  cursor: pointer;
+  border-bottom: 1px solid #F5F5F5;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+  border-radius: 8px;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:active { background: var(--orange-pale); }
+.search-result-emoji { font-size: 28px; width: 36px; text-align: center; flex-shrink: 0; }
+.search-result-info { flex: 1; }
+.search-result-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--black); }
+.search-result-price { font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange); margin-top: 2px; }
+.search-no-results { padding: 16px 4px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; color: var(--gray); text-align: center; }
+
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
 .hamburger {
   display: none;
@@ -1556,31 +1646,54 @@ footer {
 .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-/* Hidden entirely on desktop; display:flex enabled in mobile media query */
+/* Right-slide panel — enabled via mobile media query */
 .mob-menu {
   display: none;
   position: fixed;
-  top: 60px; left: 0; right: 0;
+  top: 0; right: 0; bottom: 0;
+  width: 280px;
   background: white;
-  z-index: 899;
+  z-index: 1000;
   flex-direction: column;
-  padding: 6px 0 16px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.15);
   visibility: hidden;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: transform 0.25s ease, opacity 0.25s ease, visibility 0.25s;
+  transform: translateX(100%);
+  transition: transform 0.28s ease, visibility 0.28s;
   pointer-events: none;
+  overflow-y: auto;
 }
 .mob-menu.open {
   visibility: visible;
-  opacity: 1;
-  transform: translateY(0);
+  transform: translateX(0);
   pointer-events: all;
 }
+.mob-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 14px;
+  border-bottom: 2px solid #F0F0F0;
+}
+.mob-menu-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  color: var(--black);
+}
+.mob-menu-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--gray);
+  padding: 4px 8px;
+  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+.mob-menu-close:active { background: var(--light-gray); }
 .mob-menu a {
   display: block;
-  padding: 16px 5%;
+  padding: 18px 20px;
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
   font-size: 16px;
@@ -1597,8 +1710,9 @@ footer {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.32);
-  z-index: 898;
+  background: rgba(0,0,0,0.4);
+  z-index: 999;
+  backdrop-filter: blur(2px);
 }
 .mob-menu-overlay.open { display: block; }
 /* ==================== MOBILE (≤900px) ==================== */
@@ -1621,6 +1735,10 @@ footer {
   .logo-text { font-size: 21px; }
   .nav-links { display: none; }
   .nav-full { display: none; }
+  .nav-search-btn { display: flex; }
+  .nav-center { justify-content: center; }
+  .cart-btn-text { display: none; }
+  .cart-btn { padding: 8px 12px; border-radius: 50px; font-size: 18px; }
   .hamburger { display: flex; }
   .mob-menu { display: flex; }
 
@@ -1725,21 +1843,16 @@ footer {
   .stat-num { font-size: 30px; }
 
   /* ── REVIEWS ──────────────────────────────────────────── */
+  .reviews-section .reviews-grid-wrap::after { display: none; }
   .reviews-grid {
     display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    gap: 14px;
-    padding-bottom: 12px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    flex-direction: column;
+    gap: 16px;
   }
-  .reviews-grid::-webkit-scrollbar { display: none; }
   .review-card {
-    min-width: 84vw;
-    flex-shrink: 0;
-    scroll-snap-align: start;
+    min-width: unset;
+    width: 100%;
+    flex-shrink: unset;
     padding: 20px;
   }
 
@@ -1807,8 +1920,6 @@ footer {
   /* ── TOAST ────────────────────────────────────────────── */
   .toast { left: 16px; right: 16px; bottom: 82px; }
 
-  /* ── STICKY ATC BAR ───────────────────────────────────── */
-  #page-product { padding-bottom: 90px !important; }
 }
 
 /* ==================== EXTRA SMALL (≤480px / iPhone 14) ==================== */
@@ -1845,46 +1956,3 @@ footer {
   .collection-card:active { transform: scale(0.97); border-color: var(--orange); }
 }
 
-/* STICKY ADD TO CART BAR (mobile product page) */
-.sticky-atc-bar {
-  display: none;
-  position: fixed;
-  bottom: 16px; left: 0; right: 0;
-  background: white;
-  border-top: 1px solid #F0F0F0;
-  padding: 10px 16px;
-  gap: 10px;
-  z-index: 200;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-  align-items: center;
-}
-
-.sticky-atc-name {
-  font-weight: 800;
-  font-size: 13px;
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sticky-atc-price {
-  font-family: 'Fredoka One', cursive;
-  font-size: 20px;
-  color: var(--orange);
-  white-space: nowrap;
-}
-
-.sticky-atc-btn {
-  background: var(--orange);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
-  -webkit-tap-highlight-color: transparent;
-}

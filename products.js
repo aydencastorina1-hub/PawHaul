@@ -246,11 +246,6 @@ function showProduct(id) {
   document.getElementById('detailThumbs').innerHTML = [0,1,2,3].map((i) =>
     `<div class="thumb ${i===0?'active':''}" onclick="selectThumb(this)">${thumbContent}</div>`).join('');
 
-  // Populate sticky ATC bar
-  var sName = document.getElementById('stickyAtcName');
-  var sPrice = document.getElementById('stickyAtcPrice');
-  if (sName) sName.textContent = currentProduct.name;
-  if (sPrice) sPrice.textContent = '$' + currentProduct.price.toFixed(2);
   showPage('product');
 }
 

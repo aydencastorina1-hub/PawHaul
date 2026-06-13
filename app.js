@@ -461,8 +461,7 @@ var _origShowPage = showPage;
 showPage = function(page, filter) {
   _origShowPage(page, filter);
   closeMobileMenu();
-  var atcBar = document.getElementById('stickyAtcBar');
-  if (atcBar) atcBar.style.display = (page === 'product' && window.innerWidth <= 900) ? 'flex' : 'none';
+  closeSearch();
 };
 
 // ==================== HAMBURGER MENU ====================
@@ -472,6 +471,7 @@ function toggleMobileMenu() {
   var burger = document.getElementById('hamburger');
   if (!menu) return;
   var isOpen = menu.classList.contains('open');
+  if (!isOpen) closeSearch();
   menu.classList.toggle('open', !isOpen);
   overlay.classList.toggle('open', !isOpen);
   burger.classList.toggle('open', !isOpen);
@@ -483,4 +483,54 @@ function closeMobileMenu() {
   menu.classList.remove('open');
   document.getElementById('mobMenuOverlay').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
+}
+
+// ==================== SEARCH ====================
+function toggleSearch() {
+  var bar = document.getElementById('navSearchBar');
+  if (!bar) return;
+  if (bar.classList.contains('open')) {
+    closeSearch();
+  } else {
+    bar.classList.add('open');
+    closeMobileMenu();
+    setTimeout(function() {
+      var inp = document.getElementById('navSearchInput');
+      if (inp) inp.focus();
+    }, 80);
+  }
+}
+
+function closeSearch() {
+  var bar = document.getElementById('navSearchBar');
+  if (!bar) return;
+  bar.classList.remove('open');
+  var inp = document.getElementById('navSearchInput');
+  if (inp) inp.value = '';
+  var res = document.getElementById('searchResults');
+  if (res) res.innerHTML = '';
+}
+
+function doSearch(val) {
+  var res = document.getElementById('searchResults');
+  if (!res) return;
+  var q = (val || '').trim().toLowerCase();
+  if (!q) { res.innerHTML = ''; return; }
+  var matches = (typeof products !== 'undefined' ? products : []).filter(function(p) {
+    return p.name.toLowerCase().indexOf(q) !== -1 ||
+           (p.desc && p.desc.toLowerCase().indexOf(q) !== -1);
+  });
+  if (matches.length === 0) {
+    res.innerHTML = '<div class="search-no-results">No results found.</div>';
+    return;
+  }
+  res.innerHTML = matches.map(function(p) {
+    return '<div class="search-result-item" onclick="closeSearch();showProduct(' + p.id + ')">' +
+      '<span class="search-result-emoji">' + p.emoji + '</span>' +
+      '<div class="search-result-info">' +
+        '<div class="search-result-name">' + p.name + '</div>' +
+        '<div class="search-result-price">$' + p.price.toFixed(2) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
 }
