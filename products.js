@@ -1,7 +1,7 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "PawHaul Walk Kit 2-in-1", price: 24.99, was: 34.99, emoji: "🧴", image: "", category: "walk",
+    id: 1, name: "PawHaul Walk Kit 2-in-1", price: 24.99, was: 34.99, emoji: "🧴", image: "", category: "water",
     badge: "🔥 Best Seller", badgeClass: "", reviews: 127,
     desc: "The ultimate walk companion. One bottle that carries both fresh water AND dry food for your dog — grab one thing and walk out the door. The water side features a leak-proof flip-out drinking bowl, and the sealed food compartment keeps kibble or treats fresh for hours. Lightweight enough to clip to any bag or belt. Perfect for walks, hikes, road trips, and every adventure.",
     sizes: ["350ml / 12oz", "550ml / 18oz"],
@@ -20,7 +20,7 @@ var products = [
     whatsInBox: "1× Walk Kit 2-in-1 bottle · 1× carabiner clip · 1× cleaning brush"
   },
   {
-    id: 2, name: "Leash With Poop Bag Dispenser", price: 19.99, was: 27.99, emoji: "🦮", image: "", category: "walk",
+    id: 2, name: "Leash With Poop Bag Dispenser", price: 19.99, was: 27.99, emoji: "🦮", image: "", category: "leash",
     badge: "⭐ New", badgeClass: "badge-new", reviews: 84,
     desc: "A full-featured dog leash with a poop bag dispenser built right into the handle — so you never leave home without bags again. No separate clip-ons, no fumbling. Pull a bag, do the job, keep walking. The 360° reflective stitching keeps you both visible on early morning and evening walks, and the padded handle makes long walks comfortable.",
     sizes: ["4ft / Standard", "5ft / Heavy Duty"],
@@ -39,7 +39,7 @@ var products = [
     whatsInBox: "1× leash with built-in dispenser · 1× starter roll of poop bags (15 bags)"
   },
   {
-    id: 3, name: "Collapsible Travel Bowl", price: 12.99, was: 17.99, emoji: "🥣", image: "", category: "walk",
+    id: 3, name: "Collapsible Travel Bowl", price: 12.99, was: 17.99, emoji: "🥣", image: "", category: "water",
     badge: "💧 Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "A food-grade silicone bowl that folds completely flat and fits in any pocket or bag. Pop it open in seconds when your dog needs water or food on the go. The included carabiner clip keeps it attached to your bag so you never leave it behind. Works for water and food — dishwasher safe and built to last.",
     sizes: ["Small — 350ml / 12oz", "Large — 700ml / 24oz"],
@@ -58,7 +58,7 @@ var products = [
     whatsInBox: "1× collapsible silicone bowl · 1× stainless steel carabiner clip"
   },
   {
-    id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "walk",
+    id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "safety",
     badge: "🔒 Safety", badgeClass: "badge-safety", reviews: 38,
     desc: "A secure waterproof silicone holder that keeps your Apple AirTag attached to your dog's collar at all times — so you always know where they are. The twist-lock closure holds the AirTag firmly in place through daily walks, rain, mud, and rough play. Compatible with Apple AirTag 1st and 2nd generation. Fits any standard collar up to 1.5\" wide.",
     sizes: ["Universal — fits all standard collars"],
@@ -77,7 +77,7 @@ var products = [
     whatsInBox: "1× AirTag silicone collar holder (Apple AirTag not included)"
   },
   {
-    id: 5, name: "Hands-Free Running Leash", price: 22.99, was: 29.99, emoji: "🏃", image: "", category: "walk",
+    id: 5, name: "Hands-Free Running Leash", price: 22.99, was: 29.99, emoji: "🏃", image: "", category: "leash",
     badge: "🏃 Active", badgeClass: "badge-active", reviews: 55,
     desc: "Run, jog, hike, or walk completely hands-free. The padded adjustable waist belt sits comfortably at your hips and the bungee section absorbs your dog's sudden lunges so you never lose your stride. Built-in zip pocket keeps your phone safe, and the side holder fits most water bottles. The quick-release buckle lets you detach instantly if needed.",
     sizes: ["One Size — waist 28\" to 48\""],
@@ -96,7 +96,7 @@ var products = [
     whatsInBox: "1× waist belt · 1× bungee leash tether · 1× poop bag holder attachment"
   },
   {
-    id: 6, name: "Reflective Safety Collar", price: 16.99, was: 21.99, emoji: "✨", image: "", category: "walk",
+    id: 6, name: "Reflective Safety Collar", price: 16.99, was: 21.99, emoji: "✨", image: "", category: "safety",
     badge: "🌙 Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "A tough everyday collar with 360° reflective strips that make your dog visible from up to 500ft in the dark — perfect for early morning walks, evening runs, and everything in between. Built from heavy-duty nylon that holds up through rain, mud, and daily wear. The quick-release buckle makes it easy on and off, and the padded inner lining keeps your dog comfortable all day.",
     sizes: ["S — neck 8\"–12\"", "M — neck 12\"–16\"", "L — neck 16\"–20\"", "XL — neck 20\"–26\""],
@@ -144,13 +144,14 @@ function showPage(page, filter) {
 
   if (page === 'home') renderHomeProducts();
   if (page === 'shop') {
-    renderShopProducts(filter || 'all');
-    if (filter) {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      var map = { walk: 1, car: 2, treats: 3, home: 4 };
-      if (map[filter]) {
-        document.querySelectorAll('.filter-btn')[map[filter]].classList.add('active');
-      }
+    var f = filter || 'all';
+    renderShopProducts(f);
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    var map = { all: 0, water: 1, leash: 2, safety: 3 };
+    var idx = map[f];
+    if (idx !== undefined) {
+      var btns = document.querySelectorAll('.filter-btn');
+      if (btns[idx]) btns[idx].classList.add('active');
     }
   }
   if (page === 'cart') renderCart();
@@ -324,7 +325,7 @@ function renderWishlist() {
   var container = document.getElementById('wishlistContent');
   if (!container) return;
   if (wishlistItems.length === 0) {
-    container.innerHTML = '<div class="empty-cart"><span class="empty-icon">nothing yet</span><h2>Your wishlist is empty!</h2><p>Heart a product to save it here</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
+    container.innerHTML = '<div class="empty-cart"><span class="empty-icon">🐾</span><h2>Your pup\'s missing out!</h2><p>Save your favorite walk gear here — tap the heart on any product.</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
     return;
   }
   container.innerHTML = '<div class="products-grid">' + wishlistItems.map(function(p) {
@@ -432,14 +433,18 @@ function toggleFaq(el) {
   el.parentElement.classList.toggle('open');
 }
 
-function showToast(msg) {
+function showToast(msg, duration) {
   try {
     var toast = document.getElementById('toast');
     if (!toast) return;
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(function() { toast.classList.remove('show'); }, 2800);
+    setTimeout(function() { toast.classList.remove('show'); }, duration || 2800);
   } catch(e) { return; }
+}
+
+function showTrackOrder() {
+  showToast('📦 Check your confirmation email for your tracking number. Need help? Email pawhaulsupport@gmail.com', 6000);
 }
 
 function submitEmail() {

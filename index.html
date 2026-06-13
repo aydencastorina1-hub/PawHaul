@@ -31,11 +31,11 @@
     <li><a onclick="showPage('contact')">Contact</a></li>
   </ul>
   <div class="nav-right">
-    <button onclick="showPage('wishlist')" style="background:none;border:none;cursor:pointer;position:relative;padding:8px;font-size:22px;line-height:1;" title="Wishlist">&#10084;&#65039;<span id="wishlistCount" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--orange);color:white;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:900;align-items:center;justify-content:center;font-family:Nunito,sans-serif;">0</span></button>
-    <button class="cart-btn" onclick="showPage('cart')">&#128722; Cart<span class="cart-count" id="cartCount">0</span></button>
     <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
+    <button onclick="showPage('wishlist')" style="background:none;border:none;cursor:pointer;position:relative;padding:8px;font-size:22px;line-height:1;" title="Wishlist">&#10084;&#65039;<span id="wishlistCount" style="display:none;position:absolute;top:-4px;right:-4px;background:var(--orange);color:white;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:900;align-items:center;justify-content:center;font-family:Nunito,sans-serif;">0</span></button>
+    <button class="cart-btn" onclick="showPage('cart')">&#128722; Cart<span class="cart-count" id="cartCount">0</span></button>
   </div>
 </nav>
 
@@ -45,8 +45,6 @@
   <a onclick="showPage('shop');closeMobileMenu()">&#128717; Shop Walk Gear</a>
   <a onclick="showPage('about');closeMobileMenu()">&#128062; Our Story</a>
   <a onclick="showPage('contact');closeMobileMenu()">&#9993; Contact</a>
-  <a onclick="showPage('wishlist');closeMobileMenu()">&#10084; Wishlist</a>
-  <a onclick="showPage('cart');closeMobileMenu()">&#128722; Cart</a>
 </div>
 <div class="mob-menu-overlay" id="mobMenuOverlay" onclick="closeMobileMenu()"></div>
 
@@ -90,21 +88,26 @@
       <h2 class="section-title">Everything You Need For <span>The Walk</span></h2>
       <p class="section-sub" style="margin: 0 auto; max-width: 480px;">Every product we sell is built specifically for walks with your dog</p>
     </div>
-    <div class="collections-grid" style="grid-template-columns: repeat(3, 1fr)" id="collectionsGrid">
-      <div class="collection-card" onclick="showPage('shop')">
+    <div class="collections-grid" style="grid-template-columns: repeat(2, 1fr)" id="collectionsGrid">
+      <div class="collection-card" onclick="showPage('shop','water')">
         <span class="col-emoji">💧</span>
         <div class="col-name">Water & Food</div>
         <div class="col-sub">Walk kits & collapsible bowls</div>
       </div>
-      <div class="collection-card" onclick="showPage('shop')">
+      <div class="collection-card" onclick="showPage('shop','leash')">
         <span class="col-emoji">🦮</span>
         <div class="col-name">Leashes & Control</div>
         <div class="col-sub">Leashes, hands-free & bag dispensers</div>
       </div>
-      <div class="collection-card" onclick="showPage('shop')">
+      <div class="collection-card" onclick="showPage('shop','safety')">
         <span class="col-emoji">🔒</span>
         <div class="col-name">Safety & Visibility</div>
         <div class="col-sub">Reflective collars & AirTag holders</div>
+      </div>
+      <div class="collection-card" onclick="showPage('shop','all')">
+        <span class="col-emoji">🐾</span>
+        <div class="col-name">All Walk Gear</div>
+        <div class="col-sub">Browse everything we make</div>
       </div>
     </div>
   </section>
@@ -232,7 +235,7 @@
         </div>
       </div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop')">Water & Food</a></li><li><a onclick="showPage('shop')">Leashes</a></li><li><a onclick="showPage('shop')">Safety Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showToast('Check the confirmation email we sent you for your tracking number. Need help? Email pawhaulsupport@gmail.com')" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom">
@@ -251,6 +254,9 @@
     </div>
     <div class="shop-filters">
       <button class="filter-btn active" onclick="filterProducts('all', this)">All Walk Gear</button>
+      <button class="filter-btn" onclick="filterProducts('water', this)">Water & Food</button>
+      <button class="filter-btn" onclick="filterProducts('leash', this)">Leashes</button>
+      <button class="filter-btn" onclick="filterProducts('safety', this)">Safety Gear</button>
     </div>
     <div class="shop-grid" id="shopProducts"></div>
   </div>
@@ -258,7 +264,7 @@
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn">📸</a><a class="social-btn">🎵</a><a class="social-btn">👍</a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop')">Water & Food</a></li><li><a onclick="showPage('shop')">Leashes</a></li><li><a onclick="showPage('shop')">Safety Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showToast('Check your confirmation email for your tracking number!')" style="cursor:pointer;">Track Order</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> 🐾</p></div>

@@ -1808,7 +1808,6 @@ footer {
   .toast { left: 16px; right: 16px; bottom: 82px; }
 
   /* ── STICKY ATC BAR ───────────────────────────────────── */
-  .sticky-atc-bar { display: flex !important; }
   #page-product { padding-bottom: 90px !important; }
 }
 
