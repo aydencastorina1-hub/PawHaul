@@ -558,8 +558,8 @@ function initCarousel(trackId, prevId, nextId) {
     prev.classList.toggle('disabled', track.scrollLeft <= 4);
     next.classList.toggle('disabled', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
   }
-  prev.addEventListener('click', function() { track.scrollBy({ left: -scrollAmt(), behavior: 'smooth' }); });
-  next.addEventListener('click', function() { track.scrollBy({ left: scrollAmt(), behavior: 'smooth' }); });
+  prev.addEventListener('click', function() { if (prev.classList.contains('disabled')) return; track.scrollBy({ left: -scrollAmt(), behavior: 'smooth' }); });
+  next.addEventListener('click', function() { if (next.classList.contains('disabled')) return; track.scrollBy({ left: scrollAmt(), behavior: 'smooth' }); });
   track.addEventListener('scroll', updateArrows, { passive: true });
   updateArrows();
 }

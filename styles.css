@@ -2034,7 +2034,10 @@ footer {
   }
   .carousel-prev { left: -6px; }
   .carousel-next { right: -6px; }
-  .carousel-btn.disabled { opacity: 0.3; pointer-events: none; }
+  .carousel-btn.disabled { opacity: 0.3; cursor: default; }
+  #homeProducts .product-card:last-child,
+  #revCarousel .review-card:last-child { scroll-snap-align: end; }
+  #backToTop { display: none !important; }
 
 }
 
