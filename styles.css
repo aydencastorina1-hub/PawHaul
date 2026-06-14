@@ -1737,6 +1737,9 @@ footer {
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
+  /* ── SMOOTH SCROLLING ─────────────────────────────────── */
+  html { scroll-behavior: smooth; }
+
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari shows the html/body background when you pull past the top or bottom.
      Deep navy (#0d0d1a) matches the footer so there is no white gap below it on overscroll. */
