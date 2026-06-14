@@ -1800,7 +1800,7 @@ footer {
   }
   /* Center the "Dog Walk Essentials" badge in the space between the hero top and the headline.
      Capped so the centered hero block doesn't push the bottom CTA buttons past the hero edge. */
-  #heroSection > div:last-child > div:nth-child(1) { margin-top: 28px; }
+  #heroSection > div:last-child > div:nth-child(1) { margin-top: 12px; }
   #heroSection > div:nth-child(2) {
     background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%) !important;
   }
