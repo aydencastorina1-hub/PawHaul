@@ -1736,6 +1736,12 @@ footer {
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
+  /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
+  /* iOS Safari shows the html/body background when you pull past the top or bottom.
+     Navy kills the white gap and matches the navy nav (top) + deep-navy footer (bottom)
+     on every page. Single-page app = one html/body bg drives both bounce edges. */
+  html, body { background-color: #1a1a2e; }
+
   /* ── ANNOUNCE BAR ─────────────────────────────────────── */
   .announce-bar { display: none; }
 
@@ -1775,8 +1781,10 @@ footer {
   .mob-menu { display: flex; }
 
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
-  /* All pages need padding-top to clear the 60px fixed nav */
-  .page { padding-top: 60px; padding-bottom: 20px; }
+  /* All pages need padding-top to clear the 60px fixed nav.
+     min-height fills the viewport so a short page's own background covers the screen
+     and the navy body only shows on true overscroll (no navy gap inside a light page). */
+  .page { padding-top: 60px; padding-bottom: 20px; min-height: 100vh; }
   /* Home: push the hero below the 60px fixed nav so the top is never cut off */
   #page-home { padding-top: 60px; }
 
