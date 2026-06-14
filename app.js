@@ -557,3 +557,23 @@ document.addEventListener('DOMContentLoaded', function() {
   // Safety net: whatever happens, reveal everything after 1.2s so nothing can stay hidden.
   setTimeout(revealAll, 1200);
 });
+
+// ==================== MOBILE SPLASH SCREEN (first load only) ====================
+// Shows only on mobile (<=900px) and only once per session. Fade in 0.3s, stay 1.2s, fade out 0.3s.
+(function() {
+  try {
+    if (window.innerWidth > 900) return;                       // mobile only
+    if (sessionStorage.getItem('pawhaulSplashSeen')) return;   // first load only
+    var s = document.getElementById('splash');
+    if (!s) return;
+    sessionStorage.setItem('pawhaulSplashSeen', '1');
+    s.classList.add('active');                                 // display:flex, opacity 0
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() { s.classList.add('show'); });  // fade in (0.3s)
+    });
+    setTimeout(function() {
+      s.classList.remove('show');                              // fade out (0.3s)
+      setTimeout(function() { s.classList.add('done'); }, 320);
+    }, 1500);                                                  // 0.3s fade-in + 1.2s stay
+  } catch (e) {}
+})();

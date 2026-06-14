@@ -46,6 +46,14 @@ body {
 .page { display: none; animation: pageIn 0.4s ease; }
 .page.active { display: block; }
 
+/* SPLASH — mobile-only loading screen. Hidden by default so desktop NEVER shows it;
+   the visible styling lives entirely inside the mobile (max-width:900px) breakpoint. */
+.splash { display: none; }
+@keyframes splashPaw {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1736,6 +1744,41 @@ footer {
   /* ── ANNOUNCE BAR ─────────────────────────────────────── */
   .announce-bar { display: none; }
 
+  /* ── SPLASH SCREEN (mobile first-load only) ───────────── */
+  .splash.active {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    background: #1a1a2e;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .splash.active.show { opacity: 1; }
+  .splash.done { display: none !important; }
+  .splash-inner { text-align: center; padding: 0 24px; }
+  .splash-paw {
+    font-size: 76px;
+    line-height: 1;
+    margin-bottom: 16px;
+    animation: splashPaw 1.4s ease-in-out infinite;
+  }
+  .splash-logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: 40px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .splash-logo span { color: var(--orange); }
+  .splash-tag {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.78);
+  }
+
   /* ── NAV: fixed small bar at the very top ────────────── */
   nav {
     position: fixed;
@@ -1746,7 +1789,17 @@ footer {
     flex-wrap: nowrap;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   }
-  .logo-circle { width: 36px; height: 36px; font-size: 15px; }
+  /* Restore the paw badge in the nav (mobile only — desktop keeps it hidden) */
+  .logo-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    background: var(--black);
+    border-radius: 50%;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
   .logo-text { font-size: 21px; }
   .nav-links { display: none; }
   .nav-full { display: none; }
@@ -1764,8 +1817,8 @@ footer {
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
   /* All pages need padding-top to clear the 60px fixed nav */
   .page { padding-top: 60px; padding-bottom: 20px; }
-  /* Home: hero image bleeds under the nav for an immersive app feel */
-  #page-home { padding-top: 0; }
+  /* Home: push the hero below the 60px fixed nav so the top is never cut off */
+  #page-home { padding-top: 60px; }
 
   /* ── HERO (image background) ──────────────────────────── */
   #heroSection { height: min(460px, 68vh) !important; }
@@ -1959,6 +2012,26 @@ footer {
   .mission-section { padding: 36px 5%; }
   .stat-num { font-size: 28px; }
   .about-hero { padding: 56px 5%; }
+
+  /* All 4 category pills fit on one line — no horizontal scrolling on iPhone */
+  .shop-filters {
+    overflow-x: visible;
+    flex-wrap: nowrap;
+    gap: 5px;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .filter-btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 4px;
+    font-size: clamp(9px, 2.7vw, 12px);
+    min-height: 40px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 /* Disable hover transform effects on touch devices */
