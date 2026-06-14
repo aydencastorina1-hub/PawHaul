@@ -7,13 +7,41 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
+  <style>
+    /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
+    body { visibility: hidden; }
+    body.app-ready { visibility: visible; }
+    #splash {
+      visibility: visible;
+      position: fixed;
+      inset: 0;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a2e;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+    #splash.fade-out { opacity: 0; }
+    #splash.done { display: none !important; }
+    #splash .splash-inner { text-align: center; padding: 0 24px; }
+    #splash .splash-paw { font-size: 76px; line-height: 1; margin-bottom: 16px; animation: splashPaw 1.4s ease-in-out infinite; }
+    #splash .splash-logo { font-family: 'Fredoka One', cursive; font-size: 40px; color: #fff; margin-bottom: 10px; }
+    #splash .splash-logo span { color: #E8630A; }
+    #splash .splash-tag { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.78); }
+    @keyframes splashPaw { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+  </style>
+  <!-- If JS is disabled, never leave the site hidden. -->
+  <noscript><style>body { visibility: visible !important; } #splash { display: none !important; }</style></noscript>
 </head>
 <body>
 
 <div class="cursor" id="cursor"></div>
 <div class="toast" id="toast">🛒 Added to cart!</div>
 
-<!-- MOBILE SPLASH (first load only) -->
+<!-- SPLASH SCREEN — shows on every load/reload, mobile and desktop -->
 <div class="splash" id="splash">
   <div class="splash-inner">
     <div class="splash-paw">🐾</div>
@@ -21,6 +49,29 @@
     <div class="splash-tag">Where Good Dogs Gear Up 🐾</div>
   </div>
 </div>
+<script>
+  // Splash controller — runs early and independently of app.js.
+  // Holds the splash ~1.4s, then reveals the site AS the splash fades out.
+  (function () {
+    var revealed = false;
+    function reveal() {
+      if (revealed) return;
+      revealed = true;
+      try {
+        document.body.classList.add('app-ready');          // un-hide the site
+        var s = document.getElementById('splash');
+        if (s) {
+          s.classList.add('fade-out');                     // fade splash out (0.4s)
+          setTimeout(function () { if (s) s.classList.add('done'); }, 450);
+        }
+      } catch (e) {
+        try { document.body.classList.add('app-ready'); } catch (_) {}
+      }
+    }
+    setTimeout(reveal, 1400);   // splash stays ~1.2s after first paint, then fades out
+    setTimeout(reveal, 4000);   // hard safety net — never leave the site hidden
+  })();
+</script>
 
 <!-- ANNOUNCE BAR -->
 <div class="announce-bar">

@@ -46,13 +46,8 @@ body {
 .page { display: none; animation: pageIn 0.4s ease; }
 .page.active { display: block; }
 
-/* SPLASH — mobile-only loading screen. Hidden by default so desktop NEVER shows it;
-   the visible styling lives entirely inside the mobile (max-width:900px) breakpoint. */
-.splash { display: none; }
-@keyframes splashPaw {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.12); }
-}
+/* SPLASH screen styling lives in inline critical CSS in index.html <head>
+   (so it paints first with no flash). @keyframes splashPaw is defined there too. */
 
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(16px); }
@@ -1743,41 +1738,6 @@ footer {
 
   /* ── ANNOUNCE BAR ─────────────────────────────────────── */
   .announce-bar { display: none; }
-
-  /* ── SPLASH SCREEN (mobile first-load only) ───────────── */
-  .splash.active {
-    display: flex;
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    align-items: center;
-    justify-content: center;
-    background: #1a1a2e;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  .splash.active.show { opacity: 1; }
-  .splash.done { display: none !important; }
-  .splash-inner { text-align: center; padding: 0 24px; }
-  .splash-paw {
-    font-size: 76px;
-    line-height: 1;
-    margin-bottom: 16px;
-    animation: splashPaw 1.4s ease-in-out infinite;
-  }
-  .splash-logo {
-    font-family: 'Fredoka One', cursive;
-    font-size: 40px;
-    color: #fff;
-    margin-bottom: 10px;
-  }
-  .splash-logo span { color: var(--orange); }
-  .splash-tag {
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.78);
-  }
 
   /* ── NAV: fixed small bar at the very top ────────────── */
   nav {
