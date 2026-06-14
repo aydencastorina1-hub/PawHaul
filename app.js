@@ -20,11 +20,11 @@ function addMsg(text, isUser) {
   row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;' + (isUser ? 'flex-direction:row-reverse;' : '');
 
   var av = document.createElement('div');
-  av.style.cssText = 'width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:800;' + (isUser ? 'background:#1A1A1A;color:white;' : 'background:#FF6B2B;color:white;');
+  av.style.cssText = 'width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;font-weight:800;' + (isUser ? 'background:#1a1a2e;color:white;' : 'background:#E8630A;color:white;');
   av.textContent = isUser ? 'You' : String.fromCodePoint(128062);
 
   var bub = document.createElement('div');
-  bub.style.cssText = 'padding:9px 13px;max-width:210px;font-size:13px;font-weight:600;line-height:1.5;' + (isUser ? 'background:#FF6B2B;color:white;border-radius:14px 14px 4px 14px;' : 'background:white;color:#1A1A1A;border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);');
+  bub.style.cssText = 'padding:9px 13px;max-width:210px;font-size:13px;font-weight:600;line-height:1.5;' + (isUser ? 'background:#E8630A;color:white;border-radius:14px 14px 4px 14px;' : 'background:white;color:#1a1a2e;border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);');
   bub.textContent = text;
 
   row.appendChild(av);
@@ -81,7 +81,7 @@ function sendChat() {
   var typing = document.createElement("div");
   typing.id = "typing";
   typing.style.cssText = "display:flex;gap:8px;align-items:center;padding:4px 0;";
-  typing.innerHTML = "<div style='width:30px;height:30px;border-radius:50%;background:#FF6B2B;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='16' height='16' fill='white'><ellipse cx='50' cy='67' rx='20' ry='16'/><ellipse cx='27' cy='47' rx='9' ry='12'/><ellipse cx='42' cy='35' rx='9' ry='12'/><ellipse cx='58' cy='35' rx='9' ry='12'/><ellipse cx='73' cy='47' rx='9' ry='12'/></svg></div><div style='background:white;border-radius:14px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:4px;align-items:center;'><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0s'></span><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0.2s'></span><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0.4s'></span></div>";
+  typing.innerHTML = "<div style='width:30px;height:30px;border-radius:50%;background:#E8630A;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='16' height='16' fill='white'><ellipse cx='50' cy='67' rx='20' ry='16'/><ellipse cx='27' cy='47' rx='9' ry='12'/><ellipse cx='42' cy='35' rx='9' ry='12'/><ellipse cx='58' cy='35' rx='9' ry='12'/><ellipse cx='73' cy='47' rx='9' ry='12'/></svg></div><div style='background:white;border-radius:14px;padding:10px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:4px;align-items:center;'><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0s'></span><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0.2s'></span><span style='width:7px;height:7px;background:#ddd;border-radius:50%;display:inline-block;animation:bounce 1s infinite 0.4s'></span></div>";
   msgs.appendChild(typing);
   msgs.scrollTop = msgs.scrollHeight;
 
@@ -516,16 +516,17 @@ function doSearch(val) {
   if (!res) return;
   var q = (val || '').trim().toLowerCase();
   if (!q) { res.innerHTML = ''; return; }
-  var matches = (typeof products !== 'undefined' ? products : []).filter(function(p) {
-    return p.name.toLowerCase().indexOf(q) !== -1 ||
-           (p.desc && p.desc.toLowerCase().indexOf(q) !== -1);
+  // Search is restricted to the 6 PawHaul products, matched by product name only.
+  var list = (typeof products !== 'undefined') ? products : [];
+  var matches = list.filter(function(p) {
+    return p.name.toLowerCase().indexOf(q) !== -1;
   });
   if (matches.length === 0) {
     res.innerHTML = '<div class="search-no-results">No results found.</div>';
     return;
   }
   res.innerHTML = matches.map(function(p) {
-    return '<div class="search-result-item" onclick="closeSearch();showProduct(' + p.id + ')">' +
+    return '<div class="search-result-item" onclick="goToProduct(' + p.id + ')">' +
       '<span class="search-result-emoji">' + p.emoji + '</span>' +
       '<div class="search-result-info">' +
         '<div class="search-result-name">' + p.name + '</div>' +
@@ -534,3 +535,25 @@ function doSearch(val) {
     '</div>';
   }).join('');
 }
+
+// ==================== SECTION REVEAL (subtle fade-up on scroll) ====================
+// The .reveal class is added by JS, so if anything fails no content is ever hidden.
+// A guaranteed fallback timer also un-hides everything, so content can NEVER get stuck invisible.
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = '.collections-section, .bestsellers, .why-section, .mission-section, .reviews-section, .faq-section, .email-section';
+  var els = document.querySelectorAll(sel);
+  function revealAll() { els.forEach(function(el) { el.classList.add('reveal-in'); }); }
+
+  if (!('IntersectionObserver' in window)) { return; } // no reveal class added -> sections stay fully visible
+
+  els.forEach(function(el) { el.classList.add('reveal'); });
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('reveal-in'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  els.forEach(function(el) { obs.observe(el); });
+
+  // Safety net: whatever happens, reveal everything after 1.2s so nothing can stay hidden.
+  setTimeout(revealAll, 1200);
+});

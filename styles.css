@@ -1,10 +1,14 @@
 ﻿:root {
-  --orange: #FF6B2B;
-  --orange-light: #FF8C55;
-  --orange-pale: #FFEEE3;
-  --black: #1A1A1A;
+  --orange: #E8630A;
+  --orange-light: #FF7A2E;
+  --orange-pale: #FCEADD;
+  --black: #1a1a2e;        /* repurposed as primary navy */
+  --navy: #1a1a2e;
+  --navy-2: #16213e;
+  --navy-deep: #0d0d1a;
   --gray: #6B6B6B;
-  --light-gray: #FAF8F5;
+  --light-gray: #f8f6f2;   /* off-white for light sections */
+  --offwhite: #f8f6f2;
   --white: #FFFFFF;
   --green: #22C55E;
   --radius: 20px;
@@ -77,7 +81,7 @@ body {
 
 /* NAVBAR */
 nav {
-  background: white;
+  background: var(--navy);
   padding: 14px 5%;
   display: flex;
   align-items: center;
@@ -85,7 +89,7 @@ nav {
   position: sticky;
   top: 0;
   z-index: 500;
-  box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.25);
 }
 
 .logo {
@@ -95,23 +99,14 @@ nav {
   cursor: pointer;
 }
 
-.logo-circle {
-  width: 46px; height: 46px;
-  background: var(--black);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  transition: transform 0.3s ease;
-}
-
-.logo:hover .logo-circle { transform: rotate(-15deg) scale(1.1); }
+/* Logo is now text-only — circle removed for a clean Ruffwear-style nav.
+   No tilt/rotation on hover or tap; the logo stays completely still. */
+.logo-circle { display: none; }
 
 .logo-text {
   font-family: 'Fredoka One', cursive;
   font-size: 24px;
-  color: var(--black);
+  color: #fff;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -125,7 +120,7 @@ nav {
 
 .nav-links a {
   text-decoration: none;
-  color: var(--black);
+  color: #fff;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -164,7 +159,7 @@ nav {
 .cart-btn:hover {
   background: var(--orange-light);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255,107,43,0.35);
+  box-shadow: 0 6px 20px rgba(232,99,10,0.35);
 }
 
 .cart-count {
@@ -193,7 +188,7 @@ nav {
   border: none;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 8px 24px rgba(255,107,43,0.3);
+  box-shadow: 0 8px 24px rgba(232,99,10,0.3);
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -202,7 +197,7 @@ nav {
 
 .btn-primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(255,107,43,0.4);
+  box-shadow: 0 12px 32px rgba(232,99,10,0.4);
   background: var(--orange-light);
 }
 
@@ -444,14 +439,14 @@ nav {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent 60%, rgba(255,107,43,0.04) 100%);
+  background: linear-gradient(135deg, transparent 60%, rgba(232,99,10,0.04) 100%);
   pointer-events: none;
 }
 
 .collection-card:hover {
   transform: translateY(-8px);
   border-color: var(--orange);
-  box-shadow: 0 20px 40px rgba(255,107,43,0.15);
+  box-shadow: 0 20px 40px rgba(232,99,10,0.15);
 }
 
 .col-emoji {
@@ -471,8 +466,10 @@ nav {
 
 .col-sub { font-size: 12px; color: var(--gray); font-weight: 600; }
 
-/* BESTSELLERS */
-.bestsellers { padding: 80px 5%; background: white; }
+/* BESTSELLERS (navy products section) */
+.bestsellers { padding: 80px 5%; background: var(--navy); }
+.bestsellers .section-title { color: #fff; }
+.bestsellers .section-title span { color: var(--orange); }
 
 .products-header {
   display: flex;
@@ -614,7 +611,7 @@ nav {
 }
 
 .why-card:hover {
-  background: rgba(255,107,43,0.12);
+  background: rgba(232,99,10,0.12);
   border-color: var(--orange);
   border-top: 3px solid var(--orange);
   transform: translateY(-6px);
@@ -685,9 +682,11 @@ nav {
 .stat-num { font-family: 'Fredoka One', cursive; font-size: 38px; color: white; display: block; }
 .stat-label { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 700; }
 
-/* REVIEWS */
-.reviews-section { padding: 80px 5%; background: var(--light-gray); }
+/* REVIEWS (navy section, white cards) */
+.reviews-section { padding: 80px 5%; background: var(--navy); }
 .reviews-header { text-align: center; margin-bottom: 44px; }
+.reviews-section .section-title { color: #fff; }
+.reviews-section .section-title span { color: var(--orange); }
 
 .reviews-section .reviews-grid-wrap {
   position: relative;
@@ -699,7 +698,7 @@ nav {
     position: absolute;
     top: 0; right: 0; bottom: 12px;
     width: 48px;
-    background: linear-gradient(to left, var(--light-gray) 0%, transparent 100%);
+    background: linear-gradient(to left, var(--navy) 0%, transparent 100%);
     pointer-events: none;
     z-index: 1;
   }
@@ -880,7 +879,7 @@ nav {
   white-space: nowrap;
 }
 
-.email-submit:hover { background: var(--orange-light); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255,107,43,0.3); }
+.email-submit:hover { background: var(--orange-light); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232,99,10,0.3); }
 
 /* ==================== SHOP PAGE ==================== */
 .shop-page { padding: 50px 5%; background: white; }
@@ -1116,7 +1115,7 @@ nav {
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 6px 20px rgba(255,107,43,0.3);
+  box-shadow: 0 6px 20px rgba(232,99,10,0.3);
 }
 
 .btn-buy-now:hover { background: var(--orange-light); transform: translateY(-2px); }
@@ -1274,15 +1273,15 @@ nav {
   cursor: pointer;
   margin-top: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 8px 24px rgba(255,107,43,0.3);
+  box-shadow: 0 8px 24px rgba(232,99,10,0.3);
 }
 
 .checkout-btn:hover { background: var(--orange-light); transform: translateY(-2px); }
 
-.empty-cart { text-align: center; padding: 80px 20px; }
-.empty-cart .empty-icon { font-size: 80px; margin-bottom: 20px; display: block; }
-.empty-cart h2 { font-family: 'Fredoka One', cursive; font-size: 32px; margin-bottom: 10px; }
-.empty-cart p { color: var(--gray); font-weight: 600; margin-bottom: 28px; }
+.empty-cart { text-align: center; padding: 64px 20px; }
+.empty-cart .empty-icon { font-size: 56px; margin-bottom: 16px; display: block; }
+.empty-cart h2 { font-family: 'Fredoka One', cursive; font-size: 24px; margin-bottom: 8px; }
+.empty-cart p { color: var(--gray); font-weight: 600; font-size: 15px; margin-bottom: 24px; }
 
 /* ==================== ABOUT PAGE ==================== */
 .about-hero {
@@ -1339,7 +1338,7 @@ nav {
   transition: all 0.3s ease;
 }
 
-.value-card:hover { background: rgba(255,107,43,0.12); border-color: var(--orange); transform: translateY(-6px); }
+.value-card:hover { background: rgba(232,99,10,0.12); border-color: var(--orange); transform: translateY(-6px); }
 .value-icon { font-size: 44px; margin-bottom: 18px; display: block; }
 .value-title { font-family: 'Fredoka One', cursive; font-size: 20px; color: white; margin-bottom: 10px; }
 .value-desc { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; font-weight: 600; }
@@ -1407,7 +1406,7 @@ nav {
 
 /* ==================== FOOTER ==================== */
 footer {
-  background: var(--black);
+  background: var(--navy-deep);
   color: white;
   padding: 60px 5% 28px;
 }
@@ -1528,6 +1527,22 @@ footer {
   50% { transform: translateY(-10px); }
 }
 
+/* Search result → scroll-to-product highlight flash */
+.product-card.flash {
+  border-color: var(--orange) !important;
+  animation: cardflash 1.6s ease;
+}
+@keyframes cardflash {
+  0%   { box-shadow: 0 0 0 0 rgba(232,99,10,0.0); }
+  25%  { box-shadow: 0 0 0 4px rgba(232,99,10,0.45); }
+  100% { box-shadow: 0 0 0 0 rgba(232,99,10,0.0); }
+}
+
+/* Subtle fade-up reveal as sections enter the viewport.
+   The .reveal class is added by JS at load, so if JS fails nothing is hidden. */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.reveal-in { opacity: 1; transform: none; }
+
 
 /* ==================== NAV CENTER & SEARCH ==================== */
 .nav-center {
@@ -1543,14 +1558,14 @@ footer {
   border: none;
   cursor: pointer;
   padding: 8px;
-  color: var(--black);
+  color: #fff;
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
   border-radius: 50%;
   transition: background 0.15s;
 }
-.nav-search-btn:active { background: var(--light-gray); }
+.nav-search-btn:active { background: rgba(255,255,255,0.12); }
 
 .nav-search-bar {
   display: none;
@@ -1637,7 +1652,7 @@ footer {
 .hamburger span {
   display: block;
   width: 22px; height: 2px;
-  background: var(--black);
+  background: #fff;
   border-radius: 2px;
   transition: transform 0.28s ease, opacity 0.28s ease;
   transform-origin: center;
@@ -1738,7 +1753,11 @@ footer {
   .nav-search-btn { display: flex; }
   .nav-center { justify-content: center; }
   .cart-btn-text { display: none; }
-  .cart-btn { padding: 8px 12px; border-radius: 50px; font-size: 18px; }
+  /* Cart becomes a plain white icon with an orange count badge (Ruffwear-style) */
+  .cart-btn { background: none; color: #fff; padding: 8px; font-size: 20px; box-shadow: none; }
+  .cart-btn:hover, .cart-btn:active { background: none; transform: none; box-shadow: none; }
+  .cart-count { background: var(--orange); top: -2px; right: -2px; }
+  .nav-right { gap: 6px; }
   .hamburger { display: flex; }
   .mob-menu { display: flex; }
 

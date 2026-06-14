@@ -167,8 +167,10 @@ function renderHomeProducts() {
 
 function renderShopProducts(filter) {
   var container = document.getElementById('shopProducts');
-  var filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
-  container.innerHTML = filtered.map(p => productCard(p)).join('');
+  if (!container) return;
+  var f = filter || 'all';
+  var filtered = (f === 'all') ? products.slice() : products.filter(function(p) { return p.category === f; });
+  container.innerHTML = filtered.map(function(p) { return productCard(p); }).join('');
 }
 
 function productCard(p) {
@@ -176,7 +178,7 @@ function productCard(p) {
     ? `<img src="${p.image}" alt="${p.name}">`
     : p.emoji;
   return `
-    <div class="product-card" onclick="showProduct(${p.id})">
+    <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
       <div class="product-img-wrap">
         <div class="product-img">${imgContent}</div>
         <div class="product-badge ${p.badgeClass||''}">${p.badge}</div>
@@ -320,7 +322,7 @@ function renderWishlist() {
   var container = document.getElementById('wishlistContent');
   if (!container) return;
   if (wishlistItems.length === 0) {
-    container.innerHTML = '<div class="empty-cart"><span class="empty-icon">🐾</span><h2>Your pup\'s missing out!</h2><p>Save your favorite walk gear here — tap the heart on any product.</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
+    container.innerHTML = '<div class="empty-cart"><span class="empty-icon">🐾</span><h2>Your pup\'s missing out!</h2><p>Heart any product to save it here</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
     return;
   }
   container.innerHTML = '<div class="products-grid">' + wishlistItems.map(function(p) {
@@ -329,9 +331,9 @@ function renderWishlist() {
     return '<div class="product-card" onclick="showProduct(' + p.id + ')">' +
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
       '<div class="product-badge ' + (p.badgeClass||'') + '">' + p.badge + '</div>' +
-      '<button class="wishlist-btn" style="opacity:1;color:#ef4444;" onclick="event.stopPropagation();wishlist(' + p.id + ')">heart</button></div>' +
+      '<button class="wishlist-btn" style="opacity:1;color:#ef4444;" onclick="event.stopPropagation();wishlist(' + p.id + ')">' + String.fromCodePoint(10084, 65039) + '</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
-      '<div class="product-stars">5 stars <span>(' + p.reviews + ' reviews)</span></div>' +
+      '<div class="product-stars">⭐⭐⭐⭐⭐ <span>(' + p.reviews + ' reviews)</span></div>' +
       '<div class="product-price"><span class="price-now">$' + p.price.toFixed(2) + '</span>' +
       (p.was ? '<span class="price-was">$' + p.was.toFixed(2) + '</span>' : '') + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
@@ -417,10 +419,23 @@ function checkout() {
 
 // ==================== FILTERS ====================
 function filterProducts(filter, btn) {
-  currentShopFilter = filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderShopProducts(filter);
+  currentShopFilter = filter || 'all';
+  document.querySelectorAll('.shop-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderShopProducts(currentShopFilter);
+}
+
+// Navigate from a search result to the matching product in the shop grid and flash it
+function goToProduct(id) {
+  closeSearch();
+  showPage('shop', 'all');
+  setTimeout(function() {
+    var el = document.getElementById('prodcard-' + id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('flash');
+    setTimeout(function() { el.classList.remove('flash'); }, 1600);
+  }, 140);
 }
 
 // ==================== UI HELPERS ====================
@@ -439,7 +454,7 @@ function showToast(msg, duration) {
 }
 
 function showTrackOrder() {
-  showToast('📦 Check your confirmation email for your tracking number. Need help? Email pawhaulsupport@gmail.com', 6000);
+  showToast('Check the confirmation email we sent you for your tracking number. Need help? Email pawhaulsupport@gmail.com', 6000);
 }
 
 function submitEmail() {
