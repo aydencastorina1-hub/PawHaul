@@ -1791,7 +1791,7 @@ footer {
   #page-cart, #page-product { min-height: 100vh; }
 
   /* ── HERO (image background) ──────────────────────────── */
-  #heroSection { height: min(460px, 68vh) !important; }
+  #heroSection { height: min(540px, 80vh) !important; }
   #heroBgImg { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   #heroSection > div:last-child {
     align-items: center !important;
