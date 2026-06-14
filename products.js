@@ -163,6 +163,7 @@ function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
   var featured = products.slice(0, 4);
   container.innerHTML = featured.map(p => productCard(p)).join('');
+  setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
 
 function renderShopProducts(filter) {

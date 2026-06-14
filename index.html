@@ -200,7 +200,11 @@
       </div>
       <button class="btn-primary" onclick="showPage('shop')">View All →</button>
     </div>
-    <div class="products-grid" id="homeProducts"></div>
+    <div class="home-carousel-wrap" id="prodCarouselWrap">
+      <button class="carousel-btn carousel-prev disabled" id="prodCarouselPrev" aria-label="Previous">&#8249;</button>
+      <div class="products-grid" id="homeProducts"></div>
+      <button class="carousel-btn carousel-next" id="prodCarouselNext" aria-label="Next">&#8250;</button>
+    </div>
   </section>
 
   <!-- WHY PAWHAUL -->
@@ -238,8 +242,9 @@
     <div class="reviews-header">
       <h2 class="section-title">What Dog Owners Are <span>Saying</span></h2>
     </div>
-    <div class="reviews-grid-wrap">
-    <div class="reviews-grid">
+    <div class="reviews-grid-wrap home-carousel-wrap" id="revCarouselWrap">
+      <button class="carousel-btn carousel-prev disabled" id="revCarouselPrev" aria-label="Previous">&#8249;</button>
+    <div class="reviews-grid" id="revCarousel">
       <div class="review-card">
         <div class="review-stars">⭐⭐⭐⭐⭐</div>
         <p class="review-text">"The Walk Kit is the one thing I actually grab every single morning. Water on one side, kibble on the other. My husband thought it was gimmicky until he used it. Now he takes it when he walks Biscuit."</p>
@@ -256,6 +261,7 @@
         <div class="reviewer"><div class="reviewer-av">M</div><div><div class="reviewer-name">Maria L.</div><div class="reviewer-loc">Denver, CO</div></div><div class="verified">✓ Verified</div></div>
       </div>
     </div>
+      <button class="carousel-btn carousel-next" id="revCarouselNext" aria-label="Next">&#8250;</button>
     </div>
   </section>
 

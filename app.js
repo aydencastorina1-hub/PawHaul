@@ -536,6 +536,27 @@ function doSearch(val) {
   }).join('');
 }
 
+// ==================== CAROUSEL ====================
+function initCarousel(trackId, prevId, nextId) {
+  var track = document.getElementById(trackId);
+  var prev = document.getElementById(prevId);
+  var next = document.getElementById(nextId);
+  if (!track || !prev || !next) return;
+  function scrollAmt() {
+    var card = track.children[0];
+    if (!card) return 220;
+    return card.offsetWidth + (parseFloat(getComputedStyle(track).gap) || 12);
+  }
+  function updateArrows() {
+    prev.classList.toggle('disabled', track.scrollLeft <= 4);
+    next.classList.toggle('disabled', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+  }
+  prev.addEventListener('click', function() { track.scrollBy({ left: -scrollAmt(), behavior: 'smooth' }); });
+  next.addEventListener('click', function() { track.scrollBy({ left: scrollAmt(), behavior: 'smooth' }); });
+  track.addEventListener('scroll', updateArrows, { passive: true });
+  updateArrows();
+}
+
 // ==================== SECTION REVEAL (subtle fade-up on scroll) ====================
 // The .reveal class is added by JS, so if anything fails no content is ever hidden.
 // A guaranteed fallback timer also un-hides everything, so content can NEVER get stuck invisible.
@@ -556,4 +577,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Safety net: whatever happens, reveal everything after 1.2s so nothing can stay hidden.
   setTimeout(revealAll, 1200);
+
+  initCarousel('revCarousel', 'revCarouselPrev', 'revCarouselNext');
 });

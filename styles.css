@@ -1733,6 +1733,7 @@ footer {
   backdrop-filter: blur(2px);
 }
 .mob-menu-overlay.open { display: block; }
+.carousel-btn { display: none; }
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
@@ -1966,6 +1967,69 @@ footer {
 
   /* ── TOAST ────────────────────────────────────────────── */
   .toast { left: 16px; right: 16px; bottom: 82px; }
+
+  /* ── HOME PRODUCTS CAROUSEL ───────────────────────────── */
+  .home-carousel-wrap { position: relative; }
+  #homeProducts {
+    display: flex !important;
+    grid-template-columns: unset !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 12px;
+    padding-bottom: 4px;
+  }
+  #homeProducts::-webkit-scrollbar { display: none; }
+  #homeProducts .product-card {
+    flex: 0 0 calc(100% / 1.5 - 8px);
+    scroll-snap-align: start;
+  }
+
+  /* ── REVIEWS CAROUSEL ──────────────────────────────────── */
+  #revCarousel {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 16px;
+    padding-bottom: 4px;
+  }
+  #revCarousel::-webkit-scrollbar { display: none; }
+  #revCarousel .review-card {
+    flex: 0 0 calc(100% / 1.2 - 8px);
+    scroll-snap-align: start;
+    min-width: unset !important;
+    width: auto !important;
+  }
+
+  /* ── CAROUSEL ARROW BUTTONS ────────────────────────────── */
+  .carousel-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #1a1a2e;
+    cursor: pointer;
+    z-index: 10;
+    transition: opacity 0.2s;
+    padding: 0;
+    line-height: 1;
+  }
+  .carousel-prev { left: -6px; }
+  .carousel-next { right: -6px; }
+  .carousel-btn.disabled { opacity: 0.3; pointer-events: none; }
 
 }
 
