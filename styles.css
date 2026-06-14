@@ -1797,7 +1797,8 @@ footer {
     align-items: center !important;
     text-align: center !important;
     padding: 0 6% !important;
-    padding-bottom: 16px !important;
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
   }
   /* Center the "Dog Walk Essentials" badge in the space between the hero top and the headline.
      Capped so the centered hero block doesn't push the bottom CTA buttons past the hero edge. */
