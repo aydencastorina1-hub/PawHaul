@@ -1737,8 +1737,10 @@ footer {
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
-  /* ── SMOOTH SCROLLING ─────────────────────────────────── */
+  /* ── SMOOTH SCROLLING & GPU ACCELERATION ──────────────── */
   html { scroll-behavior: smooth; }
+  nav { transform: translateZ(0); will-change: transform; }
+  .page { -webkit-overflow-scrolling: touch; }
 
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari shows the html/body background when you pull past the top or bottom.

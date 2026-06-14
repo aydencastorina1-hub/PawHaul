@@ -378,12 +378,19 @@ function closePolicyModal() {
 }
 
 // ── BACK TO TOP ───────────────────────────────────────────────
-window.addEventListener('scroll', function() {
-  var btn = document.getElementById('backToTop');
-  if (btn) {
-    btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
-  }
-});
+(function() {
+  var ticking = false;
+  window.addEventListener('scroll', function() {
+    if (!ticking) {
+      requestAnimationFrame(function() {
+        var btn = document.getElementById('backToTop');
+        if (btn) btn.style.display = window.scrollY > 400 ? 'flex' : 'none';
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
 
 // ── BUNDLE SUGGESTION ─────────────────────────────────────────
 var bundleMap = {

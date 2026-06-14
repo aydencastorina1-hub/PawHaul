@@ -140,6 +140,8 @@ var currentQty = 1;
 function showPage(page, filter) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
+  // Use instant so smooth-scroll CSS doesn't animate page transitions
+  document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0, 0);
 
   if (page === 'home') renderHomeProducts();
@@ -156,6 +158,11 @@ function showPage(page, filter) {
   }
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
+  // Snap to top after render, then restore smooth scrolling for user swipes
+  requestAnimationFrame(function() {
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = '';
+  });
 }
 
 // ==================== RENDER PRODUCTS ====================
