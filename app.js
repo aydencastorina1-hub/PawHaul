@@ -605,6 +605,67 @@ function initCarousel(trackId, prevId, nextId) {
   goTo(0, true);
 }
 
+// ==================== DETAIL IMAGE CAROUSEL ====================
+function initDetailCarousel() {
+  var track = document.getElementById('detTrack');
+  var prev = document.getElementById('detPrev');
+  var next = document.getElementById('detNext');
+  var dotsWrap = document.getElementById('detDots');
+  if (!track || !prev || !next) return;
+
+  var idx = 0;
+  var total = track.children.length;
+  var touchStartX = 0;
+  var touchStartLeft = 0;
+  var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
+
+  function step() { return track.offsetWidth || 300; }
+  function maxScroll() { return Math.max(0, (total - 1) * step()); }
+
+  function smoothTo(target) {
+    var start = track.scrollLeft;
+    var dest = Math.max(0, Math.min(target, maxScroll()));
+    var diff = dest - start;
+    if (!diff) return;
+    var t0 = null;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / 300, 1);
+      track.scrollLeft = start + diff * (1 - Math.pow(1 - p, 3));
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+
+  function goTo(n, instant) {
+    idx = Math.max(0, Math.min(n, total - 1));
+    var target = idx * step();
+    if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
+    prev.classList.toggle('disabled', idx === 0);
+    next.classList.toggle('disabled', idx >= total - 1);
+    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
+  }
+
+  prev.addEventListener('click', function() { goTo(idx - 1); });
+  next.addEventListener('click', function() { goTo(idx + 1); });
+
+  track.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartLeft = track.scrollLeft;
+  }, { passive: true });
+
+  track.addEventListener('touchmove', function(e) {
+    var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
+    track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
+  }, { passive: true });
+
+  track.addEventListener('touchend', function(e) {
+    var delta = touchStartX - e.changedTouches[0].clientX;
+    goTo(Math.round((touchStartLeft + delta) / step()));
+  }, { passive: true });
+
+  goTo(0, true);
+}
+
 // ==================== SECTION REVEAL (subtle fade-up on scroll) ====================
 // The .reveal class is added by JS, so if anything fails no content is ever hidden.
 // A guaranteed fallback timer also un-hides everything, so content can NEVER get stuck invisible.

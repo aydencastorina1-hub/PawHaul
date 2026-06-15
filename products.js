@@ -212,11 +212,25 @@ function showProduct(id) {
   if (!currentProduct) return;
 
   var detailImg = document.getElementById('detailImg');
-  if (currentProduct.image) {
-    detailImg.innerHTML = `<img src="${currentProduct.image}" alt="${currentProduct.name}">`;
-  } else {
-    detailImg.textContent = currentProduct.emoji;
-  }
+  var slideHtml = currentProduct.image
+    ? '<img src="' + currentProduct.image + '" alt="' + currentProduct.name + '">'
+    : '<span style="font-size:110px;line-height:1">' + currentProduct.emoji + '</span>';
+  detailImg.innerHTML =
+    '<div class="det-carousel">' +
+      '<div class="det-track" id="detTrack">' +
+        '<div class="det-slide">' + slideHtml + '</div>' +
+        '<div class="det-slide">' + slideHtml + '</div>' +
+        '<div class="det-slide">' + slideHtml + '</div>' +
+      '</div>' +
+      '<button class="det-prev" id="detPrev" aria-label="Previous">&#8249;</button>' +
+      '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
+      '<div class="det-dots" id="detDots">' +
+        '<span class="det-dot active"></span>' +
+        '<span class="det-dot"></span>' +
+        '<span class="det-dot"></span>' +
+      '</div>' +
+    '</div>';
+  setTimeout(function() { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
   document.getElementById('detailName').textContent = currentProduct.name;
   document.getElementById('detailPrice').textContent = `$${currentProduct.price.toFixed(2)}`;
   document.getElementById('detailWas').textContent = currentProduct.was ? `$${currentProduct.was.toFixed(2)}` : '';
