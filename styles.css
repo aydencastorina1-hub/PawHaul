@@ -1742,6 +1742,9 @@ footer {
   nav { transform: translateZ(0); will-change: transform; }
   .page { -webkit-overflow-scrolling: touch; }
 
+  /* ── DISABLE DOUBLE-TAP ZOOM ───────────────────────────── */
+  * { touch-action: manipulation; }
+
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari shows the html/body background when you pull past the top or bottom.
      Deep navy (#0d0d1a) matches the footer so there is no white gap below it on overscroll. */
