@@ -549,19 +549,60 @@ function initCarousel(trackId, prevId, nextId) {
   var prev = document.getElementById(prevId);
   var next = document.getElementById(nextId);
   if (!track || !prev || !next) return;
-  function scrollAmt() {
+
+  var idx = 0;
+  var touchStartX = 0;
+  var touchStartLeft = 0;
+
+  function step() {
     var card = track.children[0];
     if (!card) return 220;
     return card.offsetWidth + (parseFloat(getComputedStyle(track).gap) || 12);
   }
-  function updateArrows() {
-    prev.classList.toggle('disabled', track.scrollLeft <= 4);
-    next.classList.toggle('disabled', track.scrollLeft + track.clientWidth >= track.scrollWidth - 4);
+  function count() { return track.children.length; }
+  function maxScroll() { return Math.max(0, (count() - 1) * step()); }
+
+  function smoothTo(target) {
+    var start = track.scrollLeft;
+    var dest = Math.max(0, Math.min(target, maxScroll()));
+    var diff = dest - start;
+    if (!diff) return;
+    var t0 = null;
+    (function tick(ts) {
+      if (!t0) t0 = ts;
+      var p = Math.min((ts - t0) / 300, 1);
+      track.scrollLeft = start + diff * (1 - Math.pow(1 - p, 3));
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
   }
-  prev.addEventListener('click', function() { if (prev.classList.contains('disabled')) return; track.scrollBy({ left: -scrollAmt(), behavior: 'smooth' }); });
-  next.addEventListener('click', function() { if (next.classList.contains('disabled')) return; track.scrollBy({ left: scrollAmt(), behavior: 'smooth' }); });
-  track.addEventListener('scroll', updateArrows, { passive: true });
-  updateArrows();
+
+  function goTo(n, instant) {
+    idx = Math.max(0, Math.min(n, count() - 1));
+    var target = idx * step();
+    if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
+    prev.classList.toggle('disabled', idx === 0);
+    next.classList.toggle('disabled', idx >= count() - 1);
+  }
+
+  prev.addEventListener('click', function() { goTo(idx - 1); });
+  next.addEventListener('click', function() { goTo(idx + 1); });
+
+  track.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartLeft = track.scrollLeft;
+  }, { passive: true });
+
+  track.addEventListener('touchmove', function(e) {
+    var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
+    track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
+  }, { passive: true });
+
+  track.addEventListener('touchend', function(e) {
+    var delta = touchStartX - e.changedTouches[0].clientX;
+    goTo(Math.round((touchStartLeft + delta) / step()));
+  }, { passive: true });
+
+  goTo(0, true);
 }
 
 // ==================== SECTION REVEAL (subtle fade-up on scroll) ====================

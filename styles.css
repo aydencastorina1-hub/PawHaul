@@ -1978,10 +1978,7 @@ footer {
   #homeProducts {
     display: flex !important;
     grid-template-columns: unset !important;
-    overflow-x: scroll;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    overflow-x: hidden;
     scrollbar-width: none;
     gap: 12px;
     padding: 0;
@@ -1990,20 +1987,14 @@ footer {
   #homeProducts::-webkit-scrollbar { display: none; }
   #homeProducts .product-card {
     flex: 0 0 calc(100% / 1.5 - 8px);
-    scroll-snap-align: start;
     flex-shrink: 0;
   }
-  /* Trailing margin extends scroll range so last card's start snap point is reachable */
-  #homeProducts .product-card:last-child { margin-right: calc(100% / 3 + 8px); }
 
   /* ── REVIEWS CAROUSEL ──────────────────────────────────── */
   #revCarousel {
     display: flex !important;
     flex-direction: row !important;
-    overflow-x: scroll;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-x: contain;
+    overflow-x: hidden;
     scrollbar-width: none;
     gap: 16px;
     padding: 0;
@@ -2012,13 +2003,10 @@ footer {
   #revCarousel::-webkit-scrollbar { display: none; }
   #revCarousel .review-card {
     flex: 0 0 calc(100% / 1.2 - 8px);
-    scroll-snap-align: start;
     flex-shrink: 0;
     min-width: unset !important;
     width: auto !important;
   }
-  /* Trailing margin extends scroll range so last card's start snap point is reachable */
-  #revCarousel .review-card:last-child { margin-right: calc(100% / 6 + 8px); }
 
   /* ── CAROUSEL ARROW BUTTONS ────────────────────────────── */
   .carousel-btn {
