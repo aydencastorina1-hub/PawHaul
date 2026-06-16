@@ -655,9 +655,10 @@ function initDetailCarousel() {
   }, { passive: true });
 
   track.addEventListener('touchmove', function(e) {
+    e.preventDefault();
     var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
     track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
-  }, { passive: true });
+  }, { passive: false });
 
   track.addEventListener('touchend', function(e) {
     var delta = touchStartX - e.changedTouches[0].clientX;

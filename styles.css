@@ -957,8 +957,8 @@ nav {
 .det-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--orange-pale); }
 .det-slide img { width: 100%; height: 100%; object-fit: cover; }
 .det-prev, .det-next, .det-dots { display: none; }
-.det-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.45); border: 1.5px solid rgba(255,255,255,0.75); transition: background 0.2s; }
-.det-dot.active { background: #fff; }
+.det-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; border: 1.5px solid #aaa; transition: background 0.2s; }
+.det-dot.active { background: #E8630A; border-color: #E8630A; }
 
 .thumb-row {
   display: flex;
@@ -1953,7 +1953,7 @@ footer {
   .product-detail-grid { grid-template-columns: 1fr; }
   /* main-img becomes auto-height wrapper; det-carousel provides the image area */
   .main-img { height: auto !important; display: block !important; padding: 0 !important; background: transparent !important; }
-  .det-carousel { height: 280px; }
+  .det-carousel { height: 280px; touch-action: pan-y; }
   #detailThumbs { display: none; }
   .det-prev, .det-next {
     position: absolute; top: 50%; transform: translateY(-50%);
