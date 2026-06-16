@@ -599,7 +599,11 @@ function initCarousel(trackId, prevId, nextId) {
 
   track.addEventListener('touchend', function(e) {
     var delta = touchStartX - e.changedTouches[0].clientX;
-    goTo(Math.round((touchStartLeft + delta) / step()));
+    if (Math.abs(delta) > 30) {
+      goTo(idx + (delta > 0 ? 1 : -1));
+    } else {
+      goTo(idx);
+    }
   }, { passive: true });
 
   goTo(0, true);
