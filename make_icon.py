@@ -11,31 +11,36 @@ from PIL import Image, ImageDraw
 NAVY = (26, 26, 46)      # #1a1a2e
 ORANGE = (232, 99, 10)   # #E8630A
 
-SIZE = 180
 SS = 4                   # supersample factor
-S = SIZE * SS
-SCALE = (SIZE / 100.0) * SS   # SVG (100 viewBox) -> supersampled px
 
-img = Image.new("RGB", (S, S), NAVY)
-d = ImageDraw.Draw(img)
+def make_paw(size):
+    """Render the paw print at `size`x`size` px (supersampled 4x, navy bg)."""
+    s = size * SS
+    scale = (size / 100.0) * SS   # SVG (100 viewBox) -> supersampled px
+    img = Image.new("RGB", (s, s), NAVY)
+    d = ImageDraw.Draw(img)
 
-def circle(cx, cy, r):
-    x, y, rr = cx * SCALE, cy * SCALE, r * SCALE
-    d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=ORANGE)
+    def circle(cx, cy, r):
+        x, y, rr = cx * scale, cy * scale, r * scale
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=ORANGE)
 
-def ellipse(cx, cy, rx, ry):
-    x, y, ex, ey = cx * SCALE, cy * SCALE, rx * SCALE, ry * SCALE
-    d.ellipse([x - ex, y - ey, x + ex, y + ey], fill=ORANGE)
+    def ellipse(cx, cy, rx, ry):
+        x, y, ex, ey = cx * scale, cy * scale, rx * scale, ry * scale
+        d.ellipse([x - ex, y - ey, x + ex, y + ey], fill=ORANGE)
 
-# Toes (top pair)
-circle(35, 30, 8)
-circle(65, 30, 8)
-# Toes (side pair)
-circle(20, 50, 7)
-circle(80, 50, 7)
-# Center pad
-ellipse(50, 68, 22, 18)
+    # Toes (top pair)
+    circle(35, 30, 8)
+    circle(65, 30, 8)
+    # Toes (side pair)
+    circle(20, 50, 7)
+    circle(80, 50, 7)
+    # Center pad
+    ellipse(50, 68, 22, 18)
 
-img = img.resize((SIZE, SIZE), Image.LANCZOS)
-img.save("apple-touch-icon.png", "PNG")
-print("Wrote apple-touch-icon.png", img.size)
+    return img.resize((size, size), Image.LANCZOS)
+
+
+for size, name in [(180, "apple-touch-icon.png"), (32, "favicon-32.png"), (16, "favicon-16.png")]:
+    out = make_paw(size)
+    out.save(name, "PNG")
+    print("Wrote", name, out.size)
