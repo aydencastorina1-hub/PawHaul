@@ -617,6 +617,7 @@ function initDetailCarousel() {
   var total = track.children.length;
   var touchStartX = 0;
   var touchStartLeft = 0;
+  if (dotsWrap) dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
 
   function step() { return track.offsetWidth || 300; }

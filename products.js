@@ -224,12 +224,8 @@ function showProduct(id) {
       '</div>' +
       '<button class="det-prev" id="detPrev" aria-label="Previous">&#8249;</button>' +
       '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
-      '<div class="det-dots" id="detDots">' +
-        '<span class="det-dot active"></span>' +
-        '<span class="det-dot"></span>' +
-        '<span class="det-dot"></span>' +
-      '</div>' +
-    '</div>';
+    '</div>' +
+    '<div class="det-dots" id="detDots"></div>';
   setTimeout(function() { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
   document.getElementById('detailName').textContent = currentProduct.name;
   document.getElementById('detailPrice').textContent = `$${currentProduct.price.toFixed(2)}`;
