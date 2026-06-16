@@ -416,7 +416,18 @@ nav {
 }
 
 /* COLLECTIONS SECTION */
-.collections-section { padding: 80px 5%; background: var(--light-gray); }
+.collections-section { padding: 80px 5%; background: var(--light-gray); position: relative; overflow: hidden; }
+.collections-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+.collections-header, .collections-grid { position: relative; z-index: 1; }
 .collections-header { text-align: center; margin-bottom: 44px; }
 
 .collections-grid {
@@ -805,6 +816,11 @@ nav {
   font-weight: 800;
   color: var(--orange);
   font-family: 'Fredoka One', cursive;
+}
+img.reviewer-av {
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--orange-pale);
 }
 
 .reviewer-name { font-weight: 800; font-size: 14px; }

@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=3">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -168,6 +168,7 @@
 
   <!-- COLLECTIONS -->
   <section class="collections-section">
+    <img class="collections-bg" loading="lazy" src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=1200" alt="Happy dog outdoors as a soft background texture">
     <div class="collections-header">
       <h2 class="section-title">Everything You Need For <span>The Walk</span></h2>
       <p class="section-sub" style="margin: 0 auto; max-width: 480px;">Every product we sell is built specifically for walks with your dog</p>
@@ -227,6 +228,12 @@
     </div>
   </section>
 
+  <!-- LIFESTYLE BANNER -->
+  <div style="position:relative;width:100%;height:250px;overflow:hidden;">
+    <img loading="lazy" src="https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=800" alt="A person walking their dog on a leash outdoors" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
+  </div>
+
   <!-- MISSION -->
   <div class="mission-section">
     <div>
@@ -253,17 +260,17 @@
       <div class="review-card">
         <div class="review-stars">⭐⭐⭐⭐⭐</div>
         <p class="review-text">"The Walk Kit is the one thing I actually grab every single morning. Water on one side, kibble on the other. My husband thought it was gimmicky until he used it. Now he takes it when he walks Biscuit."</p>
-        <div class="reviewer"><div class="reviewer-av">S</div><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-loc">Portland, OR</div></div><div class="verified">✓ Verified</div></div>
+        <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=100" alt="Sarah M. with her golden retriever"><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-loc">Portland, OR</div></div><div class="verified">✓ Verified</div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">⭐⭐⭐⭐</div>
         <p class="review-text">"Reflective collar is solid and the hands-free leash works well for running. Took a little adjusting to get the waist belt right but once it fits it's great. Dog doesn't notice it at all."</p>
-        <div class="reviewer"><div class="reviewer-av">J</div><div><div class="reviewer-name">James R.</div><div class="reviewer-loc">Austin, TX</div></div><div class="verified">✓ Verified</div></div>
+        <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=100" alt="James R.'s happy dog"><div><div class="reviewer-name">James R.</div><div class="reviewer-loc">Austin, TX</div></div><div class="verified">✓ Verified</div></div>
       </div>
       <div class="review-card">
         <div class="review-stars">⭐⭐⭐⭐⭐</div>
         <p class="review-text">"AirTag holder hasn't budged in two months. Clips onto her collar, waterproof, she's gone through puddles and mud and it stays put. Small thing but I sleep better knowing where Luna is."</p>
-        <div class="reviewer"><div class="reviewer-av">M</div><div><div class="reviewer-name">Maria L.</div><div class="reviewer-loc">Denver, CO</div></div><div class="verified">✓ Verified</div></div>
+        <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=100" alt="Maria L. with her labrador"><div><div class="reviewer-name">Maria L.</div><div class="reviewer-loc">Denver, CO</div></div><div class="verified">✓ Verified</div></div>
       </div>
     </div>
       <button class="carousel-btn carousel-next" id="revCarouselNext" aria-label="Next">&#8250;</button>
@@ -478,6 +485,7 @@
 
 <!-- ==================== ABOUT PAGE ==================== -->
 <div id="page-about" class="page" style="background:white;">
+  <img loading="lazy" src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800" alt="A golden retriever running through a sunlit field" style="width:100%;height:300px;object-fit:cover;display:block;">
   <div class="about-hero">
     <div class="section-tag">Our Story</div>
     <h1>Built For Every <span>Walk</span></h1>
