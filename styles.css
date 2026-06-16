@@ -1802,10 +1802,16 @@ footer {
   /* ── DISABLE DOUBLE-TAP ZOOM ───────────────────────────── */
   * { touch-action: manipulation; }
 
+  /* ── PREVENT HORIZONTAL SCROLL ─────────────────────────── */
+  html, body { overflow-x: hidden; max-width: 100%; }
+
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari shows the html/body background when you pull past the top or bottom.
      Deep navy (#0d0d1a) matches the footer so there is no white gap below it on overscroll. */
   html, body { background-color: #0d0d1a; }
+
+  /* sections with decorative elements that extend beyond their bounds */
+  .email-section { overflow: hidden; }
 
   /* ── ANNOUNCE BAR ─────────────────────────────────────── */
   .announce-bar { display: none; }
