@@ -699,3 +699,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
   initCarousel('revCarousel', 'revCarouselPrev', 'revCarouselNext');
 });
+
+// ==================== 10% OFF POPUP ====================
+function dismissOffer() {
+  var overlay = document.getElementById('offerOverlay');
+  var popup = document.getElementById('offerPopup');
+  if (!overlay || !popup) return;
+  overlay.classList.remove('active');
+  popup.classList.remove('active');
+}
+
+function handleOfferSubmit(e) {
+  e.preventDefault();
+  dismissOffer();
+}
+
+setTimeout(function() {
+  var overlay = document.getElementById('offerOverlay');
+  var popup = document.getElementById('offerPopup');
+  if (!overlay || !popup) return;
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      overlay.classList.add('active');
+      popup.classList.add('active');
+    });
+  });
+  document.getElementById('offerClose').addEventListener('click', dismissOffer);
+  overlay.addEventListener('click', dismissOffer);
+}, 10000);

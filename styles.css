@@ -695,6 +695,54 @@ nav {
   position: relative;
 }
 
+/* ── 10% OFF POPUP ─────────────────────────────────────────── */
+.offer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 999; opacity: 0; pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.offer-overlay.active { opacity: 1; pointer-events: auto; }
+
+.offer-popup {
+  position: fixed; bottom: 0; left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: min(420px, 100%);
+  background: #1a1a2e; border-radius: 20px 20px 0 0;
+  padding: 32px 28px 48px; box-sizing: border-box;
+  z-index: 1000; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.offer-popup.active { transform: translateX(-50%) translateY(0); }
+
+.offer-close {
+  position: absolute; top: 16px; right: 16px;
+  background: rgba(255,255,255,0.15); border: none; color: #fff;
+  width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.offer-close:hover { background: rgba(255,255,255,0.28); }
+
+.offer-content { text-align: center; }
+.offer-emoji { font-size: 52px; line-height: 1; margin-bottom: 14px; }
+.offer-headline { color: #fff; font-size: 22px; font-weight: 800; margin: 0 0 8px; font-family: 'Fredoka One', cursive; }
+.offer-sub { color: rgba(255,255,255,0.68); font-size: 14px; margin: 0 0 22px; }
+
+.offer-input {
+  width: 100%; padding: 13px 16px; border: 1.5px solid rgba(255,255,255,0.45);
+  border-radius: 10px; background: transparent; color: #fff;
+  font-size: 15px; box-sizing: border-box; margin-bottom: 12px;
+  outline: none; font-family: inherit;
+}
+.offer-input::placeholder { color: rgba(255,255,255,0.35); }
+.offer-input:focus { border-color: #E8630A; }
+
+.offer-btn {
+  width: 100%; padding: 15px; background: #E8630A; color: #fff;
+  border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
+  cursor: pointer; font-family: inherit; transition: background 0.2s;
+}
+.offer-btn:hover { background: #cf5800; }
+
 @media (max-width: 900px) {
   .reviews-section .reviews-grid-wrap::after {
     content: '';

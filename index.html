@@ -632,8 +632,23 @@
 
 
 
-  <script src="products.js?v=6"></script>
-  <script src="app.js?v=6"></script>
+  <script src="products.js?v=7"></script>
+  <script src="app.js?v=7"></script>
+
+  <!-- 10% OFF POPUP -->
+  <div id="offerOverlay" class="offer-overlay"></div>
+  <div id="offerPopup" class="offer-popup">
+    <button id="offerClose" class="offer-close" aria-label="Close">&#x2715;</button>
+    <div class="offer-content">
+      <div class="offer-emoji">🐾</div>
+      <h2 class="offer-headline">Get 10% Off Your First Order</h2>
+      <p class="offer-sub">Enter your email and we'll send you a code</p>
+      <form class="offer-form" onsubmit="handleOfferSubmit(event)">
+        <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required>
+        <button type="submit" class="offer-btn">Claim My 10% Off</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
 
