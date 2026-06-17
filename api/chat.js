@@ -46,14 +46,44 @@ var SYSTEM_PROMPT = [
 ].join("\n");
 
 module.exports = async function handler(req, res) {
+  // Temporary deploy/diagnostic marker so we can confirm new code is live.
+  var BUILD_MARKER = "debug-2026-06-16-a";
+
+  var apiKey = process.env.GROQ_API_KEY;
+  var groqEnvNames = Object.keys(process.env).filter(function (k) {
+    return /groq/i.test(k);
+  });
+  console.log(
+    "[chat] method=" + req.method +
+    " hasKey=" + (!!apiKey) +
+    " keyLen=" + (apiKey ? apiKey.length : 0) +
+    " groqEnvNames=" + JSON.stringify(groqEnvNames) +
+    " marker=" + BUILD_MARKER
+  );
+
+  // GET = health check: confirms which code/env the live function sees.
+  if (req.method === "GET") {
+    res.status(200).json({
+      marker: BUILD_MARKER,
+      hasKey: !!apiKey,
+      keyLen: apiKey ? apiKey.length : 0,
+      groqEnvNames: groqEnvNames
+    });
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
 
-  var apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    res.status(500).json({ error: "GROQ_API_KEY is not configured on the server." });
+    res.status(500).json({
+      error: "GROQ_API_KEY is not configured on the server.",
+      marker: BUILD_MARKER,
+      hasKey: false,
+      groqEnvNames: groqEnvNames
+    });
     return;
   }
 
