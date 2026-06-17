@@ -1950,6 +1950,7 @@ footer {
   /* ── COLLECTIONS ──────────────────────────────────────── */
   .collections-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px; }
   .collection-card { padding: 20px 12px; }
+  .col-thumb { display: none; } /* hide category card photos on mobile only */
   .col-emoji { font-size: 36px; margin-bottom: 10px; }
   .col-name { font-size: 15px; }
 
