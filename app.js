@@ -274,7 +274,7 @@ function doSearch(val) {
   if (!res) return;
   var q = (val || '').trim().toLowerCase();
   if (!q) { res.innerHTML = ''; return; }
-  // Search is restricted to the 6 PawHaul products, matched by product name only.
+  // Search is restricted to the 8 PawHaul products, matched by product name only.
   var list = (typeof products !== 'undefined') ? products : [];
   var matches = list.filter(function(p) {
     return p.name.toLowerCase().indexOf(q) !== -1;

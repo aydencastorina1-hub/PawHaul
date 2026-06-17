@@ -113,6 +113,38 @@ var products = [
     ],
     material: "Heavy-duty nylon webbing with reflective threading · Stainless steel D-ring · Quick-release plastic buckle · Soft padded lining",
     whatsInBox: "1× reflective safety collar"
+  },
+  {
+    id: 7, name: "Dual Dog Walk Coupler", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
+    badge: "⭐ New", badgeClass: "badge-new", reviews: 67,
+    desc: "Walk two dogs at once with zero tangle. The 360° swivel clips prevent knots while the bungee cord absorbs shock from both dogs at the same time. The adjustable length fits all breed sizes, so a big dog and a little one can walk comfortably side by side. Perfect for multi-dog households that want one hand free and zero chaos on the walk.",
+    sizes: ["One Size — adjustable length"],
+    colors: ["Black", "Blue", "Orange"],
+    features: [
+      "No-tangle 360° swivel clips",
+      "Bungee cord absorbs shock from both dogs",
+      "Adjustable length fits all breed sizes",
+      "Walk two dogs with easy one-hand control",
+      "Reflective stitching for low-light visibility"
+    ],
+    material: "Heavy-duty nylon webbing · Elastic bungee section · 360° stainless steel swivel clips",
+    whatsInBox: "1× dual dog coupler with bungee section · 2× 360° swivel clips"
+  },
+  {
+    id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🪝", image: "", category: "leash",
+    badge: "🔥 Popular", badgeClass: "badge-popular", reviews: 43,
+    desc: "Never carry a poop bag in your hand again. This carabiner clip hooks directly onto any leash so the bag hangs securely while you keep walking. It's compatible with all standard leashes, lightweight enough to forget it's there, and odor resistant so nothing lingers. The simplest little upgrade to every single walk.",
+    sizes: ["Universal — fits all leashes"],
+    colors: ["Black", "Orange", "Green"],
+    features: [
+      "Fits all standard leashes",
+      "Odor-resistant coating",
+      "Lightweight — barely noticeable on the leash",
+      "Strong carabiner clip closure",
+      "Hands-free bag carry on every walk"
+    ],
+    material: "Lightweight aluminum carabiner · Odor-resistant coating",
+    whatsInBox: "1× carabiner bag hook clip"
   }
 ];
 
@@ -168,7 +200,7 @@ function showPage(page, filter) {
 // ==================== RENDER PRODUCTS ====================
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
-  var featured = products.slice(0, 4);
+  var featured = products.slice(0, 8);
   container.innerHTML = featured.map(p => productCard(p)).join('');
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }

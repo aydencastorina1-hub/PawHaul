@@ -15,6 +15,8 @@ var SYSTEM_PROMPT = [
   "4. AirTag Dog Tag Holder - $14.99 (was $19.99) - Waterproof silicone holder that keeps Apple AirTag on your dog's collar. Twist lock closure. Fits standard collars up to 1.5 inch wide.",
   "5. Hands-Free Running Leash - $22.99 (was $29.99) - Waist belt leash with bungee cord. Adjustable waist 28-48 inch. Bungee absorbs shock. Phone pocket included.",
   "6. Reflective Safety Collar - $16.99 (was $22.99) - Reflective strips visible up to 500 feet. Adjustable sizing. Available in small, medium, large.",
+  "7. Dual Dog Walk Coupler - $21.99 (was $28.99) - Walk two dogs at once with zero tangle. 360-degree swivel clips prevent knots while the bungee cord absorbs shock from both dogs. Adjustable length fits all breed sizes. Reflective stitching. Perfect for multi-dog households.",
+  "8. Walk Clean Bag Hook - $9.99 (was $14.99) - A carabiner clip that hooks a poop bag directly onto any leash so the bag hangs securely while you keep walking. Compatible with all standard leashes. Lightweight and odor resistant. Hands-free carry.",
   "",
   "SHIPPING:",
   "- Free shipping on all orders, no minimum",
