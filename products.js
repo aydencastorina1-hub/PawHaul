@@ -200,9 +200,9 @@ function showPage(page, filter) {
 // ==================== RENDER PRODUCTS ====================
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
-  // Home carousel = these 4 specific products, in this exact order.
+  // Home carousel = these 5 specific products, in this exact order.
   // (Shop page still shows all products.)
-  var featuredIds = [8, 6, 4, 2]; // Bag Hook, Reflective Collar, AirTag Holder, Leash w/ Dispenser
+  var featuredIds = [1, 8, 6, 4, 2]; // Walk Kit, Bag Hook, Reflective Collar, AirTag Holder, Leash w/ Dispenser
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);
