@@ -200,7 +200,12 @@ function showPage(page, filter) {
 // ==================== RENDER PRODUCTS ====================
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
-  var featured = products.slice(0, 8);
+  // Home carousel = these 4 specific products, in this exact order.
+  // (Shop page still shows all products.)
+  var featuredIds = [8, 6, 4, 2]; // Bag Hook, Reflective Collar, AirTag Holder, Leash w/ Dispenser
+  var featured = featuredIds
+    .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
+    .filter(Boolean);
   container.innerHTML = featured.map(p => productCard(p)).join('');
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
@@ -221,7 +226,7 @@ function productCard(p) {
     <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
       <div class="product-img-wrap">
         <div class="product-img">${imgContent}</div>
-        <button class="wishlist-btn" onclick="event.stopPropagation(); wishlist(${p.id})">${wishlistItems.some(function(w){return w.id===p.id}) ? '♥' : '♡'}</button>
+        <button class="wishlist-btn" data-wid="${p.id}" onclick="event.stopPropagation(); wishlist(${p.id})">${wishlistItems.some(function(w){return w.id===p.id}) ? '♥' : '♡'}</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
@@ -355,8 +360,14 @@ function wishlist(id) {
     showToast('Added to wishlist!');
   }
   updateWishlistCount();
-  renderHomeProducts();
-  renderShopProducts(currentShopFilter);
+  // Update heart glyphs in place so the carousel/shop never reset or scroll.
+  var inWish = wishlistItems.some(function(w) { return w.id === id; });
+  document.querySelectorAll('.wishlist-btn[data-wid="' + id + '"]').forEach(function(btn) {
+    btn.textContent = inWish ? '♥' : '♡';
+  });
+  // Keep the wishlist page in sync only if it's the page being viewed.
+  var wlPage = document.getElementById('page-wishlist');
+  if (wlPage && wlPage.classList.contains('active')) renderWishlist();
 }
 
 function updateWishlistCount() {
@@ -379,7 +390,7 @@ function renderWishlist() {
     var inWish = true;
     return '<div class="product-card" onclick="showProduct(' + p.id + ')">' +
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
-      '<button class="wishlist-btn" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
+      '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
       '<div class="product-stars">⭐⭐⭐⭐⭐ <span>(' + p.reviews + ' reviews)</span></div>' +
       '<div class="product-price"><span class="price-now">$' + p.price.toFixed(2) + '</span>' +
