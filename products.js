@@ -221,8 +221,7 @@ function productCard(p) {
     <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
       <div class="product-img-wrap">
         <div class="product-img">${imgContent}</div>
-        <div class="product-badge ${p.badgeClass||''}">${p.badge}</div>
-        <button class="wishlist-btn" onclick="event.stopPropagation(); wishlist(${p.id})">${wishlistItems.some(function(w){return w.id===p.id}) ? String.fromCodePoint(10084,65039) : String.fromCodePoint(129293)}</button>
+        <button class="wishlist-btn" onclick="event.stopPropagation(); wishlist(${p.id})">${wishlistItems.some(function(w){return w.id===p.id}) ? '♥' : '♡'}</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
@@ -380,8 +379,7 @@ function renderWishlist() {
     var inWish = true;
     return '<div class="product-card" onclick="showProduct(' + p.id + ')">' +
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
-      '<div class="product-badge ' + (p.badgeClass||'') + '">' + p.badge + '</div>' +
-      '<button class="wishlist-btn" style="opacity:1;color:#ef4444;" onclick="event.stopPropagation();wishlist(' + p.id + ')">' + String.fromCodePoint(10084, 65039) + '</button></div>' +
+      '<button class="wishlist-btn" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
       '<div class="product-stars">⭐⭐⭐⭐⭐ <span>(' + p.reviews + ' reviews)</span></div>' +
       '<div class="product-price"><span class="price-now">$' + p.price.toFixed(2) + '</span>' +

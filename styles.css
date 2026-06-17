@@ -535,22 +535,6 @@ nav {
 
 .product-card:hover .product-img { transform: scale(1.08); }
 
-.product-badge {
-  position: absolute;
-  top: 12px; left: 12px;
-  background: var(--orange);
-  color: white;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 4px 11px;
-  border-radius: 50px;
-  letter-spacing: 0.3px;
-}
-.product-badge.badge-new { background: #16A34A; }
-.product-badge.badge-popular { background: #0284C7; }
-.product-badge.badge-safety { background: #1E293B; }
-.product-badge.badge-active { background: #7C3AED; }
-.product-badge.badge-night { background: #3730A3; }
 
 .wishlist-btn {
   position: absolute;
@@ -560,7 +544,8 @@ nav {
   border: none;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  color: #FF0000; /* hearts always solid red */
   display: flex;
   align-items: center;
   justify-content: center;
