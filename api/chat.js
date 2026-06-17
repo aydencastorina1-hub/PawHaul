@@ -45,30 +45,25 @@ var SYSTEM_PROMPT = [
   "Be friendly, fun, and helpful. Use dog emojis occasionally 🐾. Keep responses short and conversational. If someone asks something you do not know tell them to email pawhaulsupport@gmail.com. Never make up information not listed above."
 ].join("\n");
 
+function resolveGroqKey() {
+  if (process.env.GROQ_API_KEY) return process.env.GROQ_API_KEY;
+  var keys = Object.keys(process.env);
+  for (var i = 0; i < keys.length; i++) {
+    if (keys[i].toLowerCase() === "groq_api_key" && process.env[keys[i]]) {
+      return process.env[keys[i]];
+    }
+  }
+  return "";
+}
+
 module.exports = async function handler(req, res) {
-  // Temporary deploy/diagnostic marker so we can confirm new code is live.
-  var BUILD_MARKER = "debug-2026-06-16-a";
+  // Resolve the key case-insensitively. Env var names are case-sensitive on
+  // Linux, so a key saved as "groq_api_key" won't be found via GROQ_API_KEY.
+  var apiKey = resolveGroqKey();
 
-  var apiKey = process.env.GROQ_API_KEY;
-  var groqEnvNames = Object.keys(process.env).filter(function (k) {
-    return /groq/i.test(k);
-  });
-  console.log(
-    "[chat] method=" + req.method +
-    " hasKey=" + (!!apiKey) +
-    " keyLen=" + (apiKey ? apiKey.length : 0) +
-    " groqEnvNames=" + JSON.stringify(groqEnvNames) +
-    " marker=" + BUILD_MARKER
-  );
-
-  // GET = health check: confirms which code/env the live function sees.
+  // GET = lightweight health check (no secrets, just whether a key is present).
   if (req.method === "GET") {
-    res.status(200).json({
-      marker: BUILD_MARKER,
-      hasKey: !!apiKey,
-      keyLen: apiKey ? apiKey.length : 0,
-      groqEnvNames: groqEnvNames
-    });
+    res.status(200).json({ ok: true, hasKey: !!apiKey });
     return;
   }
 
@@ -78,12 +73,8 @@ module.exports = async function handler(req, res) {
   }
 
   if (!apiKey) {
-    res.status(500).json({
-      error: "GROQ_API_KEY is not configured on the server.",
-      marker: BUILD_MARKER,
-      hasKey: false,
-      groqEnvNames: groqEnvNames
-    });
+    console.error("[chat] no Groq key found in environment");
+    res.status(500).json({ error: "GROQ_API_KEY is not configured on the server." });
     return;
   }
 
