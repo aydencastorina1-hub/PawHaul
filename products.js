@@ -1,23 +1,34 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "PawHaul Walk Kit 2-in-1", price: 24.99, was: 34.99, emoji: "🧴", image: "", category: "water",
+    id: 1, name: "PawHaul Walk Kit 2-in-1", emoji: "🧴", image: "", category: "water",
     badge: "🔥 Best Seller", badgeClass: "", reviews: 127,
-    desc: "The ultimate walk companion. One bottle that carries both fresh water AND dry food for your dog — grab one thing and walk out the door. The water side features a leak-proof flip-out drinking bowl, and the sealed food compartment keeps kibble or treats fresh for hours. Lightweight enough to clip to any bag or belt. Perfect for walks, hikes, road trips, and every adventure.",
-    sizes: ["350ml / 12oz", "550ml / 18oz"],
-    colors: ["Pink", "Blue", "White"],
+    desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
+
+    // Variant options (Shopify-ready). Size drives the price; color does not.
+    sizes: ["350ml", "550ml"],
+    colors: ["Pink", "Teal/Blue", "Red/Maroon"],
+
+    // Per-size variant pricing — maps each size option to its price.
+    // `price`/`was` below mirror the default (first) size so every other part
+    // of the app (shop cards, home carousel, bundles, search) keeps working.
+    sizePrices: {
+      "350ml": { price: 19.99, was: 27.99 },
+      "550ml": { price: 24.99, was: 34.99 }
+    },
+    price: 19.99, was: 27.99,
+
     features: [
-      "100% leak-proof water compartment",
-      "Separate sealed food & treat storage",
-      "Flip-out silicone drinking bowl",
+      "Leak-proof — holds water and dry food in one sealed container",
+      "Flip-out drinking spout for easy on-the-go hydration",
+      "Lightweight and durable — great for walks, hikes and travel",
+      "Ideal for small to medium dogs",
       "BPA-free food-grade materials throughout",
-      "Carabiner clip included — attaches to any bag",
-      "Lightweight: under 200g empty",
-      "One-hand pour and lock operation",
+      "One-hand open and lock operation",
       "Easy to clean — all parts detach"
     ],
-    material: "BPA-free food-grade plastic body · Food-safe silicone flip bowl · Stainless steel locking cap",
-    whatsInBox: "1× Walk Kit 2-in-1 bottle · 1× carabiner clip · 1× cleaning brush"
+    material: "BPA-free food-grade plastic body · Food-safe silicone drinking spout · Leak-proof sealed food compartment",
+    whatsInBox: "1× Walk Kit 2-in-1 bottle (water + food compartments)"
   },
   {
     id: 2, name: "Leash With Poop Bag Dispenser", price: 19.99, was: 27.99, emoji: "🦮", image: "", category: "leash",
@@ -167,6 +178,8 @@ if (EMAILJS_PUBLIC_KEY) {
 var cart = [];
 var currentProduct = null;
 var currentQty = 1;
+var currentSize = null;          // selected size variant on the detail page
+var currentVariantPrice = null;  // price for the selected size (falls back to product.price)
 
 // ==================== NAVIGATION ====================
 function showPage(page, filter) {
@@ -218,6 +231,23 @@ function renderShopProducts(filter) {
   container.innerHTML = filtered.map(function(p) { return productCard(p); }).join('');
 }
 
+// Builds the inner HTML of a .product-price block. Products with per-size
+// variant pricing show a price RANGE (e.g. "$19.99–$24.99"); single-price
+// products show the price plus the struck-through "was". Shared by the shop
+// grid, the home carousel and the wishlist so they always stay consistent.
+function priceDisplayHtml(p) {
+  if (p.sizePrices) {
+    var prices = Object.keys(p.sizePrices).map(function (k) { return p.sizePrices[k].price; });
+    var min = Math.min.apply(null, prices);
+    var max = Math.max.apply(null, prices);
+    if (min !== max) {
+      return '<span class="price-now price-range">$' + min.toFixed(2) + '–$' + max.toFixed(2) + '</span>';
+    }
+  }
+  return '<span class="price-now">$' + p.price.toFixed(2) + '</span>' +
+    (p.was ? '<span class="price-was">$' + p.was.toFixed(2) + '</span>' : '');
+}
+
 function productCard(p) {
   var imgContent = p.image
     ? `<img src="${p.image}" alt="${p.name}">`
@@ -231,10 +261,7 @@ function productCard(p) {
       <div class="product-info">
         <div class="product-name">${p.name}</div>
         <div class="product-stars">⭐⭐⭐⭐⭐ <span>(${p.reviews} reviews)</span></div>
-        <div class="product-price">
-          <span class="price-now">$${p.price.toFixed(2)}</span>
-          ${p.was ? `<span class="price-was">$${p.was.toFixed(2)}</span>` : ''}
-        </div>
+        <div class="product-price">${priceDisplayHtml(p)}</div>
         <button class="btn-black" onclick="event.stopPropagation(); quickAdd(${p.id})">Add To Cart 🛒</button>
       </div>
     </div>
@@ -264,8 +291,11 @@ function showProduct(id) {
     '<div class="det-dots" id="detDots"></div>';
   setTimeout(function() { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
   document.getElementById('detailName').textContent = currentProduct.name;
-  document.getElementById('detailPrice').textContent = `$${currentProduct.price.toFixed(2)}`;
-  document.getElementById('detailWas').textContent = currentProduct.was ? `$${currentProduct.was.toFixed(2)}` : '';
+  // Default to the first size variant; its price drives the initial display.
+  currentSize = (currentProduct.sizes && currentProduct.sizes.length) ? currentProduct.sizes[0] : null;
+  var defVariant = (currentProduct.sizePrices && currentSize) ? currentProduct.sizePrices[currentSize] : null;
+  currentVariantPrice = defVariant ? defVariant.price : currentProduct.price;
+  setDetailPrice(currentVariantPrice, defVariant ? defVariant.was : currentProduct.was);
   document.getElementById('detailDesc').textContent = currentProduct.desc;
   document.getElementById('detailReviews').textContent = `(${currentProduct.reviews} reviews)`;
   document.getElementById('qtyNum').textContent = '1';
@@ -274,7 +304,7 @@ function showProduct(id) {
   document.getElementById('detailCategory').textContent = cats[currentProduct.category] || 'PawHaul';
 
   document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map((s, i) =>
-    `<button class="option-btn ${i===0?'active':''}" onclick="selectOption(this)">${s}</button>`).join('');
+    `<button class="option-btn ${i===0?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');
 
   document.getElementById('detailColors').innerHTML = currentProduct.colors.map((c, i) =>
     `<button class="option-btn ${i===0?'active':''}" onclick="selectOption(this)">${c}</button>`).join('');
@@ -287,14 +317,8 @@ function showProduct(id) {
   var boxEl = document.getElementById('detailBox');
   if (boxEl) boxEl.textContent = currentProduct.whatsInBox || '';
 
-  var saveEl = document.querySelector('.save');
-  if (saveEl && currentProduct.was) {
-    var savePct = Math.round((1 - currentProduct.price / currentProduct.was) * 100);
-    saveEl.textContent = 'Save ' + savePct + '%';
-    saveEl.style.display = '';
-  } else if (saveEl) {
-    saveEl.style.display = 'none';
-  }
+  // (Price, "was" and the Save % badge are set by setDetailPrice above,
+  //  using the selected size variant.)
 
   var thumbContent = currentProduct.image
     ? `<img src="${currentProduct.image}" alt="${currentProduct.name}">`
@@ -310,6 +334,35 @@ function selectOption(btn) {
   btn.classList.add('active');
 }
 
+// Writes the price, struck-through "was", and Save % badge on the detail page.
+// Shared by showProduct (initial render) and selectSize (when the size toggles).
+function setDetailPrice(price, was) {
+  var priceEl = document.getElementById('detailPrice');
+  var wasEl = document.getElementById('detailWas');
+  var saveEl = document.querySelector('.save');
+  if (priceEl) priceEl.textContent = '$' + Number(price).toFixed(2);
+  if (wasEl) wasEl.textContent = was ? '$' + Number(was).toFixed(2) : '';
+  if (saveEl) {
+    if (was && was > price) {
+      saveEl.textContent = 'Save ' + Math.round((1 - price / was) * 100) + '%';
+      saveEl.style.display = '';
+    } else {
+      saveEl.style.display = 'none';
+    }
+  }
+}
+
+// Size buttons use this instead of selectOption: it toggles the active state
+// AND re-prices the page from the product's sizePrices map (if present).
+function selectSize(btn) {
+  selectOption(btn);
+  if (!currentProduct) return;
+  currentSize = btn.textContent.trim();
+  var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
+  currentVariantPrice = variant ? variant.price : currentProduct.price;
+  setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
+}
+
 function selectThumb(thumb) {
   thumb.closest('.thumb-row').querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
   thumb.classList.add('active');
@@ -322,7 +375,12 @@ function changeQty(delta) {
 
 function addToCartDetail() {
   if (!currentProduct) return;
-  for (var i = 0; i < currentQty; i++) addToCart(currentProduct);
+  // Add the selected size variant at its price (falls back to the base price).
+  var item = Object.assign({}, currentProduct, {
+    price: (typeof currentVariantPrice === 'number') ? currentVariantPrice : currentProduct.price,
+    size: currentSize || ''
+  });
+  for (var i = 0; i < currentQty; i++) addToCart(item);
 }
 
 function buyNow() {
@@ -332,7 +390,10 @@ function buyNow() {
 
 // ==================== CART ====================
 function addToCart(product) {
-  var existing = cart.find(item => item.id === product.id);
+  // Match on id + size so different size variants are separate line items.
+  // Products added without a size (e.g. quick-add) just match on id as before.
+  var size = product.size || '';
+  var existing = cart.find(item => item.id === product.id && (item.size || '') === size);
   if (existing) { existing.qty++; }
   else { cart.push({ ...product, qty: 1 }); }
   updateCartCount();
@@ -393,8 +454,7 @@ function renderWishlist() {
       '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
       '<div class="product-stars">⭐⭐⭐⭐⭐ <span>(' + p.reviews + ' reviews)</span></div>' +
-      '<div class="product-price"><span class="price-now">$' + p.price.toFixed(2) + '</span>' +
-      (p.was ? '<span class="price-was">$' + p.was.toFixed(2) + '</span>' : '') + '</div>' +
+      '<div class="product-price">' + priceDisplayHtml(p) + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
   }).join('') + '</div>';
 }
@@ -407,8 +467,11 @@ function updateCartCount() {
   if (mobileCount) mobileCount.textContent = total;
 }
 
-function removeFromCart(id) {
-  cart = cart.filter(item => item.id !== id);
+function removeFromCart(idx) {
+  // idx is the cart line index (cart is re-rendered fresh each time, so
+  // indices always match what's on screen — this is variant-safe).
+  if (idx < 0 || idx >= cart.length) return;
+  cart.splice(idx, 1);
   updateCartCount();
   renderCart();
 }
@@ -433,20 +496,20 @@ function renderCart() {
   container.innerHTML = `
     <div class="cart-layout">
       <div class="cart-items">
-        ${cart.map(item => `
+        ${cart.map((item, idx) => `
           <div class="cart-item">
             <div class="cart-item-img">${item.emoji}</div>
             <div class="cart-item-info">
               <div class="cart-item-name">${item.name}</div>
-              <div class="cart-item-variant">Qty: ${item.qty}</div>
+              <div class="cart-item-variant">${item.size ? item.size + ' · ' : ''}Qty: ${item.qty}</div>
               <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
             </div>
             <div class="cart-item-right">
-              <button class="remove-btn" onclick="removeFromCart(${item.id})">✕</button>
+              <button class="remove-btn" onclick="removeFromCart(${idx})">✕</button>
               <div class="qty-control">
-                <button class="qty-btn" onclick="updateCartQty(${item.id}, -1)">−</button>
+                <button class="qty-btn" onclick="updateCartQty(${idx}, -1)">−</button>
                 <span class="qty-num">${item.qty}</span>
-                <button class="qty-btn" onclick="updateCartQty(${item.id}, 1)">+</button>
+                <button class="qty-btn" onclick="updateCartQty(${idx}, 1)">+</button>
               </div>
             </div>
           </div>
@@ -463,8 +526,8 @@ function renderCart() {
     </div>`;
 }
 
-function updateCartQty(id, delta) {
-  var item = cart.find(i => i.id === id);
+function updateCartQty(idx, delta) {
+  var item = cart[idx];
   if (!item) return;
   item.qty = Math.max(1, item.qty + delta);
   updateCartCount();

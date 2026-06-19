@@ -582,6 +582,9 @@ nav {
 
 .price-now { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--orange); }
 .price-was { font-size: 13px; color: var(--gray); text-decoration: line-through; font-weight: 600; }
+/* Variant price range (e.g. "$19.99–$24.99") — slightly smaller and kept on
+   one line so it never wraps or overflows a narrow mobile product card. */
+.price-now.price-range { font-size: clamp(15px, 4.4vw, 18px); white-space: nowrap; }
 
 /* WHY SECTION */
 .why-section {
