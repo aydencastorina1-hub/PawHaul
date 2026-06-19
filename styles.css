@@ -510,7 +510,7 @@ nav {
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-6px) scale(1.02);
   box-shadow: var(--shadow-hover);
   border-color: var(--orange);
 }
@@ -585,7 +585,9 @@ nav {
 
 /* WHY SECTION */
 .why-section {
-  background: var(--black);
+  /* Subtle depth: barely-there navy gradient instead of a flat fill.
+     Stays well within readable contrast for the white text on top. */
+  background: linear-gradient(160deg, #1f2040 0%, var(--navy) 55%, #14152b 100%);
   padding: 80px 5%;
   color: white;
 }
@@ -1467,7 +1469,9 @@ img.reviewer-av {
 
 /* ==================== FOOTER ==================== */
 footer {
-  background: var(--navy-deep);
+  /* Subtle navy gradient. Bottom stays --navy-deep (#0d0d1a) to match the
+     body background so the mobile overscroll bounce never flashes a seam. */
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
   color: white;
   padding: 60px 5% 28px;
 }
@@ -2175,5 +2179,52 @@ footer {
   /* Keep color changes, just remove transforms */
   .product-card:active { transform: scale(0.97); border-color: var(--orange); }
   .collection-card:active { transform: scale(0.97); border-color: var(--orange); }
+}
+
+/* ============================================================
+   VISUAL POLISH PASS — additive only, no layout/structure change
+   ============================================================ */
+
+/* Subtle press-down on tap/click for the primary action buttons.
+   Applies on touch too (press feedback) since it's :active, not :hover.
+   Each of these already declares a transition, so the scale eases smoothly. */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-black:active,
+.btn-white:active,
+.btn-add-cart:active,
+.btn-buy-now:active,
+.checkout-btn:active,
+.email-submit:active,
+.filter-btn:active,
+.offer-btn:active,
+.cart-btn:active {
+  transform: scale(0.97);
+}
+
+/* Balance multi-line section headings so line breaks look even.
+   Only affects auto-wrapping (the hero h1 uses explicit <br>, so it's
+   untouched); ignored gracefully by browsers without support. */
+.section-title { text-wrap: balance; }
+
+/* Respect users who prefer reduced motion: drop the hover/press transforms
+   and the scroll-reveal slide so nothing animates, but content stays visible. */
+@media (prefers-reduced-motion: reduce) {
+  .product-card:hover,
+  .product-card:active,
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-black:active,
+  .btn-white:active,
+  .btn-add-cart:active,
+  .btn-buy-now:active,
+  .checkout-btn:active,
+  .email-submit:active,
+  .filter-btn:active,
+  .offer-btn:active,
+  .cart-btn:active {
+    transform: none;
+  }
+  .reveal { transition: opacity 0.2s ease; transform: none; }
 }
 
