@@ -47,12 +47,19 @@ var SYSTEM_PROMPT = [
   "Be friendly, fun, and helpful. Use dog emojis occasionally 🐾. Keep responses short and conversational. If someone asks something you do not know tell them to email pawhaulsupport@gmail.com. Never make up information not listed above."
 ].join("\n");
 
+// Strip anything that can't legally appear in an HTTP header value — BOMs,
+// CR/LF, stray whitespace. A UTF-8 BOM smuggled in by a shell pipe once broke
+// the Authorization header with "Cannot convert argument to a ByteString".
+function cleanKey(value) {
+  return String(value || "").replace(/[^\x21-\x7E]/g, "");
+}
+
 function resolveGroqKey() {
-  if (process.env.GROQ_API_KEY) return process.env.GROQ_API_KEY;
+  if (process.env.GROQ_API_KEY) return cleanKey(process.env.GROQ_API_KEY);
   var keys = Object.keys(process.env);
   for (var i = 0; i < keys.length; i++) {
     if (keys[i].toLowerCase() === "groq_api_key" && process.env[keys[i]]) {
-      return process.env[keys[i]];
+      return cleanKey(process.env[keys[i]]);
     }
   }
   return "";
