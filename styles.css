@@ -30,14 +30,19 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* HERO IMAGE */
-#heroBgImg {
+/* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
+   rotation driven from app.js). Every slide stays centered on its subject. */
+#heroSection .hero-slide {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  display: block;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
 }
+#heroSection .hero-slide.active { opacity: 1; }
 
 /* CUSTOM CURSOR */
 .cursor { display: none; }
@@ -588,9 +593,6 @@ nav {
 
 .price-now { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--orange); }
 .price-was { font-size: 13px; color: var(--gray); text-decoration: line-through; font-weight: 600; }
-/* Variant price range (e.g. "$19.99–$24.99") — slightly smaller and kept on
-   one line so it never wraps or overflows a narrow mobile product card. */
-.price-now.price-range { font-size: clamp(15px, 4.4vw, 18px); white-space: nowrap; }
 
 /* WHY SECTION */
 .why-section {
@@ -1876,9 +1878,9 @@ footer {
      covers the screen on a short page like an empty cart. */
   #page-cart, #page-product { min-height: 100vh; }
 
-  /* ── HERO (image background) ──────────────────────────── */
+  /* ── HERO (slideshow background) ──────────────────────── */
   #heroSection { height: min(540px, 80vh) !important; }
-  #heroBgImg { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+  #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   #heroSection > div:last-child {
     align-items: center !important;
     text-align: center !important;
@@ -1889,7 +1891,7 @@ footer {
   /* Center the "Dog Walk Essentials" badge in the space between the hero top and the headline.
      Capped so the centered hero block doesn't push the bottom CTA buttons past the hero edge. */
   #heroSection > div:last-child > div:nth-child(1) { margin-top: 12px; }
-  #heroSection > div:nth-child(2) {
+  #heroSection .hero-overlay {
     background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%) !important;
   }
   #heroSection h1 { font-size: clamp(26px, 8vw, 40px) !important; }
@@ -2237,5 +2239,82 @@ footer {
     transform: none;
   }
   .reveal { transition: opacity 0.2s ease; transform: none; }
+}
+
+/* ============================================================
+   TABLET / DESKTOP / LARGE — min-width queries ONLY.
+   Mobile (≤767px) is final and must never be affected by these.
+   ============================================================ */
+
+/* ── TABLET (768px+) ─────────────────────────────────────────
+   Phones show ~1.5 cards per carousel view; tablets have room
+   for 2. Product grids step up from 2 to 3 columns. */
+@media (min-width: 768px) {
+  #homeProducts { gap: 16px; }
+  #homeProducts .product-card { flex: 0 0 calc(50% - 8px); }
+  #revCarousel .review-card { flex: 0 0 calc(50% - 8px); }
+  .products-grid, .shop-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ── DESKTOP (901px+) ────────────────────────────────────────
+   Grids back to their 4-column desktop layout. The Best Sellers
+   row carries 5 featured products, so as a plain 4-col grid the
+   5th card strands alone on a second row — instead it becomes a
+   4-per-view arrow carousel (same initCarousel the mobile view
+   already uses; the arrows just become visible here). */
+@media (min-width: 901px) {
+  .products-grid, .shop-grid { grid-template-columns: repeat(4, 1fr); }
+
+  #prodCarouselWrap { position: relative; }
+  #homeProducts {
+    display: flex !important;
+    grid-template-columns: unset !important;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    gap: 22px;
+    padding: 0;
+    margin: 0;
+  }
+  #homeProducts::-webkit-scrollbar { display: none; }
+  #homeProducts .product-card { flex: 0 0 calc(25% - 16.5px); flex-shrink: 0; }
+  #prodCarouselWrap .carousel-btn {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--black);
+    cursor: pointer;
+    z-index: 5;
+  }
+  #prodCarouselWrap .carousel-prev { left: -16px; }
+  #prodCarouselWrap .carousel-next { right: -16px; }
+  #prodCarouselWrap .carousel-btn.disabled { opacity: 0.3; cursor: default; }
+}
+
+/* ── LARGE DESKTOP (1440px+) ─────────────────────────────────
+   Cap content width so nothing stretches edge-to-edge on big
+   monitors (full-bleed section backgrounds stay full-bleed);
+   give the hero a little more height so it doesn't look squat. */
+@media (min-width: 1440px) {
+  .collections-header, .collections-grid,
+  .products-header, #prodCarouselWrap,
+  .why-header, .why-grid,
+  .reviews-header, .reviews-grid-wrap,
+  .shop-page, .product-detail,
+  .footer-grid, .footer-bottom {
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  #heroSection { height: 600px !important; }
 }
 

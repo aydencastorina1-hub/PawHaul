@@ -35,7 +35,7 @@ function addMsg(text, isUser) {
 
 
 
-// ── AI CHATBOT (Groq llama3-8b-8192 via /api/chat serverless proxy) ──
+// ── AI CHATBOT (Groq openai/gpt-oss-20b via /api/chat serverless proxy) ──
 // No API key lives in this file. The browser calls our own /api/chat
 // endpoint, which adds the system prompt + key server-side and talks to
 // Groq. Replaces the old keyword chatbot entirely.
@@ -143,14 +143,33 @@ function closePolicyModal() {
   }, { passive: true });
 })();
 
-// ── BUNDLE SUGGESTION ─────────────────────────────────────────
+// ── HERO SLIDESHOW ────────────────────────────────────────────
+// Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
+// looping forever. Slides 2-4 are pre-warmed AFTER window load so they never
+// pop in unloaded but also never compete with the first paint on mobile.
+(function () {
+  var slides = document.querySelectorAll('#heroSection .hero-slide');
+  if (slides.length < 2) return;
+  window.addEventListener('load', function () {
+    slides.forEach(function (img) { var pre = new Image(); pre.src = img.src; });
+  });
+  var idx = 0;
+  setInterval(function () {
+    if (document.hidden) return; // pause in background tabs
+    idx = (idx + 1) % slides.length;
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+  }, 5000);
+})();
+
+// ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
 var bundleMap = {
-  1: [2, 3],    // Walk Kit → suggest Leash + Bowl
-  2: [1, 5],    // Leash → suggest Walk Kit + Running Leash
-  3: [1, 2],    // Bowl → suggest Walk Kit + Leash
-  4: [6, 1],    // AirTag → suggest Collar + Walk Kit
-  5: [1, 2],    // Running Leash → suggest Walk Kit + Leash
-  6: [4, 2],    // Collar → suggest AirTag + Leash
+  1: [2, 3],    // Walk Kit → suggest Retractable Leash + Bowl
+  2: [8],       // Retractable Leash → pairs with Walk Clean Bag Hook ("Add Both")
+  3: [1, 2],    // Bowl → suggest Walk Kit + Retractable Leash
+  4: [6, 1],    // AirTag → suggest LED Collar + Walk Kit
+  5: [1, 2],    // Running Leash → suggest Walk Kit + Retractable Leash
+  6: [4, 2],    // LED Collar → suggest AirTag + Retractable Leash
+  8: [2],       // Bag Hook → pairs with Retractable Leash ("Add Both")
 };
 
 var originalShowProduct = showProduct;
@@ -172,7 +191,7 @@ function showBundle(productId) {
   allIds.forEach(function(bid) {
     var p = products.find(function(x) { return x.id === bid; });
     if (!p) return;
-    total += p.price;
+    total += lowestVariant(p).price;
     var isMain = bid === productId;
     var imgContent = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
     html += '<div style="display:flex;align-items:center;gap:12px;background:white;padding:10px 14px;border-radius:10px;">' +
@@ -181,18 +200,22 @@ function showBundle(productId) {
         '<div style="font-weight:800;font-size:13px;line-height:1.4;">' + p.name +
           (isMain ? ' <span style="background:var(--orange);color:white;font-size:10px;padding:2px 7px;border-radius:50px;white-space:nowrap;">This Item</span>' : '') +
         '</div>' +
-        '<div style="color:var(--orange);font-weight:800;font-size:13px;">$' + p.price.toFixed(2) + '</div>' +
+        '<div style="color:var(--orange);font-weight:800;font-size:13px;">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
       '</div>' +
       '<span style="color:var(--green);font-size:14px;font-weight:900;">&#10003;</span>' +
     '</div>';
   });
 
+  var isPair = allIds.length === 2;
   html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:2px dashed #F0F0F0;margin-top:4px;">' +
-    '<span style="font-weight:800;font-size:14px;">Bundle Total</span>' +
+    '<span style="font-weight:800;font-size:14px;">' + (isPair ? 'Combined Price' : 'Bundle Total') + '</span>' +
     '<span style="font-family:Fredoka One,cursive;font-size:20px;color:var(--orange);">$' + total.toFixed(2) + '</span>' +
   '</div>';
 
   bundleItems.innerHTML = html;
+  // Two-item pairings read "Add Both To Cart"; bigger bundles keep "Add Bundle To Cart".
+  var bundleBtn = document.getElementById('bundleAddBtn');
+  if (bundleBtn) bundleBtn.textContent = isPair ? 'Add Both To Cart 🛒' : 'Add Bundle To Cart 🛒';
   bundleDiv.style.display = 'block';
 }
 
@@ -207,7 +230,12 @@ function addBundleToCart() {
     var p = products.find(function(x) { return x.id === bid; });
     if (!p) return;
     var alreadyInCart = cart.some(function(c) { return c.id === bid; });
-    if (!alreadyInCart) { cart.push({ ...p, qty: 1 }); }
+    if (!alreadyInCart) {
+      // Variant products go in at their lowest-priced option (the price shown
+      // in the bundle box), tagged with its size.
+      var v = lowestVariant(p);
+      cart.push(Object.assign({}, p, { price: v.price, size: v.size || '', qty: 1 }));
+    }
   });
 
   updateCartCount();
@@ -288,7 +316,7 @@ function doSearch(val) {
       '<span class="search-result-emoji">' + p.emoji + '</span>' +
       '<div class="search-result-info">' +
         '<div class="search-result-name">' + p.name + '</div>' +
-        '<div class="search-result-price">$' + p.price.toFixed(2) + '</div>' +
+        '<div class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -311,7 +339,11 @@ function initCarousel(trackId, prevId, nextId) {
     return card.offsetWidth + (parseFloat(getComputedStyle(track).gap) || 12);
   }
   function count() { return track.children.length; }
-  function maxScroll() { return Math.max(0, (count() - 1) * step()); }
+  // True scroll limit (content minus viewport) — with several cards per view
+  // the last reachable index is well before count()-1, so clamp to it or the
+  // next arrow keeps "working" with nothing left to reveal.
+  function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
+  function maxIdx() { return Math.min(count() - 1, Math.ceil(maxScroll() / step())); }
 
   function smoothTo(target) {
     var start = track.scrollLeft;
@@ -328,11 +360,11 @@ function initCarousel(trackId, prevId, nextId) {
   }
 
   function goTo(n, instant) {
-    idx = Math.max(0, Math.min(n, count() - 1));
-    var target = idx * step();
+    idx = Math.max(0, Math.min(n, maxIdx()));
+    var target = Math.min(idx * step(), maxScroll());
     if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
     prev.classList.toggle('disabled', idx === 0);
-    next.classList.toggle('disabled', idx >= count() - 1);
+    next.classList.toggle('disabled', idx >= maxIdx());
   }
 
   prev.addEventListener('click', function() { goTo(idx - 1); });

@@ -31,42 +31,48 @@ var products = [
     whatsInBox: "1× Walk Kit 2-in-1 bottle (water + food compartments)"
   },
   {
-    id: 2, name: "Leash With Poop Bag Dispenser", price: 19.99, was: 27.99, emoji: "🦮", image: "", category: "leash",
+    id: 2, name: "Heavy-Duty Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
     badge: "⭐ New", badgeClass: "badge-new", reviews: 84,
-    desc: "A full-featured dog leash with a poop bag dispenser built right into the handle — so you never leave home without bags again. No separate clip-ons, no fumbling. Pull a bag, do the job, keep walking. The 360° reflective stitching keeps you both visible on early morning and evening walks, and the padded handle makes long walks comfortable.",
-    sizes: ["4ft / Standard", "5ft / Heavy Duty"],
-    colors: ["Black", "Blue", "Pink"],
+    desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
+
+    // Length drives the price (labels must exactly equal the sizePrices keys).
+    sizes: ["3m (10ft)", "5m (16ft)"],
+    colors: ["Red", "Gray", "Blue", "Black", "Pink", "Green", "Coffee", "Teal"],
+    sizePrices: {
+      "3m (10ft)": { price: 17.99, was: 24.99 },
+      "5m (16ft)": { price: 21.99, was: 28.99 }
+    },
+    price: 17.99, was: 24.99,
+
     features: [
-      "Built-in poop bag dispenser at the handle",
-      "Comes with 1 starter roll of bags (15 bags)",
-      "360° reflective stitching for night safety",
-      "Padded non-slip comfort grip handle",
-      "Heavy-duty nylon webbing construction",
-      "Secure stainless steel D-ring clip",
-      "Fits all dog sizes — small to XL",
-      "Easy-load dispenser refills any standard roll"
+      "Smooth, jam-free retracting mechanism",
+      "One-touch lock button for instant stopping power",
+      "Durable nylon tape handles dogs of all sizes",
+      "Comfortable ergonomic anti-slip grip",
+      "Available in 3m (10ft) and 5m (16ft) lengths",
+      "360° tangle-free swivel clip",
+      "8 colors to match your dog's style"
     ],
-    material: "Heavy-duty nylon webbing · TPU padded handle grip · Stainless steel hardware",
-    whatsInBox: "1× leash with built-in dispenser · 1× starter roll of poop bags (15 bags)"
+    material: "Durable nylon tape · Impact-resistant casing · Ergonomic anti-slip grip · Stainless steel swivel clip",
+    whatsInBox: "1× heavy-duty retractable dog leash"
   },
   {
-    id: 3, name: "Collapsible Travel Bowl", price: 12.99, was: 17.99, emoji: "🥣", image: "", category: "water",
+    id: 3, name: "Collapsible Travel Bowl", price: 14.99, was: 19.99, emoji: "🥣", image: "", category: "water",
     badge: "💧 Popular", badgeClass: "badge-popular", reviews: 91,
-    desc: "A food-grade silicone bowl that folds completely flat and fits in any pocket or bag. Pop it open in seconds when your dog needs water or food on the go. The included carabiner clip keeps it attached to your bag so you never leave it behind. Works for water and food — dishwasher safe and built to last.",
-    sizes: ["Small — 350ml / 12oz", "Large — 700ml / 24oz"],
-    colors: ["Orange", "Blue", "Green"],
+    desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
+    sizes: ["5.12in diameter × 1.97in height"],
+    colors: ["Red", "Blue", "Orange", "Pink", "Green", "Gray", "Black"],
     features: [
-      "Folds flat to under 2cm — fits any pocket",
-      "100% food-grade BPA-free silicone",
-      "Dishwasher safe — top rack",
-      "Non-slip base keeps it steady when open",
-      "Carabiner clip included",
-      "Lightweight: under 60g",
-      "Works for both water and dry food",
-      "Heat resistant up to 200°C / 392°F"
+      "Folds completely flat for easy storage",
+      "Pops open in seconds for food or water",
+      "Built-in carabiner clip hooks onto your bag, belt, or leash",
+      "Great size for walks and travel",
+      "Easy to clean — just rinse and fold",
+      "Durable, lightweight food-grade silicone",
+      "7 colors to choose from"
     ],
-    material: "100% food-grade BPA-free silicone · Stainless steel carabiner clip",
-    whatsInBox: "1× collapsible silicone bowl · 1× stainless steel carabiner clip"
+    material: "Food-grade silicone bowl · Built-in carabiner clip",
+    whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
     id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "safety",
@@ -107,23 +113,22 @@ var products = [
     whatsInBox: "1× waist belt · 1× bungee leash tether · 1× poop bag holder attachment"
   },
   {
-    id: 6, name: "Reflective Safety Collar", price: 16.99, was: 21.99, emoji: "✨", image: "", category: "safety",
+    id: 6, name: "LED Light-Up Dog Collar", price: 21.99, was: 29.99, emoji: "💡", image: "", category: "safety",
     badge: "🌙 Night Safety", badgeClass: "badge-night", reviews: 62,
-    desc: "A tough everyday collar with 360° reflective strips that make your dog visible from up to 500ft in the dark — perfect for early morning walks, evening runs, and everything in between. Built from heavy-duty nylon that holds up through rain, mud, and daily wear. The quick-release buckle makes it easy on and off, and the padded inner lining keeps your dog comfortable all day.",
-    sizes: ["S — neck 8\"–12\"", "M — neck 12\"–16\"", "L — neck 16\"–20\"", "XL — neck 20\"–26\""],
-    colors: ["Orange", "Blue", "Pink", "Black"],
+    desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
+    sizes: ["Small 13-16in", "Medium 14.5-18in", "Large 16-20.5in", "XL 16.5-22in"],
+    colors: ["Blue", "Green", "Pink", "Red", "Black"],
     features: [
-      "360° reflective strips — visible up to 500ft away",
-      "Heavy-duty nylon webbing — built for daily wear",
-      "Quick-release safety buckle",
-      "Padded soft inner lining for all-day comfort",
-      "Adjustable fit with secure slide buckle",
-      "Stainless steel D-ring for leash attachment",
-      "All-weather and waterproof — hose it clean",
-      "Available in 4 sizes and 4 colors"
+      "3 light modes — fast blink, slow blink, steady glow",
+      "Super bright at night — visible from far away",
+      "USB rechargeable — full charge in about 2 hours",
+      "Long battery life — holds a charge through multiple walks",
+      "Stays cool — doesn't overheat during wear",
+      "Detachable design fits any standard collar setup",
+      "4 sizes from Small (13-16in) to XL (16.5-22in)"
     ],
-    material: "Heavy-duty nylon webbing with reflective threading · Stainless steel D-ring · Quick-release plastic buckle · Soft padded lining",
-    whatsInBox: "1× reflective safety collar"
+    material: "Flexible LED light strip · USB rechargeable battery · Durable webbing band",
+    whatsInBox: "1× LED light-up dog collar · 1× USB charging cable"
   },
   {
     id: 7, name: "Dual Dog Walk Coupler", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
@@ -142,20 +147,20 @@ var products = [
     whatsInBox: "1× dual dog coupler with bungee section · 2× 360° swivel clips"
   },
   {
-    id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🪝", image: "", category: "leash",
+    id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🦴", image: "", category: "leash",
     badge: "🔥 Popular", badgeClass: "badge-popular", reviews: 43,
-    desc: "Never carry a poop bag in your hand again. This carabiner clip hooks directly onto any leash so the bag hangs securely while you keep walking. It's compatible with all standard leashes, lightweight enough to forget it's there, and odor resistant so nothing lingers. The simplest little upgrade to every single walk.",
+    desc: "Never get caught without a bag again. This bone-shaped poop bag dispenser clips directly onto any leash with a sturdy carabiner. Holds a full roll of bags inside, dispensing one at a time through the easy-pull slot. Lightweight and built to last.",
     sizes: ["Universal — fits all leashes"],
-    colors: ["Black", "Orange", "Green"],
+    colors: ["Red", "Blue", "Black", "Pink", "Green"],
     features: [
-      "Fits all standard leashes",
-      "Odor-resistant coating",
-      "Lightweight — barely noticeable on the leash",
-      "Strong carabiner clip closure",
-      "Hands-free bag carry on every walk"
+      "Bone-shaped dispenser holds a full roll of bags",
+      "Dispenses one bag at a time through the easy-pull slot",
+      "Sturdy carabiner clips onto any leash securely",
+      "Easy-to-spot colors — never dig for it",
+      "Lightweight and built to last"
     ],
-    material: "Lightweight aluminum carabiner · Odor-resistant coating",
-    whatsInBox: "1× carabiner bag hook clip"
+    material: "Durable ABS bone-shaped shell · Aluminum carabiner clip",
+    whatsInBox: "1× bone-shaped bag dispenser with carabiner (bag roll not included)"
   }
 ];
 
@@ -215,7 +220,7 @@ function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
   // Home carousel = these 5 specific products, in this exact order.
   // (Shop page still shows all products.)
-  var featuredIds = [1, 8, 6, 4, 2]; // Walk Kit, Bag Hook, Reflective Collar, AirTag Holder, Leash w/ Dispenser
+  var featuredIds = [1, 8, 6, 4, 2]; // Walk Kit, Bag Hook, LED Collar, AirTag Holder, Retractable Leash
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);
@@ -231,21 +236,29 @@ function renderShopProducts(filter) {
   container.innerHTML = filtered.map(function(p) { return productCard(p); }).join('');
 }
 
-// Builds the inner HTML of a .product-price block. Products with per-size
-// variant pricing show a price RANGE (e.g. "$19.99–$24.99"); single-price
-// products show the price plus the struck-through "was". Shared by the shop
-// grid, the home carousel and the wishlist so they always stay consistent.
-function priceDisplayHtml(p) {
+// SITE-WIDE PRICE RULE: product cards always show the LOWEST price option —
+// never a range. lowestVariant() finds the cheapest size variant (or the base
+// price for single-price products); its label drives the default selection on
+// the detail page too.
+function lowestVariant(p) {
   if (p.sizePrices) {
-    var prices = Object.keys(p.sizePrices).map(function (k) { return p.sizePrices[k].price; });
-    var min = Math.min.apply(null, prices);
-    var max = Math.max.apply(null, prices);
-    if (min !== max) {
-      return '<span class="price-now price-range">$' + min.toFixed(2) + '–$' + max.toFixed(2) + '</span>';
-    }
+    var best = null;
+    Object.keys(p.sizePrices).forEach(function (k) {
+      var v = p.sizePrices[k];
+      if (v && (!best || v.price < best.price)) best = { size: k, price: v.price, was: v.was };
+    });
+    if (best) return best;
   }
-  return '<span class="price-now">$' + p.price.toFixed(2) + '</span>' +
-    (p.was ? '<span class="price-was">$' + p.was.toFixed(2) + '</span>' : '');
+  return { size: null, price: p.price, was: p.was };
+}
+
+// Builds the inner HTML of a .product-price block: the lowest price plus its
+// struck-through "was". Shared by the shop grid, the home carousel and the
+// wishlist so they always stay consistent.
+function priceDisplayHtml(p) {
+  var v = lowestVariant(p);
+  return '<span class="price-now">$' + v.price.toFixed(2) + '</span>' +
+    (v.was ? '<span class="price-was">$' + v.was.toFixed(2) + '</span>' : '');
 }
 
 function productCard(p) {
@@ -291,11 +304,19 @@ function showProduct(id) {
     '<div class="det-dots" id="detDots"></div>';
   setTimeout(function() { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
   document.getElementById('detailName').textContent = currentProduct.name;
-  // Default to the first size variant; its price drives the initial display.
-  currentSize = (currentProduct.sizes && currentProduct.sizes.length) ? currentProduct.sizes[0] : null;
-  var defVariant = (currentProduct.sizePrices && currentSize) ? currentProduct.sizePrices[currentSize] : null;
-  currentVariantPrice = defVariant ? defVariant.price : currentProduct.price;
-  setDetailPrice(currentVariantPrice, defVariant ? defVariant.was : currentProduct.was);
+  // Default to the CHEAPEST size variant (site-wide lowest-price rule); its
+  // price drives the initial display and its button starts out selected.
+  var cheapest = lowestVariant(currentProduct);
+  var defSizeIdx = 0;
+  if (currentProduct.sizes && currentProduct.sizes.length) {
+    var found = currentProduct.sizes.indexOf(cheapest.size);
+    if (found > -1) defSizeIdx = found;
+    currentSize = currentProduct.sizes[defSizeIdx];
+  } else {
+    currentSize = null;
+  }
+  currentVariantPrice = cheapest.price;
+  setDetailPrice(cheapest.price, cheapest.was);
   document.getElementById('detailDesc').textContent = currentProduct.desc;
   document.getElementById('detailReviews').textContent = `(${currentProduct.reviews} reviews)`;
   document.getElementById('qtyNum').textContent = '1';
@@ -304,7 +325,7 @@ function showProduct(id) {
   document.getElementById('detailCategory').textContent = cats[currentProduct.category] || 'PawHaul';
 
   document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map((s, i) =>
-    `<button class="option-btn ${i===0?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');
+    `<button class="option-btn ${i===defSizeIdx?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');
 
   document.getElementById('detailColors').innerHTML = currentProduct.colors.map((c, i) =>
     `<button class="option-btn ${i===0?'active':''}" onclick="selectOption(this)">${c}</button>`).join('');
@@ -402,7 +423,11 @@ function addToCart(product) {
 
 function quickAdd(id) {
   var product = products.find(p => p.id === id);
-  if (product) addToCart(product);
+  if (!product) return;
+  // Card buttons add the LOWEST-priced variant (the price the card shows),
+  // tagged with its size so it lands on the right cart line.
+  var v = lowestVariant(product);
+  addToCart(Object.assign({}, product, { price: v.price, size: v.size || '' }));
 }
 
 var wishlistItems = [];
