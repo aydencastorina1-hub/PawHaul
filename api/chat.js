@@ -104,10 +104,14 @@ module.exports = async function handler(req, res) {
     }
 
     var payload = {
-      // llama3-8b-8192 was decommissioned by Groq; this is its replacement.
-      model: "llama-3.1-8b-instant",
+      // llama-3.1-8b-instant is deprecated by Groq (shutdown 2026-08-16);
+      // openai/gpt-oss-20b is Groq's recommended replacement.
+      model: "openai/gpt-oss-20b",
       messages: [{ role: "system", content: SYSTEM_PROMPT }].concat(clean),
-      max_tokens: 400,
+      // gpt-oss is a reasoning model: reasoning tokens count toward
+      // max_tokens, so give headroom and keep reasoning effort low.
+      max_tokens: 1024,
+      reasoning_effort: "low",
       temperature: 0.6
     };
 
@@ -123,7 +127,13 @@ module.exports = async function handler(req, res) {
     if (!groqRes.ok) {
       var errText = await groqRes.text();
       console.error("Groq API error", groqRes.status, errText);
-      res.status(502).json({ error: "Upstream AI error" });
+      // Surface the upstream status + a short error snippet so failures are
+      // diagnosable from the live site (Groq error bodies contain no secrets).
+      res.status(502).json({
+        error: "Upstream AI error",
+        upstreamStatus: groqRes.status,
+        detail: String(errText).slice(0, 300)
+      });
       return;
     }
 
