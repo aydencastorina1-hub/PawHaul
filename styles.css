@@ -2348,3 +2348,44 @@ footer {
   #heroSection { height: 600px !important; }
 }
 
+
+/* ============================================================
+   MOBILE-ONLY (≤767px): uniform "Our Most Loved Products" cards.
+   Flex-basis alone let a long product name (min-width:auto) force
+   its card wider than the others, which then skewed heights too.
+   Every card is now a fixed 230x360 box and the image / title /
+   price / button zones have fixed heights, so all cards match
+   regardless of content length. Desktop (768px+) is untouched.
+   ============================================================ */
+@media (max-width: 767px) {
+  #homeProducts .product-card {
+    flex: 0 0 230px;          /* fixed width — not a % of the viewport */
+    width: 230px;
+    min-width: 0;             /* long names can no longer stretch the card */
+    height: 360px;
+  }
+  #homeProducts .product-img-wrap,
+  #homeProducts .product-img { height: 150px; }
+  #homeProducts .product-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 14px;
+  }
+  /* Title always occupies exactly two lines' worth of space */
+  #homeProducts .product-name {
+    font-size: 13px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 2.7em;
+    margin-bottom: 0;
+  }
+  #homeProducts .product-stars { margin-bottom: 0; }
+  /* space-between does the aligning now — auto margin would fight it */
+  #homeProducts .product-info .btn-black { margin-top: 0; }
+}
