@@ -2389,3 +2389,54 @@ footer {
   /* space-between does the aligning now — auto margin would fight it */
   #homeProducts .product-info .btn-black { margin-top: 0; }
 }
+
+/* ============================================================
+   TABLET/DESKTOP RESPONSIVE FIX PASS — min-width queries ONLY.
+   Mobile (≤767px) is final and untouched by construction.
+   ============================================================ */
+@media (min-width: 768px) {
+  /* IMAGE CROPS — the hero slides include two PORTRAIT photos; at wide
+     aspect ratios a center-center crop showed sky instead of the subject.
+     Per-slide object-position keeps the dog/person in frame. !important
+     is required to beat the ≤900 mobile block's own !important rule in
+     the 768–900 overlap (these selectors are more specific + later). */
+  #heroSection .hero-slide:nth-of-type(1) { object-position: center 70% !important; } /* man + dog low in frame, sky above */
+  #heroSection .hero-slide:nth-of-type(3) { object-position: center 45% !important; } /* shaking dog's ears clipped at top */
+  #heroSection .hero-slide:nth-of-type(4) { object-position: center 72% !important; } /* small dog near bottom edge */
+  .lifestyle-banner img { object-position: center 38%; }  /* dogs' heads sit above center */
+  .about-hero-img { object-position: center 60%; }        /* running puppy sits below center */
+
+  /* EQUAL-HEIGHT CAROUSEL CARDS — base .product-card{height:100%} resolves
+     as auto inside the flex carousel (no definite container height), so
+     short-name cards rendered shorter and Add To Cart buttons misaligned.
+     height:auto lets the default align-items:stretch equalize them. */
+  .product-card { height: auto; }
+}
+
+/* Hero CTAs in the 768–900 overlap: the mobile block stacks them full-width
+   (phone style). Side-by-side auto-width reads as intentional tablet layout.
+   Scoped with an upper bound so the 901+ inline flex-end alignment is kept. */
+@media (min-width: 768px) and (max-width: 900px) {
+  #heroSection > div:last-child > div:last-child {
+    flex-direction: row !important;
+    width: auto !important;
+    justify-content: center !important;
+  }
+  #heroSection > div:last-child > div:last-child button { width: auto !important; }
+  #heroSection .btn-primary { width: auto !important; }
+}
+
+@media (min-width: 1024px) {
+  /* Collections stayed a stretched 2x2 at every width — go 4-across once
+     there is room (beats the inline grid-template-columns on the div). */
+  #collectionsGrid { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+@media (min-width: 1440px) {
+  /* Mission section stretched edge-to-edge on large monitors while every
+     other section was capped at 1400px — cap it the same way. */
+  .mission-section {
+    padding-left: max(5%, calc((100% - 1400px) / 2));
+    padding-right: max(5%, calc((100% - 1400px) / 2));
+  }
+}
