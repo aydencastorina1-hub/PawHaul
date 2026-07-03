@@ -261,6 +261,110 @@ function priceDisplayHtml(p) {
     (v.was ? '<span class="price-was">$' + v.was.toFixed(2) + '</span>' : '');
 }
 
+// ── Compact on-card variant pickers (home carousel + shop grid) ──
+// Tiny color swatches + size pills rendered between the reviews and the
+// price. Selection lives in the card's own DOM (active classes), so every
+// card picks independently; cardAdd() reads it back at add-to-cart time.
+var SWATCH_COLORS = {
+  red: '#D63031', maroon: '#7B1E24', pink: '#F06292', blue: '#2563EB',
+  teal: '#0D9488', green: '#16A34A', gray: '#9CA3AF', grey: '#9CA3AF',
+  black: '#15151F', coffee: '#6F4E37', orange: '#E8630A'
+};
+
+// "Teal/Blue" style dual names render as a split circle.
+function swatchCss(name) {
+  var parts = String(name).split('/').map(function (x) {
+    return SWATCH_COLORS[x.trim().toLowerCase()] || '#CCCCCC';
+  });
+  if (parts.length > 1) return 'background:linear-gradient(135deg,' + parts[0] + ' 50%,' + parts[1] + ' 50%)';
+  return 'background:' + parts[0];
+}
+
+// Cards are tiny, so size labels compress: "Small 13-16in" → "S",
+// "3m (10ft)" → "3m", "350ml" stays. The FULL label is kept in data-size
+// (it must exactly equal the sizePrices key for pricing/cart lines).
+function shortSizeLabel(s) {
+  s = String(s);
+  var word = s.match(/^(XXL|XL|Small|Medium|Large)\b/i);
+  if (word) {
+    var w = word[1].toLowerCase();
+    return w === 'small' ? 'S' : w === 'medium' ? 'M' : w === 'large' ? 'L' : word[1].toUpperCase();
+  }
+  var unit = s.match(/^\d+(?:\.\d+)?\s?(?:ml|cm|mm|in|ft|oz|m|L)\b/i);
+  if (unit) return unit[0].replace(/\s+/g, '');
+  return s;
+}
+
+function cardOptionsHtml(p) {
+  var colorRow = '', sizeRow = '';
+  if (p.colors && p.colors.length > 1) {
+    colorRow = '<div class="mini-swatches">' + p.colors.map(function (c, i) {
+      return '<button type="button" class="mini-swatch' + (i === 0 ? ' active' : '') +
+        '" data-color="' + c + '" title="' + c + '" aria-label="Color: ' + c +
+        '" style="' + swatchCss(c) + '" onclick="cardSelectColor(event,this)"></button>';
+    }).join('') + '</div>';
+  }
+  // Only render a size row when there's actually a choice — single-size
+  // products carry long descriptive labels ("Universal — fits all leashes")
+  // that would just be noise on a card.
+  if (p.sizes && p.sizes.length > 1) {
+    var def = lowestVariant(p).size || p.sizes[0];
+    sizeRow = '<div class="mini-sizes">' + p.sizes.map(function (s) {
+      return '<button type="button" class="mini-size' + (s === def ? ' active' : '') +
+        '" data-size="' + s + '" title="' + s +
+        '" onclick="cardSelectSize(event,this,' + p.id + ')">' + shortSizeLabel(s) + '</button>';
+    }).join('') + '</div>';
+  }
+  if (!colorRow && !sizeRow) return '';
+  return '<div class="card-opts" onclick="event.stopPropagation()">' + colorRow + sizeRow + '</div>';
+}
+
+function cardSelectColor(ev, btn) {
+  ev.stopPropagation();
+  var card = btn.closest('.product-card');
+  if (!card) return;
+  card.querySelectorAll('.mini-swatch').forEach(function (b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function cardSelectSize(ev, btn, id) {
+  ev.stopPropagation();
+  var card = btn.closest('.product-card');
+  if (!card) return;
+  card.querySelectorAll('.mini-size').forEach(function (b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  // Re-price the card instantly from the selected size variant.
+  var p = products.find(function (x) { return x.id === id; });
+  var priceEl = card.querySelector('.product-price');
+  if (!p || !priceEl) return;
+  var sp = p.sizePrices ? p.sizePrices[btn.dataset.size] : null;
+  var price = sp ? sp.price : p.price;
+  var was = sp ? sp.was : p.was;
+  priceEl.innerHTML = '<span class="price-now">$' + price.toFixed(2) + '</span>' +
+    (was ? '<span class="price-was">$' + was.toFixed(2) + '</span>' : '');
+}
+
+// Card Add To Cart: adds whatever size/color the card currently has
+// selected (falls back to the cheapest variant, same as quickAdd).
+function cardAdd(ev, id) {
+  if (ev) ev.stopPropagation();
+  var p = products.find(function (x) { return x.id === id; });
+  if (!p) return;
+  var card = ev && ev.target ? ev.target.closest('.product-card') : null;
+  var v = lowestVariant(p);
+  var size = v.size || '', price = v.price;
+  var sizeBtn = card ? card.querySelector('.mini-size.active') : null;
+  if (sizeBtn && sizeBtn.dataset.size) {
+    size = sizeBtn.dataset.size;
+    var sp = p.sizePrices ? p.sizePrices[size] : null;
+    price = sp ? sp.price : p.price;
+  }
+  var item = Object.assign({}, p, { price: price, size: size || '' });
+  var sw = card ? card.querySelector('.mini-swatch.active') : null;
+  if (sw && sw.dataset.color) item.color = sw.dataset.color;
+  addToCart(item);
+}
+
 function productCard(p) {
   var imgContent = p.image
     ? `<img src="${p.image}" alt="${p.name}">`
@@ -274,8 +378,9 @@ function productCard(p) {
       <div class="product-info">
         <div class="product-name">${p.name}</div>
         <div class="product-stars">⭐⭐⭐⭐⭐ <span>(${p.reviews} reviews)</span></div>
+        ${cardOptionsHtml(p)}
         <div class="product-price">${priceDisplayHtml(p)}</div>
-        <button class="btn-black" onclick="event.stopPropagation(); quickAdd(${p.id})">Add To Cart 🛒</button>
+        <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart 🛒</button>
       </div>
     </div>
   `;

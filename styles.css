@@ -597,9 +597,9 @@ nav {
   flex-direction: column;
   flex: 1 1 auto;
 }
-/* Pin the Add To Cart button to the bottom so every card aligns,
-   regardless of how many lines the product name takes. */
-.product-info .btn-black { margin-top: auto; }
+/* Pin the price + Add To Cart button to the bottom so every card aligns,
+   regardless of name length or how many variant-picker rows it has. */
+.product-info .product-price { margin-top: auto; }
 .product-name { font-weight: 800; font-size: 15px; margin-bottom: 6px; }
 .product-stars { color: #FFB800; font-size: 12px; margin-bottom: 10px; }
 .product-stars span { color: var(--gray); font-size: 11px; font-weight: 600; }
@@ -613,6 +613,48 @@ nav {
 
 .price-now { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--orange); }
 .price-was { font-size: 13px; color: var(--gray); text-decoration: line-through; font-weight: 600; }
+
+/* COMPACT ON-CARD VARIANT PICKERS (home carousel + shop grid) */
+.card-opts {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0 0 10px;
+  cursor: default; /* taps here select options, never open the product */
+}
+.mini-swatches { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+.mini-swatch {
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  border: 1px solid rgba(26, 26, 46, 0.18);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.mini-swatch:hover { transform: scale(1.18); }
+.mini-swatch.active { box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--orange); }
+.mini-sizes { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.mini-size {
+  font-family: 'Nunito', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: white;
+  color: var(--black);
+  cursor: pointer;
+  transition: all 0.15s var(--ease);
+}
+.mini-size:hover { border-color: var(--orange); }
+.mini-size.active {
+  border-color: var(--orange);
+  background: rgba(232, 99, 10, 0.10);
+  color: var(--orange);
+}
 
 /* WHY SECTION */
 .why-section {
@@ -2362,7 +2404,7 @@ footer {
     flex: 0 0 230px;          /* fixed width — not a % of the viewport */
     width: 230px;
     min-width: 0;             /* long names can no longer stretch the card */
-    height: 360px;
+    height: 404px;            /* fits the variant picker rows (was 360) */
   }
   #homeProducts .product-img-wrap,
   #homeProducts .product-img { height: 150px; }
@@ -2386,8 +2428,10 @@ footer {
     margin-bottom: 0;
   }
   #homeProducts .product-stars { margin-bottom: 0; }
-  /* space-between does the aligning now — auto margin would fight it */
+  /* space-between does the aligning now — auto margins would fight it */
   #homeProducts .product-info .btn-black { margin-top: 0; }
+  #homeProducts .product-price { margin-top: 0; margin-bottom: 0; }
+  #homeProducts .card-opts { margin-bottom: 0; }
 }
 
 /* ============================================================
