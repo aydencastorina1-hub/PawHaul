@@ -2388,7 +2388,7 @@ footer {
 @media (min-width: 1440px) {
   .collections-header, .col-carousel-wrap,
   .products-header, #prodCarouselWrap,
-  .why-header, .why-points,
+  .why-header, .walk-route,
   .reviews-header, .reviews-grid-wrap,
   .shop-page, .product-detail,
   .footer-grid, .footer-bottom {
@@ -2581,9 +2581,9 @@ footer {
 .col-carousel-wrap .carousel-btn {
   display: flex;
   position: absolute;
-  /* Mobile: anchor to the center of the 200px image zone so the arrows
-     sit over the photo and never cover the slide text below it. */
-  top: 100px;
+  /* Mobile: center the arrows exactly on the seam where the 200px slide
+     image meets the white body — over the boundary, never the text. */
+  top: 200px;
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
@@ -2636,80 +2636,123 @@ footer {
   .col-carousel-wrap .carousel-next { right: -18px; }
 }
 
+
 /* ============================================================
-   WHY SECTION REDESIGN — editorial numbered points over a
-   full-bleed lifestyle photo with a heavy navy overlay.
-   Replaces the flat icon-tile .why-card grid (those rules are
-   now dead). Appended LAST so it wins at every breakpoint.
+   WHY SECTION v3 — "THE WALK ROUTE". No photo: the 4 points are
+   stops along a dashed dog-walk path, each with an orange number
+   badge on the line and a glassy card. Background = navy gradient
+   + two soft orange glows + a whisper-faint tiled paw pattern
+   (inline SVG — no external image). Mobile: path down the left.
+   Desktop: path down the center, stops zigzag left/right.
    ============================================================ */
-.why-section { position: relative; overflow: hidden; }
-.why-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* Wide scenic source (dog small in frame) + true centering — the old
-     close-up photo read as "zoomed in" no matter how it was positioned. */
-  object-position: center center;
-}
-/* ~88% navy keeps the photo as texture while text stays high-contrast */
-.why-bg-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg,
-    rgba(31, 32, 64, 0.92) 0%,
-    rgba(26, 26, 46, 0.86) 55%,
-    rgba(20, 21, 43, 0.93) 100%);
+.why-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='120' height='120'%3E%3Cg fill='%23ffffff' fill-opacity='0.022' transform='rotate(-18 50 50)'%3E%3Cellipse cx='50' cy='67' rx='20' ry='16'/%3E%3Cellipse cx='27' cy='47' rx='9' ry='12'/%3E%3Cellipse cx='42' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='58' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='73' cy='47' rx='9' ry='12'/%3E%3C/g%3E%3C/svg%3E") repeat,
+    radial-gradient(640px 340px at 88% 6%, rgba(232, 99, 10, 0.10), transparent 70%),
+    radial-gradient(520px 340px at 4% 96%, rgba(232, 99, 10, 0.07), transparent 70%),
+    linear-gradient(160deg, #1f2040 0%, #1a1a2e 55%, #14152b 100%);
+  background-size: 150px, auto, auto, auto;
 }
 .why-content { position: relative; z-index: 1; }
 
-/* Mobile-first: vertical numbered list with hairline dividers */
-.why-points {
-  max-width: 1080px;
+.walk-route {
+  position: relative;
+  max-width: 940px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr;
 }
-.why-point {
+/* The dashed walk path */
+.walk-route::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 30px;
+  left: 25px;
+  border-left: 2px dashed rgba(232, 99, 10, 0.45);
+}
+/* ...and the route ends at a paw. You arrived. */
+.walk-route::after {
+  content: '🐾';
+  position: absolute;
+  bottom: -4px;
+  left: 26px;
+  transform: translateX(-50%);
+  font-size: 20px;
+}
+
+.route-stop { position: relative; padding-left: 78px; }
+.route-stop + .route-stop { margin-top: 36px; }
+
+.route-badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 30px 4px;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
-  text-align: left;
-}
-.why-point:first-child { border-top: none; }
-.why-num {
+  align-items: center;
+  justify-content: center;
   font-family: 'Fredoka One', cursive;
-  font-size: 42px;
-  line-height: 0.95;
-  color: var(--orange);
-  flex-shrink: 0;
-  min-width: 62px; /* equal number column = aligned text blocks */
+  font-size: 19px;
+  color: white;
+  background: linear-gradient(135deg, #F58138 0%, var(--orange) 55%, var(--orange-dark) 100%);
+  box-shadow: 0 0 0 5px rgba(232, 99, 10, 0.16), 0 8px 20px rgba(232, 99, 10, 0.35);
 }
-.why-point-title {
+
+.route-card {
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 16px;
+  padding: 20px 22px;
+  transition: all 0.3s var(--ease);
+}
+.route-card:hover {
+  background: rgba(232, 99, 10, 0.07);
+  border-color: rgba(232, 99, 10, 0.55);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+.route-title {
   font-family: 'Fredoka One', cursive;
   font-weight: 400;
   font-size: 21px;
   line-height: 1.2;
   color: #f8f6f2;
-  margin: 4px 0 10px; /* optically centers against the big number */
+  margin-bottom: 8px;
 }
-.why-point-desc {
+.route-desc {
   font-size: 14.5px;
   font-weight: 600;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.65);
-  max-width: 52ch;
 }
 
-/* Tablet/desktop: two editorial columns */
+/* Desktop: path down the middle, stops alternate sides */
 @media (min-width: 768px) {
-  .why-points { grid-template-columns: 1fr 1fr; column-gap: 72px; }
-  .why-point:nth-child(2) { border-top: none; } /* both items in the top row */
-  .why-point { padding: 38px 4px; gap: 24px; }
-  .why-num { font-size: 58px; min-width: 86px; }
-  .why-point-title { font-size: 25px; margin-top: 8px; }
-  .why-point-desc { font-size: 15px; }
+  .walk-route::before { left: 50%; margin-left: -1px; }
+  .walk-route::after { left: 50%; font-size: 24px; bottom: -14px; }
+  .route-stop {
+    width: 50%;
+    padding-left: 0;
+    padding-right: 74px;
+  }
+  .route-stop:nth-child(even) {
+    margin-left: 50%;
+    padding-right: 0;
+    padding-left: 74px;
+  }
+  /* Stagger: each stop starts alongside the previous one's lower half */
+  .route-stop + .route-stop { margin-top: -44px; }
+  .route-badge {
+    width: 56px;
+    height: 56px;
+    font-size: 21px;
+  }
+  .route-stop:nth-child(odd) .route-badge { left: auto; right: -28px; }
+  .route-stop:nth-child(even) .route-badge { left: -28px; }
+  .route-card { padding: 24px 28px; }
+  .route-title { font-size: 24px; }
+  .route-desc { font-size: 15px; }
 }

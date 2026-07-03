@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=27">
+  <link rel="stylesheet" href="styles.css?v=28">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -247,8 +247,6 @@
 
   <!-- WHY PAWHAUL -->
   <section class="why-section">
-    <img class="why-bg" loading="lazy" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2000&q=80" alt="" aria-hidden="true">
-    <div class="why-bg-overlay" aria-hidden="true"></div>
     <div class="why-content">
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="why-header">
@@ -256,33 +254,34 @@
       <h2 class="section-title" style="color:white;">Built For Dog Owners <span style="color:var(--orange);">Who Do More</span></h2>
       <p class="section-sub">Every product we make solves a real problem for real dog owners</p>
     </div>
-    <div class="why-points">
-      <div class="why-point">
-        <div class="why-num">01</div>
-        <div>
-          <h3 class="why-point-title">Water On Every Walk</h3>
-          <p class="why-point-desc">Fresh water for your dog whenever they need it — no extra bowls, no mess, no hassle</p>
+    <!-- The 4 points as stops along a dashed dog-walk route 🐾 -->
+    <div class="walk-route">
+      <div class="route-stop">
+        <div class="route-badge">01</div>
+        <div class="route-card">
+          <h3 class="route-title">Water On Every Walk</h3>
+          <p class="route-desc">Fresh water for your dog whenever they need it — no extra bowls, no mess, no hassle</p>
         </div>
       </div>
-      <div class="why-point">
-        <div class="why-num">02</div>
-        <div>
-          <h3 class="why-point-title">Food Ready To Go</h3>
-          <p class="why-point-desc">Keep dry food fresh and ready in your pocket — never cut a walk short for feeding time</p>
+      <div class="route-stop">
+        <div class="route-badge">02</div>
+        <div class="route-card">
+          <h3 class="route-title">Food Ready To Go</h3>
+          <p class="route-desc">Keep dry food fresh and ready in your pocket — never cut a walk short for feeding time</p>
         </div>
       </div>
-      <div class="why-point">
-        <div class="why-num">03</div>
-        <div>
-          <h3 class="why-point-title">Total Walk Control</h3>
-          <p class="why-point-desc">Leashes and hands-free options that make every walk easier, safer and more enjoyable</p>
+      <div class="route-stop">
+        <div class="route-badge">03</div>
+        <div class="route-card">
+          <h3 class="route-title">Total Walk Control</h3>
+          <p class="route-desc">Leashes and hands-free options that make every walk easier, safer and more enjoyable</p>
         </div>
       </div>
-      <div class="why-point">
-        <div class="why-num">04</div>
-        <div>
-          <h3 class="why-point-title">Safe Day &amp; Night</h3>
-          <p class="why-point-desc">LED light-up collars and AirTag holders so your dog is always visible and never lost</p>
+      <div class="route-stop">
+        <div class="route-badge">04</div>
+        <div class="route-card">
+          <h3 class="route-title">Safe Day &amp; Night</h3>
+          <p class="route-desc">LED light-up collars and AirTag holders so your dog is always visible and never lost</p>
         </div>
       </div>
     </div>
