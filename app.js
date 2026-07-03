@@ -477,27 +477,53 @@ function initCarousel(trackId, prevId, nextId) {
     next.classList.toggle('disabled', idx >= maxIdx());
   }
 
-  prev.addEventListener('click', function() { goTo(idx - 1); });
-  next.addEventListener('click', function() { goTo(idx + 1); });
+  // Re-render pages re-run initCarousel on the SAME track element — abort
+  // the previous instance's listeners so they never stack up and fight.
+  if (track._carouselAbort) track._carouselAbort.abort();
+  var ac = new AbortController();
+  track._carouselAbort = ac;
+  var opts = { passive: true, signal: ac.signal };
+
+  // Sync internal state to wherever the track actually rests. Native
+  // momentum scrolling settles between indexes, so idx must be derived
+  // from scrollLeft — a stale idx made the next tap/arrow visibly "jump".
+  function resync() {
+    idx = Math.max(0, Math.min(Math.round(track.scrollLeft / step()), maxIdx()));
+    prev.classList.toggle('disabled', idx === 0);
+    next.classList.toggle('disabled', idx >= maxIdx());
+  }
+  var scrollT;
+  track.addEventListener('scroll', function() {
+    clearTimeout(scrollT);
+    scrollT = setTimeout(resync, 120);
+  }, opts);
+
+  prev.addEventListener('click', function() { goTo(idx - 1); }, { signal: ac.signal });
+  next.addEventListener('click', function() { goTo(idx + 1); }, { signal: ac.signal });
 
   track.addEventListener('touchstart', function(e) {
     touchStartX = e.touches[0].clientX;
     touchStartLeft = track.scrollLeft;
-  }, { passive: true });
+  }, opts);
 
   track.addEventListener('touchmove', function(e) {
     var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
     track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
-  }, { passive: true });
+  }, opts);
 
   track.addEventListener('touchend', function(e) {
     var delta = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(delta) > 30) {
-      goTo(idx + (delta > 0 ? 1 : -1));
-    } else {
-      goTo(idx);
+      // Real swipe: advance from where the gesture STARTED.
+      goTo(Math.round(touchStartLeft / step()) + (delta > 0 ? 1 : -1));
+    } else if (Math.abs(delta) > 8) {
+      // Micro-drag: settle on the nearest card.
+      goTo(Math.round(track.scrollLeft / step()));
     }
-  }, { passive: true });
+    // Pure tap (≤8px): never move the track — picking a color/size or
+    // opening a product must not slide the carousel. resync() via the
+    // scroll listener keeps idx honest.
+  }, opts);
 
   goTo(0, true);
 }

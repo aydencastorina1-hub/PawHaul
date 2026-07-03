@@ -655,6 +655,15 @@ nav {
   background: rgba(232, 99, 10, 0.10);
   color: var(--orange);
 }
+/* Pressing a swatch/pill must not "press" the whole card — :active
+   propagates to ancestors, so without this the card scale(0.97) press
+   feedback fires on every picker tap and the card visibly shakes.
+   (:has() outranks both the base and the hover:none :active rules.) */
+.product-card:active:has(.card-opts:active) {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--line-soft);
+}
 
 /* WHY SECTION */
 .why-section {

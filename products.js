@@ -301,7 +301,7 @@ function cardOptionsHtml(p) {
     colorRow = '<div class="mini-swatches">' + p.colors.map(function (c, i) {
       return '<button type="button" class="mini-swatch' + (i === 0 ? ' active' : '') +
         '" data-color="' + c + '" title="' + c + '" aria-label="Color: ' + c +
-        '" style="' + swatchCss(c) + '" onclick="cardSelectColor(event,this)"></button>';
+        '" style="' + swatchCss(c) + '" onmousedown="event.preventDefault()" onclick="cardSelectColor(event,this)"></button>';
     }).join('') + '</div>';
   }
   // Only render a size row when there's actually a choice — single-size
@@ -312,7 +312,7 @@ function cardOptionsHtml(p) {
     sizeRow = '<div class="mini-sizes">' + p.sizes.map(function (s) {
       return '<button type="button" class="mini-size' + (s === def ? ' active' : '') +
         '" data-size="' + s + '" title="' + s +
-        '" onclick="cardSelectSize(event,this,' + p.id + ')">' + shortSizeLabel(s) + '</button>';
+        '" onmousedown="event.preventDefault()" onclick="cardSelectSize(event,this,' + p.id + ')">' + shortSizeLabel(s) + '</button>';
     }).join('') + '</div>';
   }
   if (!colorRow && !sizeRow) return '';
