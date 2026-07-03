@@ -42,25 +42,135 @@ function addMsg(text, isUser) {
 var chatHistory = [];
 var CHAT_FALLBACK = "Woof, my brain just hiccuped! 🐾 Please email pawhaulsupport@gmail.com and a real human will get back to you within 24 hours.";
 
-async function sendChatToAI(userMessage) {
-  try {
-    chatHistory.push({ role: "user", content: userMessage });
-    var response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: chatHistory })
-    });
-    if (!response.ok) { chatHistory.pop(); return null; }
-    var data = await response.json();
-    var reply = data && data.reply ? String(data.reply).trim() : "";
-    if (!reply) { chatHistory.pop(); return null; }
-    chatHistory.push({ role: "assistant", content: reply });
-    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
-    return reply;
-  } catch (e) {
-    chatHistory.pop();
-    return null;
+// ── Chatbot cart tool ─────────────────────────────────────────
+// When the AI decides to add a product it emits an add_to_cart tool call;
+// the server relays it here and THIS runs the site's real cart functions
+// (products/lowestVariant/addToCart from products.js) — same code path as
+// the Add To Cart buttons, so the cart badge, toast and cart page all
+// update for real. The result is sent back so the AI only confirms what
+// actually happened.
+function chatbotAddToCart(args) {
+  var id = parseInt(args && args.product_id, 10);
+  var product = products.find(function (p) { return p.id === id; });
+  if (!product) {
+    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1-8." };
   }
+
+  var qty = parseInt(args && args.quantity, 10);
+  if (!(qty >= 1)) qty = 1;
+  if (qty > 10) qty = 10;
+
+  // Color doesn't affect price or cart lines, but never accept an option
+  // the product doesn't actually come in.
+  var color = null;
+  if (args && args.color) {
+    var wantColor = String(args.color).trim().toLowerCase();
+    color = (product.colors || []).find(function (c) { return c.toLowerCase() === wantColor; }) ||
+            (product.colors || []).find(function (c) { return c.toLowerCase().indexOf(wantColor) > -1; }) || null;
+    if (!color) {
+      return { ok: false, error: "'" + args.color + "' is not an available color. Options: " + (product.colors || []).join(", ") };
+    }
+  }
+
+  // Resolve the size variant. No size given = cheapest option (site-wide
+  // lowest-price rule, same as the product-card quick-add buttons).
+  var size, price;
+  if (args && args.size) {
+    var wantSize = String(args.size).trim().toLowerCase();
+    var match = (product.sizes || []).find(function (s) { return s.toLowerCase() === wantSize; }) ||
+                (product.sizes || []).find(function (s) { return s.toLowerCase().indexOf(wantSize) > -1; });
+    if (!match) {
+      return { ok: false, error: "'" + args.size + "' is not an available size. Options: " + (product.sizes || []).join(", ") };
+    }
+    size = match;
+    var sp = product.sizePrices ? product.sizePrices[match] : null;
+    price = sp ? sp.price : product.price;
+  } else {
+    var v = lowestVariant(product);
+    size = v.size || '';
+    price = v.price;
+  }
+
+  var item = Object.assign({}, product, { price: price, size: size || '' });
+  if (color) item.color = color;
+  for (var i = 0; i < qty; i++) addToCart(item);
+
+  return {
+    ok: true,
+    added: {
+      product: product.name,
+      size: size || null,
+      color: color,
+      unit_price: price,
+      quantity: qty
+    },
+    cart_item_count: cart.reduce(function (sum, it) { return sum + it.qty; }, 0)
+  };
+}
+
+function runChatToolCall(tc) {
+  try {
+    if (!tc || !tc.function || tc.function.name !== "add_to_cart") {
+      return { ok: false, error: "Unknown tool" };
+    }
+    var toolArgs;
+    try { toolArgs = JSON.parse(tc.function.arguments || "{}"); }
+    catch (e) { return { ok: false, error: "Could not parse tool arguments" }; }
+    return chatbotAddToCart(toolArgs);
+  } catch (e) {
+    return { ok: false, error: "Cart action failed: " + (e && e.message ? e.message : "unknown error") };
+  }
+}
+
+async function sendChatToAI(userMessage) {
+  chatHistory.push({ role: "user", content: userMessage });
+  // The tool exchange (assistant tool_calls + tool results) only lives for
+  // this request cycle; the final text reply carries the memory of the add,
+  // so chatHistory stays plain user/assistant strings.
+  var toolTurns = [];
+  var succeededAdds = [];
+  try {
+    for (var round = 0; round < 3; round++) {
+      var response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: chatHistory.concat(toolTurns) })
+      });
+      if (!response.ok) break;
+      var data = await response.json();
+
+      if (data && data.assistantMessage && Array.isArray(data.assistantMessage.tool_calls)) {
+        toolTurns.push(data.assistantMessage);
+        data.assistantMessage.tool_calls.forEach(function (tc) {
+          var result = runChatToolCall(tc);
+          if (result.ok && result.added) succeededAdds.push(result.added);
+          toolTurns.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(result) });
+        });
+        continue; // next round: the AI turns the results into a reply
+      }
+
+      var reply = data && data.reply ? String(data.reply).trim() : "";
+      if (!reply) break;
+      chatHistory.push({ role: "assistant", content: reply });
+      if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+      return reply;
+    }
+  } catch (e) { /* fall through to the honest fallback below */ }
+
+  // The AI turn failed. If items DID land in the cart, say so truthfully
+  // (the add really happened); otherwise report nothing and let the caller
+  // show the generic fallback.
+  if (succeededAdds.length) {
+    var summary = succeededAdds.map(function (a) {
+      return (a.quantity > 1 ? a.quantity + "× " : "") + a.product + (a.size ? " (" + a.size + ")" : "");
+    }).join(", ");
+    var confirmMsg = "Added " + summary + " to your cart! 🐾";
+    chatHistory.push({ role: "assistant", content: confirmMsg });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+    return confirmMsg;
+  }
+  chatHistory.pop();
+  return null;
 }
 
 function sendChat() {
