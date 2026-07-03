@@ -2581,7 +2581,9 @@ footer {
 .col-carousel-wrap .carousel-btn {
   display: flex;
   position: absolute;
-  top: 50%;
+  /* Mobile: anchor to the center of the 200px image zone so the arrows
+     sit over the photo and never cover the slide text below it. */
+  top: 100px;
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
@@ -2599,8 +2601,8 @@ footer {
   line-height: 1;
   transition: opacity 0.2s;
 }
-.col-carousel-wrap .carousel-prev { left: -6px; }
-.col-carousel-wrap .carousel-next { right: -6px; }
+.col-carousel-wrap .carousel-prev { left: -10px; }
+.col-carousel-wrap .carousel-next { right: -10px; }
 .col-carousel-wrap .carousel-btn.disabled { opacity: 0.3; cursor: default; }
 
 /* Tablet/desktop: one full-width banner slide, image beside the copy.
@@ -2627,8 +2629,11 @@ footer {
   .col-slide-btn { margin-top: 8px; }
   .col-slide-head { font-size: 33px; }
   .col-slide-copy { font-size: 15.5px; max-width: 48ch; }
-  .col-carousel-wrap .carousel-prev { left: 14px; }
-  .col-carousel-wrap .carousel-next { right: 14px; }
+  /* Banner slide: re-center vertically and hang the arrows just outside
+     the carousel edge (18px overlap vs 48px body padding = text clear). */
+  .col-carousel-wrap .carousel-btn { top: 50%; }
+  .col-carousel-wrap .carousel-prev { left: -18px; }
+  .col-carousel-wrap .carousel-next { right: -18px; }
 }
 
 /* ============================================================
@@ -2644,7 +2649,9 @@ footer {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 55%;
+  /* Wide scenic source (dog small in frame) + true centering — the old
+     close-up photo read as "zoomed in" no matter how it was positioned. */
+  object-position: center center;
 }
 /* ~88% navy keeps the photo as texture while text stays high-contrast */
 .why-bg-overlay {
