@@ -2388,7 +2388,7 @@ footer {
 @media (min-width: 1440px) {
   .collections-header, .col-carousel-wrap,
   .products-header, #prodCarouselWrap,
-  .why-header, .why-grid,
+  .why-header, .why-points,
   .reviews-header, .reviews-grid-wrap,
   .shop-page, .product-detail,
   .footer-grid, .footer-bottom {
@@ -2629,4 +2629,80 @@ footer {
   .col-slide-copy { font-size: 15.5px; max-width: 48ch; }
   .col-carousel-wrap .carousel-prev { left: 14px; }
   .col-carousel-wrap .carousel-next { right: 14px; }
+}
+
+/* ============================================================
+   WHY SECTION REDESIGN — editorial numbered points over a
+   full-bleed lifestyle photo with a heavy navy overlay.
+   Replaces the flat icon-tile .why-card grid (those rules are
+   now dead). Appended LAST so it wins at every breakpoint.
+   ============================================================ */
+.why-section { position: relative; overflow: hidden; }
+.why-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 55%;
+}
+/* ~88% navy keeps the photo as texture while text stays high-contrast */
+.why-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg,
+    rgba(31, 32, 64, 0.92) 0%,
+    rgba(26, 26, 46, 0.86) 55%,
+    rgba(20, 21, 43, 0.93) 100%);
+}
+.why-content { position: relative; z-index: 1; }
+
+/* Mobile-first: vertical numbered list with hairline dividers */
+.why-points {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+.why-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 30px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  text-align: left;
+}
+.why-point:first-child { border-top: none; }
+.why-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: 42px;
+  line-height: 0.95;
+  color: var(--orange);
+  flex-shrink: 0;
+  min-width: 62px; /* equal number column = aligned text blocks */
+}
+.why-point-title {
+  font-family: 'Fredoka One', cursive;
+  font-weight: 400;
+  font-size: 21px;
+  line-height: 1.2;
+  color: #f8f6f2;
+  margin: 4px 0 10px; /* optically centers against the big number */
+}
+.why-point-desc {
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 52ch;
+}
+
+/* Tablet/desktop: two editorial columns */
+@media (min-width: 768px) {
+  .why-points { grid-template-columns: 1fr 1fr; column-gap: 72px; }
+  .why-point:nth-child(2) { border-top: none; } /* both items in the top row */
+  .why-point { padding: 38px 4px; gap: 24px; }
+  .why-num { font-size: 58px; min-width: 86px; }
+  .why-point-title { font-size: 25px; margin-top: 8px; }
+  .why-point-desc { font-size: 15px; }
 }
