@@ -2386,7 +2386,7 @@ footer {
    monitors (full-bleed section backgrounds stay full-bleed);
    give the hero a little more height so it doesn't look squat. */
 @media (min-width: 1440px) {
-  .collections-header, .collections-grid,
+  .collections-header, .col-carousel-wrap,
   .products-header, #prodCarouselWrap,
   .why-header, .why-grid,
   .reviews-header, .reviews-grid-wrap,
@@ -2492,4 +2492,141 @@ footer {
     padding-left: max(5%, calc((100% - 1400px) / 2));
     padding-right: max(5%, calc((100% - 1400px) / 2));
   }
+}
+
+/* ============================================================
+   COLLECTIONS BENEFIT CAROUSEL — replaces the old 4-box grid.
+   One slide per category: lifestyle image + problem-focused
+   headline + benefit copy + Shop link. Driven by the same
+   initCarousel() as the product/review carousels (JS drag on
+   touch, arrows everywhere), so overflow stays hidden and the
+   30px swipe threshold / boundary clamping match the site.
+   Appended LAST so it wins at every breakpoint.
+   ============================================================ */
+.col-carousel-wrap { position: relative; }
+#collectionsCarousel {
+  display: flex;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  gap: 16px;
+}
+#collectionsCarousel::-webkit-scrollbar { display: none; }
+
+/* Mobile-first slide: image on top, copy below, next slide peeks. */
+.col-slide {
+  flex: 0 0 calc(100% - 40px); /* ~24px peek of the next slide */
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border: 2px solid var(--line-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.col-slide-img { height: 200px; flex-shrink: 0; overflow: hidden; }
+.col-slide-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.col-slide-body {
+  padding: 22px 20px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1 1 auto;
+}
+.col-slide-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+.col-slide-head {
+  font-family: 'Fredoka One', cursive;
+  font-weight: 400;
+  font-size: 23px;
+  line-height: 1.18;
+  color: var(--black);
+}
+.col-slide-copy {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.65;
+  color: var(--gray);
+}
+.col-slide-btn {
+  margin-top: auto; /* pins the CTA to the bottom on every slide */
+  padding: 12px 24px;
+  border: none;
+  border-radius: 999px;
+  background: var(--orange);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-orange);
+  transition: all 0.2s var(--ease);
+}
+.col-slide-btn:hover { background: var(--orange-dark); transform: translateY(-2px); box-shadow: var(--shadow-orange-hover); }
+.col-slide-btn:active { background: var(--orange-dark); transform: translateY(0); }
+
+/* Arrows: base CSS hides .carousel-btn outside the mobile block, so this
+   carousel styles its own at every width (same look as the others). */
+.col-carousel-wrap .carousel-btn {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #1a1a2e;
+  cursor: pointer;
+  z-index: 10;
+  padding: 0;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+.col-carousel-wrap .carousel-prev { left: -6px; }
+.col-carousel-wrap .carousel-next { right: -6px; }
+.col-carousel-wrap .carousel-btn.disabled { opacity: 0.3; cursor: default; }
+
+/* Tablet/desktop: one full-width banner slide, image beside the copy.
+   The slide needs a DEFINITE height — with height:auto the img's
+   height:100% resolves to intrinsic size and a portrait photo makes the
+   banner ~1000px tall, pushing the CTA out of view. */
+@media (min-width: 768px) {
+  .col-slide {
+    flex-basis: 100%;
+    flex-direction: row;
+    height: 420px;
+  }
+  .col-slide-img {
+    width: 52%;
+    height: 100%;
+  }
+  .col-slide-body {
+    width: 48%;
+    padding: 40px 48px;
+    justify-content: center;
+    gap: 14px;
+  }
+  /* Centered group reads better than a bottom-pinned CTA in a banner */
+  .col-slide-btn { margin-top: 8px; }
+  .col-slide-head { font-size: 33px; }
+  .col-slide-copy { font-size: 15.5px; max-width: 48ch; }
+  .col-carousel-wrap .carousel-prev { left: 14px; }
+  .col-carousel-wrap .carousel-next { right: 14px; }
 }

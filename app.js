@@ -617,6 +617,9 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(revealAll, 1200);
 
   initCarousel('revCarousel', 'revCarouselPrev', 'revCarouselNext');
+  // Collections benefit carousel is static HTML (never re-rendered), so a
+  // single init here is enough — same drag/arrow/boundary logic as the rest.
+  initCarousel('collectionsCarousel', 'colCarPrev', 'colCarNext');
 });
 
 // ==================== 10% OFF POPUP ====================

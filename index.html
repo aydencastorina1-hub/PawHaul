@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=23">
+  <link rel="stylesheet" href="styles.css?v=25">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -179,27 +179,52 @@
       <h2 class="section-title">Everything You Need For <span>The Walk</span></h2>
       <p class="section-sub" style="margin: 0 auto; max-width: 480px;">Every product we sell is built specifically for walks with your dog</p>
     </div>
-    <div class="collections-grid" style="grid-template-columns: repeat(2, 1fr)" id="collectionsGrid">
-      <div class="collection-card" onclick="showPage('shop','water')">
-        <span class="col-emoji">💧</span>
-        <div class="col-name">Water & Food</div>
-        <div class="col-sub">Walk kits & collapsible bowls</div>
+    <div class="col-carousel-wrap">
+      <button class="carousel-btn carousel-prev disabled" id="colCarPrev" aria-label="Previous category">&#8249;</button>
+      <div id="collectionsCarousel">
+
+        <div class="col-slide">
+          <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=1200&q=85" alt="A happy dog outside on a warm-weather walk"></div>
+          <div class="col-slide-body">
+            <div class="col-slide-tag">💧 Water &amp; Food</div>
+            <h3 class="col-slide-head">Never Run Out Of Water Mid-Walk</h3>
+            <p class="col-slide-copy">Long walk, hot day, no fountain in sight — your dog shouldn't have to wait until you're home. Carry water and food in one hand, and keep the tail wagging for every extra mile.</p>
+            <button class="col-slide-btn" onclick="showPage('shop','water')">Shop Water &amp; Food →</button>
+          </div>
+        </div>
+
+        <div class="col-slide">
+          <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=1200&q=85" alt="A dog walking calmly on a leash"></div>
+          <div class="col-slide-body">
+            <div class="col-slide-tag">🦮 Leashes &amp; Control</div>
+            <h3 class="col-slide-head">Total Control, Every Time</h3>
+            <p class="col-slide-copy">Freedom for them, control for you. Whether it's a squirrel sprint, a two-dog tangle, or a busy street crossing, the right leash turns chaos into a calm walk.</p>
+            <button class="col-slide-btn" onclick="showPage('shop','leash')">Shop Leashes →</button>
+          </div>
+        </div>
+
+        <div class="col-slide">
+          <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=1200&q=85" alt="A dog on a trail at golden hour, when light starts to fade"></div>
+          <div class="col-slide-body">
+            <div class="col-slide-tag">🔒 Safety &amp; Visibility</div>
+            <h3 class="col-slide-head">Seen And Safe, Day Or Night</h3>
+            <p class="col-slide-copy">Dusk comes fast — and dark coats disappear in it. Light your dog up so drivers spot them from far away, and always know exactly where they are if they ever slip off.</p>
+            <button class="col-slide-btn" onclick="showPage('shop','safety')">Shop Safety Gear →</button>
+          </div>
+        </div>
+
+        <div class="col-slide">
+          <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=1200&q=85" alt="An owner and dog out on a walk, fully geared up"></div>
+          <div class="col-slide-body">
+            <div class="col-slide-tag">🐾 All Walk Gear</div>
+            <h3 class="col-slide-head">Every Walk, Fully Covered</h3>
+            <p class="col-slide-copy">Water, leash, light and clean-up — everything the two of you need out there, in one place. Grab the full setup and never turn back home for a forgotten thing again.</p>
+            <button class="col-slide-btn" onclick="showPage('shop','all')">Shop All Walk Gear →</button>
+          </div>
+        </div>
+
       </div>
-      <div class="collection-card" onclick="showPage('shop','leash')">
-        <span class="col-emoji">🦮</span>
-        <div class="col-name">Leashes & Control</div>
-        <div class="col-sub">Leashes, couplers, bag hooks & dispensers</div>
-      </div>
-      <div class="collection-card" onclick="showPage('shop','safety')">
-        <span class="col-emoji">🔒</span>
-        <div class="col-name">Safety & Visibility</div>
-        <div class="col-sub">LED collars & AirTag holders</div>
-      </div>
-      <div class="collection-card" onclick="showPage('shop','all')">
-        <span class="col-emoji">🐾</span>
-        <div class="col-name">All Walk Gear</div>
-        <div class="col-sub">Browse everything we make</div>
-      </div>
+      <button class="carousel-btn carousel-next" id="colCarNext" aria-label="Next category">&#8250;</button>
     </div>
   </section>
 
@@ -664,7 +689,7 @@
 
 
   <script src="products.js?v=16"></script>
-  <script src="app.js?v=13"></script>
+  <script src="app.js?v=14"></script>
 
   <!-- 10% OFF POPUP -->
   <div id="offerOverlay" class="offer-overlay"></div>
