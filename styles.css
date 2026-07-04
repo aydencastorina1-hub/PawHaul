@@ -2044,6 +2044,63 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .search-no-results .snr-emoji { display: block; font-size: 34px; margin-bottom: 8px; }
 .search-no-results .snr-hint { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: #aaa; }
 
+/* Browse-by-category cards under the search input — the default "no query
+   yet" state. Hidden while typing so live results own the panel. */
+.search-browse {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 20px 0 14px;
+}
+.nav-search-bar.typing .search-browse { display: none; }
+.search-browse-title {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 12px;
+}
+.search-browse-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.search-cat-card {
+  border: 1.5px solid var(--line-soft);
+  border-radius: 16px;
+  overflow: hidden;
+  background: white;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s ease, transform 0.2s var(--ease), box-shadow 0.2s ease;
+}
+.search-cat-card:hover {
+  border-color: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(26, 26, 46, 0.10);
+}
+.search-cat-card:active { transform: scale(0.97); border-color: var(--orange); }
+/* Placeholder image slot — swap in a real photo later with an <img> */
+.search-cat-img {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #F4F1EC 0%, #ECE7E0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #C4BBAE;
+}
+.search-cat-img svg { width: 30px; height: 30px; }
+.search-cat-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.search-cat-card:hover .search-cat-img { color: var(--orange); }
+.search-cat-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--black);
+  padding: 10px 12px 12px;
+}
+
 /* Mobile: the search panel becomes a full-screen overlay (its own close X),
    still position:fixed so the page behind keeps its exact scroll position. */
 @media (max-width: 900px) {
@@ -2054,7 +2111,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     transform: translateY(-18px);
   }
   .nav-search-bar.open { transform: none; }
-  .search-results { flex: 1; max-height: none; }
+  /* Only let the results list claim the screen while typing; when idle the
+     browse cards sit prominently right under the input instead */
+  .search-results { flex: 0 1 auto; max-height: none; }
+  .nav-search-bar.typing .search-results { flex: 1 1 auto; }
+  .search-browse { padding-top: 26px; }
+  .search-cat-img svg { width: 34px; height: 34px; }
 }
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */

@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=34">
+  <link rel="stylesheet" href="styles.css?v=35">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -124,6 +124,30 @@
     <button class="nav-search-close" onclick="closeSearch()" aria-label="Close search">&#10005;</button>
   </div>
   <div class="search-results" id="searchResults"></div>
+  <!-- Browse-by-category cards: prominent while the input is empty, hidden
+       while typing (.typing on the bar). Image slots are placeholders —
+       drop an <img> into .search-cat-img to swap in real photos later. -->
+  <div class="search-browse" id="searchBrowse">
+    <div class="search-browse-title">Browse by category</div>
+    <div class="search-browse-grid">
+      <div class="search-cat-card" onclick="searchGoCategory('all')" role="button" tabindex="0">
+        <div class="search-cat-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+        <div class="search-cat-name">All Walk Gear</div>
+      </div>
+      <div class="search-cat-card" onclick="searchGoCategory('water')" role="button" tabindex="0">
+        <div class="search-cat-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div>
+        <div class="search-cat-name">Water &amp; Food</div>
+      </div>
+      <div class="search-cat-card" onclick="searchGoCategory('leash')" role="button" tabindex="0">
+        <div class="search-cat-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+        <div class="search-cat-name">Leashes &amp; Control</div>
+      </div>
+      <div class="search-cat-card" onclick="searchGoCategory('safety')" role="button" tabindex="0">
+        <div class="search-cat-img"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg></div>
+        <div class="search-cat-name">Safety &amp; Visibility</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- MOBILE MENU (slides from right) -->
@@ -769,7 +793,7 @@
 
 
   <script src="products.js?v=18"></script>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->

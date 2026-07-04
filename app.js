@@ -471,6 +471,13 @@ function stopSearchPhCycle() {
   if (searchPhTimer) { clearInterval(searchPhTimer); searchPhTimer = null; }
 }
 
+// Category card in the search panel: jump to the shop with that filter
+// active, then close the overlay.
+function searchGoCategory(cat) {
+  showPage('shop', cat || 'all');
+  closeSearch();
+}
+
 function toggleSearch() {
   if (searchIsOpen()) { closeSearch(); } else { openSearch(); }
 }
@@ -497,7 +504,7 @@ function closeSearch() {
   var bar = document.getElementById('navSearchBar');
   var scrim = document.getElementById('searchScrim');
   if (!bar) return;
-  bar.classList.remove('open');
+  bar.classList.remove('open', 'typing');
   if (scrim) scrim.classList.remove('open');
   syncOverlayChrome();
   stopSearchPhCycle();
@@ -579,6 +586,8 @@ function doSearch(val) {
   if (inp && ph) {
     inp.addEventListener('input', function() {
       ph.classList.toggle('ph-hidden', !!inp.value);
+      // While typing, the browse-by-category cards give way to live results
+      if (bar) bar.classList.toggle('typing', !!inp.value);
     });
   }
 })();
