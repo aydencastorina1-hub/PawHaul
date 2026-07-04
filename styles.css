@@ -1523,52 +1523,119 @@ img.reviewer-av {
 
 .about-story { padding: 80px 5%; background: white; }
 
-.story-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 70px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.story-img {
-  height: 380px;
-  background: var(--orange-pale);
-  border-radius: var(--radius);
+/* The founder story as a flowing editorial narrative: a centered reading
+   column, numbered subheads, and one big serif pull-quote in the middle. */
+.story-flow { max-width: 720px; margin: 0 auto; }
+.story-sec { margin-bottom: 46px; }
+.story-sec:last-child { margin-bottom: 0; }
+.story-sec h3 {
+  font-family: 'Fredoka One', cursive;
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.25;
+  color: var(--black);
+  margin-bottom: 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 120px;
+  align-items: baseline;
+  gap: 13px;
 }
+.story-num {
+  font-size: 15px;
+  color: var(--orange);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
+.story-sec p { font-size: 16.5px; color: var(--gray); line-height: 1.85; font-weight: 600; margin-bottom: 14px; }
+.story-sec p:last-child { margin-bottom: 0; }
 
-.story-content h2 { font-family: 'Fredoka One', cursive; font-size: 36px; margin-bottom: 18px; line-height: 1.2; }
-.story-content h2 span { color: var(--orange); }
-.story-content p { font-size: 16px; color: var(--gray); line-height: 1.8; font-weight: 600; margin-bottom: 16px; }
+.story-pullquote {
+  margin: 54px 0;
+  text-align: center;
+  background: var(--orange-pale);
+  border-radius: 24px;
+  padding: 44px 40px 36px;
+}
+.pq-mark {
+  display: block;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 88px;
+  line-height: 0.55;
+  color: var(--orange);
+  margin-bottom: 6px;
+}
+.story-pullquote blockquote {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-size: clamp(20px, 2.6vw, 28px);
+  line-height: 1.5;
+  color: var(--black);
+  margin: 0 0 18px;
+}
+.story-pullquote figcaption {
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--orange);
+}
 
 .about-values { background: var(--black); padding: 80px 5%; }
 .about-values-header { text-align: center; margin-bottom: 50px; }
 .about-values-header .section-title { color: white; }
 .about-values-header .section-sub { color: rgba(255,255,255,0.55); margin: 0 auto; max-width: 460px; }
 
-.values-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+/* Four provable promises as alternating icon/text rows */
+.values-flow {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-
-.value-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius);
-  padding: 32px 26px;
-  text-align: center;
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px;
+  padding: 28px 32px;
   transition: all 0.3s var(--ease);
 }
+.value-row:nth-child(even) { flex-direction: row-reverse; }
+.value-row:hover {
+  background: rgba(232,99,10,0.07);
+  border-color: rgba(232,99,10,0.55);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.35);
+}
+.value-visual {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  border-radius: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(232,99,10,0.24), rgba(232,99,10,0.07));
+  border: 1px solid rgba(232,99,10,0.42);
+  color: var(--orange);
+}
+.value-visual svg { width: 42px; height: 42px; display: block; }
+.value-text { flex: 1; min-width: 0; }
+.value-row-title { font-family: 'Fredoka One', cursive; font-weight: 400; font-size: 22px; color: white; margin-bottom: 8px; }
+.value-row-desc { font-size: 14.5px; color: rgba(255,255,255,0.62); line-height: 1.7; font-weight: 600; }
 
-.value-card:hover { background: rgba(232,99,10,0.12); border-color: var(--orange); transform: translateY(-6px); }
-.value-icon { font-size: 44px; margin-bottom: 18px; display: block; }
-.value-title { font-family: 'Fredoka One', cursive; font-size: 20px; color: white; margin-bottom: 10px; }
-.value-desc { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; font-weight: 600; }
+/* Phones: every value row reads icon-left (alternation is a wide-screen
+   rhythm — tablets 701px+ keep it), smaller icon tile so text gets the width */
+@media (max-width: 700px) {
+  .value-row, .value-row:nth-child(even) { flex-direction: row; }
+  .value-row { align-items: flex-start; gap: 16px; padding: 20px 18px; }
+  .value-visual { flex-basis: 58px; width: 58px; height: 58px; border-radius: 17px; }
+  .value-visual svg { width: 27px; height: 27px; }
+  .value-row-title { font-size: 18px; }
+  .value-row-desc { font-size: 13.5px; }
+}
 
 /* ==================== CONTACT PAGE ==================== */
 .contact-page { padding: 70px 5%; background: white; }
@@ -2332,11 +2399,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .cart-summary { position: static; }
 
   /* ── ABOUT PAGE ───────────────────────────────────────── */
-  .story-grid { grid-template-columns: 1fr; gap: 24px; margin-bottom: 40px; }
-  .story-img { height: 220px; }
-  .story-content h2 { font-size: 26px; }
-  .values-grid { grid-template-columns: 1fr; gap: 10px; }
-  .value-card { padding: 24px 20px; }
+  .story-sec { margin-bottom: 36px; }
+  .story-sec h3 { font-size: 21px; gap: 10px; }
+  .story-num { font-size: 13px; }
+  .story-sec p { font-size: 15px; line-height: 1.8; }
+  .story-pullquote { margin: 40px 0; padding: 32px 22px 28px; border-radius: 20px; }
+  .pq-mark { font-size: 64px; }
   .about-hero h1 { font-size: clamp(28px, 8vw, 44px); }
   .about-hero p { font-size: 15px; margin-bottom: 24px; }
 
@@ -2462,6 +2530,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .product-card:hover { transform: none; box-shadow: none; border-color: var(--line-soft); }
   .collection-card:hover { transform: none; border-color: transparent; box-shadow: none; }
   .why-card:hover { transform: none; }
+  .value-row:hover { transform: none; box-shadow: none; }
   .review-card:hover { transform: none; }
   .btn-primary:hover { transform: none; }
   .btn-secondary:hover { transform: none; }
