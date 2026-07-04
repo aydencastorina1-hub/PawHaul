@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=29">
+  <link rel="stylesheet" href="styles.css?v=30">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -254,39 +254,55 @@
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="why-header">
       <div class="section-tag" style="background:rgba(232,99,10,0.2);color:var(--orange-light)">Why PawHaul</div>
-      <h2 class="section-title" style="color:white;">Built For Dog Owners <span style="color:var(--orange);">Who Do More</span></h2>
-      <p class="section-sub">Every product we make solves a real problem for real dog owners</p>
+      <h2 class="section-title" style="color:white;">The PawHaul <span style="color:var(--orange);">Promise</span></h2>
+      <p class="section-sub">Four promises behind every single order — no fine print</p>
     </div>
-    <!-- The 4 points as stops along a dashed dog-walk route 🐾 -->
+    <!-- The 4 promises as stops along a dashed dog-walk route 🐾 -->
     <div class="walk-route">
       <div class="route-stop">
         <div class="route-badge">01</div>
         <div class="route-card">
-          <h3 class="route-title">Water On Every Walk</h3>
-          <p class="route-desc">Fresh water for your dog whenever they need it — no extra bowls, no mess, no hassle</p>
+          <div class="route-card-head">
+            <span class="route-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <h3 class="route-title">Built To Survive Real Walks</h3>
+          </div>
+          <p class="route-desc">Not made for a photoshoot. Every product goes through rain, mud, drool and daily wear before it ever reaches your door.</p>
         </div>
       </div>
       <div class="route-stop">
         <div class="route-badge">02</div>
         <div class="route-card">
-          <h3 class="route-title">Food Ready To Go</h3>
-          <p class="route-desc">Keep dry food fresh and ready in your pocket — never cut a walk short for feeding time</p>
+          <div class="route-card-head">
+            <span class="route-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v5h5"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <h3 class="route-title">30-Day No-Questions-Asked Returns</h3>
+          </div>
+          <p class="route-desc">Not happy for any reason? Send it back within 30 days for a full refund. No hassle, no hoops.</p>
         </div>
       </div>
       <div class="route-stop">
         <div class="route-badge">03</div>
         <div class="route-card">
-          <h3 class="route-title">Total Walk Control</h3>
-          <p class="route-desc">Leashes and hands-free options that make every walk easier, safer and more enjoyable</p>
+          <div class="route-card-head">
+            <span class="route-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6h13v11H1z"/><path d="M14 9h4l4 4v4h-8"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></span>
+            <h3 class="route-title">Free Shipping, Every Order</h3>
+          </div>
+          <p class="route-desc">No minimums, no fine print. Every single order ships free, every time.</p>
         </div>
       </div>
       <div class="route-stop">
         <div class="route-badge">04</div>
         <div class="route-card">
-          <h3 class="route-title">Safe Day &amp; Night</h3>
-          <p class="route-desc">LED light-up collars and AirTag holders so your dog is always visible and never lost</p>
+          <div class="route-card-head">
+            <span class="route-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>
+            <h3 class="route-title">Built By Dog Owners, For Dog Owners</h3>
+          </div>
+          <p class="route-desc">We tested every product on our own dogs before it ever made it to the site. If it doesn't earn a spot on our own walks, it doesn't earn a spot on PawHaul.</p>
         </div>
       </div>
+    </div>
+    <div class="why-cta">
+      <p class="why-cta-line">Join thousands of dog owners who've made the switch.</p>
+      <button class="btn-primary" onclick="showPage('shop')">Shop Now →</button>
     </div>
     </div>
   </section>

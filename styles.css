@@ -2858,19 +2858,52 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   transform: translateY(-3px);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
 }
+.route-card-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.route-icon {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(232, 99, 10, 0.14);
+  border: 1px solid rgba(232, 99, 10, 0.38);
+  color: var(--orange-light);
+}
+.route-icon svg { width: 20px; height: 20px; display: block; }
 .route-title {
   font-family: 'Fredoka One', cursive;
   font-weight: 400;
-  font-size: 21px;
+  font-size: 20px;
   line-height: 1.2;
   color: #f8f6f2;
-  margin-bottom: 8px;
 }
 .route-desc {
   font-size: 14.5px;
   font-weight: 600;
   line-height: 1.7;
   color: rgba(255, 255, 255, 0.65);
+}
+
+/* Closing CTA — turn the trust points into a purchase decision */
+.why-cta {
+  text-align: center;
+  margin-top: 60px;
+}
+.why-cta-line {
+  font-family: 'Fredoka One', cursive;
+  font-weight: 400;
+  font-size: clamp(20px, 3.2vw, 27px);
+  line-height: 1.3;
+  color: #f8f6f2;
+  max-width: 520px;
+  margin: 0 auto 22px;
 }
 
 /* Desktop: path down the middle, stops alternate sides */
@@ -2897,6 +2930,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .route-stop:nth-child(odd) .route-badge { left: auto; right: -28px; }
   .route-stop:nth-child(even) .route-badge { left: -28px; }
   .route-card { padding: 24px 28px; }
-  .route-title { font-size: 24px; }
+  .route-title { font-size: 22px; }
   .route-desc { font-size: 15px; }
+  .route-icon { flex-basis: 42px; width: 42px; height: 42px; }
+  .route-icon svg { width: 22px; height: 22px; }
+  .why-cta { margin-top: 76px; }
 }
