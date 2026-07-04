@@ -803,9 +803,16 @@ nav {
   transition: opacity 0.45s var(--ease), transform 0.45s cubic-bezier(0.34, 1.3, 0.4, 1);
 }
 
-.offer-photo { position: relative; width: 45%; min-height: 480px; flex-shrink: 0; }
+.offer-photo {
+  position: relative; width: 45%; min-height: 480px; flex-shrink: 0;
+  background: #1a1a2e; /* same as the card: a raster gap can never flash a lighter color */
+  overflow: hidden;
+}
 .offer-photo img {
-  position: absolute; inset: 0; width: 100%; height: 100%;
+  /* 1px overscan on every edge: dvh/percentage heights land on fractional
+     pixels, and during scroll repaints the image can rasterize a hairline
+     short of its box, flashing a seam at the photo/body boundary */
+  position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px);
   object-fit: cover; object-position: center 62%; /* keep the dog in frame on wide/short crops */
 }
 /* Blend the photo edge into the navy body so the two halves read as one card */
@@ -828,6 +835,7 @@ nav {
 .offer-body {
   flex: 1; display: flex; flex-direction: column; justify-content: center;
   padding: 48px 44px; min-width: 0;
+  position: relative; background: #1a1a2e; /* paint over any seam at the photo edge */
 }
 .offer-kicker {
   color: var(--orange); font-size: 12px; font-weight: 900;
@@ -881,7 +889,8 @@ nav {
   }
   .offer-photo { width: 100%; height: min(40dvh, 360px); min-height: 220px; }
   .offer-photo::after { background: linear-gradient(to bottom, transparent 55%, #1a1a2e 100%); }
-  .offer-body { padding: 8px 22px 28px; }
+  /* overlap the body 1px onto the photo so no hairline can open between them */
+  .offer-body { padding: 9px 22px 28px; margin-top: -1px; }
   .offer-headline { font-size: clamp(27px, 7.5vw, 34px); }
   .offer-sub { font-size: 14px; margin-bottom: 20px; }
 }
