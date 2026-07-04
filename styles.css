@@ -777,51 +777,114 @@ nav {
 
 /* ── 10% OFF POPUP ─────────────────────────────────────────── */
 .offer-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 999; opacity: 0; pointer-events: none;
-  transition: opacity 0.35s ease;
+  position: fixed; inset: 0; background: rgba(13,13,26,0.62);
+  z-index: 1000; opacity: 0; pointer-events: none;
+  transition: opacity 0.4s ease;
 }
 .offer-overlay.active { opacity: 1; pointer-events: auto; }
 
+/* Centered modal: lifestyle photo + offer body. Desktop = side-by-side,
+   mobile (≤900px below) = photo stacked on top, near full-screen. */
 .offer-popup {
-  position: fixed; bottom: 0; left: 50%;
-  transform: translateX(-50%) translateY(100%);
-  width: min(420px, 100%);
-  background: #1a1a2e; border-radius: 20px 20px 0 0;
-  padding: 32px 28px 48px; box-sizing: border-box;
-  z-index: 1000; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.92);
+  width: min(820px, calc(100% - 40px));
+  background: #1a1a2e; border-radius: 24px;
+  overflow: hidden; display: flex; box-sizing: border-box;
+  box-shadow: 0 40px 90px -20px rgba(0,0,0,0.55);
+  z-index: 1001;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 0.45s var(--ease), transform 0.45s cubic-bezier(0.34, 1.3, 0.4, 1),
+              visibility 0s linear 0.45s;
 }
-.offer-popup.active { transform: translateX(-50%) translateY(0); }
+.offer-popup.active {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+  transition: opacity 0.45s var(--ease), transform 0.45s cubic-bezier(0.34, 1.3, 0.4, 1);
+}
+
+.offer-photo { position: relative; width: 45%; min-height: 480px; flex-shrink: 0; }
+.offer-photo img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; object-position: center 62%; /* keep the dog in frame on wide/short crops */
+}
+/* Blend the photo edge into the navy body so the two halves read as one card */
+.offer-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to right, transparent 62%, #1a1a2e 100%);
+}
 
 .offer-close {
-  position: absolute; top: 16px; right: 16px;
-  background: rgba(255,255,255,0.15); border: none; color: #fff;
-  width: 34px; height: 34px; border-radius: 50%; font-size: 16px;
+  position: absolute; top: 14px; right: 14px; z-index: 5;
+  background: rgba(13,13,26,0.55); border: none; color: #fff;
+  width: 38px; height: 38px; border-radius: 50%; font-size: 16px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
-.offer-close:hover { background: rgba(255,255,255,0.28); }
+.offer-close:hover { background: rgba(13,13,26,0.8); }
+.offer-close:active { transform: scale(0.92); }
 
-.offer-content { text-align: center; }
-.offer-emoji { font-size: 52px; line-height: 1; margin-bottom: 14px; }
-.offer-headline { color: #fff; font-size: 22px; font-weight: 800; margin: 0 0 8px; font-family: 'Fredoka One', cursive; }
-.offer-sub { color: rgba(255,255,255,0.68); font-size: 14px; margin: 0 0 22px; }
+.offer-body {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  padding: 48px 44px; min-width: 0;
+}
+.offer-kicker {
+  color: var(--orange); font-size: 12px; font-weight: 900;
+  letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 12px;
+}
+.offer-headline {
+  color: #fff; font-size: clamp(26px, 3.2vw, 36px); line-height: 1.15;
+  margin: 0 0 12px; font-family: 'Fredoka One', cursive; font-weight: 400;
+}
+.offer-headline span { color: var(--orange); }
+.offer-sub { color: rgba(255,255,255,0.68); font-size: 15px; font-weight: 600; line-height: 1.6; margin: 0 0 24px; }
 
 .offer-input {
-  width: 100%; padding: 13px 16px; border: 1.5px solid rgba(255,255,255,0.45);
-  border-radius: 10px; background: transparent; color: #fff;
-  font-size: 15px; box-sizing: border-box; margin-bottom: 12px;
-  outline: none; font-family: inherit;
+  width: 100%; padding: 14px 16px; border: 1.5px solid rgba(255,255,255,0.35);
+  border-radius: 12px; background: rgba(255,255,255,0.06); color: #fff;
+  font-size: 16px; box-sizing: border-box; margin-bottom: 12px;
+  outline: none; font-family: inherit; font-weight: 600;
+  transition: border-color 0.2s, background 0.2s;
 }
 .offer-input::placeholder { color: rgba(255,255,255,0.35); }
-.offer-input:focus { border-color: var(--orange); }
+.offer-input:focus { border-color: var(--orange); background: rgba(255,255,255,0.1); }
 
 .offer-btn {
-  width: 100%; padding: 15px; background: #E8630A; color: #fff;
-  border: none; border-radius: 10px; font-size: 16px; font-weight: 700;
-  cursor: pointer; font-family: inherit; transition: background 0.2s;
+  width: 100%; padding: 16px; background: var(--orange); color: #fff;
+  border: none; border-radius: 12px; font-size: 16px; font-weight: 800;
+  cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 .offer-btn:hover { background: #cf5800; }
+.offer-btn:disabled { opacity: 0.65; cursor: default; }
+
+.offer-dismiss {
+  background: none; border: none; margin-top: 16px; align-self: center;
+  color: rgba(255,255,255,0.45); font-size: 13px; font-weight: 700;
+  font-family: inherit; cursor: pointer; text-decoration: underline;
+  text-underline-offset: 3px; -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s;
+}
+.offer-dismiss:hover { color: rgba(255,255,255,0.75); }
+
+/* Near full-screen on mobile: photo banner on top, content below.
+   Internal scroll (rare, tiny screens) instead of overflowing the viewport. */
+@media (max-width: 900px) {
+  .offer-popup {
+    flex-direction: column;
+    width: calc(100% - 24px);
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 20px;
+  }
+  .offer-photo { width: 100%; height: min(40dvh, 360px); min-height: 220px; }
+  .offer-photo::after { background: linear-gradient(to bottom, transparent 55%, #1a1a2e 100%); }
+  .offer-body { padding: 8px 22px 28px; }
+  .offer-headline { font-size: clamp(27px, 7.5vw, 34px); }
+  .offer-sub { font-size: 14px; margin-bottom: 20px; }
+}
 
 @media (max-width: 900px) {
   .reviews-section .reviews-grid-wrap::after {
@@ -1710,7 +1773,7 @@ footer {
 }
 
 .nav-search-btn {
-  display: none;
+  display: flex;
   background: none;
   border: none;
   cursor: pointer;
@@ -1722,20 +1785,52 @@ footer {
   border-radius: 50%;
   transition: background 0.15s;
 }
+.nav-search-btn:hover,
 .nav-search-btn:active { background: rgba(255,255,255,0.12); }
 
+/* The floating chat paw (inline z-index 9999) would ride on top of the
+   search overlay and the offer popup — fade it out while either is up. */
+#chatWidget { transition: opacity 0.25s ease; }
+body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
+
+/* Dim the page behind the open search panel. Fixed, so the page itself
+   never shifts, reflows or loses its scroll position. */
+.search-scrim {
+  position: fixed; inset: 0; background: rgba(13,13,26,0.45);
+  z-index: 895; opacity: 0; pointer-events: none;
+  transition: opacity 0.28s ease;
+  touch-action: none;
+}
+.search-scrim.open { opacity: 1; pointer-events: auto; }
+
+/* Search panel. Desktop/tablet: dropdown pinned below the nav (JS sets the
+   exact top). Mobile (≤900px block further down): full-screen overlay.
+   Always in the layer tree (visibility, not display) so it can transition. */
 .nav-search-bar {
-  display: none;
   position: fixed;
   top: 60px; left: 0; right: 0;
   background: white;
-  z-index: 901;
-  padding: 10px 4%;
-  box-shadow: var(--shadow);
+  z-index: 905;
+  padding: 16px 5% 10px;
+  box-shadow: 0 24px 48px -16px rgba(13,13,26,0.28);
+  display: flex;
   flex-direction: column;
   gap: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-14px);
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease),
+              visibility 0s linear 0.28s;
+  overscroll-behavior: contain;
 }
-.nav-search-bar.open { display: flex; }
+.nav-search-bar.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+}
 
 .nav-search-inner {
   display: flex;
@@ -1743,14 +1838,19 @@ footer {
   gap: 10px;
   background: var(--light-gray);
   border-radius: 50px;
-  padding: 10px 16px;
+  padding: 12px 18px;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 .nav-search-input {
   flex: 1;
+  min-width: 0;
   border: none;
   background: none;
   font-family: 'Nunito', sans-serif;
-  font-size: 15px;
+  font-size: 16px; /* ≥16px so iOS never auto-zooms (zooming = the page "jumps") */
   font-weight: 600;
   color: var(--black);
   outline: none;
@@ -1762,34 +1862,72 @@ footer {
   cursor: pointer;
   font-size: 16px;
   color: var(--gray);
-  padding: 0 4px;
+  padding: 6px 8px;
+  border-radius: 50%;
   -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s;
 }
+.nav-search-close:hover { color: var(--black); }
 
 .search-results {
   border-top: 1px solid transparent;
   margin-top: 0;
+  width: 100%;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  max-height: min(430px, calc(100vh - 220px));
 }
-.search-results:not(:empty) { margin-top: 8px; border-top-color: var(--line-soft); }
+.search-results:not(:empty) { margin-top: 10px; border-top-color: var(--line-soft); }
 
 .search-result-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 4px;
+  padding: 10px 6px;
   cursor: pointer;
   border-bottom: 1px solid #F5F5F5;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 .search-result-item:last-child { border-bottom: none; }
-.search-result-item:active { background: var(--orange-pale); }
-.search-result-emoji { font-size: 28px; width: 36px; text-align: center; flex-shrink: 0; }
-.search-result-info { flex: 1; }
+.search-result-item:hover, .search-result-item:active { background: var(--orange-pale); }
+.search-result-thumb {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: var(--orange-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0; overflow: hidden;
+}
+.search-result-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.search-result-info { flex: 1; min-width: 0; }
 .search-result-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--black); }
+.search-result-name b { color: var(--orange); font-weight: 900; }
 .search-result-price { font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange); margin-top: 2px; }
-.search-no-results { padding: 16px 4px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; color: var(--gray); text-align: center; }
+.search-no-results {
+  padding: 30px 8px 24px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px; font-weight: 700; color: var(--gray);
+  text-align: center;
+}
+.search-no-results .snr-emoji { display: block; font-size: 34px; margin-bottom: 8px; }
+.search-no-results .snr-hint { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: #aaa; }
+
+/* Mobile: the search panel becomes a full-screen overlay (its own close X),
+   still position:fixed so the page behind keeps its exact scroll position. */
+@media (max-width: 900px) {
+  .nav-search-bar {
+    top: 0 !important; /* JS positions desktop only; mobile always full-screen */
+    bottom: 0;
+    padding: 14px 5% 10px;
+    transform: translateY(-18px);
+  }
+  .nav-search-bar.open { transform: none; }
+  .search-results { flex: 1; max-height: none; }
+}
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
 .hamburger {
@@ -2320,6 +2458,12 @@ footer {
     transform: none;
   }
   .reveal { transition: opacity 0.2s ease; transform: none; }
+  /* Search panel + offer popup: fade only, no slide/scale */
+  .nav-search-bar { transform: none; transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
+  .nav-search-bar.open { transition: opacity 0.2s ease; }
+  .offer-popup { transform: translate(-50%, -50%); transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
+  .offer-popup.active { transform: translate(-50%, -50%); transition: opacity 0.2s ease; }
+  .search-scrim, .offer-overlay { transition: opacity 0.2s ease; }
 }
 
 /* ============================================================

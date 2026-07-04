@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=28">
+  <link rel="stylesheet" href="styles.css?v=29">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -110,11 +110,14 @@
   </div>
 </nav>
 
-<!-- SEARCH BAR -->
-<div class="nav-search-bar" id="navSearchBar">
+<!-- SEARCH OVERLAY — scrim dims the page; the panel drops in below the nav
+     (full-screen on mobile). Everything is position:fixed so opening/closing
+     never shifts the page or loses the scroll position. -->
+<div class="search-scrim" id="searchScrim" onclick="closeSearch()"></div>
+<div class="nav-search-bar" id="navSearchBar" role="dialog" aria-modal="true" aria-label="Search products">
   <div class="nav-search-inner">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="navSearchInput" class="nav-search-input" placeholder="Search walk gear..." oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false">
+    <input type="text" id="navSearchInput" class="nav-search-input" placeholder="Search walk gear..." oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search products">
     <button class="nav-search-close" onclick="closeSearch()" aria-label="Close search">&#10005;</button>
   </div>
   <div class="search-results" id="searchResults"></div>
@@ -716,20 +719,25 @@
 
 
   <script src="products.js?v=17"></script>
-  <script src="app.js?v=15"></script>
+  <script src="app.js?v=16"></script>
 
-  <!-- 10% OFF POPUP -->
+  <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
+       (already preloaded for the slideshow), so showing it costs zero extra bytes. -->
   <div id="offerOverlay" class="offer-overlay"></div>
-  <div id="offerPopup" class="offer-popup">
+  <div id="offerPopup" class="offer-popup" role="dialog" aria-modal="true" aria-label="Get 10% off your first order">
     <button id="offerClose" class="offer-close" aria-label="Close">&#x2715;</button>
-    <div class="offer-content">
-      <div class="offer-emoji">🐾</div>
-      <h2 class="offer-headline">Get 10% Off Your First Order</h2>
-      <p class="offer-sub">Enter your email and we'll send you a code</p>
+    <div class="offer-photo">
+      <img src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" alt="Dog and owner out on a walk" loading="lazy">
+    </div>
+    <div class="offer-body">
+      <div class="offer-kicker">🐾 Welcome To The Pack</div>
+      <h2 class="offer-headline">Get <span>10% Off</span> Your First Order</h2>
+      <p class="offer-sub">Gear built for every walk. Drop your email and we'll send your code right away.</p>
       <form class="offer-form" onsubmit="handleOfferSubmit(event)">
-        <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required>
-        <button type="submit" class="offer-btn">Claim My 10% Off</button>
+        <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required autocomplete="email">
+        <button type="submit" class="offer-btn" id="offerBtn">Claim My 10% Off →</button>
       </form>
+      <button type="button" class="offer-dismiss" onclick="dismissOffer()">No thanks, maybe later</button>
     </div>
   </div>
 </body>

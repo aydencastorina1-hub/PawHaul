@@ -382,27 +382,65 @@ function closeMobileMenu() {
 }
 
 // ==================== SEARCH ====================
-function toggleSearch() {
+// In-place overlay search: a fixed scrim + fixed panel, so opening/closing
+// never reflows the page or moves the scroll position. Desktop/tablet gets a
+// dropdown pinned right under the nav; mobile (≤900px, CSS) goes full-screen.
+
+function searchIsMobile() {
+  return window.matchMedia('(max-width: 900px)').matches;
+}
+
+// Pin the desktop dropdown to the nav's live bottom edge (the nav is sticky,
+// so its viewport position depends on whether the announce bar has scrolled
+// away). Mobile is full-screen via CSS (!important), so skip it there.
+function positionSearchBar() {
   var bar = document.getElementById('navSearchBar');
+  var nav = document.getElementById('mainNav');
+  if (!bar || !nav || searchIsMobile()) return;
+  bar.style.top = Math.max(0, Math.round(nav.getBoundingClientRect().bottom)) + 'px';
+}
+
+function searchIsOpen() {
+  var bar = document.getElementById('navSearchBar');
+  return !!(bar && bar.classList.contains('open'));
+}
+
+// Hide the floating chat paw while the search overlay or offer popup is up
+// (it sits at z-index 9999 and would float on top of them).
+function syncOverlayChrome() {
+  document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen());
+}
+
+function toggleSearch() {
+  if (searchIsOpen()) { closeSearch(); } else { openSearch(); }
+}
+
+function openSearch() {
+  var bar = document.getElementById('navSearchBar');
+  var scrim = document.getElementById('searchScrim');
   if (!bar) return;
-  if (bar.classList.contains('open')) {
-    closeSearch();
-  } else {
-    bar.classList.add('open');
-    closeMobileMenu();
-    setTimeout(function() {
-      var inp = document.getElementById('navSearchInput');
-      if (inp) inp.focus();
-    }, 80);
+  closeMobileMenu();
+  positionSearchBar();
+  bar.classList.add('open');
+  if (scrim) scrim.classList.add('open');
+  syncOverlayChrome();
+  // Focus synchronously (still inside the tap gesture) so iOS opens the
+  // keyboard; preventScroll so focusing the fixed input can't nudge the page.
+  var inp = document.getElementById('navSearchInput');
+  if (inp) {
+    try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
   }
 }
 
 function closeSearch() {
   var bar = document.getElementById('navSearchBar');
+  var scrim = document.getElementById('searchScrim');
   if (!bar) return;
   bar.classList.remove('open');
+  if (scrim) scrim.classList.remove('open');
+  syncOverlayChrome();
   var inp = document.getElementById('navSearchInput');
-  if (inp) inp.value = '';
+  if (inp) { inp.value = ''; inp.blur(); }
   var res = document.getElementById('searchResults');
   if (res) res.innerHTML = '';
 }
@@ -412,25 +450,64 @@ function doSearch(val) {
   if (!res) return;
   var q = (val || '').trim().toLowerCase();
   if (!q) { res.innerHTML = ''; return; }
-  // Search is restricted to the 8 PawHaul products, matched by product name only.
   var list = (typeof products !== 'undefined') ? products : [];
-  var matches = list.filter(function(p) {
-    return p.name.toLowerCase().indexOf(q) !== -1;
+  // Name matches rank first, then category/description matches below them.
+  var nameHits = [], otherHits = [];
+  list.forEach(function(p) {
+    if (p.name.toLowerCase().indexOf(q) !== -1) { nameHits.push(p); return; }
+    var haystack = ((p.category || '') + ' ' + (p.desc || '')).toLowerCase();
+    if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
+  var matches = nameHits.concat(otherHits);
   if (matches.length === 0) {
-    res.innerHTML = '<div class="search-no-results">No results found.</div>';
+    res.innerHTML = '<div class="search-no-results">' +
+      '<span class="snr-emoji">🐾</span>' +
+      'No products found' +
+      '<span class="snr-hint">Try "leash", "bottle", "collar"...</span>' +
+    '</div>';
     return;
   }
+  // Bold the matched part of the name. Product names are plain text and the
+  // query is regex-escaped, so this stays injection-safe.
+  var safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  var hl = new RegExp('(' + safe + ')', 'ig');
   res.innerHTML = matches.map(function(p) {
+    var thumb = p.image
+      ? '<img src="' + p.image + '" alt="" loading="lazy">'
+      : p.emoji;
     return '<div class="search-result-item" onclick="goToProduct(' + p.id + ')">' +
-      '<span class="search-result-emoji">' + p.emoji + '</span>' +
+      '<span class="search-result-thumb">' + thumb + '</span>' +
       '<div class="search-result-info">' +
-        '<div class="search-result-name">' + p.name + '</div>' +
+        '<div class="search-result-name">' + p.name.replace(hl, '<b>$1</b>') + '</div>' +
         '<div class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
       '</div>' +
     '</div>';
   }).join('');
 }
+
+// One-time wiring for scroll/keyboard behavior around the overlay.
+(function() {
+  var bar = document.getElementById('navSearchBar');
+  var scrim = document.getElementById('searchScrim');
+
+  // Keep the desktop dropdown glued to the nav if the viewport changes or the
+  // page scrolls (scrollbar drag still works while the scrim is up).
+  window.addEventListener('resize', function() { if (searchIsOpen()) positionSearchBar(); });
+  window.addEventListener('scroll', function() { if (searchIsOpen()) positionSearchBar(); }, { passive: true });
+
+  // The scrim swallows wheel/touch so the page behind holds perfectly still.
+  if (scrim) {
+    scrim.addEventListener('wheel', function(e) { e.preventDefault(); }, { passive: false });
+    scrim.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+  }
+  // On the panel itself only the results list may scroll — anywhere else a
+  // touch-drag would rubber-band the page behind it (iOS).
+  if (bar) {
+    bar.addEventListener('touchmove', function(e) {
+      if (!e.target.closest('.search-results')) e.preventDefault();
+    }, { passive: false });
+  }
+})();
 
 // ==================== CAROUSEL ====================
 function initCarousel(trackId, prevId, nextId) {
@@ -623,17 +700,53 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================== 10% OFF POPUP ====================
+function offerIsOpen() {
+  var popup = document.getElementById('offerPopup');
+  return !!(popup && popup.classList.contains('active'));
+}
+
 function dismissOffer() {
   var overlay = document.getElementById('offerOverlay');
   var popup = document.getElementById('offerPopup');
   if (!overlay || !popup) return;
   overlay.classList.remove('active');
   popup.classList.remove('active');
+  syncOverlayChrome();
 }
 
+// Sends the code with the same EmailJS setup as the footer email box; if the
+// welcome template isn't configured (or sending fails), the customer still
+// gets the code via toast so the promise of the popup is always kept.
 function handleOfferSubmit(e) {
   e.preventDefault();
-  dismissOffer();
+  var input = document.getElementById('offerEmail');
+  var email = input ? input.value.trim() : '';
+  if (!email || email.indexOf('@') === -1) {
+    showToast('⚠️ Please enter a valid email!');
+    return;
+  }
+  var btn = document.getElementById('offerBtn');
+  function finish(msg) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
+    if (input) input.value = '';
+    dismissOffer();
+    showToast(msg, 5000);
+  }
+  var canSend = typeof EMAILJS_PUBLIC_KEY !== 'undefined' && EMAILJS_PUBLIC_KEY &&
+                typeof EMAILJS_WELCOME_TEMPLATE !== 'undefined' && EMAILJS_WELCOME_TEMPLATE;
+  if (!canSend) {
+    finish('🎉 Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
+    to_email: email,
+    discount_code: DISCOUNT_CODE
+  }).then(function() {
+    finish('🎉 10% off code sent to your email!');
+  }).catch(function() {
+    finish('🎉 Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
+  });
 }
 
 setTimeout(function() {
@@ -644,8 +757,16 @@ setTimeout(function() {
     requestAnimationFrame(function() {
       overlay.classList.add('active');
       popup.classList.add('active');
+      syncOverlayChrome();
     });
   });
   document.getElementById('offerClose').addEventListener('click', dismissOffer);
   overlay.addEventListener('click', dismissOffer);
 }, 10000);
+
+// Escape closes whichever overlay is up (search first, then the offer).
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  if (searchIsOpen()) { closeSearch(); }
+  else if (offerIsOpen()) { dismissOffer(); }
+});
