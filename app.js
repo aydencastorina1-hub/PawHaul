@@ -14,6 +14,38 @@ function askQuick(question) {
   sendChat();
 }
 
+// Safety net: the chat bubble renders plain text, so if the AI slips any
+// markdown past the system prompt (tables, **bold**, # headers, `code`),
+// strip it down to clean readable lines instead of showing raw symbols.
+function stripMarkdown(text) {
+  var t = String(text || '');
+  // code fences and inline backticks
+  t = t.replace(/```[a-zA-Z]*\n?/g, '').replace(/`([^`]*)`/g, '$1');
+  // [text](url) links -> just the text
+  t = t.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+  // **bold** / __bold__ / *italic* / _italic_ -> bare text
+  t = t.replace(/(\*\*|__)([\s\S]*?)\1/g, '$2');
+  t = t.replace(/(^|\s)\*([^*\n]+)\*(?=[\s.,!?)]|$)/g, '$1$2');
+  t = t.replace(/(^|\s)_([^_\n]+)_(?=[\s.,!?)]|$)/g, '$1$2');
+  // # headers (line starts only, so "#1 best seller" survives)
+  t = t.replace(/^#{1,6}\s+/gm, '');
+  // table separator rows (|---|---|) -> drop the whole line
+  // ([ \t] not \s in the classes: \s eats newlines and merges lines)
+  t = t.replace(/^[ \t]*\|?[ \t]*:?-{2,}[ \t|:-]*$/gm, '');
+  // table rows -> cells joined with " - " on a plain line; a bare "#"
+  // cell (markdown's numbering column header) carries no meaning - drop it
+  t = t.replace(/^[ \t]*\|(.+)\|[ \t]*$/gm, function (m, inner) {
+    return inner.split('|').map(function (c) { return c.trim(); })
+      .filter(function (c) { return c && c !== '#'; }).join(' - ');
+  });
+  // * bullets -> hyphen bullets, then kill leftover pipes/asterisks
+  t = t.replace(/^\s*\*\s+/gm, '- ');
+  t = t.replace(/\|/g, ' ').replace(/\*/g, '');
+  // tidy: no trailing spaces, max one blank line, trimmed
+  t = t.replace(/[ \t]+\n/g, '\n').replace(/[ \t]{2,}/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  return t;
+}
+
 function addMsg(text, isUser) {
   var msgs = document.getElementById('chatMessages');
   var row = document.createElement('div');
@@ -24,8 +56,9 @@ function addMsg(text, isUser) {
   av.textContent = isUser ? 'You' : String.fromCodePoint(128062);
 
   var bub = document.createElement('div');
-  bub.style.cssText = 'padding:9px 13px;max-width:210px;font-size:13px;font-weight:600;line-height:1.5;' + (isUser ? 'background:#E8630A;color:white;border-radius:14px 14px 4px 14px;' : 'background:white;color:#1a1a2e;border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);');
-  bub.textContent = text;
+  // white-space:pre-line so the bot's line breaks between products render
+  bub.style.cssText = 'padding:9px 13px;max-width:210px;font-size:13px;font-weight:600;line-height:1.5;white-space:pre-line;' + (isUser ? 'background:#E8630A;color:white;border-radius:14px 14px 4px 14px;' : 'background:white;color:#1a1a2e;border-radius:14px 14px 14px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.06);');
+  bub.textContent = isUser ? text : stripMarkdown(text);
 
   row.appendChild(av);
   row.appendChild(bub);
