@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=33">
+  <link rel="stylesheet" href="styles.css?v=34">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -46,14 +46,14 @@
 <body>
 
 <div class="cursor" id="cursor"></div>
-<div class="toast" id="toast">🛒 Added to cart!</div>
+<div class="toast" id="toast">Added to cart!</div>
 
 <!-- SPLASH SCREEN — shows on every load/reload, mobile and desktop -->
 <div class="splash" id="splash">
   <div class="splash-inner">
-    <div class="splash-paw">🐾</div>
+    <div class="splash-paw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="var(--orange)" style="width:1em;height:1em;display:block;margin:0 auto" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="splash-logo">Paw<span>Haul</span></div>
-    <div class="splash-tag">Where Good Dogs Gear Up 🐾</div>
+    <div class="splash-tag">Where Good Dogs Gear Up</div>
   </div>
 </div>
 <script>
@@ -82,7 +82,7 @@
 
 <!-- ANNOUNCE BAR -->
 <div class="announce-bar">
-  🎉 Free Shipping On All Orders <span>🐾</span> 30-Day Returns <span>🐾</span> New Walk Gear Added Regularly
+  Free Shipping On All Orders <span>•</span> 30-Day Returns <span>•</span> New Walk Gear Added Regularly
 </div>
 
 <!-- NAVBAR -->
@@ -103,7 +103,7 @@
     <button class="nav-search-btn" id="navSearchBtn" onclick="toggleSearch()" aria-label="Search">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
-    <button class="cart-btn" onclick="showPage('cart')">&#128722;<span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></button>
+    <button class="cart-btn" onclick="showPage('cart')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;vertical-align:-0.18em" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></button>
     <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -132,11 +132,11 @@
     <span class="mob-menu-title">Menu</span>
     <button class="mob-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">&#10005;</button>
   </div>
-  <a onclick="showPage('home');closeMobileMenu()">&#127968; Home</a>
-  <a onclick="showPage('shop');closeMobileMenu()">&#128717; Shop Walk Gear</a>
-  <a onclick="showPage('about');closeMobileMenu()">&#128062; Our Story</a>
-  <a onclick="showPage('contact');closeMobileMenu()">&#9993; Contact</a>
-  <a onclick="showPage('wishlist');closeMobileMenu()">&#10084; Wishlist</a>
+  <a onclick="showPage('home');closeMobileMenu()">Home</a>
+  <a onclick="showPage('shop');closeMobileMenu()">Shop Walk Gear</a>
+  <a onclick="showPage('about');closeMobileMenu()">Our Story</a>
+  <a onclick="showPage('contact');closeMobileMenu()">Contact</a>
+  <a onclick="showPage('wishlist');closeMobileMenu()">Wishlist</a>
 </div>
 <div class="mob-menu-overlay" id="mobMenuOverlay" onclick="closeMobileMenu()"></div>
 
@@ -154,27 +154,27 @@
     <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.0) 100%);"></div>
     <!-- Text overlay -->
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6%;text-align:right;">
-      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:800;margin-bottom:18px;">🐕 Dog Walk Essentials</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:800;margin-bottom:18px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.1em;height:1.1em;vertical-align:-0.18em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Dog Walk Essentials</div>
       <h1 style="font-family:Fredoka One,cursive;font-size:clamp(32px,7vw,56px);color:white;line-height:1.1;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,0.3);">Every Walk.<br><span style="color:var(--orange);">Every Dog.</span><br>Every Time.</h1>
       <p style="font-size:15px;color:rgba(255,255,255,0.88);font-weight:600;line-height:1.8;margin-bottom:26px;max-width:180px;margin-left:auto;text-align:right;">The gear your dog deserves — water, food, safety and more. Built for every walk.</p>
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:16px;">
-        <span style="color:#FFB800;font-size:16px;">⭐⭐⭐⭐⭐</span>
+        <span style="font-size:16px;display:inline-flex;gap:2px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></span>
         <span style="color:rgba(255,255,255,0.75);font-size:12px;font-weight:700;">5-star rated</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
         <button class="btn-primary" onclick="showPage('shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</button>
-        <button onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:white;border:2px solid rgba(255,255,255,0.5);padding:13px 28px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Best Sellers ⭐</button>
+        <button onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:white;border:2px solid rgba(255,255,255,0.5);padding:13px 28px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Best Sellers</button>
       </div>
     </div>
   </section>
 
     <!-- TRUST BAR -->
   <div class="trust-bar">
-    <div class="trust-item">🚚 Free Shipping</div>
-    <div class="trust-item">🐕 All Dog Sizes</div>
-    <div class="trust-item">🔒 Secure Checkout</div>
-    <div class="trust-item">↩️ 30 Day Returns</div>
-    <div class="trust-item">💳 Easy Payments</div>
+    <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span> Free Shipping</div>
+    <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:15px;height:15px" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span> All Dog Sizes</div>
+    <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> Secure Checkout</div>
+    <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span> 30 Day Returns</div>
+    <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Easy Payments</div>
   </div>
 
 
@@ -192,7 +192,7 @@
         <div class="col-slide">
           <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=1200&q=85" alt="A happy dog outside on a warm-weather walk"></div>
           <div class="col-slide-body">
-            <div class="col-slide-tag">💧 Water &amp; Food</div>
+            <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Water &amp; Food</div>
             <h3 class="col-slide-head">Never Run Out Of Water Mid-Walk</h3>
             <p class="col-slide-copy">Long walk, hot day, no fountain in sight — your dog shouldn't have to wait until you're home. Carry water and food in one hand, and keep the tail wagging for every extra mile.</p>
             <button class="col-slide-btn" onclick="showPage('shop','water')">Shop Water &amp; Food →</button>
@@ -202,7 +202,7 @@
         <div class="col-slide">
           <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=1200&q=85" alt="A dog walking calmly on a leash"></div>
           <div class="col-slide-body">
-            <div class="col-slide-tag">🦮 Leashes &amp; Control</div>
+            <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Leashes &amp; Control</div>
             <h3 class="col-slide-head">Total Control, Every Time</h3>
             <p class="col-slide-copy">Freedom for them, control for you. Whether it's a squirrel sprint, a two-dog tangle, or a busy street crossing, the right leash turns chaos into a calm walk.</p>
             <button class="col-slide-btn" onclick="showPage('shop','leash')">Shop Leashes →</button>
@@ -212,7 +212,7 @@
         <div class="col-slide">
           <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=1200&q=85" alt="A dog on a trail at golden hour, when light starts to fade"></div>
           <div class="col-slide-body">
-            <div class="col-slide-tag">🔒 Safety &amp; Visibility</div>
+            <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg> Safety &amp; Visibility</div>
             <h3 class="col-slide-head">Seen And Safe, Day Or Night</h3>
             <p class="col-slide-copy">Dusk comes fast — and dark coats disappear in it. Light your dog up so drivers spot them from far away, and always know exactly where they are if they ever slip off.</p>
             <button class="col-slide-btn" onclick="showPage('shop','safety')">Shop Safety Gear →</button>
@@ -222,7 +222,7 @@
         <div class="col-slide">
           <div class="col-slide-img"><img loading="lazy" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=1200&q=85" alt="An owner and dog out on a walk, fully geared up"></div>
           <div class="col-slide-body">
-            <div class="col-slide-tag">🐾 All Walk Gear</div>
+            <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> All Walk Gear</div>
             <h3 class="col-slide-head">Every Walk, Fully Covered</h3>
             <p class="col-slide-copy">Water, leash, light and clean-up — everything the two of you need out there, in one place. Grab the full setup and never turn back home for a forgotten thing again.</p>
             <button class="col-slide-btn" onclick="showPage('shop','all')">Shop All Walk Gear →</button>
@@ -260,7 +260,7 @@
       <h2 class="section-title" style="color:white;">The PawHaul <span style="color:var(--orange);">Promise</span></h2>
       <p class="section-sub">Four promises behind every single order — no fine print</p>
     </div>
-    <!-- The 4 promises as stops along a dashed dog-walk route 🐾 -->
+    <!-- The 4 promises as stops along a dashed dog-walk route -->
     <div class="walk-route">
       <div class="route-stop">
         <div class="route-badge">01</div>
@@ -341,17 +341,17 @@
       <button class="carousel-btn carousel-prev disabled" id="revCarouselPrev" aria-label="Previous">&#8249;</button>
     <div class="reviews-grid" id="revCarousel">
       <div class="review-card">
-        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <div class="review-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></div>
         <p class="review-text">"The 2-in-1 Walk Bottle is the one thing I grab every morning. The flip-out spout makes it so easy to give her a drink mid-walk, and the food side is genuinely leak-proof — kibble stays sealed and fresh. Took it on a weekend trip too. Perfect size for my medium dog."</p>
         <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&q=90" alt="Sarah M. with her golden retriever"><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-loc">Portland, OR</div></div><div class="verified">✓ Verified</div></div>
       </div>
       <div class="review-card">
-        <div class="review-stars">⭐⭐⭐⭐</div>
+        <div class="review-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></div>
         <p class="review-text">"LED collar is super bright at night and the hands-free leash works well for running. Took a little adjusting to get the waist belt right but once it fits it's great. Dog doesn't notice either one at all."</p>
         <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=200&q=90" alt="James R.'s happy dog"><div><div class="reviewer-name">James R.</div><div class="reviewer-loc">Austin, TX</div></div><div class="verified">✓ Verified</div></div>
       </div>
       <div class="review-card">
-        <div class="review-stars">⭐⭐⭐⭐⭐</div>
+        <div class="review-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></div>
         <p class="review-text">"AirTag holder hasn't budged in two months. Clips onto her collar, waterproof, she's gone through puddles and mud and it stays put. Small thing but I sleep better knowing where Luna is."</p>
         <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=200&q=90" alt="Maria L. with her labrador"><div><div class="reviewer-name">Maria L.</div><div class="reviewer-loc">Denver, CO</div></div><div class="verified">✓ Verified</div></div>
       </div>
@@ -411,9 +411,9 @@
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div>
         <p>Walk gear built specifically for dog owners. Water, food, leashes, safety — everything for a better walk.</p>
         <div class="social-row">
-          <a class="social-btn">📸</a>
-          <a class="social-btn">🎵</a>
-          <a class="social-btn">👍</a>
+          <a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a>
+          <a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a>
+          <a class="social-btn" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></a>
         </div>
       </div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','leash')">Leashes</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
@@ -421,8 +421,8 @@
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom">
-      <p>© 2026 <span>PawHaul</span> — Built For Every Walk 🐾</p>
-      <p>Made with ❤️ for dog owners everywhere</p>
+      <p>© 2026 <span>PawHaul</span> — Built For Every Walk</p>
+      <p>Made for dog owners everywhere</p>
     </div>
   </footer>
 </div>
@@ -431,7 +431,7 @@
 <div id="page-shop" class="page" style="background:white;">
   <div class="shop-page">
     <div class="shop-header">
-      <h1>Walk Gear 🐾</h1>
+      <h1>Walk Gear</h1>
       <p>Everything you need for the perfect walk with your dog</p>
     </div>
     <div class="shop-filters">
@@ -445,12 +445,12 @@
   <footer>
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
-      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn">📸</a><a class="social-btn">🎵</a><a class="social-btn">👍</a></div></div>
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a><a class="social-btn" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','leash')">Leashes</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> 🐾</p></div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -466,7 +466,7 @@
       <div class="product-detail-info">
         <div class="section-tag" id="detailCategory">Walk Essentials</div>
         <h1 id="detailName">2-in-1 Walk Bottle</h1>
-        <div class="detail-stars">⭐⭐⭐⭐⭐ <span id="detailReviews">(127 reviews)</span></div>
+        <div class="detail-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span id="detailReviews">(127 reviews)</span></div>
         <div class="detail-price">
           <span class="now" id="detailPrice">$19.99</span>
           <span class="was" id="detailWas">$27.99</span>
@@ -486,51 +486,51 @@
           </div>
         </div>
         <div class="detail-btns">
-          <button class="btn-add-cart" onclick="addToCartDetail()">Add To Cart 🛒</button>
-          <button class="btn-buy-now" onclick="buyNow()">Buy It Now ⚡</button>
+          <button class="btn-add-cart" onclick="addToCartDetail()">Add To Cart</button>
+          <button class="btn-buy-now" onclick="buyNow()">Buy It Now</button>
         </div>
         
       <!-- BUNDLE SUGGESTION -->
       <div id="bundleSuggestion" style="display:none;margin-top:24px;background:var(--orange-pale);border-radius:var(--radius);padding:20px;border:2px solid var(--orange);">
-        <div style="font-family:Fredoka One,cursive;font-size:18px;margin-bottom:14px;color:var(--black);">🐾 Frequently Bought Together</div>
+        <div style="font-family:Fredoka One,cursive;font-size:18px;margin-bottom:14px;color:var(--black);">Frequently Bought Together</div>
         <div id="bundleItems" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart 🛒</button>
+        <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart</button>
       </div>
       <ul class="detail-features" id="detailFeatures"></ul>
 
       <div class="detail-section">
-        <div class="detail-section-title">🧵 Material</div>
+        <div class="detail-section-title">Material</div>
         <p class="detail-section-text" id="detailMaterial"></p>
       </div>
       <div class="detail-section">
-        <div class="detail-section-title">📦 What's in the Box</div>
+        <div class="detail-section-title">What's in the Box</div>
         <p class="detail-section-text" id="detailBox"></p>
       </div>
 
       <div class="detail-info-cards">
         <div class="detail-info-card">
-          <span class="detail-info-icon">🚚</span>
+          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
           <div>
             <div class="detail-info-label">Free Shipping</div>
             <div class="detail-info-value">Ships in 1–3 business days · Arrives in 7–14 days</div>
           </div>
         </div>
         <div class="detail-info-card">
-          <span class="detail-info-icon">↩️</span>
+          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span>
           <div>
             <div class="detail-info-label">30-Day Returns</div>
             <div class="detail-info-value">Not happy? Return it within 30 days — no questions asked</div>
           </div>
         </div>
         <div class="detail-info-card">
-          <span class="detail-info-icon">🔒</span>
+          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
           <div>
             <div class="detail-info-label">Secure Checkout</div>
             <div class="detail-info-value">SSL encrypted · Your payment info is always safe</div>
           </div>
         </div>
         <div class="detail-info-card">
-          <span class="detail-info-icon">🐾</span>
+          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:22px;height:22px;display:block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>
           <div>
             <div class="detail-info-label">PawHaul Guarantee</div>
             <div class="detail-info-value">Every product is tested and built for real daily walks</div>
@@ -548,7 +548,7 @@
 <div id="page-wishlist" class="page" style="background:white;">
   <div class="cart-page">
     <button class="back-btn" onclick="showPage('shop')">← Continue Shopping</button>
-    <h1>My Wishlist <span style="color:var(--orange)">❤️</span></h1>
+    <h1>My Wishlist <span style="color:var(--orange)">♥</span></h1>
     <div id="wishlistContent"></div>
   </div>
   <footer>
@@ -559,13 +559,13 @@
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> — Built For Every Walk 🐾</p></div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> — Built For Every Walk</p></div>
   </footer>
 </div>
 <div id="page-cart" class="page" style="background:white;">
   <div class="cart-page">
     <button class="back-btn" onclick="showPage('shop')">← Continue Shopping</button>
-    <h1>Your Cart 🛒</h1>
+    <h1>Your Cart</h1>
     <div id="cartContent"></div>
   </div>
 </div>
@@ -648,12 +648,12 @@
   <footer>
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
-      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn">📸</a><a class="social-btn">🎵</a></div></div>
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> 🐾</p></div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -666,14 +666,14 @@
         <h1>We'd Love To <span>Hear From You</span></h1>
         <p>Have a question about your order, our products, or just want to share a photo of your pup? We're here for all of it.</p>
         <div class="contact-methods">
-          <div class="contact-method"><span class="contact-method-icon">📧</span><div><div class="contact-method-label">Email Us</div><div class="contact-method-value">pawhaulsupport@gmail.com</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon">📦</span><div><div class="contact-method-label">Track Your Order</div><div class="contact-method-value">Use your order confirmation email</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon">↩️</span><div><div class="contact-method-label">Returns & Refunds</div><div class="contact-method-value">30 day no questions asked policy</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon">⏰</span><div><div class="contact-method-label">Response Time</div><div class="contact-method-value">Within 24 hours</div></div></div>
+          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></span><div><div class="contact-method-label">Email Us</div><div class="contact-method-value">pawhaulsupport@gmail.com</div></div></div>
+          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><div><div class="contact-method-label">Track Your Order</div><div class="contact-method-value">Use your order confirmation email</div></div></div>
+          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span><div><div class="contact-method-label">Returns & Refunds</div><div class="contact-method-value">30 day no questions asked policy</div></div></div>
+          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="contact-method-label">Response Time</div><div class="contact-method-value">Within 24 hours</div></div></div>
         </div>
       </div>
       <div class="contact-form-wrap">
-        <h2>Send Us A Message 🐾</h2>
+        <h2>Send Us A Message</h2>
         <div class="form-row">
           <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="John"></div>
           <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" placeholder="Smith"></div>
@@ -686,7 +686,7 @@
             <option>Product Question</option>
             <option>Return Request</option>
             <option>General Inquiry</option>
-            <option>Just saying hi 🐾</option>
+            <option>Just saying hi</option>
           </select>
         </div>
         <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="Tell us how we can help..."></textarea></div>
@@ -697,12 +697,12 @@
   <footer>
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
-      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn">📸</a><a class="social-btn">🎵</a></div></div>
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> 🐾</p></div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -768,8 +768,8 @@
 
 
 
-  <script src="products.js?v=17"></script>
-  <script src="app.js?v=18"></script>
+  <script src="products.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->
@@ -780,7 +780,7 @@
       <img src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" alt="Dog and owner out on a walk" loading="lazy">
     </div>
     <div class="offer-body">
-      <div class="offer-kicker">🐾 Welcome To The Pack</div>
+      <div class="offer-kicker"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.2em;height:1.2em;vertical-align:-0.25em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Welcome To The Pack</div>
       <h2 class="offer-headline">Get <span>10% Off</span> Your First Order</h2>
       <p class="offer-sub">Gear built for every walk. Drop your email and we'll send your code right away.</p>
       <form class="offer-form" onsubmit="handleOfferSubmit(event)">

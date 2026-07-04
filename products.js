@@ -2,7 +2,7 @@
 var products = [
   {
     id: 1, name: "2-in-1 Walk Bottle", emoji: "🧴", image: "", category: "water",
-    badge: "🔥 Best Seller", badgeClass: "", reviews: 127,
+    badge: "Best Seller", badgeClass: "", reviews: 127,
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
@@ -32,7 +32,7 @@ var products = [
   },
   {
     id: 2, name: "Heavy-Duty Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
-    badge: "⭐ New", badgeClass: "badge-new", reviews: 84,
+    badge: "New", badgeClass: "badge-new", reviews: 84,
     desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
 
     // Length drives the price (labels must exactly equal the sizePrices keys).
@@ -58,7 +58,7 @@ var products = [
   },
   {
     id: 3, name: "Collapsible Travel Bowl", price: 14.99, was: 19.99, emoji: "🥣", image: "", category: "water",
-    badge: "💧 Popular", badgeClass: "badge-popular", reviews: 91,
+    badge: "Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Pink", "Green", "Gray", "Black"],
@@ -76,7 +76,7 @@ var products = [
   },
   {
     id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "safety",
-    badge: "🔒 Safety", badgeClass: "badge-safety", reviews: 38,
+    badge: "Safety", badgeClass: "badge-safety", reviews: 38,
     desc: "A secure waterproof silicone holder that keeps your Apple AirTag attached to your dog's collar at all times — so you always know where they are. The twist-lock closure holds the AirTag firmly in place through daily walks, rain, mud, and rough play. Compatible with Apple AirTag 1st and 2nd generation. Fits any standard collar up to 1.5\" wide.",
     sizes: ["Universal — fits all standard collars"],
     colors: ["Black", "Orange", "Pink"],
@@ -95,7 +95,7 @@ var products = [
   },
   {
     id: 5, name: "Hands-Free Running Leash", price: 22.99, was: 29.99, emoji: "🏃", image: "", category: "leash",
-    badge: "🏃 Active", badgeClass: "badge-active", reviews: 55,
+    badge: "Active", badgeClass: "badge-active", reviews: 55,
     desc: "Run, jog, hike, or walk completely hands-free. The padded adjustable waist belt sits comfortably at your hips and the bungee section absorbs your dog's sudden lunges so you never lose your stride. Built-in zip pocket keeps your phone safe, and the side holder fits most water bottles. The quick-release buckle lets you detach instantly if needed.",
     sizes: ["One Size — waist 28\" to 48\""],
     colors: ["Black", "Orange", "Blue"],
@@ -114,7 +114,7 @@ var products = [
   },
   {
     id: 6, name: "LED Light-Up Dog Collar", price: 21.99, was: 29.99, emoji: "💡", image: "", category: "safety",
-    badge: "🌙 Night Safety", badgeClass: "badge-night", reviews: 62,
+    badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     sizes: ["Small 13-16in", "Medium 14.5-18in", "Large 16-20.5in", "XL 16.5-22in"],
     colors: ["Blue", "Green", "Pink", "Red", "Black"],
@@ -132,7 +132,7 @@ var products = [
   },
   {
     id: 7, name: "Dual Dog Walk Coupler", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
-    badge: "⭐ New", badgeClass: "badge-new", reviews: 67,
+    badge: "New", badgeClass: "badge-new", reviews: 67,
     desc: "Walk two dogs at once with zero tangle. The 360° swivel clips prevent knots while the bungee cord absorbs shock from both dogs at the same time. The adjustable length fits all breed sizes, so a big dog and a little one can walk comfortably side by side. Perfect for multi-dog households that want one hand free and zero chaos on the walk.",
     sizes: ["One Size — adjustable length"],
     colors: ["Black", "Blue", "Orange"],
@@ -148,7 +148,7 @@ var products = [
   },
   {
     id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🦴", image: "", category: "leash",
-    badge: "🔥 Popular", badgeClass: "badge-popular", reviews: 43,
+    badge: "Popular", badgeClass: "badge-popular", reviews: 43,
     desc: "Never get caught without a bag again. This bone-shaped poop bag dispenser clips directly onto any leash with a sturdy carabiner. Holds a full roll of bags inside, dispensing one at a time through the easy-pull slot. Lightweight and built to last.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Red", "Blue", "Black", "Pink", "Green"],
@@ -377,10 +377,10 @@ function productCard(p) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-stars">⭐⭐⭐⭐⭐ <span>(${p.reviews} reviews)</span></div>
+        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews} reviews)</span></div>
         ${cardOptionsHtml(p)}
         <div class="product-price">${priceDisplayHtml(p)}</div>
-        <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart 🛒</button>
+        <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
       </div>
     </div>
   `;
@@ -523,7 +523,7 @@ function addToCart(product) {
   if (existing) { existing.qty++; }
   else { cart.push({ ...product, qty: 1 }); }
   updateCartCount();
-  showToast(`🐾 ${product.name} added to cart!`);
+  showToast(`${product.name} added to cart!`);
 }
 
 function quickAdd(id) {
@@ -573,7 +573,7 @@ function renderWishlist() {
   var container = document.getElementById('wishlistContent');
   if (!container) return;
   if (wishlistItems.length === 0) {
-    container.innerHTML = '<div class="empty-cart"><span class="empty-icon">🐾</span><h2>Your pup\'s missing out!</h2><p>Heart any product to save it here</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
+    container.innerHTML = '<div class="empty-cart"><span class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="var(--orange)" style="width:52px;height:52px;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span><h2>Your pup\'s missing out!</h2><p>Heart any product to save it here</p><button class="btn-primary" onclick="showPage(\'shop\')">Browse Products</button></div>';
     return;
   }
   container.innerHTML = '<div class="products-grid">' + wishlistItems.map(function(p) {
@@ -583,7 +583,7 @@ function renderWishlist() {
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
       '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
-      '<div class="product-stars">⭐⭐⭐⭐⭐ <span>(' + p.reviews + ' reviews)</span></div>' +
+      '<div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(' + p.reviews + ' reviews)</span></div>' +
       '<div class="product-price">' + priceDisplayHtml(p) + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
   }).join('') + '</div>';
@@ -611,7 +611,7 @@ function renderCart() {
   if (cart.length === 0) {
     container.innerHTML = `
       <div class="empty-cart">
-        <span class="empty-icon">🛒</span>
+        <span class="empty-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:52px;height:52px;display:inline-block" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></span>
         <h2>Your cart is empty!</h2>
         <p>Looks like your pup needs some new gear</p>
         <button class="btn-primary" onclick="showPage('shop')">Shop Now →</button>
@@ -648,10 +648,10 @@ function renderCart() {
       <div class="cart-summary">
         <h3>Order Summary</h3>
         <div class="summary-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
-        <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE 🎉</span></div>
+        <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
         <div class="summary-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
         <button class="checkout-btn" onclick="checkout()">Checkout Securely →</button>
-        <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px;font-weight:600">🔒 Secure checkout • 30 day returns</p>
+        <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px;font-weight:600">Secure checkout • 30 day returns</p>
       </div>
     </div>`;
 }
@@ -665,7 +665,7 @@ function updateCartQty(idx, delta) {
 }
 
 function checkout() {
-  showToast('🎉 Redirecting to secure checkout...');
+  showToast('Redirecting to secure checkout...');
   setTimeout(function() { window.open('https://pawhaul.myshopify.com/cart', '_blank'); }, 1000);
 }
 
@@ -713,11 +713,11 @@ function submitEmail() {
   var input = document.querySelector('.email-input');
   var email = input.value.trim();
   if (!email || !email.includes('@')) {
-    showToast('⚠️ Please enter a valid email!');
+    showToast('Please enter a valid email!');
     return;
   }
   if (!EMAILJS_PUBLIC_KEY) {
-    showToast('🎉 Your code: ' + DISCOUNT_CODE + ' — 10% off your order!');
+    showToast('Your code: ' + DISCOUNT_CODE + ' — 10% off your order!');
     input.value = '';
     return;
   }
@@ -727,11 +727,11 @@ function submitEmail() {
     to_email: email,
     discount_code: DISCOUNT_CODE
   }).then(function() {
-    showToast('🎉 10% off code sent to your email!');
+    showToast('10% off code sent to your email!');
     input.value = '';
     if (btn) btn.disabled = false;
   }).catch(function() {
-    showToast('🎉 Your code is: ' + DISCOUNT_CODE + ' — 10% off!');
+    showToast('Your code is: ' + DISCOUNT_CODE + ' — 10% off!');
     input.value = '';
     if (btn) btn.disabled = false;
   });
@@ -741,7 +741,7 @@ function submitContact() {
   var inputs = document.querySelectorAll('#page-contact .form-input, #page-contact .form-textarea');
   var allFilled = true;
   inputs.forEach(function(el) { if (!el.value.trim()) allFilled = false; });
-  if (!allFilled) { showToast('⚠️ Please fill in all fields!'); return; }
+  if (!allFilled) { showToast('Please fill in all fields!'); return; }
 
   var formInputs = document.querySelectorAll('#page-contact .form-input');
   var firstName  = formInputs[0] ? formInputs[0].value.trim() : '';
@@ -753,7 +753,7 @@ function submitContact() {
   message = message ? message.value.trim() : '';
 
   if (!EMAILJS_PUBLIC_KEY) {
-    showToast('✅ Message sent! We\'ll reply within 24 hours 🐾');
+    showToast('Message sent! We\'ll reply within 24 hours.');
     inputs.forEach(function(el) { el.value = ''; });
     return;
   }
@@ -778,11 +778,11 @@ function submitContact() {
     message:    message,
     to_email:   'pawhaulsupport@gmail.com'
   }).then(function() {
-    showToast('✅ Message sent! We\'ll reply within 24 hours 🐾');
+    showToast('Message sent! We\'ll reply within 24 hours.');
     inputs.forEach(function(el) { el.value = ''; });
     if (btn) { btn.disabled = false; btn.textContent = 'Send Message →'; }
   }).catch(function() {
-    showToast('❌ Something went wrong. Email us at pawhaulsupport@gmail.com');
+    showToast('Something went wrong. Email us at pawhaulsupport@gmail.com');
     if (btn) { btn.disabled = false; btn.textContent = 'Send Message →'; }
   });
 }

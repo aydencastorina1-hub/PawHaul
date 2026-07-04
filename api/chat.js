@@ -64,7 +64,7 @@ var SYSTEM_PROMPT = [
   "Jam-free retractable leash with one-touch lock",
   "- Just clean conversational text with simple line breaks. A hyphen between a name and its price is fine; special symbols are not.",
   "",
-  "Be friendly, fun, and helpful. Use dog emojis occasionally 🐾. Keep responses short and conversational. If someone asks something you do not know tell them to email pawhaulsupport@gmail.com. Never make up information not listed above."
+  "Be friendly, fun, and helpful. NEVER use emojis in your responses — keep the tone clean, professional and warm. Keep responses short and conversational. If someone asks something you do not know tell them to email pawhaulsupport@gmail.com. Never make up information not listed above."
 ].join("\n");
 
 // The one tool the model can call. It executes IN THE BROWSER (the client

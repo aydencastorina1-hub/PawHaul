@@ -73,7 +73,7 @@ function addMsg(text, isUser) {
 // endpoint, which adds the system prompt + key server-side and talks to
 // Groq. Replaces the old keyword chatbot entirely.
 var chatHistory = [];
-var CHAT_FALLBACK = "Woof, my brain just hiccuped! 🐾 Please email pawhaulsupport@gmail.com and a real human will get back to you within 24 hours.";
+var CHAT_FALLBACK = "Woof, my brain just hiccuped! Please email pawhaulsupport@gmail.com and a real human will get back to you within 24 hours.";
 
 // ── Chatbot cart tool ─────────────────────────────────────────
 // When the AI decides to add a product it emits an add_to_cart tool call;
@@ -197,7 +197,7 @@ async function sendChatToAI(userMessage) {
     var summary = succeededAdds.map(function (a) {
       return (a.quantity > 1 ? a.quantity + "× " : "") + a.product + (a.size ? " (" + a.size + ")" : "");
     }).join(", ");
-    var confirmMsg = "Added " + summary + " to your cart! 🐾";
+    var confirmMsg = "Added " + summary + " to your cart!";
     chatHistory.push({ role: "assistant", content: confirmMsg });
     if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
     return confirmMsg;
@@ -358,7 +358,7 @@ function showBundle(productId) {
   bundleItems.innerHTML = html;
   // Two-item pairings read "Add Both To Cart"; bigger bundles keep "Add Bundle To Cart".
   var bundleBtn = document.getElementById('bundleAddBtn');
-  if (bundleBtn) bundleBtn.textContent = isPair ? 'Add Both To Cart 🛒' : 'Add Bundle To Cart 🛒';
+  if (bundleBtn) bundleBtn.textContent = isPair ? 'Add Both To Cart' : 'Add Bundle To Cart';
   bundleDiv.style.display = 'block';
 }
 
@@ -382,7 +382,7 @@ function addBundleToCart() {
   });
 
   updateCartCount();
-  showToast('🐾 Bundle added to cart!');
+  showToast('Bundle added to cart!');
 }
 
 // ==================== PAGE NAVIGATION HOOKS ====================
@@ -525,7 +525,7 @@ function doSearch(val) {
   var matches = nameHits.concat(otherHits);
   if (matches.length === 0) {
     res.innerHTML = '<div class="search-no-results">' +
-      '<span class="snr-emoji">🐾</span>' +
+      '<span class="snr-emoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#C9C2B8" style="width:34px;height:34px;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>' +
       'No products found' +
       '<span class="snr-hint">Try "leash", "bottle", "collar"...</span>' +
     '</div>';
@@ -796,7 +796,7 @@ function handleOfferSubmit(e) {
   var input = document.getElementById('offerEmail');
   var email = input ? input.value.trim() : '';
   if (!email || email.indexOf('@') === -1) {
-    showToast('⚠️ Please enter a valid email!');
+    showToast('Please enter a valid email!');
     return;
   }
   var btn = document.getElementById('offerBtn');
@@ -809,7 +809,7 @@ function handleOfferSubmit(e) {
   var canSend = typeof EMAILJS_PUBLIC_KEY !== 'undefined' && EMAILJS_PUBLIC_KEY &&
                 typeof EMAILJS_WELCOME_TEMPLATE !== 'undefined' && EMAILJS_WELCOME_TEMPLATE;
   if (!canSend) {
-    finish('🎉 Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
+    finish('Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
     return;
   }
   if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
@@ -817,9 +817,9 @@ function handleOfferSubmit(e) {
     to_email: email,
     discount_code: DISCOUNT_CODE
   }).then(function() {
-    finish('🎉 10% off code sent to your email!');
+    finish('10% off code sent to your email!');
   }).catch(function() {
-    finish('🎉 Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
+    finish('Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
   });
 }
 
