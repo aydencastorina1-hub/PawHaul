@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=31">
+  <link rel="stylesheet" href="styles.css?v=32">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -116,8 +116,11 @@
 <div class="search-scrim" id="searchScrim" onclick="closeSearch()"></div>
 <div class="nav-search-bar" id="navSearchBar" role="dialog" aria-modal="true" aria-label="Search products">
   <div class="nav-search-inner">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="navSearchInput" class="nav-search-input" placeholder="Search walk gear..." oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search products">
+    <svg class="nav-search-paw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="19" height="19" fill="currentColor" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg>
+    <div class="nav-search-field">
+      <input type="text" id="navSearchInput" class="nav-search-input" oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search products">
+      <span class="nav-search-ph" id="navSearchPh" aria-hidden="true">Search leashes...</span>
+    </div>
     <button class="nav-search-close" onclick="closeSearch()" aria-label="Close search">&#10005;</button>
   </div>
   <div class="search-results" id="searchResults"></div>
@@ -735,7 +738,7 @@
 
 
   <script src="products.js?v=17"></script>
-  <script src="app.js?v=16"></script>
+  <script src="app.js?v=17"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->

@@ -411,6 +411,33 @@ function syncOverlayChrome() {
   document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen());
 }
 
+// Rotating placeholder: cycles example searches while the input is empty
+// (pauses automatically once the user types — the overlay hides via the
+// input listener below, and we skip advancing while there's text).
+var SEARCH_PLACEHOLDERS = ['Search leashes...', 'Search collars...', 'Search water bottles...', 'Search safety gear...'];
+var searchPhTimer = null;
+var searchPhIdx = 0;
+
+function startSearchPhCycle() {
+  stopSearchPhCycle();
+  var ph = document.getElementById('navSearchPh');
+  if (!ph) return;
+  searchPhTimer = setInterval(function() {
+    var inp = document.getElementById('navSearchInput');
+    if (inp && inp.value) return; // user is typing — hold the current phrase
+    ph.classList.add('is-fading');
+    setTimeout(function() {
+      searchPhIdx = (searchPhIdx + 1) % SEARCH_PLACEHOLDERS.length;
+      ph.textContent = SEARCH_PLACEHOLDERS[searchPhIdx];
+      ph.classList.remove('is-fading');
+    }, 240); // matches the CSS fade duration
+  }, 2600);
+}
+
+function stopSearchPhCycle() {
+  if (searchPhTimer) { clearInterval(searchPhTimer); searchPhTimer = null; }
+}
+
 function toggleSearch() {
   if (searchIsOpen()) { closeSearch(); } else { openSearch(); }
 }
@@ -430,6 +457,7 @@ function openSearch() {
   if (inp) {
     try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
   }
+  startSearchPhCycle();
 }
 
 function closeSearch() {
@@ -439,8 +467,11 @@ function closeSearch() {
   bar.classList.remove('open');
   if (scrim) scrim.classList.remove('open');
   syncOverlayChrome();
+  stopSearchPhCycle();
   var inp = document.getElementById('navSearchInput');
   if (inp) { inp.value = ''; inp.blur(); }
+  var ph = document.getElementById('navSearchPh');
+  if (ph) ph.classList.remove('ph-hidden', 'is-fading');
   var res = document.getElementById('searchResults');
   if (res) res.innerHTML = '';
 }
@@ -506,6 +537,16 @@ function doSearch(val) {
     bar.addEventListener('touchmove', function(e) {
       if (!e.target.closest('.search-results')) e.preventDefault();
     }, { passive: false });
+  }
+
+  // The rotating placeholder is a real element over the input (native
+  // placeholders can't fade) — hide it the instant there's any text.
+  var inp = document.getElementById('navSearchInput');
+  var ph = document.getElementById('navSearchPh');
+  if (inp && ph) {
+    inp.addEventListener('input', function() {
+      ph.classList.toggle('ph-hidden', !!inp.value);
+    });
   }
 })();
 
