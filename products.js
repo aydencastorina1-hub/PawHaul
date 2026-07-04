@@ -1,7 +1,7 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "PawHaul Walk Kit 2-in-1", emoji: "🧴", image: "", category: "water",
+    id: 1, name: "2-in-1 Walk Bottle", emoji: "🧴", image: "", category: "water",
     badge: "🔥 Best Seller", badgeClass: "", reviews: 127,
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
 
@@ -28,7 +28,7 @@ var products = [
       "Easy to clean — all parts detach"
     ],
     material: "BPA-free food-grade plastic body · Food-safe silicone drinking spout · Leak-proof sealed food compartment",
-    whatsInBox: "1× Walk Kit 2-in-1 bottle (water + food compartments)"
+    whatsInBox: "1× 2-in-1 Walk Bottle (water + food compartments)"
   },
   {
     id: 2, name: "Heavy-Duty Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
@@ -220,7 +220,7 @@ function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
   // Home carousel = these 5 specific products, in this exact order.
   // (Shop page still shows all products.)
-  var featuredIds = [1, 8, 6, 4, 2]; // Walk Kit, Bag Hook, LED Collar, AirTag Holder, Retractable Leash
+  var featuredIds = [1, 8, 6, 4, 2]; // Walk Bottle, Bag Hook, LED Collar, AirTag Holder, Retractable Leash
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);

@@ -273,11 +273,11 @@ function closePolicyModal() {
 
 // ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
 var bundleMap = {
-  1: [2, 3],    // Walk Kit → suggest Retractable Leash + Bowl
+  1: [2, 3],    // Walk Bottle → suggest Retractable Leash + Bowl
   2: [8],       // Retractable Leash → pairs with Walk Clean Bag Hook ("Add Both")
-  3: [1, 2],    // Bowl → suggest Walk Kit + Retractable Leash
-  4: [6, 1],    // AirTag → suggest LED Collar + Walk Kit
-  5: [1, 2],    // Running Leash → suggest Walk Kit + Retractable Leash
+  3: [1, 2],    // Bowl → suggest Walk Bottle + Retractable Leash
+  4: [6, 1],    // AirTag → suggest LED Collar + Walk Bottle
+  5: [1, 2],    // Running Leash → suggest Walk Bottle + Retractable Leash
   6: [4, 2],    // LED Collar → suggest AirTag + Retractable Leash
   8: [2],       // Bag Hook → pairs with Retractable Leash ("Add Both")
 };
