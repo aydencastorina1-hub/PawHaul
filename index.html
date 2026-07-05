@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Site is light-only: without this, browsers in OS/browser dark mode paint the
+     unstyled canvas black before styles.css applies, causing a flash on load. -->
+<meta name="color-scheme" content="light">
 <title>PawHaul — Built For Every Walk</title>
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=4">
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=4">
@@ -11,9 +14,10 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
 <!-- First hero slide is the LCP image — preload it; slides 2-4 are pre-warmed after load by app.js -->
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=37">
+  <link rel="stylesheet" href="styles.css?v=38">
 </head>
 <body>
 
@@ -740,6 +744,9 @@
 
 
 
+  <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
+       calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="products.js?v=18"></script>
   <script src="app.js?v=20"></script>
 

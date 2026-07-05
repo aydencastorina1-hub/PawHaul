@@ -50,7 +50,9 @@ body {
 ::selection { background: var(--orange); color: #fff; }
 
 /* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
-   rotation driven from app.js). Every slide stays centered on its subject. */
+   rotation driven from app.js). Every slide stays centered on its subject.
+   Navy fallback bg so a slow-loading first image never shows white-then-photo pop. */
+#heroSection { background: var(--black); }
 #heroSection .hero-slide {
   position: absolute;
   inset: 0;
