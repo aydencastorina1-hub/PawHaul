@@ -4,6 +4,7 @@ var products = [
     id: 1, name: "2-in-1 Walk Bottle", emoji: "🧴", image: "", category: "water",
     badge: "Best Seller", badgeClass: "", reviews: 127,
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
+    tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
     sizes: ["350ml", "550ml"],
@@ -34,6 +35,7 @@ var products = [
     id: 2, name: "Heavy-Duty Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 84,
     desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
+    tagline: "Smooth, jam-free control that adapts to every walk.",
 
     // Length drives the price (labels must exactly equal the sizePrices keys).
     sizes: ["3m (10ft)", "5m (16ft)"],
@@ -60,6 +62,7 @@ var products = [
     id: 3, name: "Collapsible Travel Bowl", price: 14.99, was: 19.99, emoji: "🥣", image: "", category: "water",
     badge: "Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
+    tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Pink", "Green", "Gray", "Black"],
     features: [
@@ -78,6 +81,7 @@ var products = [
     id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "safety",
     badge: "Safety", badgeClass: "badge-safety", reviews: 38,
     desc: "A secure waterproof silicone holder that keeps your Apple AirTag attached to your dog's collar at all times — so you always know where they are. The twist-lock closure holds the AirTag firmly in place through daily walks, rain, mud, and rough play. Compatible with Apple AirTag 1st and 2nd generation. Fits any standard collar up to 1.5\" wide.",
+    tagline: "Always know where they are, rain or shine.",
     sizes: ["Universal — fits all standard collars"],
     colors: ["Black", "Orange", "Pink"],
     features: [
@@ -97,6 +101,7 @@ var products = [
     id: 6, name: "LED Light-Up Dog Collar", price: 21.99, was: 29.99, emoji: "💡", image: "", category: "safety",
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
+    tagline: "Be seen on every night walk, no matter how dark.",
     sizes: ["Small 13-16in", "Medium 14.5-18in", "Large 16-20.5in", "XL 16.5-22in"],
     colors: ["Blue", "Green", "Pink", "Red", "Black"],
     features: [
@@ -115,6 +120,7 @@ var products = [
     id: 7, name: "No-Tangle LED Dual Dog Leash", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 74,
     desc: "Walk two dogs at once without the tangled mess. This retractable dual leash features 360-degree swivel clips and independent braking so each dog moves freely without crossing lines. A built-in LED light keeps you visible on night walks. Compact, durable, and built for everyday control.",
+    tagline: "Walk two dogs at once — zero tangles, zero hassle.",
     // Sourced from the AliExpress listing (4.9★, 700+ sales on this listing, 1,000+ total seller sales).
     // Sizing intentionally left unspecified — no weight limit or dimension in the listing.
     sizes: ["One Size"],
@@ -137,6 +143,7 @@ var products = [
     id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🦴", image: "", category: "leash",
     badge: "Popular", badgeClass: "badge-popular", reviews: 43,
     desc: "Never get caught without a bag again. This bone-shaped poop bag dispenser clips directly onto any leash with a sturdy carabiner. Holds a full roll of bags inside, dispensing one at a time through the easy-pull slot. Lightweight and built to last.",
+    tagline: "A full roll of bags, always within reach.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Red", "Blue", "Black", "Pink", "Green"],
     features: [
@@ -364,9 +371,9 @@ function productCard(p) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews} reviews)</span></div>
-        ${cardOptionsHtml(p)}
+        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews})</span></div>
         <div class="product-price">${priceDisplayHtml(p)}</div>
+        ${cardOptionsHtml(p)}
         <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
       </div>
     </div>
@@ -410,7 +417,10 @@ function showProduct(id) {
   currentVariantPrice = cheapest.price;
   setDetailPrice(cheapest.price, cheapest.was);
   document.getElementById('detailDesc').textContent = currentProduct.desc;
+  document.getElementById('detailTagline').textContent = currentProduct.tagline || '';
   document.getElementById('detailReviews').textContent = `(${currentProduct.reviews} reviews)`;
+  var reviewsCountEl = document.getElementById('detailReviewsCount');
+  if (reviewsCountEl) reviewsCountEl.textContent = currentProduct.reviews + ' reviews';
   document.getElementById('qtyNum').textContent = '1';
 
   var cats = { walk: 'Walk Essentials', car: 'Car & Travel', treats: 'Health & Treats', home: 'Home & Grooming' };
@@ -433,11 +443,14 @@ function showProduct(id) {
   // (Price, "was" and the Save % badge are set by setDetailPrice above,
   //  using the selected size variant.)
 
-  var thumbContent = currentProduct.image
-    ? `<img src="${currentProduct.image}" alt="${currentProduct.name}">`
-    : currentProduct.emoji;
-  document.getElementById('detailThumbs').innerHTML = [0,1,2,3].map((i) =>
-    `<div class="thumb ${i===0?'active':''}" onclick="selectThumb(this)">${thumbContent}</div>`).join('');
+  // Every accordion section re-opens to its default state (Description open,
+  // the rest closed) on a fresh product view.
+  document.querySelectorAll('.pd-acc-item').forEach(function(item, i) {
+    item.classList.toggle('open', i === 0);
+  });
+
+  document.getElementById('stickyName').textContent = currentProduct.name;
+  initStickyAtc();
 
   showPage('product');
 }
@@ -447,14 +460,17 @@ function selectOption(btn) {
   btn.classList.add('active');
 }
 
-// Writes the price, struck-through "was", and Save % badge on the detail page.
+// Writes the price, struck-through "was", and Save % badge on the detail page
+// (main price block AND the sticky Add To Cart bar, which mirrors it).
 // Shared by showProduct (initial render) and selectSize (when the size toggles).
 function setDetailPrice(price, was) {
   var priceEl = document.getElementById('detailPrice');
   var wasEl = document.getElementById('detailWas');
   var saveEl = document.querySelector('.save');
+  var stickyPriceEl = document.getElementById('stickyPrice');
   if (priceEl) priceEl.textContent = '$' + Number(price).toFixed(2);
   if (wasEl) wasEl.textContent = was ? '$' + Number(was).toFixed(2) : '';
+  if (stickyPriceEl) stickyPriceEl.textContent = '$' + Number(price).toFixed(2);
   if (saveEl) {
     if (was && was > price) {
       saveEl.textContent = 'Save ' + Math.round((1 - price / was) * 100) + '%';
@@ -476,9 +492,45 @@ function selectSize(btn) {
   setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
 }
 
-function selectThumb(thumb) {
-  thumb.closest('.thumb-row').querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
-  thumb.classList.add('active');
+// ==================== DESCRIPTION/REVIEWS/SHIPPING ACCORDION ====================
+function togglePdAccordion(btn) {
+  btn.closest('.pd-acc-item').classList.toggle('open');
+}
+
+// ==================== STICKY ADD TO CART BAR ====================
+// Shows once the main "Add To Cart"/"Buy It Now" row scrolls out of view, so
+// the action is always reachable without scrolling back up. A plain scroll
+// listener (not IntersectionObserver) is deliberate: a fast fling/flick or a
+// programmatic scrollTo can jump the anchor from "below the viewport" straight
+// to "above the viewport" without the browser ever sampling an intermediate
+// "intersecting" frame, so a threshold-crossing observer can silently miss
+// the transition entirely (reproduced while testing). Checking the anchor's
+// actual position on every scroll tick has no such gap. Re-runs on every
+// showProduct() call, removing its previous listener first so re-visits
+// never stack up.
+var _stickyAtcHandler = null;
+function initStickyAtc() {
+  var bar = document.getElementById('stickyAtc');
+  var anchor = document.querySelector('.detail-btns');
+  if (!bar || !anchor) return;
+
+  if (_stickyAtcHandler) window.removeEventListener('scroll', _stickyAtcHandler);
+  bar.classList.remove('show');
+  document.getElementById('chatWidget') && document.getElementById('chatWidget').classList.remove('chat-lifted');
+
+  function update() {
+    // A hidden ancestor (navigated away from the product page) still reports
+    // a getBoundingClientRect (just collapsed), so gate on the page itself.
+    var onProductPage = document.getElementById('page-product').classList.contains('active');
+    var scrolledPast = anchor.getBoundingClientRect().bottom < 0;
+    var show = onProductPage && scrolledPast;
+    bar.classList.toggle('show', show);
+    var chat = document.getElementById('chatWidget');
+    if (chat) chat.classList.toggle('chat-lifted', show);
+  }
+  _stickyAtcHandler = update;
+  window.addEventListener('scroll', update, { passive: true });
+  update(); // correct initial state immediately, no need to wait for a scroll event
 }
 
 function changeQty(delta) {

@@ -391,6 +391,14 @@ showPage = function(page, filter) {
   _origShowPage(page, filter);
   closeMobileMenu();
   closeSearch();
+  // Leaving the product page: hide the sticky Add To Cart bar immediately
+  // rather than waiting on the next IntersectionObserver callback.
+  if (page !== 'product') {
+    var stickyBar = document.getElementById('stickyAtc');
+    if (stickyBar) stickyBar.classList.remove('show');
+    var chat = document.getElementById('chatWidget');
+    if (chat) chat.classList.remove('chat-lifted');
+  }
 };
 
 // ==================== HAMBURGER MENU ====================

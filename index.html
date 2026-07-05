@@ -48,7 +48,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=44" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="styles.css?v=47" onload="document.documentElement.classList.remove('no-flash')">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -481,7 +481,6 @@
     <div class="product-detail-grid">
       <div class="product-gallery">
         <div class="main-img" id="detailImg">🧴</div>
-        <div class="thumb-row" id="detailThumbs"></div>
       </div>
       <div class="product-detail-info">
         <div class="section-tag" id="detailCategory">Walk Essentials</div>
@@ -492,7 +491,7 @@
           <span class="was" id="detailWas">$27.99</span>
           <span class="save">Save 29%</span>
         </div>
-        <p class="detail-desc" id="detailDesc">Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.</p>
+        <p class="detail-tagline" id="detailTagline">Water and food in one leak-proof bottle — never cut a walk short again.</p>
         <div class="option-label">Size</div>
         <div class="options-row" id="detailSizes"></div>
         <div class="option-label">Color</div>
@@ -509,57 +508,93 @@
           <button class="btn-add-cart" onclick="addToCartDetail()">Add To Cart</button>
           <button class="btn-buy-now" onclick="buyNow()">Buy It Now</button>
         </div>
-        
+        <div class="detail-trust-mini">
+          <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Free Shipping</span>
+          <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>30-Day Returns</span>
+        </div>
+
       <!-- BUNDLE SUGGESTION -->
       <div id="bundleSuggestion" style="display:none;margin-top:24px;background:var(--orange-pale);border-radius:var(--radius);padding:20px;border:2px solid var(--orange);">
         <div style="font-family:Fredoka One,cursive;font-size:18px;margin-bottom:14px;color:var(--black);">Frequently Bought Together</div>
         <div id="bundleItems" style="display:flex;flex-direction:column;gap:10px;"></div>
         <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart</button>
       </div>
-      <ul class="detail-features" id="detailFeatures"></ul>
 
-      <div class="detail-section">
-        <div class="detail-section-title">Material</div>
-        <p class="detail-section-text" id="detailMaterial"></p>
-      </div>
-      <div class="detail-section">
-        <div class="detail-section-title">What's in the Box</div>
-        <p class="detail-section-text" id="detailBox"></p>
-      </div>
-
-      <div class="detail-info-cards">
-        <div class="detail-info-card">
-          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
-          <div>
-            <div class="detail-info-label">Free Shipping</div>
-            <div class="detail-info-value">Ships in 1–3 business days · Arrives in 7–14 days</div>
+      <!-- DESCRIPTION / REVIEWS / SHIPPING — ACCORDION -->
+      <div class="pd-accordion">
+        <div class="pd-acc-item open">
+          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Description<span class="pd-acc-icon">+</span></button>
+          <div class="pd-acc-body">
+            <p class="detail-desc" id="detailDesc"></p>
+            <ul class="detail-features" id="detailFeatures"></ul>
+            <div class="detail-section">
+              <div class="detail-section-title">Material</div>
+              <p class="detail-section-text" id="detailMaterial"></p>
+            </div>
+            <div class="detail-section">
+              <div class="detail-section-title">What's in the Box</div>
+              <p class="detail-section-text" id="detailBox"></p>
+            </div>
           </div>
         </div>
-        <div class="detail-info-card">
-          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span>
-          <div>
-            <div class="detail-info-label">30-Day Returns</div>
-            <div class="detail-info-value">Not happy? Return it within 30 days — no questions asked</div>
+        <div class="pd-acc-item">
+          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Reviews<span class="pd-acc-icon">+</span></button>
+          <div class="pd-acc-body">
+            <div class="pd-reviews-summary">
+              <div class="pd-reviews-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></div>
+              <div class="pd-reviews-count" id="detailReviewsCount">127 reviews</div>
+            </div>
+            <p class="detail-section-text">Based on verified PawHaul purchases.</p>
           </div>
         </div>
-        <div class="detail-info-card">
-          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <div>
-            <div class="detail-info-label">Secure Checkout</div>
-            <div class="detail-info-value">SSL encrypted · Your payment info is always safe</div>
-          </div>
-        </div>
-        <div class="detail-info-card">
-          <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:22px;height:22px;display:block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>
-          <div>
-            <div class="detail-info-label">PawHaul Guarantee</div>
-            <div class="detail-info-value">Every product is tested and built for real daily walks</div>
+        <div class="pd-acc-item">
+          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Shipping &amp; Returns<span class="pd-acc-icon">+</span></button>
+          <div class="pd-acc-body">
+            <div class="detail-info-cards">
+              <div class="detail-info-card">
+                <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></span>
+                <div>
+                  <div class="detail-info-label">Free Shipping</div>
+                  <div class="detail-info-value">Ships in 1–3 business days · Arrives in 7–14 days</div>
+                </div>
+              </div>
+              <div class="detail-info-card">
+                <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span>
+                <div>
+                  <div class="detail-info-label">30-Day Returns</div>
+                  <div class="detail-info-value">Not happy? Return it within 30 days — no questions asked</div>
+                </div>
+              </div>
+              <div class="detail-info-card">
+                <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:22px;height:22px;display:block" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                <div>
+                  <div class="detail-info-label">Secure Checkout</div>
+                  <div class="detail-info-value">SSL encrypted · Your payment info is always safe</div>
+                </div>
+              </div>
+              <div class="detail-info-card">
+                <span class="detail-info-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:22px;height:22px;display:block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>
+                <div>
+                  <div class="detail-info-label">PawHaul Guarantee</div>
+                  <div class="detail-info-value">Every product is tested and built for real daily walks</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       </div>
     </div>
+  </div>
+
+  <!-- STICKY ADD TO CART BAR — appears once the main Add To Cart button scrolls out of view -->
+  <div class="sticky-atc" id="stickyAtc">
+    <div class="sticky-atc-info">
+      <div class="sticky-atc-name" id="stickyName">Product name</div>
+      <div class="sticky-atc-price" id="stickyPrice">$0.00</div>
+    </div>
+    <button class="sticky-atc-btn" onclick="addToCartDetail()">Add To Cart</button>
   </div>
 </div>
 
@@ -822,8 +857,8 @@
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="products.js?v=21"></script>
-  <script src="app.js?v=27"></script>
+  <script src="products.js?v=24"></script>
+  <script src="app.js?v=28"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->
