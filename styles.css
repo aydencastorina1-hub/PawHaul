@@ -3231,3 +3231,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .contact-hero-wrap { height: 400px; }
   .contact-hero-img { object-position: 42% 38%; }
 }
+
+/* ==================== CHAT WIDGET ==================== */
+/* Everything else in the chat widget is inline (index.html/app.js) — this is
+   the one rule that needs an actual class, since :focus can't be expressed
+   as an inline style attribute. Navy border at rest, orange glow on focus —
+   same pattern as the nav search bar and contact form inputs. */
+.chat-input { border: 2px solid rgba(26,26,46,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(232,99,10,0.14); }
