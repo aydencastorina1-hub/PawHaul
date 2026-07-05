@@ -1644,7 +1644,12 @@ img.reviewer-av {
 }
 
 /* ==================== CONTACT PAGE ==================== */
-.contact-page { padding: 70px 5%; background: white; }
+/* Hero photo + intro text reuse the About page's exact pattern (.about-hero)
+   for visual consistency between the two "premium" content pages. */
+.contact-hero-wrap { height: 280px; }
+.contact-hero-img { object-position: center 32%; } /* keeps both the owner + dog in frame on narrow/tall crops */
+
+.contact-page { padding: 60px 5% 70px; background: white; }
 
 .contact-grid {
   display: grid;
@@ -1653,26 +1658,59 @@ img.reviewer-av {
   align-items: start;
 }
 
-.contact-info h1 { font-family: 'Fredoka One', cursive; font-size: 44px; margin-bottom: 12px; }
-.contact-info h1 span { color: var(--orange); }
-.contact-info p { font-size: 16px; color: var(--gray); font-weight: 600; line-height: 1.7; margin-bottom: 36px; }
-
-.contact-methods { display: flex; flex-direction: column; gap: 18px; }
+/* 2x2 icon cards — same soft-shadow/rounded-corner language as product/collection cards */
+.contact-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 .contact-method {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 18px 20px;
-  background: var(--light-gray);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s var(--ease);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 22px 20px;
+  background: white;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s var(--ease);
 }
+.contact-method:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: rgba(232,99,10,0.3); }
 
-.contact-method:hover { background: var(--orange-pale); transform: translateX(6px); }
-.contact-method-icon { font-size: 28px; }
-.contact-method-label { font-size: 12px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
-.contact-method-value { font-weight: 800; font-size: 15px; }
+.contact-method-icon-tile {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, rgba(232,99,10,0.16), rgba(232,99,10,0.05));
+  border: 1px solid rgba(232,99,10,0.28);
+  color: var(--orange);
+}
+.contact-method-icon-tile svg { width: 21px; height: 21px; display: block; }
+.contact-method-label { font-size: 11px; color: var(--gray); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+.contact-method-value { font-weight: 800; font-size: 14px; line-height: 1.4; word-break: break-word; }
+
+/* Quick answers — instant links for the most common questions, no form needed */
+.quick-answers { margin-top: 28px; padding: 24px; background: var(--light-gray); border-radius: var(--radius); }
+.quick-answers-title { font-family: 'Fredoka One', cursive; font-weight: 400; font-size: 16px; margin-bottom: 12px; color: var(--black); }
+.quick-answer-links { display: flex; flex-direction: column; }
+.quick-answer-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 2px;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--black);
+  border-bottom: 1px solid var(--line);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+.quick-answer-link:last-child { border-bottom: none; padding-bottom: 2px; }
+.quick-answer-link:first-child { padding-top: 2px; }
+.quick-answer-link:hover { color: var(--orange); }
+.quick-answer-link svg { width: 16px; height: 16px; color: var(--orange); flex-shrink: 0; }
 
 .contact-form-wrap {
   background: var(--light-gray);
@@ -1682,9 +1720,9 @@ img.reviewer-av {
 
 .contact-form-wrap h2 { font-family: 'Fredoka One', cursive; font-size: 28px; margin-bottom: 24px; }
 
-.form-group { margin-bottom: 18px; }
+.form-group { margin-bottom: 20px; }
 
-.form-label { display: block; font-weight: 800; font-size: 13px; margin-bottom: 7px; }
+.form-label { display: block; font-weight: 800; font-size: 13px; margin-bottom: 8px; }
 
 .form-input, .form-textarea, .form-select {
   width: 100%;
@@ -1695,11 +1733,14 @@ img.reviewer-av {
   font-size: 14px;
   font-weight: 600;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: white;
 }
 
-.form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--orange); }
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 4px rgba(232, 99, 10, 0.14);
+}
 .form-textarea { height: 120px; resize: vertical; }
 
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -3176,4 +3217,17 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .route-icon { flex-basis: 42px; width: 42px; height: 42px; }
   .route-icon svg { width: 22px; height: 22px; }
   .why-cta { margin-top: 76px; }
+}
+
+/* Contact page: bring the two-column layout (info+quick-answers | form) in at
+   tablet width too, not just the 901px+ the shared ≤900 block leaves it at.
+   The hero photo also gets taller + a re-centered crop here — the wider the
+   band, the more a short crop clips the dog out of frame entirely, so give
+   it more vertical room instead of losing the second subject. */
+@media (min-width: 768px) {
+  .contact-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+  .contact-form-wrap { padding: 32px; }
+  .form-row { grid-template-columns: 1fr 1fr; }
+  .contact-hero-wrap { height: 400px; }
+  .contact-hero-img { object-position: 42% 38%; }
 }

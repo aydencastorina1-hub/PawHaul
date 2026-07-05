@@ -695,6 +695,18 @@ function toggleFaq(el) {
   el.parentElement.classList.toggle('open');
 }
 
+// Jump from Contact's "quick answers" links to a specific FAQ item on the
+// home page, opening it so the answer is visible without another click.
+function goToFaq(itemId) {
+  showPage('home');
+  setTimeout(function() {
+    var el = document.getElementById(itemId);
+    if (!el) return;
+    el.classList.add('open');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 140);
+}
+
 function showToast(msg, duration) {
   try {
     var toast = document.getElementById('toast');

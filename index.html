@@ -48,7 +48,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=40" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="styles.css?v=41" onload="document.documentElement.classList.remove('no-flash')">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -387,7 +387,7 @@
       <h2 class="section-title">Got <span>Questions?</span></h2>
     </div>
     <div class="faq-wrap">
-      <div class="faq-item open">
+      <div class="faq-item open" id="faq-shipping">
         <div class="faq-q" onclick="toggleFaq(this)">How long does shipping take?<span class="faq-icon">+</span></div>
         <div class="faq-a">All orders typically arrive within 7-14 business days. You'll receive a tracking number as soon as your order ships so you can follow it the whole way.</div>
       </div>
@@ -403,7 +403,7 @@
         <div class="faq-q" onclick="toggleFaq(this)">Are the products durable for daily use?<span class="faq-icon">+</span></div>
         <div class="faq-a">Every PawHaul product is built for daily walks. The 2-in-1 Walk Bottle is 100% leak proof, the leashes use heavy-duty nylon, the collars are all-weather resistant, and the collapsible bowl is food-grade silicone that lasts for years.</div>
       </div>
-      <div class="faq-item">
+      <div class="faq-item" id="faq-returns">
         <div class="faq-q" onclick="toggleFaq(this)">What is your return policy?<span class="faq-icon">+</span></div>
         <div class="faq-a">We offer a 30 day hassle free return policy on all products. Not happy for any reason? We'll make it right — no questions asked.</div>
       </div>
@@ -679,20 +679,51 @@
 
 <!-- ==================== CONTACT PAGE ==================== -->
 <div id="page-contact" class="page" style="background:white;">
+  <div class="contact-hero-wrap" style="position:relative;width:100%;overflow:hidden;">
+    <img loading="lazy" class="contact-hero-img" src="https://images.unsplash.com/photo-1602900017944-678041f27dbc?w=1600&q=90" alt="A smiling owner crouching next to his happy dog on a leash in a sunlit park" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
+  </div>
+  <div class="about-hero">
+    <div class="section-tag">Get In Touch</div>
+    <h1>We'd Love To <span>Hear From You</span></h1>
+    <p>Whether it's a question about your order, our gear, or you just want to share a photo of your dog on a walk — we actually read every message.</p>
+  </div>
   <div class="contact-page">
     <div class="contact-grid">
       <div class="contact-info">
-        <div class="section-tag">Get In Touch</div>
-        <h1>We'd Love To <span>Hear From You</span></h1>
-        <p>Have a question about your order, our products, or just want to share a photo of your pup? We're here for all of it.</p>
         <div class="contact-methods">
-          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></span><div><div class="contact-method-label">Email Us</div><div class="contact-method-value">pawhaulsupport@gmail.com</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><div><div class="contact-method-label">Track Your Order</div><div class="contact-method-value">Use your order confirmation email</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span><div><div class="contact-method-label">Returns & Refunds</div><div class="contact-method-value">30 day no questions asked policy</div></div></div>
-          <div class="contact-method"><span class="contact-method-icon" style="color:var(--orange)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;display:block" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><div class="contact-method-label">Response Time</div><div class="contact-method-value">Within 24 hours</div></div></div>
+          <div class="contact-method">
+            <div class="contact-method-icon-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="22,6 12,13 2,6"/></svg></div>
+            <div class="contact-method-label">Email Us</div>
+            <div class="contact-method-value">pawhaulsupport@gmail.com</div>
+          </div>
+          <div class="contact-method">
+            <div class="contact-method-icon-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+            <div class="contact-method-label">Track Your Order</div>
+            <div class="contact-method-value">Use your order confirmation email</div>
+          </div>
+          <div class="contact-method">
+            <div class="contact-method-icon-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></div>
+            <div class="contact-method-label">Returns & Refunds</div>
+            <div class="contact-method-value">30 day no questions asked policy</div>
+          </div>
+          <div class="contact-method">
+            <div class="contact-method-icon-tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+            <div class="contact-method-label">Response Time</div>
+            <div class="contact-method-value">Within 24 hours</div>
+          </div>
+        </div>
+        <div class="quick-answers">
+          <h3 class="quick-answers-title">Looking For A Quick Answer?</h3>
+          <div class="quick-answer-links">
+            <a class="quick-answer-link" onclick="goToFaq('faq-shipping')">Shipping Times<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a class="quick-answer-link" onclick="goToFaq('faq-returns')">Return Policy<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            <a class="quick-answer-link" onclick="showTrackOrder()">Order Tracking<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+          </div>
         </div>
       </div>
       <div class="contact-form-wrap">
+        <div class="section-tag">Get Started</div>
         <h2>Send Us A Message</h2>
         <div class="form-row">
           <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="John"></div>
@@ -791,7 +822,7 @@
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="products.js?v=19"></script>
+  <script src="products.js?v=20"></script>
   <script src="app.js?v=23"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
