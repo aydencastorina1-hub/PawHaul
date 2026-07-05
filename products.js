@@ -716,17 +716,10 @@ function filterProducts(filter, btn) {
   renderShopProducts(currentShopFilter);
 }
 
-// Navigate from a search result to the matching product in the shop grid and flash it
+// Navigate from a search result straight to that product's own detail page.
 function goToProduct(id) {
   closeSearch();
-  showPage('shop', 'all');
-  setTimeout(function() {
-    var el = document.getElementById('prodcard-' + id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el.classList.add('flash');
-    setTimeout(function() { el.classList.remove('flash'); }, 1600);
-  }, 140);
+  showProduct(id);
 }
 
 // ==================== UI HELPERS ====================

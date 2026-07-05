@@ -2040,17 +2040,6 @@ footer {
   50% { transform: translateY(-10px); }
 }
 
-/* Search result → scroll-to-product highlight flash */
-.product-card.flash {
-  border-color: var(--orange) !important;
-  animation: cardflash 1.6s ease;
-}
-@keyframes cardflash {
-  0%   { box-shadow: 0 0 0 0 rgba(232,99,10,0.0); }
-  25%  { box-shadow: 0 0 0 4px rgba(232,99,10,0.45); }
-  100% { box-shadow: 0 0 0 0 rgba(232,99,10,0.0); }
-}
-
 /* Subtle fade-up reveal as sections enter the viewport.
    The .reveal class is added by JS at load, so if JS fails nothing is hidden. */
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
