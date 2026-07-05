@@ -311,6 +311,7 @@ var bundleMap = {
   3: [1, 2],    // Bowl → suggest Walk Bottle + Retractable Leash
   4: [6, 1],    // AirTag → suggest LED Collar + Walk Bottle
   6: [4, 2],    // LED Collar → suggest AirTag + Retractable Leash
+  7: [8],       // No-Tangle LED Dual Dog Leash → pairs with Walk Clean Bag Hook ("Add Both")
   8: [2],       // Bag Hook → pairs with Retractable Leash ("Add Both")
 };
 
