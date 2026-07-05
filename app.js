@@ -290,13 +290,16 @@ function closePolicyModal() {
 // Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
 // looping forever. Slides 2-4 are pre-warmed AFTER window load so they never
 // pop in unloaded but also never compete with the first paint on mobile.
+// Starts on a random slide each load (instead of always slide 1) so repeat
+// visits/reloads don't feel repetitive; rotation continues normally from there.
 (function () {
   var slides = document.querySelectorAll('#heroSection .hero-slide');
   if (slides.length < 2) return;
   window.addEventListener('load', function () {
     slides.forEach(function (img) { var pre = new Image(); pre.src = img.src; });
   });
-  var idx = 0;
+  var idx = Math.floor(Math.random() * slides.length);
+  slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
   setInterval(function () {
     if (document.hidden) return; // pause in background tabs
     idx = (idx + 1) % slides.length;
@@ -413,6 +416,17 @@ function closeMobileMenu() {
   document.getElementById('mobMenuOverlay').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
 }
+
+// Some mobile browsers restore a page from the back/forward cache (e.g. after
+// a pull-to-refresh or swipe-back gesture) with whatever open/closed state the
+// menu, search overlay or offer popup happened to be in when the tab was last
+// backgrounded. Force everything closed on every pageshow (fresh loads too,
+// where these are already closed, so this is a harmless no-op there).
+window.addEventListener('pageshow', function () {
+  closeMobileMenu();
+  closeSearch();
+  dismissOffer();
+});
 
 // ==================== SEARCH ====================
 // In-place overlay search: a fixed scrim + fixed panel, so opening/closing
@@ -760,7 +774,14 @@ function initDetailCarousel() {
 // A guaranteed fallback timer also un-hides everything, so content can NEVER get stuck invisible.
 document.addEventListener('DOMContentLoaded', function() {
   var sel = '.collections-section, .bestsellers, .why-section, .mission-section, .reviews-section, .faq-section, .email-section';
-  var els = document.querySelectorAll(sel);
+  // Only reveal-gate sections that start fully below the fold. .collections-section
+  // in particular is often already partly visible in the first viewport on load, and
+  // IntersectionObserver's first callback isn't synchronous with paint — that race
+  // could leave an already-on-screen section sitting at opacity:0 for several hundred
+  // ms (looked like a black/blank section flash) before the observer caught up.
+  var els = Array.prototype.filter.call(document.querySelectorAll(sel), function(el) {
+    return el.getBoundingClientRect().top >= window.innerHeight;
+  });
   function revealAll() { els.forEach(function(el) { el.classList.add('reveal-in'); }); }
 
   if (!('IntersectionObserver' in window)) { return; } // no reveal class added -> sections stay fully visible
