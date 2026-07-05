@@ -13,7 +13,7 @@
 <link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=35">
+  <link rel="stylesheet" href="styles.css?v=36">
   <!-- SPLASH critical CSS (inline so the splash is the FIRST paint — no flash of the site underneath) -->
   <style>
     /* Hide the whole site until JS reveals it; the splash overrides this to stay visible. */
@@ -156,11 +156,19 @@
     <span class="mob-menu-title">Menu</span>
     <button class="mob-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">&#10005;</button>
   </div>
+  <div class="mob-menu-brand">
+    <div class="mob-menu-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="white" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+    <span class="mob-menu-brand-text">Paw<span>Haul</span></span>
+  </div>
   <a onclick="showPage('home');closeMobileMenu()">Home</a>
   <a onclick="showPage('shop');closeMobileMenu()">Shop Walk Gear</a>
   <a onclick="showPage('about');closeMobileMenu()">Our Story</a>
   <a onclick="showPage('contact');closeMobileMenu()">Contact</a>
   <a onclick="showPage('wishlist');closeMobileMenu()">Wishlist</a>
+  <div class="mob-menu-footer">
+    <div class="paw-divider paw-divider--on-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+    <p class="mob-menu-tagline">Every Walk. Every Dog. Every Time.</p>
+  </div>
 </div>
 <div class="mob-menu-overlay" id="mobMenuOverlay" onclick="closeMobileMenu()"></div>
 

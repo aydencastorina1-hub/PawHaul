@@ -2206,6 +2206,50 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .mob-menu a:last-child { border-bottom: none; }
 .mob-menu a:active { color: var(--orange); background: var(--orange-pale); }
 
+.mob-menu-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid #F5F5F5;
+}
+.mob-menu-brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--black);
+  border-radius: 50%;
+}
+.mob-menu-brand-text {
+  font-family: 'Fredoka One', cursive;
+  font-size: 19px;
+  color: var(--black);
+}
+.mob-menu-brand-text span { color: var(--orange); }
+
+.mob-menu-footer {
+  margin-top: auto;
+  padding: 16px 20px 22px;
+  text-align: center;
+  border-top: 1px solid #F5F5F5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.mob-menu-footer .paw-divider { margin: 0; }
+.mob-menu-tagline {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: var(--gray);
+}
+
 .mob-menu-overlay {
   display: none;
   position: fixed;
