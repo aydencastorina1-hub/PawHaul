@@ -18,6 +18,11 @@
   --line: #E9E4DB;
   --line-soft: #F1EEE7;
 
+  /* Shown behind every <img> until it decodes, so a slow connection reveals
+     a soft neutral placeholder instead of whatever's behind the element
+     (which on mobile can be the deep-navy body — read as a "black flash"). */
+  --img-placeholder: #f0ede6;
+
   --radius: 20px;
   --radius-sm: 12px;
 
@@ -36,6 +41,22 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: hidden; }
 
+/* Every <img> on the site is a real photo (hero slides, lifestyle shots,
+   reviewer avatars, category images) — never an icon — so this is safe
+   to apply universally. The gradient sweeps continuously; once the photo
+   decodes it's opaque and covers the whole box via object-fit:cover, so
+   the shimmer is simply hidden behind it — no load-event JS required. */
+@keyframes imgShimmer {
+  0% { background-position: 150% 0; }
+  100% { background-position: -50% 0; }
+}
+img {
+  background-color: var(--img-placeholder);
+  background-image: linear-gradient(100deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 80%);
+  background-size: 250% 100%;
+  animation: imgShimmer 1.6s ease-in-out infinite;
+}
+
 body {
   font-family: 'Nunito', sans-serif;
   background: white;
@@ -51,8 +72,10 @@ body {
 
 /* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
    rotation driven from app.js). Every slide stays centered on its subject.
-   Navy fallback bg so a slow-loading first image never shows white-then-photo pop. */
-#heroSection { background: var(--black); }
+   Light placeholder fallback so a slow-loading image never flashes black/navy
+   before it decodes — the individual .hero-slide <img>s also carry the
+   universal shimmer (see top of file) while their own bytes are in flight. */
+#heroSection { background: var(--img-placeholder); }
 #heroSection .hero-slide {
   position: absolute;
   inset: 0;
@@ -818,6 +841,13 @@ nav {
      short of its box, flashing a seam at the photo/body boundary */
   position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px);
   object-fit: cover; object-position: center 62%; /* keep the dog in frame on wide/short crops */
+  /* Override the universal <img> shimmer (top of file): this img fills
+     .offer-photo exactly, so its own background would otherwise hide the
+     navy fallback behind it — reintroducing the light-flash-on-navy-card
+     mismatch this component was already built to avoid. This image also
+     reuses the already-preloaded hero slide, so it's never really "loading". */
+  background: #1a1a2e;
+  animation: none;
 }
 /* Blend the photo edge into the navy body so the two halves read as one card */
 .offer-photo::after {
@@ -2745,6 +2775,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .offer-popup { transform: translate(-50%, -50%); transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
   .offer-popup.active { transform: translate(-50%, -50%); transition: opacity 0.2s ease; }
   .search-scrim, .offer-overlay { transition: opacity 0.2s ease; }
+  img { animation: none; }
 }
 
 /* ============================================================
