@@ -713,7 +713,9 @@ function initDetailCarousel() {
   var idx = 0;
   var total = track.children.length;
   var touchStartX = 0;
+  var touchStartY = 0;
   var touchStartLeft = 0;
+  var touchAxis = null; // 'x' once a swipe is confirmed horizontal, 'y' once confirmed vertical
   if (dotsWrap) dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
 
@@ -748,16 +750,33 @@ function initDetailCarousel() {
 
   track.addEventListener('touchstart', function(e) {
     touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
     touchStartLeft = track.scrollLeft;
+    touchAxis = null;
   }, { passive: true });
 
   track.addEventListener('touchmove', function(e) {
-    e.preventDefault();
-    var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
-    track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
+    var dx = e.touches[0].clientX - touchStartX;
+    var dy = e.touches[0].clientY - touchStartY;
+
+    // Decide the gesture's axis once there's enough movement to be sure —
+    // whichever direction has moved further wins, and that decision sticks
+    // for the rest of this touch. Until then, do nothing: no preventDefault
+    // (so a vertical scroll can still start natively) and no scrollLeft
+    // change (so a few pixels of jitter don't nudge the image early).
+    if (!touchAxis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      touchAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if (touchAxis === 'x') {
+      e.preventDefault();
+      var raw = touchStartLeft - dx;
+      track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
+    }
+    // touchAxis === 'y' (or not yet decided): let the page scroll normally.
   }, { passive: false });
 
   track.addEventListener('touchend', function(e) {
+    if (touchAxis !== 'x') return; // vertical scroll or a tap — never treat as a swipe
     var delta = touchStartX - e.changedTouches[0].clientX;
     if (Math.abs(delta) > 30) {
       goTo(idx + (delta > 0 ? 1 : -1));
