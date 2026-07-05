@@ -86,7 +86,7 @@ function chatbotAddToCart(args) {
   var id = parseInt(args && args.product_id, 10);
   var product = products.find(function (p) { return p.id === id; });
   if (!product) {
-    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1-8." };
+    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1, 2, 3, 4, 6, 7, 8." };
   }
 
   var qty = parseInt(args && args.quantity, 10);
@@ -310,7 +310,6 @@ var bundleMap = {
   2: [8],       // Retractable Leash → pairs with Walk Clean Bag Hook ("Add Both")
   3: [1, 2],    // Bowl → suggest Walk Bottle + Retractable Leash
   4: [6, 1],    // AirTag → suggest LED Collar + Walk Bottle
-  5: [1, 2],    // Running Leash → suggest Walk Bottle + Retractable Leash
   6: [4, 2],    // LED Collar → suggest AirTag + Retractable Leash
   8: [2],       // Bag Hook → pairs with Retractable Leash ("Add Both")
 };
@@ -540,7 +539,7 @@ function doSearch(val) {
   var nameHits = [], otherHits = [];
   list.forEach(function(p) {
     if (p.name.toLowerCase().indexOf(q) !== -1) { nameHits.push(p); return; }
-    var haystack = ((p.category || '') + ' ' + (p.desc || '')).toLowerCase();
+    var haystack = ((p.category || '') + ' ' + (p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
     if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
   var matches = nameHits.concat(otherHits);

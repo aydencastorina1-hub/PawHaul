@@ -13,9 +13,8 @@ var SYSTEM_PROMPT = [
   "2. Heavy-Duty Retractable Dog Leash - PRICE VARIES BY LENGTH: 3m (10ft) is $17.99 (was $24.99) and 5m (16ft) is $21.99 (was $28.99). Retractable leash with a smooth, jam-free mechanism and a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes. Comfortable ergonomic grip. Colors: Red, Gray, Blue, Black, Pink, Green, Coffee, Teal. Pairs perfectly with the Walk Clean Bag Hook.",
   "3. Collapsible Travel Bowl - $14.99 (was $19.99) - Silicone collapsible bowl that folds flat for easy storage and pops open in seconds for food or water. Built-in carabiner clip hooks onto your bag, belt, or leash. Size: 5.12in diameter x 1.97in height. Durable, lightweight, easy to clean. Colors: Red, Blue, Orange, Pink, Green, Gray, Black.",
   "4. AirTag Dog Tag Holder - $14.99 (was $19.99) - Waterproof silicone holder that keeps Apple AirTag on your dog's collar. Twist lock closure. Fits standard collars up to 1.5 inch wide. Colors: Black, Orange, Pink.",
-  "5. Hands-Free Running Leash - $22.99 (was $29.99) - Waist belt leash with bungee cord. Adjustable waist 28-48 inch. Bungee absorbs shock. Phone pocket included. Colors: Black, Orange, Blue.",
   "6. LED Light-Up Dog Collar - $21.99 (was $29.99) - USB rechargeable LED collar with 3 light modes: fast blink, slow blink, and steady glow. Super bright for night walks, doesn't overheat, charges fully in about 2 hours and holds a charge through multiple walks. Detachable design fits any standard collar setup. Sizes: Small 13-16in, Medium 14.5-18in, Large 16-20.5in, XL 16.5-22in. Colors: Blue, Green, Pink, Red, Black.",
-  "7. Dual Dog Walk Coupler - $21.99 (was $28.99) - Walk two dogs at once with zero tangle. 360-degree swivel clips prevent knots while the bungee cord absorbs shock from both dogs. Adjustable length fits all breed sizes. Reflective stitching. Perfect for multi-dog households. Colors: Black, Blue, Orange.",
+  "7. No-Tangle LED Dual Dog Leash - $21.99 (was $28.99) - Walk two dogs at once without the tangled mess. Retractable dual leash with 360-degree swivel clips and independent braking so each dog moves freely without crossing lines. Built-in LED light keeps you visible on night walks. Compact, durable, built for everyday control. No specific size/weight limit listed. Colors: Black, Red, Navy.",
   "8. Walk Clean Bag Hook - $9.99 (was $14.99) - Bone-shaped poop bag dispenser that clips directly onto any leash with a sturdy carabiner. Holds a full roll of bags inside and dispenses one at a time through the easy-pull slot. Lightweight and built to last. Colors: Red, Blue, Black, Pink, Green. Pairs perfectly with the Heavy-Duty Retractable Dog Leash.",
   "",
   "SHIPPING:",
@@ -45,7 +44,7 @@ var SYSTEM_PROMPT = [
   "- Sign up with email on the website to get the code",
   "",
   "ADDING TO CART (add_to_cart tool):",
-  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the product's number in the PRODUCTS list above (1-8).",
+  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the number shown at the start of that product's line above (valid ids: 1, 2, 3, 4, 6, 7, 8 — there is no product 5).",
   "- Only call the tool when the customer clearly asks to add a product or says yes to adding it. Never add anything they have not agreed to.",
   "- If you are not sure WHICH product they mean, ask a short clarifying question instead of guessing.",
   "- Size: pass the exact size option listed for that product. If the customer did not pick a size for a product whose price varies by size, omit size — the cheapest option is added by default — and mention which size was added.",
@@ -82,7 +81,7 @@ var TOOLS = [
         properties: {
           product_id: {
             type: "integer",
-            description: "The product's number in the PRODUCTS list (1-8)."
+            description: "The product's number in the PRODUCTS list (valid ids: 1, 2, 3, 4, 6, 7, 8 — there is no product 5)."
           },
           size: {
             type: "string",

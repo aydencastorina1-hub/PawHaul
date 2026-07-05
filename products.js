@@ -94,25 +94,6 @@ var products = [
     whatsInBox: "1× AirTag silicone collar holder (Apple AirTag not included)"
   },
   {
-    id: 5, name: "Hands-Free Running Leash", price: 22.99, was: 29.99, emoji: "🏃", image: "", category: "leash",
-    badge: "Active", badgeClass: "badge-active", reviews: 55,
-    desc: "Run, jog, hike, or walk completely hands-free. The padded adjustable waist belt sits comfortably at your hips and the bungee section absorbs your dog's sudden lunges so you never lose your stride. Built-in zip pocket keeps your phone safe, and the side holder fits most water bottles. The quick-release buckle lets you detach instantly if needed.",
-    sizes: ["One Size — waist 28\" to 48\""],
-    colors: ["Black", "Orange", "Blue"],
-    features: [
-      "Fully hands-free — clips around your waist",
-      "Bungee cord absorbs sudden pulls and lunges",
-      "Padded neoprene waist belt — fits 28\" to 48\"",
-      "Built-in zip phone pocket fits most phones",
-      "Side water bottle holder included",
-      "360° reflective accents for low-light safety",
-      "Quick-release safety buckle",
-      "Connects to collar or harness D-ring"
-    ],
-    material: "Neoprene padded waist belt · Elastic bungee cord · Heavy-duty nylon leash attachment",
-    whatsInBox: "1× waist belt · 1× bungee leash tether · 1× poop bag holder attachment"
-  },
-  {
     id: 6, name: "LED Light-Up Dog Collar", price: 21.99, was: 29.99, emoji: "💡", image: "", category: "safety",
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
@@ -131,20 +112,26 @@ var products = [
     whatsInBox: "1× LED light-up dog collar · 1× USB charging cable"
   },
   {
-    id: 7, name: "Dual Dog Walk Coupler", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new", reviews: 67,
-    desc: "Walk two dogs at once with zero tangle. The 360° swivel clips prevent knots while the bungee cord absorbs shock from both dogs at the same time. The adjustable length fits all breed sizes, so a big dog and a little one can walk comfortably side by side. Perfect for multi-dog households that want one hand free and zero chaos on the walk.",
-    sizes: ["One Size — adjustable length"],
-    colors: ["Black", "Blue", "Orange"],
+    id: 7, name: "No-Tangle LED Dual Dog Leash", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
+    badge: "New", badgeClass: "badge-new", reviews: 74,
+    desc: "Walk two dogs at once without the tangled mess. This retractable dual leash features 360-degree swivel clips and independent braking so each dog moves freely without crossing lines. A built-in LED light keeps you visible on night walks. Compact, durable, and built for everyday control.",
+    // Sourced from the AliExpress listing (4.9★, 700+ sales on this listing, 1,000+ total seller sales).
+    // Sizing intentionally left unspecified — no weight limit or dimension in the listing.
+    sizes: ["One Size"],
+    colors: ["Black", "Red", "Navy"],
+    // Search keywords not shown in the UI (Shopify-style tags) so alternate phrasings
+    // like "two dog leash" or "LED leash" still find this product.
+    tags: ["dual leash", "two dog leash", "LED leash", "dual dog leash", "no-tangle leash"],
     features: [
-      "No-tangle 360° swivel clips",
-      "Bungee cord absorbs shock from both dogs",
-      "Adjustable length fits all breed sizes",
-      "Walk two dogs with easy one-hand control",
-      "Reflective stitching for low-light visibility"
+      "360° swivel clips keep both leashes moving freely without tangling",
+      "Independent braking lets each dog move at their own pace",
+      "Built-in LED light — bright for its size, great for night walks",
+      "Retractable design stays compact and easy to store",
+      "Smooth, confident control walking two dogs at once",
+      "Durable build made for everyday use"
     ],
-    material: "Heavy-duty nylon webbing · Elastic bungee section · 360° stainless steel swivel clips",
-    whatsInBox: "1× dual dog coupler with bungee section · 2× 360° swivel clips"
+    material: "Heavy-duty nylon webbing · Retractable cord mechanism · 360° swivel clips · Built-in LED light module",
+    whatsInBox: "1× No-Tangle LED Dual Dog Leash · 2× swivel clips"
   },
   {
     id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🦴", image: "", category: "leash",
