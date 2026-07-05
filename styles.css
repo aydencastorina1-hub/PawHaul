@@ -70,9 +70,6 @@ body {
 .page { display: none; animation: pageIn 0.4s ease; }
 .page.active { display: block; }
 
-/* SPLASH screen styling lives in inline critical CSS in index.html <head>
-   (so it paints first with no flash). @keyframes splashPaw is defined there too. */
-
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
