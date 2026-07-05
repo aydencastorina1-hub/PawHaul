@@ -69,8 +69,12 @@ body {
 .cursor { display: none; }
 
 /* PAGE SYSTEM */
-.page { display: none; animation: pageIn 0.4s ease; }
+.page { display: none; }
 .page.active { display: block; }
+/* Only JS-driven page switches (showPage) add this — never present on the
+   page that's statically .active in the HTML, so the very first paint never
+   animates in from invisible. */
+.page.page-transition { animation: pageIn 0.4s ease; }
 
 @keyframes pageIn {
   from { opacity: 0; transform: translateY(16px); }

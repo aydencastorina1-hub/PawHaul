@@ -188,8 +188,8 @@ var currentVariantPrice = null;  // price for the selected size (falls back to p
 
 // ==================== NAVIGATION ====================
 function showPage(page, filter) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
+  document.getElementById('page-' + page).classList.add('active', 'page-transition');
   // Use instant so smooth-scroll CSS doesn't animate page transitions
   document.documentElement.style.scrollBehavior = 'auto';
   window.scrollTo(0, 0);
