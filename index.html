@@ -1,11 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-flash">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- This is a single-URL SPA (no pushState/history entries), so there is no
+     legitimate case where a restored scroll position is wanted: reloading (or
+     iOS's pull-to-refresh) should always land at the top. Opting out of the
+     browser's automatic scroll restoration must happen this early, before it
+     has a chance to run. -->
+<script>if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; } window.scrollTo(0, 0);</script>
 <!-- Site is light-only: without this, browsers in OS/browser dark mode paint the
      unstyled canvas black before styles.css applies, causing a flash on load. -->
 <meta name="color-scheme" content="light">
+<!-- FOUC guard for elements whose "closed" look depends on styles.css: on WebKit
+     (confirmed via Safari-engine testing, not reproducible on Chromium) these can
+     render in their raw/unstyled state for the first render — and because
+     styles.css also defines a `transition` on them, the correct-CSS style then
+     visibly ANIMATES in from that stale first frame (looked like the mobile menu
+     "flashing open" on reload). Forcing display:none here is immune to stylesheet
+     load timing since it's inline and parsed before anything else. Removed by the
+     stylesheet's onload (plus a short fallback) once the real CSS is safely active. -->
+<style>html.no-flash #mobMenu, html.no-flash #mobMenuOverlay, html.no-flash #navSearchBar, html.no-flash #searchScrim { display: none !important; }</style>
 <title>PawHaul — Built For Every Walk</title>
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=4">
 <link rel="icon" type="image/svg+xml" href="favicon.svg?v=4">
@@ -17,7 +32,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=39">
+  <link rel="stylesheet" href="styles.css?v=40" onload="document.documentElement.classList.remove('no-flash')">
+  <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
 
@@ -748,7 +764,7 @@
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="products.js?v=19"></script>
-  <script src="app.js?v=21"></script>
+  <script src="app.js?v=22"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->

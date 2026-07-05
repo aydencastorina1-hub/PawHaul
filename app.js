@@ -420,12 +420,15 @@ function closeMobileMenu() {
 // Some mobile browsers restore a page from the back/forward cache (e.g. after
 // a pull-to-refresh or swipe-back gesture) with whatever open/closed state the
 // menu, search overlay or offer popup happened to be in when the tab was last
-// backgrounded. Force everything closed on every pageshow (fresh loads too,
-// where these are already closed, so this is a harmless no-op there).
+// backgrounded — and with whatever scroll position it had, since a bfcache
+// restore doesn't re-run the <head> script that resets scroll on a normal
+// load. Force everything closed and scrolled to top on every pageshow (fresh
+// loads too, where these are already correct, so this is a harmless no-op).
 window.addEventListener('pageshow', function () {
   closeMobileMenu();
   closeSearch();
   dismissOffer();
+  window.scrollTo(0, 0);
 });
 
 // ==================== SEARCH ====================
