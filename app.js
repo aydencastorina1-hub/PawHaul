@@ -288,18 +288,15 @@ function closePolicyModal() {
 
 // ── HERO SLIDESHOW ────────────────────────────────────────────
 // Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
-// looping forever. Slides 2-4 are pre-warmed AFTER window load so they never
-// pop in unloaded but also never compete with the first paint on mobile.
-// Starts on a random slide each load (instead of always slide 1) so repeat
-// visits/reloads don't feel repetitive; rotation continues normally from there.
+// looping forever. All 4 are loaded eagerly at high priority (index.html)
+// since the starting slide is randomized — the actual random pick and the
+// matching preload link + initial .active class are decided as early as
+// possible in <head>/inline (see index.html); this just continues the
+// rotation from whichever slide that was.
 (function () {
   var slides = document.querySelectorAll('#heroSection .hero-slide');
   if (slides.length < 2) return;
-  window.addEventListener('load', function () {
-    slides.forEach(function (img) { var pre = new Image(); pre.src = img.src; });
-  });
-  var idx = Math.floor(Math.random() * slides.length);
-  slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+  var idx = window.__heroStartIdx || 0;
   setInterval(function () {
     if (document.hidden) return; // pause in background tabs
     idx = (idx + 1) % slides.length;

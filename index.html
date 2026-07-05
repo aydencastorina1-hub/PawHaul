@@ -27,8 +27,24 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
-<!-- First hero slide is the LCP image — preload it; slides 2-4 are pre-warmed after load by app.js -->
-<link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high">
+<!-- The hero slideshow starts on a random slide (app.js), so the LCP image
+     isn't known until we've picked one — decide it here (as early as possible)
+     and preload THAT exact image at highest priority, instead of always
+     preloading slide 1 regardless of which one actually shows first. -->
+<script>
+(function () {
+  var heroImgs = [
+    'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100',
+    'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2400&q=100',
+    'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=2400&q=100',
+    'https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=2400&q=100'
+  ];
+  var idx = Math.floor(Math.random() * heroImgs.length);
+  window.__heroStartIdx = idx;
+  document.write('<link rel="preload" as="image" href="' + heroImgs[idx] + '" fetchpriority="high">');
+})();
+</script>
+<noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -137,11 +153,23 @@
 
   <!-- HERO -->
   <section id="heroSection" style="position:relative;width:100%;height:520px;overflow:hidden;">
-    <!-- Crossfading slideshow — 4 images, 5s per image, 1.5s fade (initHeroSlideshow in app.js) -->
+    <!-- Crossfading slideshow — 4 images, 5s per image, 1.5s fade (initHeroSlideshow in app.js).
+         All 4 are eager+high-priority since the starting slide is randomized (head script) and
+         we want whichever one is chosen to already be loading, not just slide 1. Slide 1 keeps a
+         hardcoded "active" as the safe fallback if JS is disabled; the inline script right below
+         corrects this to the real random pick the instant it can (before any image data can have
+         arrived, so there's no visible swap). -->
     <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" alt="Dog out on a walk" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2400&q=100" alt="Dog enjoying the outdoors" loading="lazy">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=2400&q=100" alt="Dog on a leash walk" loading="lazy">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=2400&q=100" alt="Happy dog outside" loading="lazy">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2400&q=100" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=2400&q=100" alt="Dog on a leash walk" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=2400&q=100" alt="Happy dog outside" loading="eager" fetchpriority="high">
+    <script>
+    (function () {
+      var slides = document.querySelectorAll('#heroSection .hero-slide');
+      var idx = window.__heroStartIdx || 0;
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+    })();
+    </script>
     <!-- Dark overlay -->
     <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.0) 100%);"></div>
     <!-- Text overlay -->
@@ -764,7 +792,7 @@
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="products.js?v=19"></script>
-  <script src="app.js?v=22"></script>
+  <script src="app.js?v=23"></script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->
