@@ -86,7 +86,7 @@ function chatbotAddToCart(args) {
   var id = parseInt(args && args.product_id, 10);
   var product = products.find(function (p) { return p.id === id; });
   if (!product) {
-    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1, 2, 3, 4, 6, 7, 8." };
+    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1, 2, 3, 4, 5, 6, 8." };
   }
 
   var qty = parseInt(args && args.quantity, 10);
@@ -105,8 +105,9 @@ function chatbotAddToCart(args) {
     }
   }
 
-  // Resolve the size variant. No size given = cheapest option (site-wide
-  // lowest-price rule, same as the product-card quick-add buttons).
+  // Resolve the size variant. No size given = cheapest option that's still
+  // actually available in the requested color (site-wide lowest-price rule,
+  // same as the product-card quick-add buttons).
   var size, price;
   if (args && args.size) {
     var wantSize = String(args.size).trim().toLowerCase();
@@ -116,12 +117,25 @@ function chatbotAddToCart(args) {
       return { ok: false, error: "'" + args.size + "' is not an available size. Options: " + (product.sizes || []).join(", ") };
     }
     size = match;
-    var sp = product.sizePrices ? product.sizePrices[match] : null;
-    price = sp ? sp.price : product.price;
   } else {
-    var v = lowestVariant(product);
-    size = v.size || '';
-    price = v.price;
+    var candidates = (product.sizes && product.sizes.length) ? product.sizes : [null];
+    var available = candidates.filter(function (s) { return !variantUnavailable(product, s, color); });
+    var pool = available.length ? available : candidates;
+    size = pool.reduce(function (best, s) {
+      var p1 = (s && product.sizePrices) ? product.sizePrices[s].price : product.price;
+      var p2 = (best && product.sizePrices) ? product.sizePrices[best].price : product.price;
+      return p1 < p2 ? s : best;
+    }, pool[0]);
+  }
+  var sp = (size && product.sizePrices) ? product.sizePrices[size] : null;
+  price = sp ? sp.price : product.price;
+
+  if (variantUnavailable(product, size, color)) {
+    return {
+      ok: false,
+      error: "That combination is currently out of stock" + (color ? " in " + color : "") +
+        (size ? " (" + size + ")" : "") + ". Try a different color or size."
+    };
   }
 
   var item = Object.assign({}, product, { price: price, size: size || '' });
@@ -306,13 +320,13 @@ function closePolicyModal() {
 
 // ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
 var bundleMap = {
-  1: [2, 3],    // Walk Bottle → suggest Retractable Leash + Bowl
-  2: [8],       // Retractable Leash → pairs with Walk Clean Bag Hook ("Add Both")
-  3: [1, 2],    // Bowl → suggest Walk Bottle + Retractable Leash
-  4: [6, 1],    // AirTag → suggest LED Collar + Walk Bottle
-  6: [4, 2],    // LED Collar → suggest AirTag + Retractable Leash
-  7: [8],       // No-Tangle LED Dual Dog Leash → pairs with Walk Clean Bag Hook ("Add Both")
-  8: [2],       // Bag Hook → pairs with Retractable Leash ("Add Both")
+  1: [2, 3],    // Water Bottle → suggest Retractable Leash + Bowl
+  2: [5, 8],    // Retractable Leash → suggest Poop Bag Clip + Poop Bag Holder
+  3: [1, 2],    // Bowl → suggest Water Bottle + Retractable Leash
+  4: [6, 1],    // AirTag Holder → suggest Light Up Collar + Water Bottle
+  5: [8, 2],    // Poop Bag Clip → suggest Poop Bag Holder + Retractable Leash
+  6: [4, 2],    // Light Up Collar → suggest AirTag Holder + Retractable Leash
+  8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
 };
 
 var originalShowProduct = showProduct;

@@ -1,14 +1,14 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "2-in-1 Walk Bottle", emoji: "🧴", image: "", category: "water",
+    id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "", category: "water",
     badge: "Best Seller", badgeClass: "", reviews: 127,
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
     sizes: ["350ml", "550ml"],
-    colors: ["Pink", "Teal/Blue", "Red/Maroon"],
+    colors: ["Pink", "White", "Blue"],
 
     // Per-size variant pricing — maps each size option to its price.
     // `price`/`was` below mirror the default (first) size so every other part
@@ -29,22 +29,29 @@ var products = [
       "Easy to clean — all parts detach"
     ],
     material: "BPA-free food-grade plastic body · Food-safe silicone drinking spout · Leak-proof sealed food compartment",
-    whatsInBox: "1× 2-in-1 Walk Bottle (water + food compartments)"
+    whatsInBox: "1× 2-in-1 Dog Water Bottle (water + food compartments)"
   },
   {
-    id: 2, name: "Heavy-Duty Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
+    id: 2, name: "Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 84,
     desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
     tagline: "Smooth, jam-free control that adapts to every walk.",
 
     // Length drives the price (labels must exactly equal the sizePrices keys).
     sizes: ["3m (10ft)", "5m (16ft)"],
-    colors: ["Red", "Gray", "Blue", "Black", "Pink", "Green", "Coffee", "Teal"],
+    colors: ["Red", "Green", "Blue", "White", "Pink"],
     sizePrices: {
       "3m (10ft)": { price: 17.99, was: 24.99 },
       "5m (16ft)": { price: 21.99, was: 28.99 }
     },
     price: 17.99, was: 24.99,
+
+    // Pink is out of stock in the 5m length only — Pink in 3m is fully
+    // purchasable. Checked against on card pickers, the detail page, and
+    // both add-to-cart paths (see variantUnavailable()).
+    unavailableVariants: [
+      { size: "5m (16ft)", color: "Pink" }
+    ],
 
     features: [
       "Smooth, jam-free retracting mechanism",
@@ -53,18 +60,18 @@ var products = [
       "Comfortable ergonomic anti-slip grip",
       "Available in 3m (10ft) and 5m (16ft) lengths",
       "360° tangle-free swivel clip",
-      "8 colors to match your dog's style"
+      "5 colors to match your dog's style"
     ],
     material: "Durable nylon tape · Impact-resistant casing · Ergonomic anti-slip grip · Stainless steel swivel clip",
-    whatsInBox: "1× heavy-duty retractable dog leash"
+    whatsInBox: "1× retractable dog leash"
   },
   {
-    id: 3, name: "Collapsible Travel Bowl", price: 14.99, was: 19.99, emoji: "🥣", image: "", category: "water",
+    id: 3, name: "Collapsible Dog Bowl", price: 14.99, was: 21.99, emoji: "🥣", image: "", category: "water",
     badge: "Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     sizes: ["5.12in diameter × 1.97in height"],
-    colors: ["Red", "Blue", "Orange", "Pink", "Green", "Gray", "Black"],
+    colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
     features: [
       "Folds completely flat for easy storage",
       "Pops open in seconds for food or water",
@@ -72,18 +79,21 @@ var products = [
       "Great size for walks and travel",
       "Easy to clean — just rinse and fold",
       "Durable, lightweight food-grade silicone",
-      "7 colors to choose from"
+      "6 colors to choose from"
     ],
     material: "Food-grade silicone bowl · Built-in carabiner clip",
     whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
-    id: 4, name: "AirTag Dog Tag Holder", price: 14.99, was: 19.99, emoji: "📍", image: "", category: "safety",
+    id: 4, name: "Dog AirTag Holder", price: 10.99, was: 16.99, emoji: "📍", image: "", category: "safety",
     badge: "Safety", badgeClass: "badge-safety", reviews: 38,
     desc: "A secure waterproof silicone holder that keeps your Apple AirTag attached to your dog's collar at all times — so you always know where they are. The twist-lock closure holds the AirTag firmly in place through daily walks, rain, mud, and rough play. Compatible with Apple AirTag 1st and 2nd generation. Fits any standard collar up to 1.5\" wide.",
     tagline: "Always know where they are, rain or shine.",
+    // Shown as a callout on the product page + surfaced in the chatbot —
+    // this is the case only, not the AirTag itself.
+    caseOnlyNote: "Case only — AirTag sold separately",
     sizes: ["Universal — fits all standard collars"],
-    colors: ["Black", "Orange", "Pink"],
+    colors: ["Black", "Transparent", "Pink", "Blue", "Green", "Purple"],
     features: [
       "Compatible with Apple AirTag 1st & 2nd gen",
       "Attaches securely to any collar up to 1.5\" wide",
@@ -98,12 +108,35 @@ var products = [
     whatsInBox: "1× AirTag silicone collar holder (Apple AirTag not included)"
   },
   {
-    id: 6, name: "LED Light-Up Dog Collar", price: 21.99, was: 29.99, emoji: "💡", image: "", category: "safety",
+    id: 5, name: "Poop Bag Clip", price: 9.99, was: 14.99, emoji: "🧷", image: "", category: "leash",
+    badge: "New", badgeClass: "badge-new", reviews: 67,
+    desc: "Never get caught without a bag again. This compact dispenser clip holds a full roll of unused bags and clips securely onto any leash, dispensing one bag at a time so you're always ready before pickup. Lightweight, weatherproof, and built to clip on and stay on.",
+    tagline: "A full roll of bags, always within reach.",
+    sizes: ["Universal — fits all leashes"],
+    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
+    features: [
+      "Compact dispenser clip holds a full roll of unused bags",
+      "Dispenses one bag at a time through the easy-pull slot",
+      "Sturdy clip attaches securely to any leash",
+      "Lightweight and weatherproof — built to clip on and stay on",
+      "7 colors to choose from"
+    ],
+    material: "Durable ABS clip shell · Aluminum carabiner",
+    whatsInBox: "1× Poop Bag Clip dispenser (bag roll not included)"
+  },
+  {
+    id: 6, name: "Light Up Dog Collar", price: 19.99, was: 26.99, emoji: "💡", image: "", category: "safety",
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
-    sizes: ["Small 13-16in", "Medium 14.5-18in", "Large 16-20.5in", "XL 16.5-22in"],
-    colors: ["Blue", "Green", "Pink", "Red", "Black"],
+    sizes: ["S (34-41cm)", "M (37-46cm)", "L (41-52cm)", "XL (42-56cm)"],
+    colors: ["Green", "Blue", "Red", "Pink", "Black"],
+    sizePrices: {
+      "S (34-41cm)": { price: 19.99, was: 26.99 },
+      "M (37-46cm)": { price: 21.99, was: 29.99 },
+      "L (41-52cm)": { price: 23.99, was: 32.99 },
+      "XL (42-56cm)": { price: 25.99, was: 35.99 }
+    },
     features: [
       "3 light modes — fast blink, slow blink, steady glow",
       "Super bright at night — visible from far away",
@@ -111,50 +144,27 @@ var products = [
       "Long battery life — holds a charge through multiple walks",
       "Stays cool — doesn't overheat during wear",
       "Detachable design fits any standard collar setup",
-      "4 sizes from Small (13-16in) to XL (16.5-22in)"
+      "4 sizes from S (34-41cm) to XL (42-56cm)"
     ],
     material: "Flexible LED light strip · USB rechargeable battery · Durable webbing band",
     whatsInBox: "1× LED light-up dog collar · 1× USB charging cable"
   },
   {
-    id: 7, name: "No-Tangle LED Dual Dog Leash", price: 21.99, was: 28.99, emoji: "🔗", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new", reviews: 74,
-    desc: "Walk two dogs at once without the tangled mess. This retractable dual leash features 360-degree swivel clips and independent braking so each dog moves freely without crossing lines. A built-in LED light keeps you visible on night walks. Compact, durable, and built for everyday control.",
-    tagline: "Walk two dogs at once — zero tangles, zero hassle.",
-    // Sourced from the AliExpress listing (4.9★, 700+ sales on this listing, 1,000+ total seller sales).
-    // Sizing intentionally left unspecified — no weight limit or dimension in the listing.
-    sizes: ["One Size"],
-    colors: ["Black", "Red", "Navy"],
-    // Search keywords not shown in the UI (Shopify-style tags) so alternate phrasings
-    // like "two dog leash" or "LED leash" still find this product.
-    tags: ["dual leash", "two dog leash", "LED leash", "dual dog leash", "no-tangle leash"],
-    features: [
-      "360° swivel clips keep both leashes moving freely without tangling",
-      "Independent braking lets each dog move at their own pace",
-      "Built-in LED light — bright for its size, great for night walks",
-      "Retractable design stays compact and easy to store",
-      "Smooth, confident control walking two dogs at once",
-      "Durable build made for everyday use"
-    ],
-    material: "Heavy-duty nylon webbing · Retractable cord mechanism · 360° swivel clips · Built-in LED light module",
-    whatsInBox: "1× No-Tangle LED Dual Dog Leash · 2× swivel clips"
-  },
-  {
-    id: 8, name: "Walk Clean Bag Hook", price: 9.99, was: 14.99, emoji: "🦴", image: "", category: "leash",
-    badge: "Popular", badgeClass: "badge-popular", reviews: 43,
-    desc: "Never get caught without a bag again. This bone-shaped poop bag dispenser clips directly onto any leash with a sturdy carabiner. Holds a full roll of bags inside, dispensing one at a time through the easy-pull slot. Lightweight and built to last.",
-    tagline: "A full roll of bags, always within reach.",
+    id: 8, name: "Poop Bag Holder", price: 9.99, was: 14.99, emoji: "🧺", image: "", category: "leash",
+    badge: "New", badgeClass: "badge-new", reviews: 24,
+    desc: "Keep your hands (and your pockets) clean on the way to the next trash can. This odor-sealing pouch clips onto your leash or bag and holds a used waste bag securely shut until you can dispose of it properly. Wipeable, discreet, and built for daily walks.",
+    tagline: "Carry it hygienically until the next trash can.",
     sizes: ["Universal — fits all leashes"],
-    colors: ["Red", "Blue", "Black", "Pink", "Green"],
+    colors: ["Green", "Blue", "Black"],
     features: [
-      "Bone-shaped dispenser holds a full roll of bags",
-      "Dispenses one bag at a time through the easy-pull slot",
-      "Sturdy carabiner clips onto any leash securely",
-      "Easy-to-spot colors — never dig for it",
-      "Lightweight and built to last"
+      "Odor-sealing pouch keeps used bags contained until disposal",
+      "Clips securely onto any leash or bag",
+      "Wipeable, easy-to-clean exterior",
+      "Discreet design for daily walks",
+      "3 colors to choose from"
     ],
-    material: "Durable ABS bone-shaped shell · Aluminum carabiner clip",
-    whatsInBox: "1× bone-shaped bag dispenser with carabiner (bag roll not included)"
+    material: "Wipeable odor-sealing fabric · Sturdy clip closure",
+    whatsInBox: "1× Poop Bag Holder pouch"
   }
 ];
 
@@ -178,6 +188,7 @@ var cart = [];
 var currentProduct = null;
 var currentQty = 1;
 var currentSize = null;          // selected size variant on the detail page
+var currentColor = null;         // selected color variant on the detail page
 var currentVariantPrice = null;  // price for the selected size (falls back to product.price)
 
 // ==================== NAVIGATION ====================
@@ -212,9 +223,9 @@ function showPage(page, filter) {
 // ==================== RENDER PRODUCTS ====================
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
-  // Home carousel = these 5 specific products, in this exact order.
-  // (Shop page still shows all products.)
-  var featuredIds = [1, 8, 6, 4, 2]; // Walk Bottle, Bag Hook, LED Collar, AirTag Holder, Retractable Leash
+  // Home carousel = these 5 specific products (best sellers), in this exact
+  // order. (Shop page still shows all products.)
+  var featuredIds = [2, 3, 8, 1, 6]; // Retractable Leash, Dog Bowl, Poop Bag Holder, Water Bottle, Light Up Collar
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);
@@ -246,13 +257,39 @@ function lowestVariant(p) {
   return { size: null, price: p.price, was: p.was };
 }
 
+// Builds the price/was markup for one exact variant (no "From" prefix —
+// used once a specific size has actually been selected).
+function variantPriceHtml(price, was) {
+  return '<span class="price-now">$' + Number(price).toFixed(2) + '</span>' +
+    (was ? '<span class="price-was">$' + Number(was).toFixed(2) + '</span>' : '');
+}
+
+// True when a product's sizes are priced differently from each other (so the
+// card price is really a starting price, not the one-and-only price).
+function hasPriceRange(p) {
+  if (!p.sizePrices) return false;
+  var prices = Object.keys(p.sizePrices).map(function (k) { return p.sizePrices[k].price; });
+  return Math.max.apply(null, prices) !== Math.min.apply(null, prices);
+}
+
 // Builds the inner HTML of a .product-price block: the lowest price plus its
-// struck-through "was". Shared by the shop grid, the home carousel and the
-// wishlist so they always stay consistent.
+// struck-through "was" (prefixed "From" when sizes actually vary in price).
+// Shared by the shop grid, the home carousel and the wishlist so they always
+// stay consistent.
 function priceDisplayHtml(p) {
   var v = lowestVariant(p);
-  return '<span class="price-now">$' + v.price.toFixed(2) + '</span>' +
-    (v.was ? '<span class="price-was">$' + v.was.toFixed(2) + '</span>' : '');
+  var prefix = hasPriceRange(p) ? '<span class="price-from">From </span>' : '';
+  return prefix + variantPriceHtml(v.price, v.was);
+}
+
+// True when this exact size+color combo has been marked unavailable on the
+// product (e.g. one color sold out in one length). A rule with only `size`
+// or only `color` set matches any value of the other field.
+function variantUnavailable(p, size, color) {
+  if (!p.unavailableVariants) return false;
+  return p.unavailableVariants.some(function (v) {
+    return (!v.size || v.size === size) && (!v.color || v.color === color);
+  });
 }
 
 // ── Compact on-card variant pickers (home carousel + shop grid) ──
@@ -291,11 +328,12 @@ function shortSizeLabel(s) {
 
 function cardOptionsHtml(p) {
   var colorRow = '', sizeRow = '';
+  var defColor = p.colors && p.colors.length ? p.colors[0] : null;
   if (p.colors && p.colors.length > 1) {
     colorRow = '<div class="mini-swatches">' + p.colors.map(function (c, i) {
       return '<button type="button" class="mini-swatch' + (i === 0 ? ' active' : '') +
         '" data-color="' + c + '" title="' + c + '" aria-label="Color: ' + c +
-        '" style="' + swatchCss(c) + '" onmousedown="event.preventDefault()" onclick="cardSelectColor(event,this)"></button>';
+        '" style="' + swatchCss(c) + '" onmousedown="event.preventDefault()" onclick="cardSelectColor(event,this,' + p.id + ')"></button>';
     }).join('') + '</div>';
   }
   // Only render a size row when there's actually a choice — single-size
@@ -304,8 +342,9 @@ function cardOptionsHtml(p) {
   if (p.sizes && p.sizes.length > 1) {
     var def = lowestVariant(p).size || p.sizes[0];
     sizeRow = '<div class="mini-sizes">' + p.sizes.map(function (s) {
-      return '<button type="button" class="mini-size' + (s === def ? ' active' : '') +
-        '" data-size="' + s + '" title="' + s +
+      var oos = variantUnavailable(p, s, defColor);
+      return '<button type="button" class="mini-size' + (s === def ? ' active' : '') + (oos ? ' mini-size-oos' : '') +
+        '" data-size="' + s + '" title="' + (oos ? s + ' — out of stock in ' + defColor : s) +
         '" onmousedown="event.preventDefault()" onclick="cardSelectSize(event,this,' + p.id + ')">' + shortSizeLabel(s) + '</button>';
     }).join('') + '</div>';
   }
@@ -313,16 +352,51 @@ function cardOptionsHtml(p) {
   return '<div class="card-opts" onclick="event.stopPropagation()">' + colorRow + sizeRow + '</div>';
 }
 
-function cardSelectColor(ev, btn) {
+function cardSelectColor(ev, btn, id) {
   ev.stopPropagation();
   var card = btn.closest('.product-card');
   if (!card) return;
   card.querySelectorAll('.mini-swatch').forEach(function (b) { b.classList.remove('active'); });
   btn.classList.add('active');
+  refreshCardSizeAvailability(card, id);
+}
+
+// After a color changes, grey out any size that's out of stock in that color
+// and — if the currently-selected size just became unavailable — jump to the
+// cheapest size that's still purchasable, re-pricing the card to match.
+function refreshCardSizeAvailability(card, id) {
+  var p = products.find(function (x) { return x.id === id; });
+  if (!p || !p.unavailableVariants) return;
+  var colorBtn = card.querySelector('.mini-swatch.active');
+  var color = colorBtn ? colorBtn.dataset.color : null;
+  var sizeBtns = card.querySelectorAll('.mini-size');
+  var activeWasOos = false;
+  sizeBtns.forEach(function (btn) {
+    var oos = variantUnavailable(p, btn.dataset.size, color);
+    btn.classList.toggle('mini-size-oos', oos);
+    btn.title = oos ? (btn.dataset.size + ' — out of stock in ' + color) : btn.dataset.size;
+    if (oos && btn.classList.contains('active')) activeWasOos = true;
+  });
+  if (!activeWasOos) return;
+  var available = p.sizes.filter(function (s) { return !variantUnavailable(p, s, color); });
+  if (!available.length) return;
+  var pick = available.reduce(function (best, s) {
+    var price = p.sizePrices ? p.sizePrices[s].price : p.price;
+    var bestPrice = p.sizePrices ? p.sizePrices[best].price : p.price;
+    return price < bestPrice ? s : best;
+  }, available[0]);
+  sizeBtns.forEach(function (btn) { btn.classList.toggle('active', btn.dataset.size === pick); });
+  var sp = p.sizePrices ? p.sizePrices[pick] : null;
+  var priceEl = card.querySelector('.product-price');
+  if (priceEl) priceEl.innerHTML = variantPriceHtml(sp ? sp.price : p.price, sp ? sp.was : p.was);
 }
 
 function cardSelectSize(ev, btn, id) {
   ev.stopPropagation();
+  if (btn.classList.contains('mini-size-oos')) {
+    showToast('That size is out of stock in this color.');
+    return;
+  }
   var card = btn.closest('.product-card');
   if (!card) return;
   card.querySelectorAll('.mini-size').forEach(function (b) { b.classList.remove('active'); });
@@ -332,10 +406,7 @@ function cardSelectSize(ev, btn, id) {
   var priceEl = card.querySelector('.product-price');
   if (!p || !priceEl) return;
   var sp = p.sizePrices ? p.sizePrices[btn.dataset.size] : null;
-  var price = sp ? sp.price : p.price;
-  var was = sp ? sp.was : p.was;
-  priceEl.innerHTML = '<span class="price-now">$' + price.toFixed(2) + '</span>' +
-    (was ? '<span class="price-was">$' + was.toFixed(2) + '</span>' : '');
+  priceEl.innerHTML = variantPriceHtml(sp ? sp.price : p.price, sp ? sp.was : p.was);
 }
 
 // Card Add To Cart: adds whatever size/color the card currently has
@@ -353,9 +424,14 @@ function cardAdd(ev, id) {
     var sp = p.sizePrices ? p.sizePrices[size] : null;
     price = sp ? sp.price : p.price;
   }
-  var item = Object.assign({}, p, { price: price, size: size || '' });
   var sw = card ? card.querySelector('.mini-swatch.active') : null;
-  if (sw && sw.dataset.color) item.color = sw.dataset.color;
+  var color = sw && sw.dataset.color ? sw.dataset.color : null;
+  if (variantUnavailable(p, size, color)) {
+    showToast('That size/color combo is out of stock — pick another.');
+    return;
+  }
+  var item = Object.assign({}, p, { price: price, size: size || '' });
+  if (color) item.color = color;
   addToCart(item);
 }
 
@@ -414,8 +490,18 @@ function showProduct(id) {
   } else {
     currentSize = null;
   }
+  currentColor = currentProduct.colors && currentProduct.colors.length ? currentProduct.colors[0] : null;
   currentVariantPrice = cheapest.price;
   setDetailPrice(cheapest.price, cheapest.was);
+  var caseNoteEl = document.getElementById('detailCaseNote');
+  if (caseNoteEl) {
+    if (currentProduct.caseOnlyNote) {
+      caseNoteEl.textContent = currentProduct.caseOnlyNote;
+      caseNoteEl.style.display = '';
+    } else {
+      caseNoteEl.style.display = 'none';
+    }
+  }
   document.getElementById('detailDesc').textContent = currentProduct.desc;
   document.getElementById('detailTagline').textContent = currentProduct.tagline || '';
   document.getElementById('detailReviews').textContent = `(${currentProduct.reviews} reviews)`;
@@ -430,7 +516,9 @@ function showProduct(id) {
     `<button class="option-btn ${i===defSizeIdx?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');
 
   document.getElementById('detailColors').innerHTML = currentProduct.colors.map((c, i) =>
-    `<button class="option-btn ${i===0?'active':''}" onclick="selectOption(this)">${c}</button>`).join('');
+    `<button class="option-btn ${i===0?'active':''}" onclick="selectColorOption(this)">${c}</button>`).join('');
+
+  updateVariantAvailability();
 
   document.getElementById('detailFeatures').innerHTML = currentProduct.features.map(f =>
     `<li>${f}</li>`).join('');
@@ -460,6 +548,44 @@ function selectOption(btn) {
   btn.classList.add('active');
 }
 
+// Color buttons use this instead of selectOption directly: it also tracks
+// currentColor and re-checks size availability (some size+color combos are
+// marked out of stock — see variantUnavailable()).
+function selectColorOption(btn) {
+  selectOption(btn);
+  currentColor = btn.textContent.trim();
+  updateVariantAvailability();
+}
+
+// Greys out any size that's unavailable in the currently-selected color, and
+// — if the currently-selected size just became unavailable — jumps to the
+// cheapest size that's still purchasable, re-pricing the page to match.
+function updateVariantAvailability() {
+  if (!currentProduct || !currentProduct.unavailableVariants) return;
+  var sizeBtns = document.querySelectorAll('#detailSizes .option-btn');
+  var activeWasOos = false;
+  sizeBtns.forEach(function (btn) {
+    var s = btn.textContent.trim();
+    var oos = variantUnavailable(currentProduct, s, currentColor);
+    btn.classList.toggle('option-btn-oos', oos);
+    btn.title = oos ? ('Out of stock in ' + currentColor) : '';
+    if (oos && btn.classList.contains('active')) activeWasOos = true;
+  });
+  if (!activeWasOos) return;
+  var available = currentProduct.sizes.filter(function (s) { return !variantUnavailable(currentProduct, s, currentColor); });
+  if (!available.length) return;
+  var pick = available.reduce(function (best, s) {
+    var price = currentProduct.sizePrices ? currentProduct.sizePrices[s].price : currentProduct.price;
+    var bestPrice = currentProduct.sizePrices ? currentProduct.sizePrices[best].price : currentProduct.price;
+    return price < bestPrice ? s : best;
+  }, available[0]);
+  sizeBtns.forEach(function (btn) { btn.classList.toggle('active', btn.textContent.trim() === pick); });
+  currentSize = pick;
+  var variant = currentProduct.sizePrices ? currentProduct.sizePrices[pick] : null;
+  currentVariantPrice = variant ? variant.price : currentProduct.price;
+  setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
+}
+
 // Writes the price, struck-through "was", and Save % badge on the detail page
 // (main price block AND the sticky Add To Cart bar, which mirrors it).
 // Shared by showProduct (initial render) and selectSize (when the size toggles).
@@ -484,6 +610,10 @@ function setDetailPrice(price, was) {
 // Size buttons use this instead of selectOption: it toggles the active state
 // AND re-prices the page from the product's sizePrices map (if present).
 function selectSize(btn) {
+  if (btn.classList.contains('option-btn-oos')) {
+    showToast('That size is out of stock in this color.');
+    return;
+  }
   selectOption(btn);
   if (!currentProduct) return;
   currentSize = btn.textContent.trim();
@@ -539,18 +669,22 @@ function changeQty(delta) {
 }
 
 function addToCartDetail() {
-  if (!currentProduct) return;
+  if (!currentProduct) return false;
+  if (variantUnavailable(currentProduct, currentSize, currentColor)) {
+    showToast('That size/color combo is out of stock — pick another.');
+    return false;
+  }
   // Add the selected size variant at its price (falls back to the base price).
   var item = Object.assign({}, currentProduct, {
     price: (typeof currentVariantPrice === 'number') ? currentVariantPrice : currentProduct.price,
     size: currentSize || ''
   });
   for (var i = 0; i < currentQty; i++) addToCart(item);
+  return true;
 }
 
 function buyNow() {
-  addToCartDetail();
-  showPage('cart');
+  if (addToCartDetail()) showPage('cart');
 }
 
 // ==================== CART ====================

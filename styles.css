@@ -656,18 +656,19 @@ nav {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .price-now { font-family: 'Fredoka One', cursive; font-size: 19px; color: var(--orange); }
 .price-was { font-size: 12px; color: var(--gray); text-decoration: line-through; font-weight: 600; }
+.price-from { font-size: 11px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
 
 /* COMPACT ON-CARD VARIANT PICKERS (home carousel + shop grid) */
 .card-opts {
   display: flex;
   flex-direction: column;
   gap: 7px;
-  margin: 0 0 10px;
+  margin: 2px 0 16px;
   cursor: default; /* taps here select options, never open the product */
 }
 .mini-swatches { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
@@ -702,6 +703,20 @@ nav {
   border-color: var(--orange);
   background: rgba(232, 99, 10, 0.10);
   color: var(--orange);
+}
+.mini-size-oos {
+  color: var(--gray);
+  background: var(--light-gray);
+  border-color: var(--line);
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.mini-size-oos:hover { border-color: var(--line); }
+.mini-size-oos.active {
+  border-color: var(--line);
+  background: var(--light-gray);
+  color: var(--gray);
 }
 /* Pressing a swatch/pill must not "press" the whole card — :active
    propagates to ancestors, so without this the card scale(0.97) press
@@ -1327,6 +1342,27 @@ img.reviewer-av {
 
 .option-btn:hover, .option-btn.active { border-color: var(--orange); color: var(--orange); }
 
+.option-btn-oos {
+  color: var(--gray);
+  background: var(--light-gray);
+  text-decoration: line-through;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.option-btn-oos:hover { border-color: var(--line); color: var(--gray); }
+.option-btn-oos.active { border-color: var(--line); color: var(--gray); }
+
+.detail-case-note {
+  display: inline-block;
+  background: rgba(232, 99, 10, 0.10);
+  color: var(--orange);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  margin: -8px 0 16px;
+}
+
 .qty-row {
   display: flex;
   align-items: center;
@@ -1406,15 +1442,15 @@ img.reviewer-av {
 
 /* PRODUCT DETAIL EXTRA SECTIONS */
 .detail-section {
-  margin-bottom: 12px;
-  padding: 14px 16px;
+  margin-bottom: 14px;
+  padding: 16px 16px 20px;
   background: var(--light-gray);
   border-radius: var(--radius-sm);
 }
 .detail-section-title {
   font-weight: 800;
   font-size: 13px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   color: var(--black);
 }
 .detail-section-text {
@@ -1811,7 +1847,7 @@ img.reviewer-av {
 /* Hero photo + intro text reuse the About page's exact pattern (.about-hero)
    for visual consistency between the two "premium" content pages. */
 .contact-hero-wrap { height: 280px; }
-.contact-hero-img { object-position: center 32%; } /* keeps both the owner + dog in frame on narrow/tall crops */
+.contact-hero-img { object-position: center 45%; } /* keeps the leashed dog centered and in frame on narrow/tall crops */
 
 .contact-page { padding: 60px 5% 70px; background: white; }
 
@@ -3022,10 +3058,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* Size pills are dropped on this compact teaser strip (still fully
      selectable on the detail page) — color swatches stay, per spec. */
   #homeProducts .mini-sizes { display: none; }
-  /* space-between does the aligning now — auto margins would fight it */
+  /* space-between does the aligning now — auto margins would fight it, but a
+     small explicit margin on each row still gives even, intentional breathing
+     room instead of letting space-between squeeze everything to near-zero. */
   #homeProducts .product-info .btn-black { margin-top: 0; }
-  #homeProducts .product-price { margin-top: 0; margin-bottom: 0; }
-  #homeProducts .card-opts { margin-bottom: 0; }
+  #homeProducts .product-price { margin-top: 0; margin-bottom: 4px; }
+  #homeProducts .card-opts { margin-top: 2px; margin-bottom: 10px; }
 }
 
 /* ============================================================
@@ -3389,7 +3427,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .contact-form-wrap { padding: 32px; }
   .form-row { grid-template-columns: 1fr 1fr; }
   .contact-hero-wrap { height: 400px; }
-  .contact-hero-img { object-position: 42% 38%; }
+  .contact-hero-img { object-position: center 45%; }
 }
 
 /* ==================== CHAT WIDGET ==================== */
