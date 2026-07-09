@@ -19,6 +19,17 @@ var products = [
     },
     price: 19.99, was: 27.99,
 
+    // Real Shopify variant GIDs (Storefront API) for checkout. Keyed
+    // "size|color" to exactly match this product's own size/color labels.
+    shopifyVariants: { productGid: "gid://shopify/Product/9527350657280", byVariant: {
+        "350ml|Pink": "gid://shopify/ProductVariant/48957400285440",
+        "550ml|Pink": "gid://shopify/ProductVariant/48957400219904",
+        "350ml|White": "gid://shopify/ProductVariant/48957400350976",
+        "550ml|White": "gid://shopify/ProductVariant/48957400252672",
+        "350ml|Blue": "gid://shopify/ProductVariant/48957400383744",
+        "550ml|Blue": "gid://shopify/ProductVariant/48957400318208"
+      } },
+
     features: [
       "Leak-proof — holds water and dry food in one sealed container",
       "Flip-out drinking spout for easy on-the-go hydration",
@@ -53,6 +64,20 @@ var products = [
       { size: "5m (16ft)", color: "Pink" }
     ],
 
+    // Real Shopify variant GIDs (Storefront API) for checkout.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276641024", byVariant: {
+        "3m (10ft)|Red": "gid://shopify/ProductVariant/48945265508608",
+        "5m (16ft)|Red": "gid://shopify/ProductVariant/48945265475840",
+        "3m (10ft)|Green": "gid://shopify/ProductVariant/48945265574144",
+        "5m (16ft)|Green": "gid://shopify/ProductVariant/48945265541376",
+        "3m (10ft)|Blue": "gid://shopify/ProductVariant/48945265705216",
+        "5m (16ft)|Blue": "gid://shopify/ProductVariant/48945265639680",
+        "3m (10ft)|White": "gid://shopify/ProductVariant/48945265803520",
+        "5m (16ft)|White": "gid://shopify/ProductVariant/48945265770752",
+        "3m (10ft)|Pink": "gid://shopify/ProductVariant/48945265934592",
+        "5m (16ft)|Pink": "gid://shopify/ProductVariant/48945265967360"
+      } },
+
     features: [
       "Smooth, jam-free retracting mechanism",
       "One-touch lock button for instant stopping power",
@@ -72,6 +97,17 @@ var products = [
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
+
+    // Real Shopify variant GIDs (Storefront API) for checkout.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276542720", byColor: {
+        "Red": "gid://shopify/ProductVariant/48945265082624",
+        "Blue": "gid://shopify/ProductVariant/48945265115392",
+        "Orange": "gid://shopify/ProductVariant/48945265148160",
+        "Green": "gid://shopify/ProductVariant/48945265213696",
+        "White": "gid://shopify/ProductVariant/48945265246464",
+        "Black": "gid://shopify/ProductVariant/48945265279232"
+      } },
+
     features: [
       "Folds completely flat for easy storage",
       "Pops open in seconds for food or water",
@@ -94,6 +130,17 @@ var products = [
     caseOnlyNote: "Case only — AirTag sold separately",
     sizes: ["Universal — fits all standard collars"],
     colors: ["Black", "Transparent", "Pink", "Blue", "Green", "Purple"],
+
+    // Real Shopify variant GIDs (Storefront API) for checkout.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276575488", byColor: {
+        "Black": "gid://shopify/ProductVariant/48945265049856",
+        "Transparent": "gid://shopify/ProductVariant/48945265017088",
+        "Pink": "gid://shopify/ProductVariant/48945264984320",
+        "Blue": "gid://shopify/ProductVariant/48945264951552",
+        "Green": "gid://shopify/ProductVariant/48945264918784",
+        "Purple": "gid://shopify/ProductVariant/48945264886016"
+      } },
+
     features: [
       "Compatible with Apple AirTag 1st & 2nd gen",
       "Attaches securely to any collar up to 1.5\" wide",
@@ -114,6 +161,18 @@ var products = [
     tagline: "A full roll of bags, always within reach.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
+
+    // Real Shopify variant GIDs (Storefront API) for checkout.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
+        "Orange": "gid://shopify/ProductVariant/48945264296192",
+        "Purple": "gid://shopify/ProductVariant/48945264328960",
+        "Red": "gid://shopify/ProductVariant/48945264361728",
+        "Black": "gid://shopify/ProductVariant/48945264394496",
+        "Green": "gid://shopify/ProductVariant/48945264656640",
+        "Pink": "gid://shopify/ProductVariant/48945264623872",
+        "Blue": "gid://shopify/ProductVariant/48945264787712"
+      } },
+
     features: [
       "Compact dispenser clip holds a full roll of unused bags",
       "Dispenses one bag at a time through the easy-pull slot",
@@ -137,6 +196,31 @@ var products = [
       "L (41-52cm)": { price: 23.99, was: 32.99 },
       "XL (42-56cm)": { price: 25.99, was: 35.99 }
     },
+
+    // Real Shopify variant GIDs (Storefront API) for checkout.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276739328", byVariant: {
+        "S (34-41cm)|Green": "gid://shopify/ProductVariant/48945266360576",
+        "M (37-46cm)|Green": "gid://shopify/ProductVariant/48945266295040",
+        "L (41-52cm)|Green": "gid://shopify/ProductVariant/48945266327808",
+        "XL (42-56cm)|Green": "gid://shopify/ProductVariant/48945266753792",
+        "S (34-41cm)|Blue": "gid://shopify/ProductVariant/48945266491648",
+        "M (37-46cm)|Blue": "gid://shopify/ProductVariant/48945266524416",
+        "L (41-52cm)|Blue": "gid://shopify/ProductVariant/48945266426112",
+        "XL (42-56cm)|Blue": "gid://shopify/ProductVariant/48945266393344",
+        "S (34-41cm)|Red": "gid://shopify/ProductVariant/48945266458880",
+        "M (37-46cm)|Red": "gid://shopify/ProductVariant/48945266655488",
+        "L (41-52cm)|Red": "gid://shopify/ProductVariant/48945266557184",
+        "XL (42-56cm)|Red": "gid://shopify/ProductVariant/48945266917632",
+        "S (34-41cm)|Pink": "gid://shopify/ProductVariant/48945266589952",
+        "M (37-46cm)|Pink": "gid://shopify/ProductVariant/48945266786560",
+        "L (41-52cm)|Pink": "gid://shopify/ProductVariant/48945266688256",
+        "XL (42-56cm)|Pink": "gid://shopify/ProductVariant/48945266622720",
+        "S (34-41cm)|Black": "gid://shopify/ProductVariant/48945266884864",
+        "M (37-46cm)|Black": "gid://shopify/ProductVariant/48945266819328",
+        "L (41-52cm)|Black": "gid://shopify/ProductVariant/48945266852096",
+        "XL (42-56cm)|Black": "gid://shopify/ProductVariant/48945266721024"
+      } },
+
     features: [
       "3 light modes — fast blink, slow blink, steady glow",
       "Super bright at night — visible from far away",
@@ -156,6 +240,17 @@ var products = [
     tagline: "Carry it hygienically until the next trash can.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
+
+    // Real Shopify variant GIDs (Storefront API) for checkout. Shopify's own
+    // product title for this listing is longer ("Canvas Dog Poop Bag
+    // Holder, Outdoor Pet Waste Bag Dispenser...") — matched by color set
+    // + price, not by title text.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276477184", byColor: {
+        "Green": "gid://shopify/ProductVariant/48945264034048",
+        "Blue": "gid://shopify/ProductVariant/48945264066816",
+        "Black": "gid://shopify/ProductVariant/48945264099584"
+      } },
+
     features: [
       "Odor-sealing pouch keeps used bags contained until disposal",
       "Clips securely onto any leash or bag",
@@ -675,9 +770,12 @@ function addToCartDetail() {
     return false;
   }
   // Add the selected size variant at its price (falls back to the base price).
+  // color is included so checkout can resolve the exact Shopify variant —
+  // it isn't shown anywhere in the cart UI, so this changes no visible behavior.
   var item = Object.assign({}, currentProduct, {
     price: (typeof currentVariantPrice === 'number') ? currentVariantPrice : currentProduct.price,
-    size: currentSize || ''
+    size: currentSize || '',
+    color: currentColor || undefined
   });
   for (var i = 0; i < currentQty; i++) addToCart(item);
   return true;
@@ -837,9 +935,62 @@ function updateCartQty(idx, delta) {
   renderCart();
 }
 
-function checkout() {
+// Resolves a local cart line to the real Shopify variant GID it corresponds
+// to, using that product's shopifyVariants map (see the DATA section above).
+// Falls back to the product's first color when a line has no color recorded
+// — quick-add and "Add Both/Bundle" never show a color picker, so their
+// cart lines never carry one; the detail page's Add To Cart does track it.
+function resolveShopifyVariantId(item) {
+  var product = products.find(function (p) { return p.id === item.id; });
+  if (!product || !product.shopifyVariants) return null;
+  var sv = product.shopifyVariants;
+  var color = item.color || (product.colors && product.colors[0]) || null;
+  if (sv.byVariant) return sv.byVariant[(item.size || '') + '|' + (color || '')] || null;
+  if (sv.byColor) return (color && sv.byColor[color]) || null;
+  return null;
+}
+
+// Builds a real Shopify cart (Storefront API, via /api/cart) from whatever's
+// in the local cart right now, then redirects to Shopify's own hosted
+// checkout so the order lands in Shopify/DSers for fulfillment. Nothing else
+// about the cart page or local cart changes — this only fires on Checkout.
+async function checkout() {
+  if (!cart.length) return;
+  var btn = document.querySelector('.checkout-btn');
+
+  var lines = [];
+  var unresolved = [];
+  cart.forEach(function (item) {
+    var variantId = resolveShopifyVariantId(item);
+    if (variantId) lines.push({ variantId: variantId, quantity: item.qty });
+    else unresolved.push(item.name);
+  });
+
+  if (unresolved.length) {
+    showToast('Sorry, ' + unresolved.join(', ') + " can't be checked out right now — please remove and try again.", 5000);
+    return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Preparing checkout...'; }
   showToast('Redirecting to secure checkout...');
-  setTimeout(function() { window.open('https://pawhaul.myshopify.com/cart', '_blank'); }, 1000);
+
+  try {
+    var res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lines: lines })
+    });
+    var data = await res.json();
+    if (data && data.ok && data.checkoutUrl) {
+      window.location.href = data.checkoutUrl;
+      return;
+    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Checkout Securely →'; }
+    showToast((data && data.error) || 'Could not start checkout — please try again.', 5000);
+  } catch (e) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Checkout Securely →'; }
+    showToast('Could not start checkout — please try again.', 5000);
+  }
 }
 
 // ==================== FILTERS ====================
