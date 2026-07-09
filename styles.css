@@ -946,6 +946,37 @@ nav {
 }
 .offer-dismiss:hover { color: rgba(255,255,255,0.75); }
 
+/* Code-reveal panel shown in place of the form after a successful signup. */
+.offer-success-msg {
+  color: rgba(255,255,255,0.78); font-size: 15px; font-weight: 600;
+  line-height: 1.6; margin: 0 0 18px;
+}
+.offer-code-row {
+  display: flex; align-items: center; gap: 10px;
+  border: 2px dashed rgba(232,99,10,0.55);
+  background: rgba(232,99,10,0.10);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;
+}
+.offer-code {
+  flex: 1; font-family: 'Fredoka One', cursive; font-size: 20px;
+  letter-spacing: 1.5px; color: var(--orange); text-align: center;
+}
+.offer-copy-btn {
+  background: var(--orange); color: #fff; border: none;
+  padding: 10px 16px; border-radius: 8px; font-weight: 800; font-size: 13px;
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+  transition: background 0.2s; -webkit-tap-highlight-color: transparent;
+}
+.offer-copy-btn:hover { background: #cf5800; }
+.offer-continue {
+  width: 100%; padding: 16px; background: transparent; color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.35); border-radius: 12px;
+  font-size: 15px; font-weight: 800; cursor: pointer; font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.offer-continue:hover { border-color: var(--orange); background: rgba(232,99,10,0.08); }
+
 /* Near full-screen on mobile: photo banner on top, content below.
    Internal scroll (rare, tiny screens) instead of overflowing the viewport. */
 @media (max-width: 900px) {

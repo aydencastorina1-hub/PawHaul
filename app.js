@@ -859,10 +859,11 @@ function dismissOffer() {
   syncOverlayChrome();
 }
 
-// Sends the code with the same EmailJS setup as the footer email box; if the
-// welcome template isn't configured (or sending fails), the customer still
-// gets the code via toast so the promise of the popup is always kept.
-function handleOfferSubmit(e) {
+// Saves the email as a real Shopify customer (Storefront API customerCreate,
+// acceptsMarketing:true — see api/customer.js) and reveals the code in the
+// popup itself instead of emailing it. A duplicate email is treated as a
+// success from the customer's point of view — they still get the code.
+async function handleOfferSubmit(e) {
   e.preventDefault();
   var input = document.getElementById('offerEmail');
   var email = input ? input.value.trim() : '';
@@ -871,43 +872,102 @@ function handleOfferSubmit(e) {
     return;
   }
   var btn = document.getElementById('offerBtn');
-  function finish(msg) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+
+  try {
+    var res = await fetch('/api/customer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await res.json();
+    if (data && data.ok) {
+      showOfferSuccess(!!data.alreadyExists);
+      return;
+    }
     if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
-    if (input) input.value = '';
-    dismissOffer();
-    showToast(msg, 5000);
+    showToast((data && data.error) || 'Something went wrong — please try again.', 5000);
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
+    showToast('Something went wrong — please try again.', 5000);
   }
-  var canSend = typeof EMAILJS_PUBLIC_KEY !== 'undefined' && EMAILJS_PUBLIC_KEY &&
-                typeof EMAILJS_WELCOME_TEMPLATE !== 'undefined' && EMAILJS_WELCOME_TEMPLATE;
-  if (!canSend) {
-    finish('Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
-    return;
-  }
-  if (btn) { btn.disabled = true; btn.textContent = 'Sending...'; }
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-    to_email: email,
-    discount_code: DISCOUNT_CODE
-  }).then(function() {
-    finish('10% off code sent to your email!');
-  }).catch(function() {
-    finish('Your code: ' + DISCOUNT_CODE + ' — 10% off your first order!');
-  });
 }
 
-setTimeout(function() {
-  var overlay = document.getElementById('offerOverlay');
-  var popup = document.getElementById('offerPopup');
-  if (!overlay || !popup) return;
-  requestAnimationFrame(function() {
+// Swaps the form for the code-reveal panel (see index.html #offerSuccess) —
+// the popup stays open so the customer can actually read/copy the code.
+function showOfferSuccess(alreadyExists) {
+  var form = document.querySelector('#offerPopup .offer-form');
+  var dismissLink = document.querySelector('#offerPopup .offer-dismiss');
+  var success = document.getElementById('offerSuccess');
+  var msg = document.getElementById('offerSuccessMsg');
+  var code = document.getElementById('offerCode');
+  if (form) form.style.display = 'none';
+  if (dismissLink) dismissLink.style.display = 'none';
+  if (code) code.textContent = DISCOUNT_CODE;
+  if (msg) {
+    msg.textContent = alreadyExists
+      ? "You're already on the list! Use this code at checkout."
+      : "You're in! Use this code at checkout.";
+  }
+  if (success) success.style.display = 'block';
+}
+
+function copyOfferCode() {
+  var codeEl = document.getElementById('offerCode');
+  var code = codeEl ? codeEl.textContent.trim() : DISCOUNT_CODE;
+  var btn = document.getElementById('offerCopyBtn');
+  function done(ok) {
+    if (!btn) return;
+    btn.textContent = ok ? 'Copied!' : 'Select & copy manually';
+    setTimeout(function() { if (btn) btn.textContent = 'Copy Code'; }, 2000);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function() { done(true); }).catch(function() { done(false); });
+  } else {
+    done(false);
+  }
+}
+
+// Shows once per visitor: after 5s, or sooner on exit intent (mouse leaving
+// via the top of the viewport, the classic "heading for the tab bar" tell).
+// The localStorage flag is set the moment it's shown (not on submit/dismiss)
+// so a visitor who ignores or closes it is never nagged again either.
+(function () {
+  var SEEN_KEY = 'pawhaul_offer_seen';
+  var alreadySeen = false;
+  try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
+  if (alreadySeen) return;
+
+  var shown = false;
+  function reveal() {
+    if (shown) return;
+    shown = true;
+    try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+    document.removeEventListener('mouseleave', exitIntent);
+
+    var overlay = document.getElementById('offerOverlay');
+    var popup = document.getElementById('offerPopup');
+    if (!overlay || !popup) return;
     requestAnimationFrame(function() {
-      overlay.classList.add('active');
-      popup.classList.add('active');
-      syncOverlayChrome();
+      requestAnimationFrame(function() {
+        overlay.classList.add('active');
+        popup.classList.add('active');
+        syncOverlayChrome();
+      });
     });
-  });
-  document.getElementById('offerClose').addEventListener('click', dismissOffer);
-  overlay.addEventListener('click', dismissOffer);
-}, 10000);
+  }
+  function exitIntent(e) {
+    if (e.clientY <= 0) reveal();
+  }
+
+  document.addEventListener('mouseleave', exitIntent);
+  setTimeout(reveal, 5000);
+
+  var closeBtn = document.getElementById('offerClose');
+  var overlayEl = document.getElementById('offerOverlay');
+  if (closeBtn) closeBtn.addEventListener('click', dismissOffer);
+  if (overlayEl) overlayEl.addEventListener('click', dismissOffer);
+})();
 
 // Escape closes whichever overlay is up (search first, then the offer).
 document.addEventListener('keydown', function(e) {

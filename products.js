@@ -272,7 +272,7 @@ var EMAILJS_PUBLIC_KEY    = 'Ejew9NO0SiQgXbDAU';
 var EMAILJS_SERVICE_ID    = 'service_qqcrtoe';
 var EMAILJS_CONTACT_TEMPLATE = 'template_t5ark9a';
 var EMAILJS_WELCOME_TEMPLATE = ''; // e.g. 'template_yyyyyy'  (10% off -> customer)
-var DISCOUNT_CODE = 'PAWHAUL10';   // Your 10% off code (change this anytime)
+var DISCOUNT_CODE = 'WELCOME10';   // Your 10% off code (change this anytime) — also shown by the offer popup
 
 if (EMAILJS_PUBLIC_KEY) {
   emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });

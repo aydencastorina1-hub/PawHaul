@@ -876,12 +876,20 @@
     <div class="offer-body">
       <div class="offer-kicker"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.2em;height:1.2em;vertical-align:-0.25em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Welcome To The Pack</div>
       <h2 class="offer-headline">Get <span>10% Off</span> Your First Order</h2>
-      <p class="offer-sub">Gear built for every walk. Drop your email and we'll send your code right away.</p>
+      <p class="offer-sub">Gear built for every walk. Drop your email and get your code instantly.</p>
       <form class="offer-form" onsubmit="handleOfferSubmit(event)">
         <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required autocomplete="email">
         <button type="submit" class="offer-btn" id="offerBtn">Claim My 10% Off →</button>
       </form>
       <button type="button" class="offer-dismiss" onclick="dismissOffer()">No thanks, maybe later</button>
+      <div class="offer-success" id="offerSuccess" style="display:none;">
+        <p class="offer-success-msg" id="offerSuccessMsg"></p>
+        <div class="offer-code-row">
+          <span class="offer-code" id="offerCode">WELCOME10</span>
+          <button type="button" class="offer-copy-btn" id="offerCopyBtn" onclick="copyOfferCode()">Copy Code</button>
+        </div>
+        <button type="button" class="offer-continue" onclick="dismissOffer()">Continue Shopping →</button>
+      </div>
     </div>
   </div>
 </body>
