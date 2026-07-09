@@ -684,7 +684,7 @@ nav {
 }
 .mini-swatch:hover { transform: scale(1.18); }
 .mini-swatch.active { box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--orange); }
-.mini-sizes { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.mini-sizes { display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 5px 10px; }
 .mini-size {
   font-family: 'Nunito', sans-serif;
   font-size: 11px;
@@ -1328,6 +1328,16 @@ img.reviewer-av {
 
 .options-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
+/* Size selector only (not colors, which still flow naturally) — a fixed 2x2
+   grid so 4-option sizes (like the Light Up Dog Collar's S/M/L/XL) always
+   read as two even rows instead of wrapping 3-then-1. */
+#detailSizes.options-row {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  justify-content: start;
+  gap: 10px 14px;
+}
+
 .option-btn {
   padding: 8px 18px;
   border-radius: 50px;
@@ -1538,8 +1548,7 @@ img.reviewer-av {
 }
 .pd-acc-item.open .pd-acc-body { max-height: 2000px; }
 .pd-acc-body .detail-desc,
-.pd-acc-body .detail-features,
-.pd-acc-body .detail-section { padding-bottom: 0; }
+.pd-acc-body .detail-features { padding-bottom: 0; }
 .pd-acc-body > *:first-child { margin-top: 2px; }
 .pd-acc-body > *:last-child { margin-bottom: 20px; }
 

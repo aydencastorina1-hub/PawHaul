@@ -316,7 +316,7 @@ function swatchCss(name) {
 // (it must exactly equal the sizePrices key for pricing/cart lines).
 function shortSizeLabel(s) {
   s = String(s);
-  var word = s.match(/^(XXL|XL|Small|Medium|Large)\b/i);
+  var word = s.match(/^(XXL|XL|Small|Medium|Large|S|M|L)\b/i);
   if (word) {
     var w = word[1].toLowerCase();
     return w === 'small' ? 'S' : w === 'medium' ? 'M' : w === 'large' ? 'L' : word[1].toUpperCase();
