@@ -844,6 +844,25 @@ document.addEventListener('DOMContentLoaded', function() {
   initCarousel('collectionsCarousel', 'colCarPrev', 'colCarNext');
 });
 
+// ==================== LIFESTYLE IMAGE FADE-IN ====================
+// Marks each large lifestyle/background photo (see .lifestyle-img in
+// styles.css) ready once it's actually decoded, triggering its CSS fade
+// instead of an abrupt shimmer-to-photo cut. A hard fallback timer
+// guarantees an image can never get stuck invisible even if load/error
+// somehow never fires — same safety-net philosophy as the reveal observer.
+document.addEventListener('DOMContentLoaded', function() {
+  var imgs = document.querySelectorAll('.lifestyle-img');
+  function ready(img) { img.classList.add('img-ready'); }
+  imgs.forEach(function(img) {
+    if (img.complete && img.naturalWidth > 0) { ready(img); }
+    else {
+      img.addEventListener('load', function() { ready(img); });
+      img.addEventListener('error', function() { ready(img); });
+    }
+  });
+  setTimeout(function() { imgs.forEach(ready); }, 2500);
+});
+
 // ==================== 10% OFF POPUP ====================
 function offerIsOpen() {
   var popup = document.getElementById('offerPopup');

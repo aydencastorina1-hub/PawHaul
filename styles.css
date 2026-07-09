@@ -57,6 +57,15 @@ img {
   animation: imgShimmer 1.6s ease-in-out infinite;
 }
 
+/* Large lifestyle/background photos (About/Contact hero, home mission
+   banner, collections carousel, 10%-off popup — hero slides excluded, they
+   already crossfade via their own .active opacity transition above) fade in
+   once actually decoded instead of snapping straight from shimmer to photo.
+   app.js adds .img-ready on load/error, with a hard fallback timer so an
+   image can never get stuck invisible if that JS somehow doesn't run. */
+.lifestyle-img { opacity: 0; transition: opacity 0.3s ease; }
+.lifestyle-img.img-ready { opacity: 1; }
+
 body {
   font-family: 'Nunito', sans-serif;
   background: white;
