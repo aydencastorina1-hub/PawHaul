@@ -3215,7 +3215,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    390px-wide screenshot, not just desktop responsive mode. */
 #collectionsCarousel .col-slide:nth-child(1) .col-slide-img img { object-position: center 78%; } /* bowl sits low in frame */
 #collectionsCarousel .col-slide:nth-child(2) .col-slide-img img { object-position: center 38%; } /* hand+leash sits high in frame */
-#collectionsCarousel .col-slide:nth-child(3) .col-slide-img img { object-position: center 85%; } /* dog+collar sits low in frame */
+#collectionsCarousel .col-slide:nth-child(3) .col-slide-img img { object-position: center 65%; } /* dog+collar sits low in frame — kept moderate: the source photo is capped at 800x800 (confirmed via the CDN, no higher-res version exists anywhere in this product's image pool), and a tighter crop filled the frame with more high-frequency fur/LED detail, making the mobile Retina upscale (the container needs ~15% more physical pixels than the source has) look noticeably softer. This value still centers the dog clearly without exaggerating that softness. */
 .col-slide-body {
   padding: 22px 20px 26px;
   display: flex;
