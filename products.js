@@ -196,8 +196,8 @@ var products = [
   {
     id: 5, name: "Poop Bag Clip", price: 9.99, was: 14.99, emoji: "🧷", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 67,
-    desc: "Never get caught without a bag again. This compact dispenser clip holds a full roll of unused bags and clips securely onto any leash, dispensing one bag at a time so you're always ready before pickup. Lightweight, weatherproof, and built to clip on and stay on.",
-    tagline: "A full roll of bags, always within reach.",
+    desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
+    tagline: "Hands-free carrying for used bags, every walk.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
 
@@ -226,14 +226,15 @@ var products = [
       } },
 
     features: [
-      "Compact dispenser clip holds a full roll of unused bags",
-      "Dispenses one bag at a time through the easy-pull slot",
-      "Sturdy clip attaches securely to any leash",
-      "Lightweight and weatherproof — built to clip on and stay on",
+      "Hands-free clip holds a used poop bag securely",
+      "Clips easily onto any leash or belt",
+      "Keeps both hands free while walking your dog",
+      "Lightweight and compact design",
+      "Quick, hygienic cleanup every time",
       "7 colors to choose from"
     ],
-    material: "Durable ABS clip shell · Aluminum carabiner",
-    whatsInBox: "1× Poop Bag Clip dispenser (bag roll not included)"
+    material: "Durable silicone clip · Secure metal hook attachment",
+    whatsInBox: "1× Poop Bag Clip"
   },
   {
     id: 6, name: "Light Up Dog Collar", price: 19.99, was: 26.99, emoji: "💡", image: "", category: "safety",
@@ -296,8 +297,8 @@ var products = [
   {
     id: 8, name: "Poop Bag Holder", price: 9.99, was: 14.99, emoji: "🧺", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 24,
-    desc: "Keep your hands (and your pockets) clean on the way to the next trash can. This odor-sealing pouch clips onto your leash or bag and holds a used waste bag securely shut until you can dispose of it properly. Wipeable, discreet, and built for daily walks.",
-    tagline: "Carry it hygienically until the next trash can.",
+    desc: "Always be ready for cleanup with a full roll of bags on hand. This durable canvas holder attaches to your leash with a sturdy carabiner clip, keeping unused waste bags organized and within reach on every walk — just pull a bag out whenever you need one. Simple, reliable, and built to last.",
+    tagline: "A full roll of bags, always within reach.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
 
@@ -318,14 +319,15 @@ var products = [
       } },
 
     features: [
-      "Odor-sealing pouch keeps used bags contained until disposal",
-      "Clips securely onto any leash or bag",
-      "Wipeable, easy-to-clean exterior",
-      "Discreet design for daily walks",
+      "Holds a full roll of unused waste bags",
+      "Durable canvas construction built to last",
+      "Sturdy carabiner clip attaches to any leash",
+      "Keeps bags organized and easy to grab",
+      "Simple, reliable design for every walk",
       "3 colors to choose from"
     ],
-    material: "Wipeable odor-sealing fabric · Sturdy clip closure",
-    whatsInBox: "1× Poop Bag Holder pouch"
+    material: "Durable canvas pouch · Sturdy metal carabiner clip",
+    whatsInBox: "1× Poop Bag Holder pouch (bag roll not included)"
   }
 ];
 
