@@ -10,6 +10,15 @@ var products = [
     sizes: ["350ml", "550ml"],
     colors: ["Pink", "White", "Blue"],
 
+    // Real product photos from Shopify, one per color (Shopify's data model
+    // gives exactly one image per variant — see per-product notes on why
+    // this is a flat color->url map, not a multi-angle gallery).
+    images: {
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S3e62153a0359458e85ca8792786f892fS.webp?width=900",
+      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0905a11eba164092b57f7dd587d9eaf1d.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa7d924844a3d4013b1b397880dadfcadU.webp?width=900"
+    },
+
     // Per-size variant pricing — maps each size option to its price.
     // `price`/`was` below mirror the default (first) size so every other part
     // of the app (shop cards, home carousel, bundles, search) keeps working.
@@ -51,6 +60,14 @@ var products = [
     // Length drives the price (labels must exactly equal the sizePrices keys).
     sizes: ["3m (10ft)", "5m (16ft)"],
     colors: ["Red", "Green", "Blue", "White", "Pink"],
+
+    images: {
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S5294cac17bbb487bac47cce1df064df0J.webp?width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S5a39efa1841e49b1ad7857b34634dad6v.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb032f773be6f4a26ad06ed2d00ca88783.webp?width=900",
+      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sef87ddb83ec648e9bb3240889af6c8a0k.webp?width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Saa15954db497432a8865ca3daedfc754j.webp?width=900"
+    },
     sizePrices: {
       "3m (10ft)": { price: 17.99, was: 24.99 },
       "5m (16ft)": { price: 21.99, was: 28.99 }
@@ -98,6 +115,19 @@ var products = [
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
 
+    // Locally-hosted: Shopify's own variant photos for this product all had
+    // an AliExpress-style measurement-diagram overlay burned in — cropped
+    // out (see images/products/) so the card/detail photos look like a
+    // normal studio product shot instead of a supplier listing screenshot.
+    images: {
+      "Red": "images/products/bowl-red.jpg",
+      "Blue": "images/products/bowl-blue.jpg",
+      "Orange": "images/products/bowl-orange.jpg",
+      "Green": "images/products/bowl-green.jpg",
+      "White": "images/products/bowl-white.jpg",
+      "Black": "images/products/bowl-black.jpg"
+    },
+
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276542720", byColor: {
         "Red": "gid://shopify/ProductVariant/48945265082624",
@@ -131,6 +161,15 @@ var products = [
     sizes: ["Universal — fits all standard collars"],
     colors: ["Black", "Transparent", "Pink", "Blue", "Green", "Purple"],
 
+    images: {
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9fc066621549467db87867143006b174g.webp?width=900",
+      "Transparent": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S43a2380c6d5a45ffa2a1743422529d30K.webp?width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S95dd5f8435454a1d9a33153ac34b3b10p.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0e0c88fc2c2a4504ba1362ebe8c19ae6B.webp?width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9056ad1490f74f2cb16aaa0efab4f25dv.webp?width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S44b6cdd7d98d431cb3a07d23fafa7b31A.webp?width=900"
+    },
+
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276575488", byColor: {
         "Black": "gid://shopify/ProductVariant/48945265049856",
@@ -162,6 +201,19 @@ var products = [
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
 
+    // Note: Shopify's own "Blue" variant image was a mismatched product (a
+    // round tag with unrelated branding text) — swapped for a matching
+    // teardrop-clip photo from the product's wider image pool instead.
+    images: {
+      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdabcb515185644749aa0640e68078179d.webp?width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0da950fa93d04a25afebfaa0336a51cbS.webp?width=900",
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Se9fbfd87f59e4b41beee2244e4b329b20.webp?width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdb52b5440928451eb6abb1ed06b3ce6dB.webp?width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S48db40d2b42148dd9cd2af3427535c48X.webp?width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S856c79dab79e4350a9cd09e7fb81679b6.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S96d1aaaf88394f8fa64e7a8ff93bede5O.webp?width=900"
+    },
+
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
         "Orange": "gid://shopify/ProductVariant/48945264296192",
@@ -190,6 +242,14 @@ var products = [
     tagline: "Be seen on every night walk, no matter how dark.",
     sizes: ["S (34-41cm)", "M (37-46cm)", "L (41-52cm)", "XL (42-56cm)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
+
+    images: {
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S4971488210cc4d1f9140e735dff55e89c.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S40bdc23869db4718bd4f9c165a29cbe6j.webp?width=900",
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1e599f4a31fc467fb29ec5abe661424ai.webp?width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S68fa949117294c3ca0eb7e22c1f30044C.webp?width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sbb698d5ecde845ef9200bd9891df6adf7.webp?width=900"
+    },
     sizePrices: {
       "S (34-41cm)": { price: 19.99, was: 26.99 },
       "M (37-46cm)": { price: 21.99, was: 29.99 },
@@ -240,6 +300,12 @@ var products = [
     tagline: "Carry it hygienically until the next trash can.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
+
+    images: {
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S8eef5a0cca254e189de3a866ef6265c8f.webp?width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0713da2667494a60a03cd40e7fc7c805B.webp?width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S56ca0b52b7874b6b8b4b98ac4f252cd2E.webp?width=900"
+    },
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Shopify's own
     // product title for this listing is longer ("Canvas Dog Poop Bag
@@ -454,6 +520,13 @@ function cardSelectColor(ev, btn, id) {
   card.querySelectorAll('.mini-swatch').forEach(function (b) { b.classList.remove('active'); });
   btn.classList.add('active');
   refreshCardSizeAvailability(card, id);
+
+  // Show that color's own product photo instead of the default color's.
+  var p = products.find(function (x) { return x.id === id; });
+  var color = btn.dataset.color;
+  var imgUrl = p ? productImageFor(p, color) : null;
+  var imgEl = card.querySelector('.product-img img');
+  if (imgUrl && imgEl) imgEl.src = imgUrl;
 }
 
 // After a color changes, grey out any size that's out of stock in that color
@@ -530,9 +603,19 @@ function cardAdd(ev, id) {
   addToCart(item);
 }
 
+// Resolves the photo for one color of a product, falling back to the
+// default (first) color's photo, then the emoji when there are no real
+// photos at all (e.g. a future product added before its images are set up).
+function productImageFor(p, color) {
+  if (!p.images) return null;
+  return p.images[color] || (p.colors && p.images[p.colors[0]]) || null;
+}
+
 function productCard(p) {
-  var imgContent = p.image
-    ? `<img src="${p.image}" alt="${p.name}">`
+  var defColor = p.colors && p.colors.length ? p.colors[0] : null;
+  var imgUrl = productImageFor(p, defColor);
+  var imgContent = imgUrl
+    ? `<img src="${imgUrl}" alt="${p.name}" loading="lazy">`
     : p.emoji;
   return `
     <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
@@ -552,27 +635,27 @@ function productCard(p) {
 }
 
 // ==================== PRODUCT DETAIL ====================
+// Shopify gives exactly one real photo per color variant (no multi-angle
+// gallery data is available via the Storefront API for this catalog) — so
+// the "gallery" is just that one photo, swapped whenever the color changes.
+// No carousel controls are rendered since there's nothing to page between.
+function renderDetailGallery(color) {
+  var detailImg = document.getElementById('detailImg');
+  if (!detailImg || !currentProduct) return;
+  var c = color || (currentProduct.colors && currentProduct.colors[0]);
+  var imgUrl = productImageFor(currentProduct, c);
+  var slideHtml = imgUrl
+    ? '<img src="' + imgUrl + '" alt="' + currentProduct.name + (c ? ' — ' + c : '') + '">'
+    : '<span style="font-size:110px;line-height:1">' + currentProduct.emoji + '</span>';
+  detailImg.innerHTML = '<div class="det-carousel"><div class="det-track" id="detTrack"><div class="det-slide">' + slideHtml + '</div></div></div>';
+}
+
 function showProduct(id) {
   currentProduct = products.find(p => p.id === id);
   currentQty = 1;
   if (!currentProduct) return;
 
-  var detailImg = document.getElementById('detailImg');
-  var slideHtml = currentProduct.image
-    ? '<img src="' + currentProduct.image + '" alt="' + currentProduct.name + '">'
-    : '<span style="font-size:110px;line-height:1">' + currentProduct.emoji + '</span>';
-  detailImg.innerHTML =
-    '<div class="det-carousel">' +
-      '<div class="det-track" id="detTrack">' +
-        '<div class="det-slide">' + slideHtml + '</div>' +
-        '<div class="det-slide">' + slideHtml + '</div>' +
-        '<div class="det-slide">' + slideHtml + '</div>' +
-      '</div>' +
-      '<button class="det-prev" id="detPrev" aria-label="Previous">&#8249;</button>' +
-      '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
-    '</div>' +
-    '<div class="det-dots" id="detDots"></div>';
-  setTimeout(function() { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
+  renderDetailGallery(currentProduct.colors && currentProduct.colors[0]);
   document.getElementById('detailName').textContent = currentProduct.name;
   // Default to the CHEAPEST size variant (site-wide lowest-price rule); its
   // price drives the initial display and its button starts out selected.
@@ -650,6 +733,7 @@ function selectColorOption(btn) {
   selectOption(btn);
   currentColor = btn.textContent.trim();
   updateVariantAvailability();
+  renderDetailGallery(currentColor);
 }
 
 // Greys out any size that's unavailable in the currently-selected color, and
@@ -848,7 +932,8 @@ function renderWishlist() {
     return;
   }
   container.innerHTML = '<div class="products-grid">' + wishlistItems.map(function(p) {
-    var imgContent = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '">') : p.emoji;
+    var wImgUrl = productImageFor(p, p.colors && p.colors[0]);
+    var imgContent = wImgUrl ? ('<img src="' + wImgUrl + '" alt="' + p.name + '" loading="lazy">') : p.emoji;
     var inWish = true;
     return '<div class="product-card" onclick="showProduct(' + p.id + ')">' +
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +

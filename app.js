@@ -350,7 +350,8 @@ function showBundle(productId) {
     if (!p) return;
     total += lowestVariant(p).price;
     var isMain = bid === productId;
-    var imgContent = p.image ? ('<img src="' + p.image + '" alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
+    var bundleImgUrl = productImageFor(p, p.colors && p.colors[0]);
+    var imgContent = bundleImgUrl ? ('<img src="' + bundleImgUrl + '" alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
     html += '<div style="display:flex;align-items:center;gap:12px;background:white;padding:10px 14px;border-radius:10px;">' +
       imgContent +
       '<div style="flex:1;">' +
@@ -579,8 +580,9 @@ function doSearch(val) {
   var safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   var hl = new RegExp('(' + safe + ')', 'ig');
   res.innerHTML = matches.map(function(p) {
-    var thumb = p.image
-      ? '<img src="' + p.image + '" alt="" loading="lazy">'
+    var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
+    var thumb = thumbUrl
+      ? '<img src="' + thumbUrl + '" alt="" loading="lazy">'
       : p.emoji;
     return '<div class="search-result-item" onclick="goToProduct(' + p.id + ')">' +
       '<span class="search-result-thumb">' + thumb + '</span>' +
@@ -720,92 +722,6 @@ function initCarousel(trackId, prevId, nextId) {
     // opening a product must not slide the carousel. resync() via the
     // scroll listener keeps idx honest.
   }, opts);
-
-  goTo(0, true);
-}
-
-// ==================== DETAIL IMAGE CAROUSEL ====================
-function initDetailCarousel() {
-  var track = document.getElementById('detTrack');
-  var prev = document.getElementById('detPrev');
-  var next = document.getElementById('detNext');
-  var dotsWrap = document.getElementById('detDots');
-  if (!track || !prev || !next) return;
-
-  var idx = 0;
-  var total = track.children.length;
-  var touchStartX = 0;
-  var touchStartY = 0;
-  var touchStartLeft = 0;
-  var touchAxis = null; // 'x' once a swipe is confirmed horizontal, 'y' once confirmed vertical
-  if (dotsWrap) dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
-  var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
-
-  function step() { return track.offsetWidth || 300; }
-  function maxScroll() { return Math.max(0, (total - 1) * step()); }
-
-  function smoothTo(target) {
-    var start = track.scrollLeft;
-    var dest = Math.max(0, Math.min(target, maxScroll()));
-    var diff = dest - start;
-    if (!diff) return;
-    var t0 = null;
-    (function tick(ts) {
-      if (!t0) t0 = ts;
-      var p = Math.min((ts - t0) / 300, 1);
-      track.scrollLeft = start + diff * (1 - Math.pow(1 - p, 3));
-      if (p < 1) requestAnimationFrame(tick);
-    })(performance.now());
-  }
-
-  function goTo(n, instant) {
-    idx = Math.max(0, Math.min(n, total - 1));
-    var target = idx * step();
-    if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
-    prev.classList.toggle('disabled', idx === 0);
-    next.classList.toggle('disabled', idx >= total - 1);
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
-  }
-
-  prev.addEventListener('click', function() { goTo(idx - 1); });
-  next.addEventListener('click', function() { goTo(idx + 1); });
-
-  track.addEventListener('touchstart', function(e) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartLeft = track.scrollLeft;
-    touchAxis = null;
-  }, { passive: true });
-
-  track.addEventListener('touchmove', function(e) {
-    var dx = e.touches[0].clientX - touchStartX;
-    var dy = e.touches[0].clientY - touchStartY;
-
-    // Decide the gesture's axis once there's enough movement to be sure —
-    // whichever direction has moved further wins, and that decision sticks
-    // for the rest of this touch. Until then, do nothing: no preventDefault
-    // (so a vertical scroll can still start natively) and no scrollLeft
-    // change (so a few pixels of jitter don't nudge the image early).
-    if (!touchAxis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-      touchAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-    }
-    if (touchAxis === 'x') {
-      e.preventDefault();
-      var raw = touchStartLeft - dx;
-      track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
-    }
-    // touchAxis === 'y' (or not yet decided): let the page scroll normally.
-  }, { passive: false });
-
-  track.addEventListener('touchend', function(e) {
-    if (touchAxis !== 'x') return; // vertical scroll or a tap — never treat as a swipe
-    var delta = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 30) {
-      goTo(idx + (delta > 0 ? 1 : -1));
-    } else {
-      goTo(idx);
-    }
-  }, { passive: true });
 
   goTo(0, true);
 }
