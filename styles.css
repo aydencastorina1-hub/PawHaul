@@ -3207,8 +3207,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center center;
   display: block;
 }
+/* Per-slide vertical framing — mobile priority, since .col-slide-img's fixed
+   200px height crops these square source photos hard. Tuned against a real
+   390px-wide screenshot, not just desktop responsive mode. */
+#collectionsCarousel .col-slide:nth-child(1) .col-slide-img img { object-position: center 78%; } /* bowl sits low in frame */
+#collectionsCarousel .col-slide:nth-child(2) .col-slide-img img { object-position: center 38%; } /* hand+leash sits high in frame */
+#collectionsCarousel .col-slide:nth-child(3) .col-slide-img img { object-position: center 85%; } /* dog+collar sits low in frame */
 .col-slide-body {
   padding: 22px 20px 26px;
   display: flex;
