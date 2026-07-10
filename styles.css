@@ -1895,7 +1895,7 @@ img.reviewer-av {
 /* ==================== CONTACT PAGE ==================== */
 /* Hero photo + intro text reuse the About page's exact pattern (.about-hero)
    for visual consistency between the two "premium" content pages. */
-.contact-hero-wrap { height: 280px; }
+.contact-hero-wrap { height: 280px; background: var(--img-placeholder); }
 .contact-hero-img { object-position: center 45%; } /* keeps the leashed dog centered and in frame on narrow/tall crops */
 
 .contact-page { padding: 60px 5% 70px; background: white; }
@@ -3196,7 +3196,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
-.col-slide-img { height: 200px; flex-shrink: 0; overflow: hidden; }
+.col-slide-img { height: 200px; flex-shrink: 0; overflow: hidden; background: var(--img-placeholder); }
 .col-slide-img img {
   width: 100%;
   height: 100%;
