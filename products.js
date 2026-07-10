@@ -68,6 +68,20 @@ var products = [
       "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sef87ddb83ec648e9bb3240889af6c8a0k.webp?width=900",
       "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Saa15954db497432a8865ca3daedfc754j.webp?width=900"
     },
+
+    // Extra detail-page gallery slides — general/non-color-specific shots
+    // from Shopify's wider image pool (a hardware close-up, an in-use
+    // hand-hold hero shot, and a full flat-lay). Picked after auditing all
+    // 24 other pool images: excluded spec/measurement diagrams with text
+    // overlays, a multi-color grid collage, and a mechanism close-up whose
+    // composition left too much empty background above the subject on a
+    // mobile crop.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0bac281c54e342e885cd09dd407d2182w.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sbdc750f0c22f49f19f834493fa8c1e8aJ.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sf813f54ca9f64fea9a4899c3006cf291s.webp?width=900"
+    ],
+
     sizePrices: {
       "3m (10ft)": { price: 17.99, was: 24.99 },
       "5m (16ft)": { price: 21.99, was: 28.99 }
@@ -127,6 +141,18 @@ var products = [
       "White": "images/products/bowl-white.jpg",
       "Black": "images/products/bowl-black.jpg"
     },
+
+    // Extra detail-page gallery slides — a lifestyle in-use shot and a solo
+    // top-down detail shot. Picked after auditing all 10 other pool images:
+    // excluded measurement-diagram overlays (same issue as the color photos
+    // above), a rainbow "colors available" fan-out collage showing several
+    // unsold colors (pink, yellow, magenta), a 3-panel backpack/belt-clip
+    // montage that also showed unsold colors (yellow, pink), and other
+    // single-color solo shots that read as another color's own photo.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Se41e912ec0cb4da697da3f6f75a261b82.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa0f8a84f540d477cb9edf31bc9bd202cq.webp?width=900"
+    ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276542720", byColor: {
@@ -214,6 +240,19 @@ var products = [
       "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S96d1aaaf88394f8fa64e7a8ff93bede5O.webp?width=900"
     },
 
+    // Extra detail-page gallery slides — a moody hardware close-up on the
+    // clip's Y-notch, a hand-holding-a-used-bag hero shot (directly matches
+    // the corrected "holds used bags" description), and a backpack-attached
+    // usage shot. Picked after auditing all 23 other pool images: excluded
+    // several wrong-product round-tag photos (unrelated branding text), a
+    // multi-color grid collage, solo studio shots of other colors, and a
+    // batch of spec/instruction diagrams.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb3cc74988c5349db92ec75f67e3e98e5R.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S68f4725cdb964fe683c982b0ac097df1C.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sde53da21db1445f4b8edf1b6e8d8a7abf.webp?width=900"
+    ],
+
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
         "Orange": "gid://shopify/ProductVariant/48945264296192",
@@ -244,13 +283,30 @@ var products = [
     sizes: ["S (34-41cm)", "M (37-46cm)", "L (41-52cm)", "XL (42-56cm)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
+    // Locally-hosted: Shopify's own variant photos for this product were all
+    // two-panel composites with a "USB Charging" text-and-checkmark banner
+    // stitched to the bottom — cropped down to just the clean product shot
+    // (see images/products/) so the card/detail/gallery photos look like a
+    // normal studio product shot instead of a supplier listing screenshot.
     images: {
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S4971488210cc4d1f9140e735dff55e89c.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S40bdc23869db4718bd4f9c165a29cbe6j.webp?width=900",
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1e599f4a31fc467fb29ec5abe661424ai.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S68fa949117294c3ca0eb7e22c1f30044C.webp?width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sbb698d5ecde845ef9200bd9891df6adf7.webp?width=900"
+      "Green": "images/products/collar-green.jpg",
+      "Blue": "images/products/collar-blue.jpg",
+      "Red": "images/products/collar-red.jpg",
+      "Pink": "images/products/collar-pink.jpg",
+      "Black": "images/products/collar-black.jpg"
     },
+
+    // Extra detail-page gallery slides — a night walk-in-progress shot (the
+    // product's core visibility use case) and a charging-cable detail shot.
+    // Picked after auditing all 30 other pool images: excluded size/spec
+    // diagrams, battery/rechargeable diagrams with text overlays, two
+    // separate rainbow "colors available" burst collages, a repeating-
+    // watermark shot, and an 11-panel photo montage.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S667ef3cbbee54b2eb1df60190cc6bee9k.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb54672fb152d4d6e95156fb5c6c85cabj.webp?width=900"
+    ],
+
     sizePrices: {
       "S (34-41cm)": { price: 19.99, was: 26.99 },
       "M (37-46cm)": { price: 21.99, was: 29.99 },
@@ -307,6 +363,17 @@ var products = [
       "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0713da2667494a60a03cd40e7fc7c805B.webp?width=900",
       "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S56ca0b52b7874b6b8b4b98ac4f252cd2E.webp?width=900"
     },
+
+    // Extra detail-page gallery slides — a pouch shown with a bag, and a
+    // hanging-on-leash lifestyle shot. Picked after auditing all 12 other
+    // pool images: excluded a batch of spec/instruction-panel graphics, one
+    // with faint Chinese-looking filler text in a product-parameters
+    // diagram, and a styled multi-pouch group shot that showed pink and
+    // grey pouches — neither an actual sold color (Green/Blue/Black only).
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1fad867101bf459eb368629dc96f3b11W.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S61093ab6323a4f95bc544447f2d9f92fQ.webp?width=900"
+    ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Shopify's own
     // product title for this listing is longer ("Canvas Dog Poop Bag
@@ -645,11 +712,40 @@ function renderDetailGallery(color) {
   var detailImg = document.getElementById('detailImg');
   if (!detailImg || !currentProduct) return;
   var c = color || (currentProduct.colors && currentProduct.colors[0]);
-  var imgUrl = productImageFor(currentProduct, c);
-  var slideHtml = imgUrl
-    ? '<img src="' + imgUrl + '" alt="' + currentProduct.name + (c ? ' — ' + c : '') + '">'
-    : '<span style="font-size:110px;line-height:1">' + currentProduct.emoji + '</span>';
-  detailImg.innerHTML = '<div class="det-carousel"><div class="det-track" id="detTrack"><div class="det-slide">' + slideHtml + '</div></div></div>';
+  var mainUrl = productImageFor(currentProduct, c);
+
+  // Slide 1 is always the selected color's own photo; the rest are general/
+  // non-color-specific shots from the product's wider Shopify image pool
+  // (lifestyle, detail, multi-color) — never another color's own photo.
+  var urls = [];
+  if (mainUrl) urls.push(mainUrl);
+  if (currentProduct.extraImages) urls = urls.concat(currentProduct.extraImages);
+
+  if (!urls.length) {
+    detailImg.innerHTML = '<div class="det-carousel"><div class="det-track" id="detTrack"><div class="det-slide">' +
+      '<span style="font-size:110px;line-height:1">' + currentProduct.emoji + '</span></div></div></div>';
+    return;
+  }
+
+  var slidesHtml = urls.map(function (url, i) {
+    var alt = currentProduct.name + (i === 0 && c ? ' — ' + c : '');
+    return '<div class="det-slide"><img src="' + url + '" alt="' + alt + '"></div>';
+  }).join('');
+
+  if (urls.length === 1) {
+    // Nothing to page between — no arrows/dots for a single real photo.
+    detailImg.innerHTML = '<div class="det-carousel"><div class="det-track" id="detTrack">' + slidesHtml + '</div></div>';
+    return;
+  }
+
+  detailImg.innerHTML =
+    '<div class="det-carousel">' +
+      '<div class="det-track" id="detTrack">' + slidesHtml + '</div>' +
+      '<button class="det-prev" id="detPrev" aria-label="Previous">&#8249;</button>' +
+      '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
+    '</div>' +
+    '<div class="det-dots" id="detDots"></div>';
+  setTimeout(function () { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
 }
 
 function showProduct(id) {
