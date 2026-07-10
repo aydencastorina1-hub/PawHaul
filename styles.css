@@ -2375,7 +2375,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   box-shadow: 0 10px 24px rgba(26, 26, 46, 0.10);
 }
 .search-cat-card:active { transform: scale(0.97); border-color: var(--orange); }
-/* Placeholder image slot — swap in a real photo later with an <img> */
 .search-cat-img {
   aspect-ratio: 16 / 9;
   background: linear-gradient(135deg, #F4F1EC 0%, #ECE7E0 100%);
@@ -2385,8 +2384,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   color: #C4BBAE;
 }
 .search-cat-img svg { width: 30px; height: 30px; }
-.search-cat-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.search-cat-img img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
 .search-cat-card:hover .search-cat-img { color: var(--orange); }
+/* Same source photos as the home carousel — same crop concerns, tuned
+   separately since this card's 16:9 box has a different aspect ratio. */
+.search-cat-photo-water { object-position: center 75%; }
+.search-cat-photo-leash { object-position: center 42%; }
+.search-cat-photo-safety { object-position: center 62%; }
 .search-cat-name {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
