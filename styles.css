@@ -103,21 +103,20 @@ body {
 /* PAGE SYSTEM */
 .page { display: none; }
 .page.active { display: block; }
-/* Only JS-driven page switches (showPage) add this — never present on the
-   page that's statically .active in the HTML, so the very first paint never
-   animates in from invisible. */
-.page.page-transition { animation: pageIn 0.4s ease; }
-
-/* No opacity here on purpose: CSS opacity composites the whole subtree
-   against whatever's behind it, so an opacity 0->1 fade briefly let the
-   mobile-only navy html/body background (set for iOS overscroll bounce)
-   bleed through every page's own opaque background during navigation —
-   most visible over large lifestyle images. A slide-up-only entrance keeps
-   the motion without ever exposing anything behind the page. */
-@keyframes pageIn {
-  from { transform: translateY(16px); }
-  to { transform: translateY(0); }
-}
+/* showPage() (products.js) still adds/removes a "page-transition" class on
+   every JS-driven navigation — harmless no-op now, left alone rather than
+   touching JS for a pure CSS fix. It used to drive a translateY(16px)->0
+   slide-up entrance (see git history / project memory for why: an earlier
+   opacity-based version let the mobile-only navy body bg bleed through
+   during the fade). That transform version had its own bug — the incoming
+   page rendered at its OFFSET (translateY 16px, i.e. visibly lower) for
+   the animation's very first frame, then animated back to translateY(0),
+   which read as the whole page "dropping down" and snapping back up on
+   every single navigation. Removed outright per explicit user request
+   (no entrance motion at all) rather than just shrinking the offset —
+   navigation should feel instant. This does NOT reintroduce the opacity
+   black-flash bug: no opacity, no transform, nothing here composites
+   against whatever's behind the page. */
 
 /* ANNOUNCE BAR */
 .announce-bar {
