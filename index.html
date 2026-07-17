@@ -33,18 +33,40 @@
      preloading slide 1 regardless of which one actually shows first. -->
 <script>
 (function () {
-  var heroImgs = [
-    'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100',
-    'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2400&q=100',
-    'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=2400&q=100',
-    'https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=2400&q=100'
+  // Was q=100 w=2400 flat (1.4-4.7MB per photo, no responsive sizing) — every
+  // visitor downloaded a 4K-quality file regardless of device, which on real
+  // mobile networks left the hero photo-less (dark overlay over bare
+  // placeholder) for long enough to be a visible "black flash". q=75 + real
+  // width buckets cut the typical mobile fetch from ~4.7MB to ~250-350KB.
+  // Deliberately kept as plain JPEG (fm=jpg), NOT auto=format/AVIF: measured
+  // side-by-side under a throttled connection and AVIF, despite being smaller
+  // in total bytes, made the flash WORSE — Chromium can't paint any partial
+  // AVIF frame, so nothing appears until 100% of the file arrives, whereas a
+  // JPEG paints progressively (a blurry top-down partial image) well before
+  // it's fully downloaded. Time-to-first-visible-pixels matters more here
+  // than final byte count once we're already this small. Buckets MUST match
+  // the <img srcset> ones below exactly, or this preload fetches a different
+  // URL than the browser ultimately picks and we just paid for two downloads
+  // instead of one.
+  var HERO_W = [640, 828, 1080, 1440, 1920, 2560];
+  var heroBases = [
+    'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4',
+    'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967',
+    'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd',
+    'https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f'
   ];
-  var idx = Math.floor(Math.random() * heroImgs.length);
+  function heroUrl(base, w) { return base + '?fm=jpg&fit=crop&q=75&w=' + w; }
+  var idx = Math.floor(Math.random() * heroBases.length);
   window.__heroStartIdx = idx;
-  document.write('<link rel="preload" as="image" href="' + heroImgs[idx] + '" fetchpriority="high">');
+  // Mirror the browser's own srcset resolution (smallest bucket >= viewport*DPR)
+  // so the preloaded URL is byte-identical to what the <img> will request.
+  var target = Math.round((window.innerWidth || 800) * (window.devicePixelRatio || 1));
+  var w = HERO_W[HERO_W.length - 1];
+  for (var i = 0; i < HERO_W.length; i++) { if (HERO_W[i] >= target) { w = HERO_W[i]; break; } }
+  document.write('<link rel="preload" as="image" href="' + heroUrl(heroBases[idx], w) + '" fetchpriority="high">');
 })();
 </script>
-<noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" fetchpriority="high"></noscript>
+<noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" fetchpriority="high"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
@@ -152,17 +174,24 @@
 <div id="page-home" class="page active">
 
   <!-- HERO -->
-  <section id="heroSection" style="position:relative;width:100%;height:520px;overflow:hidden;">
+  <section id="heroSection" style="position:relative;width:100%;height:520px;overflow:hidden;background:#f0ede6;">
     <!-- Crossfading slideshow — 4 images, 5s per image, 1.5s fade (initHeroSlideshow in app.js).
          All 4 are eager+high-priority since the starting slide is randomized (head script) and
          we want whichever one is chosen to already be loading, not just slide 1. Slide 1 keeps a
          hardcoded "active" as the safe fallback if JS is disabled; the inline script right below
          corrects this to the real random pick the instant it can (before any image data can have
-         arrived, so there's no visible swap). -->
-    <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" alt="Dog out on a walk" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&w=2400&q=100" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&w=2400&q=100" alt="Dog on a leash walk" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?w=2400&q=100" alt="Happy dog outside" loading="eager" fetchpriority="high">
+         arrived, so there's no visible swap).
+         srcset/sizes: was a flat q=100 w=2400 URL (1.4-4.7MB, same file regardless of device) —
+         responsive widths + q=75 (plain JPEG, see the auto=format note in the <head> preload
+         script above for why AVIF was tried and rejected) cut the typical mobile download to
+         ~250-400KB, shrinking the window where the dark contrast overlay below is sitting on bare
+         placeholder instead of the actual photo. #heroSection also now has an INLINE background
+         (not just the styles.css placeholder rule) so that window is never literally
+         transparent/white before styles.css itself has even loaded. -->
+    <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog out on a walk" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog on a leash walk" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Happy dog outside" loading="eager" fetchpriority="high">
     <script>
     (function () {
       var slides = document.querySelectorAll('#heroSection .hero-slide');
@@ -633,7 +662,14 @@
 <!-- ==================== ABOUT PAGE ==================== -->
 <div id="page-about" class="page" style="background:white;">
   <div style="position:relative;width:100%;height:350px;overflow:hidden;background:var(--img-placeholder);">
-    <img loading="eager" fetchpriority="high" class="about-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?w=1600&q=90" alt="A dog on an outdoor trail at golden hour" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <!-- eager (not lazy) so this page's own hero never flashes on navigation (an
+         SPA where every page's markup already exists in the DOM, so lazy-load's
+         viewport check doesn't fire cleanly on nav — see the Contact hero note
+         below); fetchpriority LOW (not high) because this photo is virtually
+         never the visible content on FIRST page load (home is) — high priority
+         here was found to starve the actually-visible home hero of bandwidth,
+         a real contributor to hero flash reports investigated 2026-07-17. -->
+    <img loading="eager" fetchpriority="low" class="about-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1600" alt="A dog on an outdoor trail at golden hour" style="width:100%;height:100%;object-fit:cover;display:block;">
     <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
   </div>
   <div class="about-hero">
@@ -720,7 +756,13 @@
 <!-- ==================== CONTACT PAGE ==================== -->
 <div id="page-contact" class="page" style="background:white;">
   <div class="contact-hero-wrap" style="position:relative;width:100%;overflow:hidden;">
-    <img loading="eager" fetchpriority="high" class="contact-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?w=2400&q=100" alt="A leashed dog outdoors in a forest setting" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <!-- Was q=100 w=2400 (2MB!) + fetchpriority=high, competing for bandwidth
+         against the actually-visible home hero on every first page load (this
+         SPA keeps every page's markup in the DOM) — same fix as the About hero
+         above: right-sized (q=75, plain JPEG -> ~500KB at this large w=2400)
+         + fetchpriority LOW (kept eager so this page's own hero still never
+         flashes on nav). -->
+    <img loading="eager" fetchpriority="low" class="contact-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=2400" alt="A leashed dog outdoors in a forest setting" style="width:100%;height:100%;object-fit:cover;display:block;">
     <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
   </div>
   <div class="about-hero">
@@ -871,7 +913,7 @@
   <div id="offerPopup" class="offer-popup" role="dialog" aria-modal="true" aria-label="Get 10% off your first order">
     <button id="offerClose" class="offer-close" aria-label="Close">&#x2715;</button>
     <div class="offer-photo">
-      <img class="lifestyle-img" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?w=2400&q=100" alt="Dog and owner out on a walk" loading="lazy">
+      <img class="lifestyle-img" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1200" alt="Dog and owner out on a walk" loading="lazy">
     </div>
     <div class="offer-body">
       <div class="offer-kicker"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.2em;height:1.2em;vertical-align:-0.25em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Welcome To The Pack</div>
