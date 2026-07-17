@@ -164,6 +164,7 @@ nav {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  text-decoration: none; /* now a real <a> (routing) — was a div, never needed this before */
 }
 
 /* Logo is now text-only — circle removed for a clean Ruffwear-style nav.
@@ -210,8 +211,11 @@ nav {
 .nav-right { display: flex; align-items: center; gap: 14px; }
 
 .cart-btn {
+  display: inline-flex; /* was a <button>, default inline-block; now a real <a href> (routing) */
+  align-items: center;
   background: var(--orange);
   color: white;
+  text-decoration: none;
   border: none;
   padding: 10px 22px;
   border-radius: 50px;
@@ -808,8 +812,10 @@ nav {
 }
 
 .btn-white {
+  display: inline-block; /* was a <button>, default inline-block; now a real <a href> (routing) */
   background: white;
   color: var(--orange);
+  text-decoration: none;
   padding: 14px 30px;
   border-radius: 50px;
   font-family: 'Nunito', sans-serif;
@@ -2107,6 +2113,7 @@ footer {
   align-items: center;
   gap: 8px;
   color: var(--gray);
+  text-decoration: none; /* now real <a href> (routing) — was a <button>, never needed this before */
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -2495,6 +2502,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-weight: 800;
   font-size: 16px;
   color: var(--black);
+  text-decoration: none; /* now real <a href> (routing) — was href-less before, so this never mattered */
   cursor: pointer;
   border-bottom: 1px solid #F5F5F5;
   transition: color 0.15s ease, background 0.15s ease;
@@ -3248,12 +3256,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   color: var(--gray);
 }
 .col-slide-btn {
+  display: inline-flex; /* was a <button>; now a real <a href> (routing). Flex items get blockified regardless, but explicit is safer. */
+  align-items: center;
+  justify-content: center;
   margin-top: auto; /* pins the CTA to the bottom on every slide */
   padding: 12px 24px;
   border: none;
   border-radius: 999px;
   background: var(--orange);
   color: white;
+  text-decoration: none;
   font-family: 'Nunito', sans-serif;
   font-size: 14px;
   font-weight: 800;

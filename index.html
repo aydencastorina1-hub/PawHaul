@@ -22,17 +22,76 @@
      stylesheet's onload (plus a short fallback) once the real CSS is safely active. -->
 <style>html.no-flash #mobMenu, html.no-flash #mobMenuOverlay, html.no-flash #navSearchBar, html.no-flash #searchScrim { display: none !important; }</style>
 <title>PawHaul — Built For Every Walk</title>
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=4">
-<link rel="icon" type="image/svg+xml" href="favicon.svg?v=4">
-<link rel="icon" type="image/x-icon" href="favicon.ico?v=4">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=4">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=4">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=4">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=4">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
+<!-- ROUTING: this is a client-rendered SPA with no build step/server-side
+     rendering, so every "page" (Home/Shop/Contact/product detail/etc.)
+     already exists in the DOM at all times — showPage()/showProduct()
+     (products.js) just toggle which .page has the "active" class. Historically
+     that state lived ONLY in memory, so the URL never changed and a reload
+     always landed back on Home. This block adds real distinct URLs (/shop,
+     /contact, /product/<name>, etc.) via the History API, WITHOUT a framework.
+     parseRoute() must run this early (before any .page content paints) so the
+     matching inline <style> below can instantly show the right page and hide
+     the Home page's static "active" default — otherwise a direct load of
+     e.g. /contact would flash Home first and then swap, the exact class of
+     bug just fixed twice on this page (hero black-flash, nav drop/snap). The
+     actual DATA-DRIVEN rendering (product name/price/images, shop grid,
+     cart/wishlist contents) still requires products.js/app.js to load, so on
+     a direct product-page load there's an unavoidable brief blank-shell
+     moment before content fills in — inherent to a script-only SPA with no
+     server-rendered HTML; not something this pass can fully eliminate. -->
+<script>
+function parseRoute(pathname) {
+  var path = pathname.replace(/\/+$/, '') || '/';
+  if (path === '/') return { type: 'page', page: 'home' };
+  if (path === '/shop') return { type: 'page', page: 'shop' };
+  var m = path.match(/^\/shop\/(water|leash|safety)$/);
+  if (m) return { type: 'page', page: 'shop', filter: m[1] };
+  if (path === '/contact') return { type: 'page', page: 'contact' };
+  if (path === '/about') return { type: 'page', page: 'about' };
+  if (path === '/wishlist') return { type: 'page', page: 'wishlist' };
+  if (path === '/cart') return { type: 'page', page: 'cart' };
+  m = path.match(/^\/product\/([a-z0-9-]+)$/);
+  if (m) return { type: 'product', slug: m[1] };
+  return { type: 'unknown' };
+}
+window.parseRoute = parseRoute;
+(function () {
+  var route = parseRoute(location.pathname);
+  window.__initialRoute = route;
+  var routeClass = 'route-home';
+  if (route.type === 'product') routeClass = 'route-product';
+  else if (route.type === 'page' && route.page !== 'home') routeClass = 'route-' + route.page;
+  document.documentElement.classList.add(routeClass);
+  window.__isHomeInitial = (routeClass === 'route-home');
+})();
+</script>
+<style>
+/* Instant, stylesheet-independent page swap for direct-URL loads — mirrors
+   the .page/.page.active rule in styles.css but must be inline+in-head to
+   win before first paint (styles.css itself hasn't loaded yet at this point). */
+html.route-shop #page-home, html.route-contact #page-home, html.route-about #page-home,
+html.route-wishlist #page-home, html.route-cart #page-home, html.route-product #page-home { display: none !important; }
+html.route-shop #page-shop, html.route-contact #page-contact, html.route-about #page-about,
+html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-product #page-product { display: block !important; }
+</style>
 <!-- The hero slideshow starts on a random slide (app.js), so the LCP image
      isn't known until we've picked one — decide it here (as early as possible)
      and preload THAT exact image at highest priority, instead of always
      preloading slide 1 regardless of which one actually shows first. -->
 <script>
 (function () {
+  // Skip entirely when the initial URL isn't Home (see the ROUTING block
+  // above) — preloading a hero photo that won't even be the visible page on
+  // this load would just steal bandwidth/priority from whatever page IS
+  // actually being requested (e.g. a direct /product/<name> load). The
+  // window.__heroStartIdx it would have set is only read by app.js's
+  // rotation code, which only runs once the user actually navigates home.
+  if (!window.__isHomeInitial) return;
   // Was q=100 w=2400 flat (1.4-4.7MB per photo, no responsive sizing) — every
   // visitor downloaded a 4K-quality file regardless of device, which on real
   // mobile networks left the hero photo-less (dark overlay over bare
@@ -70,7 +129,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=52" onload="document.documentElement.classList.remove('no-flash')">
+  <!-- All asset paths on this page are now root-relative (leading "/") — routing
+       (real /shop, /product/<name>, etc. URLs) means a page can load from a
+       nested path, and a bare relative path like "styles.css" would then
+       resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
+       site root. Bit this exact way once already; keep new asset refs
+       root-relative too. -->
+  <link rel="stylesheet" href="/styles.css?v=52" onload="document.documentElement.classList.remove('no-flash')">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -85,23 +150,23 @@
 
 <!-- NAVBAR -->
 <nav id="mainNav">
-  <div class="logo" onclick="showPage('home');closeMobileMenu();closeSearch()">
+  <a class="logo" href="/" onclick="goTo(event,'home');closeMobileMenu();closeSearch()">
     <div class="logo-circle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <span class="logo-text">Paw<span>Haul</span></span>
-  </div>
+  </a>
   <div class="nav-center">
     <ul class="nav-links">
-      <li><a onclick="showPage('home')">Home</a></li>
-      <li><a onclick="showPage('shop')">Shop<span class="nav-full"> Walk Gear</span></a></li>
-      <li><a onclick="showPage('about')">Our Story</a></li>
-      <li><a onclick="showPage('contact')">Contact</a></li>
+      <li><a href="/" onclick="goTo(event,'home')">Home</a></li>
+      <li><a href="/shop" onclick="goTo(event,'shop')">Shop<span class="nav-full"> Walk Gear</span></a></li>
+      <li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li>
+      <li><a href="/contact" onclick="goTo(event,'contact')">Contact</a></li>
     </ul>
   </div>
   <div class="nav-right">
     <button class="nav-search-btn" id="navSearchBtn" onclick="toggleSearch()" aria-label="Search">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </button>
-    <button class="cart-btn" onclick="showPage('cart')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;vertical-align:-0.18em" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></button>
+    <a class="cart-btn" href="/cart" onclick="goTo(event,'cart')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;vertical-align:-0.18em" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></a>
     <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
@@ -129,7 +194,7 @@
     <div class="search-browse-title">Browse by category</div>
     <div class="search-browse-grid">
       <div class="search-cat-card" onclick="searchGoCategory('all')" role="button" tabindex="0">
-        <div class="search-cat-img"><img loading="lazy" class="lifestyle-img search-cat-photo-all" src="images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul walk gear"></div>
+        <div class="search-cat-img"><img loading="lazy" class="lifestyle-img search-cat-photo-all" src="/images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul walk gear"></div>
         <div class="search-cat-name">All Walk Gear</div>
       </div>
       <div class="search-cat-card" onclick="searchGoCategory('water')" role="button" tabindex="0">
@@ -158,11 +223,11 @@
     <div class="mob-menu-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="white" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <span class="mob-menu-brand-text">Paw<span>Haul</span></span>
   </div>
-  <a onclick="showPage('home');closeMobileMenu()">Home</a>
-  <a onclick="showPage('shop');closeMobileMenu()">Shop Walk Gear</a>
-  <a onclick="showPage('about');closeMobileMenu()">Our Story</a>
-  <a onclick="showPage('contact');closeMobileMenu()">Contact</a>
-  <a onclick="showPage('wishlist');closeMobileMenu()">Wishlist</a>
+  <a href="/" onclick="goTo(event,'home');closeMobileMenu()">Home</a>
+  <a href="/shop" onclick="goTo(event,'shop');closeMobileMenu()">Shop Walk Gear</a>
+  <a href="/about" onclick="goTo(event,'about');closeMobileMenu()">Our Story</a>
+  <a href="/contact" onclick="goTo(event,'contact');closeMobileMenu()">Contact</a>
+  <a href="/wishlist" onclick="goTo(event,'wishlist');closeMobileMenu()">Wishlist</a>
   <div class="mob-menu-footer">
     <div class="paw-divider paw-divider--on-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <p class="mob-menu-tagline">Every Walk. Every Dog. Every Time.</p>
@@ -211,7 +276,7 @@
         <span style="color:rgba(255,255,255,0.75);font-size:12px;font-weight:700;">5-star rated</span>
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
-        <button class="btn-primary" onclick="showPage('shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</button>
+        <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</a>
         <button onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:white;border:2px solid rgba(255,255,255,0.5);padding:13px 28px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Best Sellers</button>
       </div>
     </div>
@@ -244,7 +309,7 @@
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Water &amp; Food</div>
             <h3 class="col-slide-head">Never Run Out Of Water Mid-Walk</h3>
             <p class="col-slide-copy">Long walk, hot day, no fountain in sight — your dog shouldn't have to wait until you're home. Carry water and food in one hand, and keep the tail wagging for every extra mile.</p>
-            <button class="col-slide-btn" onclick="showPage('shop','water')">Shop Water &amp; Food →</button>
+            <a class="col-slide-btn" href="/shop/water" onclick="goTo(event,'shop','water')">Shop Water &amp; Food →</a>
           </div>
         </div>
 
@@ -254,7 +319,7 @@
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Leashes &amp; Control</div>
             <h3 class="col-slide-head">Total Control, Every Time</h3>
             <p class="col-slide-copy">Freedom for them, control for you. Whether it's a squirrel sprint, a two-dog tangle, or a busy street crossing, the right leash turns chaos into a calm walk.</p>
-            <button class="col-slide-btn" onclick="showPage('shop','leash')">Shop Leashes →</button>
+            <a class="col-slide-btn" href="/shop/leash" onclick="goTo(event,'shop','leash')">Shop Leashes →</a>
           </div>
         </div>
 
@@ -264,17 +329,17 @@
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/></svg> Safety &amp; Visibility</div>
             <h3 class="col-slide-head">Seen And Safe, Day Or Night</h3>
             <p class="col-slide-copy">Dusk comes fast — and dark coats disappear in it. Light your dog up so drivers spot them from far away, and always know exactly where they are if they ever slip off.</p>
-            <button class="col-slide-btn" onclick="showPage('shop','safety')">Shop Safety Gear →</button>
+            <a class="col-slide-btn" href="/shop/safety" onclick="goTo(event,'shop','safety')">Shop Safety Gear →</a>
           </div>
         </div>
 
         <div class="col-slide">
-          <div class="col-slide-img"><img loading="lazy" class="lifestyle-img" src="images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul products: the 2-in-1 Dog Water Bottle, Retractable Dog Leash, and Dog AirTag Holder"></div>
+          <div class="col-slide-img"><img loading="lazy" class="lifestyle-img" src="/images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul products: the 2-in-1 Dog Water Bottle, Retractable Dog Leash, and Dog AirTag Holder"></div>
           <div class="col-slide-body">
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> All Walk Gear</div>
             <h3 class="col-slide-head">Every Walk, Fully Covered</h3>
             <p class="col-slide-copy">Water, leash, light and clean-up — everything the two of you need out there, in one place. Grab the full setup and never turn back home for a forgotten thing again.</p>
-            <button class="col-slide-btn" onclick="showPage('shop','all')">Shop All Walk Gear →</button>
+            <a class="col-slide-btn" href="/shop" onclick="goTo(event,'shop','all')">Shop All Walk Gear →</a>
           </div>
         </div>
 
@@ -291,7 +356,7 @@
         <div class="section-tag">Best Sellers</div>
         <h2 class="section-title">Our Most <span>Loved</span> Products</h2>
       </div>
-      <button class="btn-primary" onclick="showPage('shop')">View All →</button>
+      <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')">View All →</a>
     </div>
     <div class="home-carousel-wrap" id="prodCarouselWrap">
       <button class="carousel-btn carousel-prev disabled" id="prodCarouselPrev" aria-label="Previous">&#8249;</button>
@@ -354,7 +419,7 @@
     </div>
     <div class="why-cta">
       <p class="why-cta-line">Join thousands of dog owners who've made the switch.</p>
-      <button class="btn-primary" onclick="showPage('shop')">Shop Now →</button>
+      <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')">Shop Now →</a>
     </div>
     </div>
   </section>
@@ -370,7 +435,7 @@
     <div>
       <h2>Grab One Thing. Walk Ready.</h2>
       <p>PawHaul was built for dog owners who want to grab one thing on the way out the door and have everything they need for the walk. Water, food, safety, control — all covered.</p>
-      <button class="btn-white" onclick="showPage('about')">Our Story →</button>
+      <a class="btn-white" href="/about" onclick="goTo(event,'about')">Our Story →</a>
     </div>
     <div class="stats-grid">
       <div class="stat-card"><span class="stat-num">BPA</span><span class="stat-label">Free Materials</span></div>
@@ -469,9 +534,9 @@
           <a class="social-btn" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></a>
         </div>
       </div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','leash')">Leashes</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <p>© 2026 <span>PawHaul</span> — Built For Every Walk</p>
@@ -499,9 +564,9 @@
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a><a class="social-btn" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','leash')">Leashes</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
@@ -510,7 +575,7 @@
 <!-- ==================== PRODUCT DETAIL PAGE ==================== -->
 <div id="page-product" class="page" style="background:white;">
   <div class="product-detail">
-    <button class="back-btn" onclick="showPage('shop')">← Back to Shop</button>
+    <a class="back-btn" href="/shop" onclick="goTo(event,'shop')">← Back to Shop</a>
     <div class="product-detail-grid">
       <div class="product-gallery">
         <div class="main-img" id="detailImg">🧴</div>
@@ -636,7 +701,7 @@
 <!-- WISHLIST PAGE -->
 <div id="page-wishlist" class="page" style="background:white;">
   <div class="cart-page">
-    <button class="back-btn" onclick="showPage('shop')">← Continue Shopping</button>
+    <a class="back-btn" href="/shop" onclick="goTo(event,'shop')">← Continue Shopping</a>
     <h1>My Wishlist <span style="color:var(--orange)">♥</span></h1>
     <div id="wishlistContent"></div>
   </div>
@@ -644,16 +709,16 @@
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><span class="footer-brand-logo">Paw<span>Haul</span></span><p>Walk gear built for dog owners.</p></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> — Built For Every Walk</p></div>
   </footer>
 </div>
 <div id="page-cart" class="page" style="background:white;">
   <div class="cart-page">
-    <button class="back-btn" onclick="showPage('shop')">← Continue Shopping</button>
+    <a class="back-btn" href="/shop" onclick="goTo(event,'shop')">← Continue Shopping</a>
     <h1>Your Cart</h1>
     <div id="cartContent"></div>
   </div>
@@ -676,7 +741,7 @@
     <div class="section-tag">Our Story</div>
     <h1>Built For Every <span>Walk</span></h1>
     <p>PawHaul started with one thirsty dog on a hot Saturday afternoon — and a walk that got cut short. Everything we've built since exists so that never happens again.</p>
-    <button class="btn-primary" onclick="showPage('shop')">Shop Our Products →</button>
+    <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')">Shop Our Products →</a>
   </div>
   <div class="about-story">
     <div class="story-flow">
@@ -745,9 +810,9 @@
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li><li><a onclick="showPage('shop','water')">Water & Food</a></li><li><a onclick="showPage('shop','safety')">Safety Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
@@ -831,9 +896,9 @@
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a onclick="showPage('shop')">All Walk Gear</a></li></ul></div>
-      <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showPage('contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a onclick="showPage('about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
@@ -904,8 +969,20 @@
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="products.js?v=27"></script>
-  <script src="app.js?v=31"></script>
+  <script src="/products.js?v=28"></script>
+  <script src="/app.js?v=32"></script>
+
+  <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/
+       images, shop grid contents, cart/wishlist contents — all of which
+       need the `products` array + showPage/showProduct, only available now
+       that products.js/app.js have run) to the route the <head> script
+       already decided and instantly reflected via CSS. sync:true means
+       "the URL is already correct, just render to match it" — must NOT
+       push a new history entry here, that would break the back button
+       (every fresh page load would grow history by one). -->
+  <script>
+  if (window.__initialRoute) { dispatchRoute(window.__initialRoute, { sync: true }); }
+  </script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->

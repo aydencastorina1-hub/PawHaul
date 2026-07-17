@@ -330,8 +330,11 @@ var bundleMap = {
 };
 
 var originalShowProduct = showProduct;
-showProduct = function(id) {
-  originalShowProduct(id);
+showProduct = function(id, opts) {
+  // opts (routing sync/push mode — see products.js) must be forwarded, not
+  // dropped, or every product-page navigation would silently stop updating
+  // the URL.
+  originalShowProduct(id, opts);
   showBundle(id);
 };
 

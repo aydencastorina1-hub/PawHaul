@@ -134,12 +134,12 @@ var products = [
     // out (see images/products/) so the card/detail photos look like a
     // normal studio product shot instead of a supplier listing screenshot.
     images: {
-      "Red": "images/products/bowl-red.jpg",
-      "Blue": "images/products/bowl-blue.jpg",
-      "Orange": "images/products/bowl-orange.jpg",
-      "Green": "images/products/bowl-green.jpg",
-      "White": "images/products/bowl-white.jpg",
-      "Black": "images/products/bowl-black.jpg"
+      "Red": "/images/products/bowl-red.jpg",
+      "Blue": "/images/products/bowl-blue.jpg",
+      "Orange": "/images/products/bowl-orange.jpg",
+      "Green": "/images/products/bowl-green.jpg",
+      "White": "/images/products/bowl-white.jpg",
+      "Black": "/images/products/bowl-black.jpg"
     },
 
     // Extra detail-page gallery slides — a lifestyle in-use shot and a solo
@@ -289,11 +289,11 @@ var products = [
     // (see images/products/) so the card/detail/gallery photos look like a
     // normal studio product shot instead of a supplier listing screenshot.
     images: {
-      "Green": "images/products/collar-green.jpg",
-      "Blue": "images/products/collar-blue.jpg",
-      "Red": "images/products/collar-red.jpg",
-      "Pink": "images/products/collar-pink.jpg",
-      "Black": "images/products/collar-black.jpg"
+      "Green": "/images/products/collar-green.jpg",
+      "Blue": "/images/products/collar-blue.jpg",
+      "Red": "/images/products/collar-red.jpg",
+      "Pink": "/images/products/collar-pink.jpg",
+      "Black": "/images/products/collar-black.jpg"
     },
 
     // Extra detail-page gallery slides — a night walk-in-progress shot (the
@@ -421,8 +421,85 @@ var currentSize = null;          // selected size variant on the detail page
 var currentColor = null;         // selected color variant on the detail page
 var currentVariantPrice = null;  // price for the selected size (falls back to product.price)
 
+// ==================== ROUTING ====================
+// Real, distinct, bookmarkable/reloadable URLs for each page — added on top
+// of the existing showPage()/showProduct() state-toggle system rather than
+// replacing it (this is a script-only SPA, no build step/framework router).
+// parseRoute() itself lives in index.html <head> (must run before first
+// paint to avoid a flash of Home on a direct /shop, /contact, etc. load —
+// see the ROUTING comment there); everything here just needs to stay in
+// sync with it.
+
+// Product URLs are named by slug, not id, per the task spec (/product/<name>)
+// — this means a product rename changes its URL (old links break); accepted
+// tradeoff for readability over a stable-but-ugly /product/<id>-<slug> form.
+function slugify(name) {
+  return String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+function pageToPath(page, filter) {
+  if (page === 'home') return '/';
+  if (page === 'shop') return (filter && filter !== 'all') ? '/shop/' + filter : '/shop';
+  if (page === 'contact') return '/contact';
+  if (page === 'about') return '/about';
+  if (page === 'wishlist') return '/wishlist';
+  if (page === 'cart') return '/cart';
+  return null; // 'product' owns its own URL (see showProduct) — never routed here
+}
+
+// opts.sync: this is the browser CORRECTING us to match a URL it already
+// has (initial load, or popstate back/forward) — never push a new history
+// entry, just normalize the address bar via replaceState.
+// opts.replace: an explicit non-sync replace (e.g. filter pills — see
+// filterProducts()) — updates the URL without growing browser history.
+// default: a real user-driven navigation — pushState (adds a back-button step).
+function navigateUrl(path, opts) {
+  opts = opts || {};
+  if (!path) return;
+  if (opts.sync) {
+    if (location.pathname !== path) history.replaceState({ p: 1 }, '', path);
+    return;
+  }
+  if (location.pathname === path) return; // already there — don't clutter history
+  if (opts.replace) history.replaceState({ p: 1 }, '', path);
+  else history.pushState({ p: 1 }, '', path);
+}
+
+// Shared by the initial-load bootstrap script (index.html, after app.js
+// loads) and the popstate (back/forward) listener below.
+function dispatchRoute(route, opts) {
+  if (!route) return;
+  if (route.type === 'product') {
+    var p = products.find(function (pr) { return slugify(pr.name) === route.slug; });
+    if (p) { showProduct(p.id, opts); return; }
+    // Unknown/stale product slug (e.g. a since-renamed or removed product) —
+    // fall back to Home rather than show a broken/empty product page, and
+    // fix the address bar to match so Back doesn't just return here.
+    showPage('home', null, opts);
+    if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
+    return;
+  }
+  if (route.type === 'page') { showPage(route.page, route.filter, opts); return; }
+  showPage('home', null, opts);
+  if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
+}
+
+window.addEventListener('popstate', function () {
+  dispatchRoute(window.parseRoute(location.pathname), { sync: true });
+});
+
+// Click handler for real <a href="..."> nav links/buttons (nav bar, footer,
+// "Shop Leashes"-style CTAs — see index.html). Lets modifier-clicks/middle-
+// click fall through to native browser behavior (open in new tab, etc, using
+// the real href) instead of always hijacking the click for SPA navigation.
+function goTo(e, page, filter) {
+  if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
+  if (e) e.preventDefault();
+  showPage(page, filter);
+}
+
 // ==================== NAVIGATION ====================
-function showPage(page, filter) {
+function showPage(page, filter, opts) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
   // Use instant so smooth-scroll CSS doesn't animate page transitions
@@ -443,6 +520,12 @@ function showPage(page, filter) {
   }
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
+
+  // page==='product' is deliberately NOT routed here — showProduct() (which
+  // is the only caller that ever passes 'product') owns that URL itself,
+  // since it needs the product's slug, not just the page name.
+  navigateUrl(pageToPath(page, filter), opts);
+
   // Snap to top after render, then restore smooth scrolling for user swipes
   requestAnimationFrame(function() {
     window.scrollTo(0, 0);
@@ -748,7 +831,7 @@ function renderDetailGallery(color) {
   setTimeout(function () { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
 }
 
-function showProduct(id) {
+function showProduct(id, opts) {
   currentProduct = products.find(p => p.id === id);
   currentQty = 1;
   if (!currentProduct) return;
@@ -816,7 +899,12 @@ function showProduct(id) {
   document.getElementById('stickyName').textContent = currentProduct.name;
   initStickyAtc();
 
-  showPage('product');
+  // sync:true — showPage('product') must NOT touch the URL itself (see
+  // pageToPath's comment); this product owns its own /product/<slug> URL,
+  // set right below with the REAL opts (push for a real navigation, sync
+  // for the initial-load/back-forward case).
+  showPage('product', null, { sync: true });
+  navigateUrl('/product/' + slugify(currentProduct.name), opts);
 }
 
 function selectOption(btn) {
@@ -1182,6 +1270,10 @@ function filterProducts(filter, btn) {
   document.querySelectorAll('.shop-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   renderShopProducts(currentShopFilter);
+  // replace (not push): switching filter pills WHILE already on Shop keeps
+  // the URL correct for reload/sharing without spamming back-button history
+  // with every pill click.
+  navigateUrl(pageToPath('shop', currentShopFilter), { replace: true });
 }
 
 // Navigate from a search result straight to that product's own detail page.
