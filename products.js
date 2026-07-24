@@ -1057,10 +1057,13 @@ function buyNow() {
 
 // ==================== CART ====================
 function addToCart(product) {
-  // Match on id + size so different size variants are separate line items.
-  // Products added without a size (e.g. quick-add) just match on id as before.
+  // Match on id + size + color so different size/color variants are separate
+  // line items (each needs to map to its own Shopify variant and show its
+  // own photo). Products added without a size/color (e.g. quick-add) just
+  // match on id, as before.
   var size = product.size || '';
-  var existing = cart.find(item => item.id === product.id && (item.size || '') === size);
+  var color = product.color || '';
+  var existing = cart.find(item => item.id === product.id && (item.size || '') === size && (item.color || '') === color);
   if (existing) { existing.qty++; syncQtyToShopify(existing); }
   else { var newItem = { ...product, qty: 1 }; cart.push(newItem); syncAddToShopify(newItem); }
   updateCartCount();
@@ -1170,9 +1173,12 @@ function renderCart() {
   container.innerHTML = `
     <div class="cart-layout">
       <div class="cart-items">
-        ${cart.map((item, idx) => `
+        ${cart.map((item, idx) => {
+          var imgUrl = productImageFor(item, item.color);
+          var imgContent = imgUrl ? ('<img src="' + imgUrl + '" alt="' + item.name + '" loading="lazy">') : item.emoji;
+          return `
           <div class="cart-item">
-            <div class="cart-item-img">${item.emoji}</div>
+            <div class="cart-item-img">${imgContent}</div>
             <div class="cart-item-info">
               <div class="cart-item-name">${item.name}</div>
               <div class="cart-item-variant">${item.size ? item.size + ' · ' : ''}Qty: ${item.qty}</div>
@@ -1187,7 +1193,8 @@ function renderCart() {
               </div>
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
       <div class="cart-summary">
         <h3>Order Summary</h3>

@@ -135,7 +135,7 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=52" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=53" onload="document.documentElement.classList.remove('no-flash')">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -969,7 +969,7 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="/products.js?v=29"></script>
+  <script src="/products.js?v=30"></script>
   <script src="/app.js?v=33"></script>
 
   <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/
