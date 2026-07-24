@@ -395,7 +395,9 @@ function addBundleToCart() {
       // Variant products go in at their lowest-priced option (the price shown
       // in the bundle box), tagged with its size.
       var v = lowestVariant(p);
-      cart.push(Object.assign({}, p, { price: v.price, size: v.size || '', qty: 1 }));
+      var newItem = Object.assign({}, p, { price: v.price, size: v.size || '', qty: 1 });
+      cart.push(newItem);
+      syncAddToShopify(newItem);
     }
   });
 

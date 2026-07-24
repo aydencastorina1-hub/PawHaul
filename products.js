@@ -1061,8 +1061,8 @@ function addToCart(product) {
   // Products added without a size (e.g. quick-add) just match on id as before.
   var size = product.size || '';
   var existing = cart.find(item => item.id === product.id && (item.size || '') === size);
-  if (existing) { existing.qty++; }
-  else { cart.push({ ...product, qty: 1 }); }
+  if (existing) { existing.qty++; syncQtyToShopify(existing); }
+  else { var newItem = { ...product, qty: 1 }; cart.push(newItem); syncAddToShopify(newItem); }
   updateCartCount();
   showToast(`${product.name} added to cart!`);
 }
@@ -1143,7 +1143,9 @@ function removeFromCart(idx) {
   // idx is the cart line index (cart is re-rendered fresh each time, so
   // indices always match what's on screen — this is variant-safe).
   if (idx < 0 || idx >= cart.length) return;
+  var removed = cart[idx];
   cart.splice(idx, 1);
+  syncRemoveFromShopify(removed);
   updateCartCount();
   renderCart();
 }
@@ -1202,6 +1204,7 @@ function updateCartQty(idx, delta) {
   var item = cart[idx];
   if (!item) return;
   item.qty = Math.max(1, item.qty + delta);
+  syncQtyToShopify(item);
   updateCartCount();
   renderCart();
 }
@@ -1221,10 +1224,214 @@ function resolveShopifyVariantId(item) {
   return null;
 }
 
-// Builds a real Shopify cart (Storefront API, via /api/cart) from whatever's
-// in the local cart right now, then redirects to Shopify's own hosted
-// checkout so the order lands in Shopify/DSers for fulfillment. Nothing else
-// about the cart page or local cart changes — this only fires on Checkout.
+// ==================== SHOPIFY CART PERSISTENCE ====================
+// Keeps a real Shopify cart (Storefront API, via /api/cart) in sync with the
+// local `cart` array in the background, and restores it on a later visit —
+// so a visitor's cart survives closing the tab/browser, tied to their
+// specific browser/device via a cart id saved in localStorage (this store
+// has no customer login/accounts, so per-device is the correct scope, not
+// per-person). The local `cart` array stays the one source of truth driving
+// the UI (pricing, variant availability, instant add/remove) — every
+// Shopify call here is fire-and-forget and never blocks a click; if a sync
+// call fails, checkout() below still reconciles/rebuilds before redirecting,
+// so a background hiccup can never send a customer to a wrong checkout.
+var SHOPIFY_CART_KEY = 'pawhaul_shopify_cart_id';
+
+function getStoredCartId() {
+  try { return localStorage.getItem(SHOPIFY_CART_KEY); } catch (e) { return null; }
+}
+function setStoredCartId(id) {
+  try {
+    if (id) localStorage.setItem(SHOPIFY_CART_KEY, id);
+    else localStorage.removeItem(SHOPIFY_CART_KEY);
+  } catch (e) { /* localStorage unavailable (private mode etc.) — cart just won't persist */ }
+}
+
+async function cartApi(payload) {
+  try {
+    var res = await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  } catch (e) {
+    return { ok: false, error: 'network' };
+  }
+}
+
+// Finds the Shopify CartLine id /api/cart returned for one merchandise
+// variant, so a later quantity change/removal can target that exact line
+// instead of re-adding or guessing.
+function findShopifyLineId(lines, variantId) {
+  if (!lines) return null;
+  for (var i = 0; i < lines.length; i++) {
+    if (lines[i].variantId === variantId) return lines[i].id;
+  }
+  return null;
+}
+
+// All syncXToShopify calls (below) go through this single-file promise
+// chain instead of running whenever their caller happens to fire. Without
+// it, two near-simultaneous adds with no cart yet (e.g. addBundleToCart's
+// forEach over 2+ products, or just clicking Add on two different products
+// quickly) would each read getStoredCartId() as empty before the other's
+// "create" had a chance to write it back — spawning TWO separate Shopify
+// carts and silently losing one of them (confirmed live: exactly this
+// happened before this queue was added). Serializing every mutation means
+// each one always sees the previous one's finished, saved cart id.
+var _cartSyncQueue = Promise.resolve();
+function queueCartSync(fn) {
+  var next = _cartSyncQueue.then(fn, fn);
+  _cartSyncQueue = next;
+  return next;
+}
+
+// Pushes one newly-added local cart line to Shopify: creates the persistent
+// cart on the very first item this browser ever adds, otherwise adds a line
+// to the existing one. Stamps item.cartLineId once known (an internal field,
+// like item.color — never shown in the cart UI) so future qty/remove calls
+// on this exact item know which Shopify line to target.
+function syncAddToShopify(item) {
+  return queueCartSync(async function () {
+    var variantId = resolveShopifyVariantId(item);
+    if (!variantId) return; // no Shopify mapping for this product — stays local-only, same as before this feature
+    var cartId = getStoredCartId();
+
+    if (cartId) {
+      var added = await cartApi({ action: 'addLines', cartId: cartId, lines: [{ variantId: variantId, quantity: item.qty }] });
+      if (added && added.ok) { item.cartLineId = findShopifyLineId(added.lines, variantId); return; }
+      // Stored id is stale/expired/deleted — drop it and fall through to
+      // creating a fresh cart rather than leaving this item un-synced forever.
+      setStoredCartId(null);
+    }
+
+    var created = await cartApi({ action: 'create', lines: [{ variantId: variantId, quantity: item.qty }] });
+    if (created && created.ok) {
+      setStoredCartId(created.cartId);
+      item.cartLineId = findShopifyLineId(created.lines, variantId);
+    }
+  });
+}
+
+function syncQtyToShopify(item) {
+  return queueCartSync(async function () {
+    var cartId = getStoredCartId();
+    if (!cartId || !item.cartLineId) return; // never successfully synced (e.g. offline when added) — nothing to update
+    await cartApi({ action: 'updateLines', cartId: cartId, lines: [{ id: item.cartLineId, quantity: item.qty }] });
+  });
+}
+
+function syncRemoveFromShopify(item) {
+  return queueCartSync(async function () {
+    var cartId = getStoredCartId();
+    if (!cartId || !item.cartLineId) return;
+    await cartApi({ action: 'removeLines', cartId: cartId, lineIds: [item.cartLineId] });
+  });
+}
+
+// Reverse of shopifyVariants (see the DATA section above): Shopify variant
+// GID -> { productId, size, color }, so a restored Shopify cart line can be
+// mapped back to a local product. Built once, lazily, since it never changes
+// after load (products/catalog are static for the page's lifetime).
+var _variantReverseMap = null;
+function variantReverseMap() {
+  if (_variantReverseMap) return _variantReverseMap;
+  var map = {};
+  products.forEach(function (p) {
+    var sv = p.shopifyVariants;
+    if (!sv) return;
+    if (sv.byVariant) {
+      Object.keys(sv.byVariant).forEach(function (key) {
+        var pipeIdx = key.indexOf('|');
+        map[sv.byVariant[key]] = { productId: p.id, size: key.slice(0, pipeIdx), color: key.slice(pipeIdx + 1) || undefined };
+      });
+    } else if (sv.byColor) {
+      Object.keys(sv.byColor).forEach(function (color) {
+        map[sv.byColor[color]] = { productId: p.id, size: '', color: color };
+      });
+    }
+  });
+  _variantReverseMap = map;
+  return map;
+}
+
+// Current price for a given size, same lookup every add-to-cart path already
+// uses (sizePrices[size] when the product has size-based pricing, else the
+// flat product price) — used when rebuilding a cart line from a restored
+// Shopify cart, where all we have is the variant, not a price.
+function priceForVariant(product, size) {
+  if (product.sizePrices && size && product.sizePrices[size]) {
+    return { price: product.sizePrices[size].price, was: product.sizePrices[size].was };
+  }
+  return { price: product.price, was: product.was };
+}
+
+// Runs once on page load (see the ROUTING bootstrap script in index.html,
+// right after dispatchRoute — needs the `products` array and `cart` to
+// already exist). Looks up any cart id saved from a previous visit and, if
+// it still resolves to a real Shopify cart, repopulates the local `cart`
+// array with its contents so a returning visitor sees what they left.
+function initCartFromStorage() {
+  // Queued through the same chain as every syncXToShopify call (see
+  // queueCartSync above) so a click that fires the instant the page becomes
+  // interactive can't read/clear the stored cart id concurrently with this.
+  return queueCartSync(async function () {
+    var cartId = getStoredCartId();
+    if (!cartId) return; // first-ever visit, or storage was cleared — normal empty cart
+
+    var result = await cartApi({ action: 'get', cartId: cartId });
+    if (!result || !result.ok) {
+      setStoredCartId(null); // expired/deleted cart — start clean rather than error out
+      return;
+    }
+    // If the visitor already added something locally before this fetch
+    // resolved (fast clicker on a slow connection), don't clobber it — rare
+    // edge case, and losing a restore in that exact race is far better than
+    // losing what they just did on purpose.
+    if (cart.length > 0) return;
+
+    var reverseMap = variantReverseMap();
+    (result.lines || []).forEach(function (line) {
+      var local = line.variantId && reverseMap[line.variantId];
+      if (!local) return; // variant no longer maps to a current product (renamed/discontinued since) — skip it, don't crash
+      var product = products.find(function (p) { return p.id === local.productId; });
+      if (!product) return;
+      var priced = priceForVariant(product, local.size);
+      var item = Object.assign({}, product, {
+        qty: line.quantity,
+        size: local.size || '',
+        price: priced.price,
+        cartLineId: line.id
+      });
+      if (local.color) item.color = local.color;
+      cart.push(item);
+    });
+
+    updateCartCount();
+    var cartPage = document.getElementById('page-cart');
+    if (cartPage && cartPage.classList.contains('active')) renderCart();
+  });
+}
+
+// True when a Shopify cart's lines exactly match the local cart's resolved
+// lines (same variants, same quantities) — used by checkout() to decide
+// whether the already-synced cart is safe to reuse as-is.
+function cartMatchesLines(shopifyLines, localLines) {
+  if (!shopifyLines || shopifyLines.length !== localLines.length) return false;
+  var counts = {};
+  shopifyLines.forEach(function (l) { counts[l.variantId] = (counts[l.variantId] || 0) + l.quantity; });
+  return localLines.every(function (l) { return counts[l.variantId] === l.quantity; });
+}
+
+// Redirects to Shopify's own hosted checkout so the order lands in Shopify/
+// DSers for fulfillment. Reuses the persistent cart kept in sync by the
+// SHOPIFY CART PERSISTENCE functions above whenever it still matches what's
+// on screen — avoids spawning a second, separate Shopify cart on every
+// checkout. Falls back to building a brand-new cart from the current local
+// lines if there's no synced cart yet, or if it's drifted out of sync for
+// any reason (a background sync call failing silently, etc.) — sync is
+// best-effort, but checkout must never be wrong about what a customer pays for.
 async function checkout() {
   if (!cart.length) return;
   var btn = document.querySelector('.checkout-btn');
@@ -1246,12 +1453,17 @@ async function checkout() {
   showToast('Redirecting to secure checkout...');
 
   try {
-    var res = await fetch('/api/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lines: lines })
-    });
-    var data = await res.json();
+    var cartId = getStoredCartId();
+    var data = null;
+    if (cartId) {
+      var existing = await cartApi({ action: 'get', cartId: cartId });
+      if (existing && existing.ok && cartMatchesLines(existing.lines, lines)) data = existing;
+    }
+    if (!data) {
+      data = await cartApi({ action: 'create', lines: lines });
+      if (data && data.ok) setStoredCartId(data.cartId);
+    }
+
     if (data && data.ok && data.checkoutUrl) {
       window.location.href = data.checkoutUrl;
       return;

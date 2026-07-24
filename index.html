@@ -969,8 +969,8 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="/products.js?v=28"></script>
-  <script src="/app.js?v=32"></script>
+  <script src="/products.js?v=29"></script>
+  <script src="/app.js?v=33"></script>
 
   <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/
        images, shop grid contents, cart/wishlist contents — all of which
@@ -982,6 +982,10 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
        (every fresh page load would grow history by one). -->
   <script>
   if (window.__initialRoute) { dispatchRoute(window.__initialRoute, { sync: true }); }
+  // Restores a returning visitor's Shopify-persisted cart (see the SHOPIFY
+  // CART PERSISTENCE section in products.js) — async, never blocks first
+  // paint or routing; just fills in cart contents/badge once it resolves.
+  initCartFromStorage();
   </script>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
