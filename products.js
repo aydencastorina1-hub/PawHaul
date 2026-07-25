@@ -499,7 +499,17 @@ function goTo(e, page, filter) {
 }
 
 // ==================== NAVIGATION ====================
+// One-time pre-paint route class (see the ROUTING <head> script in
+// index.html) that forces the direct-load page visible via an ID-selector
+// !important rule, before styles.css/JS are even ready. It must be stripped
+// the moment real navigation takes over — otherwise that !important rule
+// keeps pinning the ORIGINAL load page's display forever, even after this
+// function removes/adds .active on the correct elements, so every nav
+// button/link appears stuck showing whatever page a hard reload landed on.
+var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product'];
+
 function showPage(page, filter, opts) {
+  document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
   // Use instant so smooth-scroll CSS doesn't animate page transitions

@@ -407,8 +407,8 @@ function addBundleToCart() {
 
 // ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
-showPage = function(page, filter) {
-  _origShowPage(page, filter);
+showPage = function(page, filter, opts) {
+  _origShowPage(page, filter, opts);
   closeMobileMenu();
   closeSearch();
   // Leaving the product page: hide the sticky Add To Cart bar immediately
