@@ -826,7 +826,22 @@ function initDetailCarousel() {
 // The .reveal class is added by JS, so if anything fails no content is ever hidden.
 // A guaranteed fallback timer also un-hides everything, so content can NEVER get stuck invisible.
 document.addEventListener('DOMContentLoaded', function() {
-  var sel = '.collections-section, .bestsellers, .why-section, .mission-section, .reviews-section, .faq-section, .email-section';
+  // .bestsellers is deliberately excluded from this selector — unlike every
+  // other section here (all static HTML already in the document at parse
+  // time), its content (#homeProducts) is populated by renderHomeProducts()
+  // as part of the page's own render, which can finish well before this
+  // DOMContentLoaded handler runs (it waits for the ENTIRE document,
+  // including markup after this point, not just the content that already
+  // rendered). That gap meant the carousel was often already painted fully
+  // visible (opacity 1) by the time this code retroactively added the
+  // .reveal class — which sets opacity:0 WITH a transition — so the browser
+  // animated it from 1 down to 0 (a visible ~0.6s fade to invisible) and
+  // then back to 1 once the IntersectionObserver caught up: a real flash/
+  // disappear/reappear cycle on content the user had already seen. No other
+  // section here can hit this, since none of them render fresh JS content
+  // at boot the way the carousel does. Confirmed via real CDP screencast
+  // frames on a throttled connection (opacity traced 1 -> ~0 -> 1).
+  var sel = '.collections-section, .why-section, .mission-section, .reviews-section, .faq-section, .email-section';
   // Only reveal-gate sections that start fully below the fold. .collections-section
   // in particular is often already partly visible in the first viewport on load, and
   // IntersectionObserver's first callback isn't synchronous with paint — that race
