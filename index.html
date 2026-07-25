@@ -172,6 +172,31 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
     </button>
   </div>
 </nav>
+<!-- Paints a returning visitor's real cart count immediately instead of the
+     static "0" above. The actual cart contents are restored from Shopify
+     asynchronously (see initCartFromStorage() in products.js, called later
+     in this document) — that fetch takes a real network round trip, and
+     until it resolves the local `cart` array starts empty every load, so
+     without this the badge would visibly flash 0 -> N. This runs inline and
+     synchronously, right after #cartCount exists in the DOM, so it always
+     lands before the render-blocking styles.css load lets the page actually
+     paint (same "no-flash" approach used elsewhere on this page). Reads a
+     small cached count written every time updateCartCount() runs (see
+     products.js) — never the source of truth, just last session's number
+     shown early; initCartFromStorage() overwrites it with the real value
+     (including back down to 0) once the actual fetch resolves. -->
+<script>
+(function () {
+  try {
+    var cached = localStorage.getItem('pawhaul_cart_count_cache');
+    var n = cached ? parseInt(cached, 10) : 0;
+    if (n > 0) {
+      var el = document.getElementById('cartCount');
+      if (el) el.textContent = n;
+    }
+  } catch (e) {}
+})();
+</script>
 
 <!-- SEARCH OVERLAY — scrim dims the page; the panel drops in below the nav
      (full-screen on mobile). Everything is position:fixed so opening/closing
@@ -969,7 +994,7 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
   <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
        calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="/products.js?v=32"></script>
+  <script src="/products.js?v=33"></script>
   <script src="/app.js?v=34"></script>
 
   <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/

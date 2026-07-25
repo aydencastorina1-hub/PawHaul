@@ -1164,6 +1164,7 @@ function updateCartCount() {
   document.getElementById('cartCount').textContent = total;
   var mobileCount = document.getElementById('menuCartCount');
   if (mobileCount) mobileCount.textContent = total;
+  setCachedCartCount(total);
 }
 
 function removeFromCart(idx) {
@@ -1276,6 +1277,19 @@ function setStoredCartId(id) {
     if (id) localStorage.setItem(SHOPIFY_CART_KEY, id);
     else localStorage.removeItem(SHOPIFY_CART_KEY);
   } catch (e) { /* localStorage unavailable (private mode etc.) — cart just won't persist */ }
+}
+
+// A tiny cached copy of the cart item count, written every time
+// updateCartCount() runs (i.e. always in sync with the real `cart` array).
+// Exists purely so the very first paint of a fresh page load — before
+// initCartFromStorage()'s async Shopify fetch has had a chance to resolve —
+// can show a returning visitor's real count instantly instead of the static
+// "0" markup in index.html. Kept in lockstep with SHOPIFY_CART_KEY: cleared
+// wherever the stored cart id is confirmed gone, so a stale cached number
+// can never outlive the cart it described (see initCartFromStorage below).
+var CART_COUNT_CACHE_KEY = 'pawhaul_cart_count_cache';
+function setCachedCartCount(n) {
+  try { localStorage.setItem(CART_COUNT_CACHE_KEY, String(n)); } catch (e) {}
 }
 
 async function cartApi(payload) {
@@ -1409,11 +1423,17 @@ function initCartFromStorage() {
   // interactive can't read/clear the stored cart id concurrently with this.
   return queueCartSync(async function () {
     var cartId = getStoredCartId();
-    if (!cartId) return; // first-ever visit, or storage was cleared — normal empty cart
+    // No stored cart id at all -- either a first-ever visit or storage was
+    // cleared. updateCartCount() (not just setCachedCartCount) so that if the
+    // pre-hydration script in index.html painted a stale cached number with
+    // nothing real behind it, the visible badge actually gets corrected too,
+    // not just the cache for next time.
+    if (!cartId) { updateCartCount(); return; }
 
     var result = await cartApi({ action: 'get', cartId: cartId });
     if (!result || !result.ok) {
       setStoredCartId(null); // expired/deleted cart — start clean rather than error out
+      updateCartCount(); // cart is genuinely empty -- reflect that on screen too, not just the cache
       return;
     }
     // If the visitor already added something locally before this fetch
