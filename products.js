@@ -512,9 +512,21 @@ function showPage(page, filter, opts) {
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
-  // Use instant so smooth-scroll CSS doesn't animate page transitions
+  // Use instant so smooth-scroll CSS doesn't animate page transitions. The
+  // actual scrollTo(0,0) is deliberately NOT called synchronously here (it
+  // used to be) — on iOS Safari, changing scrollY synchronously inside the
+  // very same tap/click handler that triggered navigation (e.g. tapping a
+  // product card while the previous page was scrolled down) gets bundled
+  // into that touch's own gesture by the OS, and the very next distinct tap
+  // — typically Add To Cart on the page that just opened — gets silently
+  // swallowed as though it were settling the scroll, not a real click,
+  // until an unrelated tap/scroll elsewhere gives the browser a clean
+  // gesture to process. requestAnimationFrame runs before the next paint
+  // (so there's still no visible flash of the old scroll position — the
+  // reset lands before anything is ever drawn at the wrong offset) but
+  // outside the click handler's own call stack, which is enough to stop
+  // iOS from treating the two taps as one gesture.
   document.documentElement.style.scrollBehavior = 'auto';
-  window.scrollTo(0, 0);
 
   if (page === 'home') renderHomeProducts();
   if (page === 'shop') {
@@ -536,7 +548,9 @@ function showPage(page, filter, opts) {
   // since it needs the product's slug, not just the page name.
   navigateUrl(pageToPath(page, filter), opts);
 
-  // Snap to top after render, then restore smooth scrolling for user swipes
+  // The actual scroll-to-top + restoring smooth scrolling for user swipes —
+  // see the comment above for why this waits for the next frame instead of
+  // running inline in showPage()'s own (possibly tap-triggered) call stack.
   requestAnimationFrame(function() {
     window.scrollTo(0, 0);
     document.documentElement.style.scrollBehavior = '';
