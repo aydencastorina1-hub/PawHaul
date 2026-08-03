@@ -953,6 +953,17 @@ nav {
 .offer-input::placeholder { color: rgba(255,255,255,0.35); }
 .offer-input:focus { border-color: var(--orange); background: rgba(255,255,255,0.1); }
 
+/* Inline format error under the email field. Sits between the input and the
+   submit button; [hidden] keeps it out of the layout entirely when clean, so
+   the popup doesn't reserve a gap for an error that usually never shows. */
+.offer-error {
+  color: #FF8A80; font-size: 13px; font-weight: 700; line-height: 1.45;
+  margin: -4px 0 12px; display: block;
+}
+.offer-error[hidden] { display: none; }
+.offer-input[aria-invalid="true"] { border-color: #FF8A80; }
+.offer-input[aria-invalid="true"]:focus { border-color: #FF8A80; }
+
 .offer-btn {
   width: 100%; padding: 16px; background: var(--orange); color: #fff;
   border: none; border-radius: 12px; font-size: 16px; font-weight: 800;

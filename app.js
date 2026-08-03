@@ -905,18 +905,88 @@ function dismissOffer() {
   syncOverlayChrome();
 }
 
+// FORMAT validation only — this deliberately does NOT check deliverability or
+// that the inbox exists (that needs a third-party verification service). The
+// goal is to stop malformed and obviously-fake addresses before they ever
+// reach Shopify's customerCreate mutation, so the customer list stays clean
+// and a typo gets corrected while the popup is still open.
+//
+// type="email" alone isn't enough: browsers accept "test@test" (no TLD),
+// which is exactly the junk we want rejected — hence the form is novalidate
+// and this runs instead.
+function isValidEmailFormat(email) {
+  var e = String(email == null ? '' : email).trim();
+  if (!e || e.length > 254 || /\s/.test(e)) return false;
+
+  var parts = e.split('@');
+  if (parts.length !== 2) return false;          // zero or multiple @
+  var local = parts[0];
+  var domain = parts[1];
+
+  // Local part: RFC-legal dot-atom characters, no leading/trailing/double dot.
+  if (!local || local.length > 64) return false;
+  if (!/^[A-Za-z0-9!#$%&'*+/=?^_`{|}~.-]+$/.test(local)) return false;
+  if (/^\.|\.$|\.\./.test(local)) return false;
+
+  // Domain: at least two labels, so a bare "test@test" (no TLD) is rejected.
+  if (!domain || domain.length > 253) return false;
+  var labels = domain.split('.');
+  if (labels.length < 2) return false;
+  for (var i = 0; i < labels.length; i++) {
+    var l = labels[i];
+    if (!l || l.length > 63) return false;
+    if (!/^[A-Za-z0-9-]+$/.test(l)) return false;
+    if (l.charAt(0) === '-' || l.charAt(l.length - 1) === '-') return false;
+  }
+
+  // TLD must be alphabetic and at least 2 chars — kills "user@host.1" and
+  // trailing-dot forms.
+  var tld = labels[labels.length - 1].toLowerCase();
+  if (!/^[a-z]{2,}$/.test(tld)) return false;
+
+  // Names reserved by RFC 2606 / RFC 6761 specifically so they can never
+  // resolve or receive mail — i.e. guaranteed-fake, not merely unusual.
+  if (['test', 'invalid', 'localhost', 'example', 'local'].indexOf(tld) > -1) return false;
+  var d = domain.toLowerCase();
+  if (d === 'example.com' || d === 'example.net' || d === 'example.org') return false;
+
+  return true;
+}
+
+function showOfferError(message) {
+  var err = document.getElementById('offerError');
+  var input = document.getElementById('offerEmail');
+  if (err) { err.textContent = message; err.hidden = false; }
+  if (input) { input.setAttribute('aria-invalid', 'true'); input.focus(); }
+}
+
+function clearOfferError() {
+  var err = document.getElementById('offerError');
+  var input = document.getElementById('offerEmail');
+  if (err) { err.hidden = true; err.textContent = ''; }
+  if (input) input.removeAttribute('aria-invalid');
+}
+
 // Saves the email as a real Shopify customer (Storefront API customerCreate,
 // acceptsMarketing:true — see api/customer.js) and reveals the code in the
-// popup itself instead of emailing it. A duplicate email is treated as a
-// success from the customer's point of view — they still get the code.
+// popup itself instead of emailing it. An email that already exists (claimed
+// on another device) does NOT get the code revealed a second time.
 async function handleOfferSubmit(e) {
   e.preventDefault();
   var input = document.getElementById('offerEmail');
   var email = input ? input.value.trim() : '';
-  if (!email || email.indexOf('@') === -1) {
-    showToast('Please enter a valid email!');
+
+  // Bail before the network call — invalid input never reaches Shopify.
+  if (!email) {
+    showOfferError('Please enter your email address.');
     return;
   }
+  if (!isValidEmailFormat(email)) {
+    showOfferError("That doesn't look like a valid email address — please check and try again.");
+    return;
+  }
+  clearOfferError();
+
   var btn = document.getElementById('offerBtn');
   if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
 
@@ -928,34 +998,54 @@ async function handleOfferSubmit(e) {
     });
     var data = await res.json();
     if (data && data.ok) {
-      showOfferSuccess(!!data.alreadyExists);
+      showOfferResult(!!data.alreadyExists);
       return;
     }
     if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
-    showToast((data && data.error) || 'Something went wrong — please try again.', 5000);
+    showOfferError((data && data.error) || 'Something went wrong — please try again.');
   } catch (err) {
     if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
-    showToast('Something went wrong — please try again.', 5000);
+    showOfferError('Something went wrong — please try again.');
   }
 }
 
-// Swaps the form for the code-reveal panel (see index.html #offerSuccess) —
-// the popup stays open so the customer can actually read/copy the code.
-function showOfferSuccess(alreadyExists) {
+// Swaps the form for the result panel (see index.html #offerSuccess) — the
+// popup stays open so the customer can actually read/copy the code.
+//
+// alreadyExists === true means this address is already a Shopify customer,
+// i.e. the code was claimed earlier (typically on another device or browser).
+// That customer is told plainly and the code row is hidden — revealing
+// WELCOME10 again would make the "one per customer" offer meaningless, since
+// anyone could re-harvest it from any fresh browser profile.
+function showOfferResult(alreadyExists) {
   var form = document.querySelector('#offerPopup .offer-form');
   var dismissLink = document.querySelector('#offerPopup .offer-dismiss');
   var success = document.getElementById('offerSuccess');
   var msg = document.getElementById('offerSuccessMsg');
   var code = document.getElementById('offerCode');
+  var codeRow = document.getElementById('offerCodeRow');
+
   if (form) form.style.display = 'none';
   if (dismissLink) dismissLink.style.display = 'none';
   if (code) code.textContent = DISCOUNT_CODE;
+  if (codeRow) codeRow.style.display = alreadyExists ? 'none' : '';
   if (msg) {
     msg.textContent = alreadyExists
-      ? "You're already on the list! Use this code at checkout."
+      ? 'This email was already used.'
       : "You're in! Use this code at checkout.";
   }
   if (success) success.style.display = 'block';
+
+  // Permanently retire the popup on this device. It's already flagged at
+  // reveal time, but re-committing it here means a successful submission is
+  // recorded even if the reveal-time write was lost (a storage quota error,
+  // a since-cleared flag, an unusual privacy setting). Both outcomes flag it:
+  // the "already used" customer has had their answer and shouldn't be asked
+  // again either. No expiry is written anywhere — the flag is permanent.
+  try { localStorage.setItem('pawhaul_offer_seen', '1'); } catch (e) {}
+  if (!alreadyExists) {
+    try { localStorage.setItem('pawhaul_offer_claimed', '1'); } catch (e) {}
+  }
 }
 
 function copyOfferCode() {
@@ -980,11 +1070,21 @@ function copyOfferCode() {
 // so a visitor who ignores or closes it is never nagged again either.
 (function () {
   var SEEN_KEY = 'pawhaul_offer_seen';
-  // Escape hatch for testing on a browser that's already been flagged: load
-  // any page with ?offer=reset to clear the flag and get the popup back.
+  var CLAIMED_KEY = 'pawhaul_offer_claimed';
+
+  // A device that actually submitted an email and got the code is done for
+  // good — no reset, no expiry, no second look. Checked before anything else
+  // so nothing below can resurrect the popup for it.
+  try { if (localStorage.getItem(CLAIMED_KEY)) return; } catch (e) {}
+
+  // Escape hatch for testing on a browser that was flagged merely by having
+  // SEEN the popup: ?offer=reset on any URL brings it back. Deliberately
+  // powerless against CLAIMED_KEY above, so it can't be used to re-harvest
+  // the code — clear site data / use a private window for that.
   try {
     if (/[?&]offer=reset\b/.test(location.search)) localStorage.removeItem(SEEN_KEY);
   } catch (e) {}
+
   var alreadySeen = false;
   try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
   if (alreadySeen) return;

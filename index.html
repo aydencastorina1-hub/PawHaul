@@ -152,7 +152,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=54" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=55" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -161,7 +161,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/products.js?v=34">
-  <link rel="preload" as="script" href="/app.js?v=36">
+  <link rel="preload" as="script" href="/app.js?v=37">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -1174,7 +1174,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
 
 
   <script src="/products.js?v=34"></script>
-  <script src="/app.js?v=36"></script>
+  <script src="/app.js?v=37"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
@@ -1212,14 +1212,22 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="offer-kicker"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.2em;height:1.2em;vertical-align:-0.25em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Welcome To The Pack</div>
       <h2 class="offer-headline">Get <span>10% Off</span> Your First Order</h2>
       <p class="offer-sub">Gear built for every walk. Drop your email and get your code instantly.</p>
-      <form class="offer-form" onsubmit="handleOfferSubmit(event)">
-        <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required autocomplete="email">
+      <!-- novalidate: the browser's own bubble for type="email" is inconsistent
+           across engines and accepts things we reject (e.g. "test@test"), so
+           validation is done in isValidEmailFormat() and reported in the
+           #offerError line below instead. -->
+      <form class="offer-form" onsubmit="handleOfferSubmit(event)" novalidate>
+        <input type="email" id="offerEmail" class="offer-input" placeholder="your@email.com" required autocomplete="email"
+               aria-describedby="offerError" oninput="clearOfferError()">
+        <p class="offer-error" id="offerError" role="alert" hidden></p>
         <button type="submit" class="offer-btn" id="offerBtn">Claim My 10% Off →</button>
       </form>
       <button type="button" class="offer-dismiss" onclick="dismissOffer()">No thanks, maybe later</button>
       <div class="offer-success" id="offerSuccess" style="display:none;">
         <p class="offer-success-msg" id="offerSuccessMsg"></p>
-        <div class="offer-code-row">
+        <!-- Hidden when the email was already claimed on another device — that
+             customer has had the code once and doesn't get it revealed again. -->
+        <div class="offer-code-row" id="offerCodeRow">
           <span class="offer-code" id="offerCode">WELCOME10</span>
           <button type="button" class="offer-copy-btn" id="offerCopyBtn" onclick="copyOfferCode()">Copy Code</button>
         </div>
