@@ -1042,6 +1042,10 @@ function showOfferResult(alreadyExists) {
   // a since-cleared flag, an unusual privacy setting). Both outcomes flag it:
   // the "already used" customer has had their answer and shouldn't be asked
   // again either. No expiry is written anywhere — the flag is permanent.
+  //
+  // Skipped entirely under ?offer=always so reviewing the popup — including
+  // running a submission through it — never retires the reviewer's browser.
+  if (OFFER_PREVIEW) return;
   try { localStorage.setItem('pawhaul_offer_seen', '1'); } catch (e) {}
   if (!alreadyExists) {
     try { localStorage.setItem('pawhaul_offer_claimed', '1'); } catch (e) {}
@@ -1064,6 +1068,19 @@ function copyOfferCode() {
   }
 }
 
+// PREVIEW MODE — ?offer=always on any URL shows the popup on EVERY load and
+// writes no localStorage at all, so the site owner can review it repeatedly
+// without burning their own once-per-device allowance. Latched once here at
+// script load rather than read live, because client-side navigation rewrites
+// the URL through pageToPath() and drops the query string; latching keeps
+// preview active for the whole page load, across in-site navigation.
+//
+// It is a review tool, not a way around the offer rules: it never clears or
+// sets a flag, so a device that has genuinely claimed the code still has
+// pawhaul_offer_claimed afterwards and goes straight back to never showing it
+// the moment the query string is gone.
+var OFFER_PREVIEW = /[?&]offer=always\b/.test(location.search);
+
 // Shows once per visitor: after 5s, or sooner on exit intent (mouse leaving
 // via the top of the viewport, the classic "heading for the tab bar" tell).
 // The localStorage flag is set the moment it's shown (not on submit/dismiss)
@@ -1072,22 +1089,24 @@ function copyOfferCode() {
   var SEEN_KEY = 'pawhaul_offer_seen';
   var CLAIMED_KEY = 'pawhaul_offer_claimed';
 
-  // A device that actually submitted an email and got the code is done for
-  // good — no reset, no expiry, no second look. Checked before anything else
-  // so nothing below can resurrect the popup for it.
-  try { if (localStorage.getItem(CLAIMED_KEY)) return; } catch (e) {}
+  if (!OFFER_PREVIEW) {
+    // A device that actually submitted an email and got the code is done for
+    // good — no reset, no expiry, no second look. Checked before anything
+    // else so nothing below can resurrect the popup for it.
+    try { if (localStorage.getItem(CLAIMED_KEY)) return; } catch (e) {}
 
-  // Escape hatch for testing on a browser that was flagged merely by having
-  // SEEN the popup: ?offer=reset on any URL brings it back. Deliberately
-  // powerless against CLAIMED_KEY above, so it can't be used to re-harvest
-  // the code — clear site data / use a private window for that.
-  try {
-    if (/[?&]offer=reset\b/.test(location.search)) localStorage.removeItem(SEEN_KEY);
-  } catch (e) {}
+    // Escape hatch for testing on a browser that was flagged merely by having
+    // SEEN the popup: ?offer=reset on any URL brings it back. Deliberately
+    // powerless against CLAIMED_KEY above, so it can't be used to re-harvest
+    // the code — clear site data / use a private window for that.
+    try {
+      if (/[?&]offer=reset\b/.test(location.search)) localStorage.removeItem(SEEN_KEY);
+    } catch (e) {}
 
-  var alreadySeen = false;
-  try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
-  if (alreadySeen) return;
+    var alreadySeen = false;
+    try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
+    if (alreadySeen) return;
+  }
 
   var shown = false;
   function reveal() {
@@ -1104,7 +1123,7 @@ function copyOfferCode() {
     if (!overlay || !popup) return;
 
     shown = true;
-    try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
+    if (!OFFER_PREVIEW) { try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {} }
     document.removeEventListener('mouseleave', exitIntent);
 
     // Close controls are bound HERE, not at script-execution time. The popup
