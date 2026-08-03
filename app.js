@@ -980,6 +980,11 @@ function copyOfferCode() {
 // so a visitor who ignores or closes it is never nagged again either.
 (function () {
   var SEEN_KEY = 'pawhaul_offer_seen';
+  // Escape hatch for testing on a browser that's already been flagged: load
+  // any page with ?offer=reset to clear the flag and get the popup back.
+  try {
+    if (/[?&]offer=reset\b/.test(location.search)) localStorage.removeItem(SEEN_KEY);
+  } catch (e) {}
   var alreadySeen = false;
   try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
   if (alreadySeen) return;
@@ -987,13 +992,30 @@ function copyOfferCode() {
   var shown = false;
   function reveal() {
     if (shown) return;
+
+    // This runs from a 5s timer / an exit-intent event, so the popup markup
+    // (which sits BELOW app.js's own <script> tag in index.html) is always
+    // parsed by now — but resolve it before committing to anything, and bail
+    // without burning the "seen" flag if it somehow isn't there. Setting the
+    // flag first would permanently mark a visitor who was never actually
+    // shown the offer.
+    var overlay = document.getElementById('offerOverlay');
+    var popup = document.getElementById('offerPopup');
+    if (!overlay || !popup) return;
+
     shown = true;
     try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {}
     document.removeEventListener('mouseleave', exitIntent);
 
-    var overlay = document.getElementById('offerOverlay');
-    var popup = document.getElementById('offerPopup');
-    if (!overlay || !popup) return;
+    // Close controls are bound HERE, not at script-execution time. The popup
+    // markup comes after this file's <script> tag, so an early
+    // getElementById returned null and the X button and backdrop silently
+    // never got a listener — the popup opened with no way to close it except
+    // Escape or the two inline-onclick buttons.
+    overlay.addEventListener('click', dismissOffer);
+    var closeBtn = document.getElementById('offerClose');
+    if (closeBtn) closeBtn.addEventListener('click', dismissOffer);
+
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         overlay.classList.add('active');
@@ -1008,11 +1030,6 @@ function copyOfferCode() {
 
   document.addEventListener('mouseleave', exitIntent);
   setTimeout(reveal, 5000);
-
-  var closeBtn = document.getElementById('offerClose');
-  var overlayEl = document.getElementById('offerOverlay');
-  if (closeBtn) closeBtn.addEventListener('click', dismissOffer);
-  if (overlayEl) overlayEl.addEventListener('click', dismissOffer);
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).
