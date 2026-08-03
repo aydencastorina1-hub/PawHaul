@@ -67,6 +67,13 @@ window.parseRoute = parseRoute;
   if (route.type === 'product') routeClass = 'route-product';
   else if (route.type === 'page' && route.page !== 'home') routeClass = 'route-' + route.page;
   document.documentElement.classList.add(routeClass);
+  // A category deep-link (/shop/leash) shows FEWER products than /shop, so the
+  // loading skeletons for the other categories must be hidden before first
+  // paint — otherwise the placeholder reserves more height than the filtered
+  // grid ends up needing and the page settles upward when it renders.
+  if (route.type === 'page' && route.page === 'shop' && route.filter) {
+    document.documentElement.classList.add('route-shop-' + route.filter);
+  }
   window.__isHomeInitial = (routeClass === 'route-home');
 })();
 </script>
@@ -78,7 +85,17 @@ html.route-shop #page-home, html.route-contact #page-home, html.route-about #pag
 html.route-wishlist #page-home, html.route-cart #page-home, html.route-product #page-home { display: none !important; }
 html.route-shop #page-shop, html.route-contact #page-contact, html.route-about #page-about,
 html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-product #page-product { display: block !important; }
+/* Category deep-links: keep only that category's loading skeletons, so the
+   reserved height matches the filtered grid exactly (see the .skel-card block
+   in styles.css). Inline + in-head for the same reason as the rule above —
+   it has to win before the first paint. */
+html.route-shop-water  #shopProducts .skel-card:not([data-cat="water"]),
+html.route-shop-leash  #shopProducts .skel-card:not([data-cat="leash"]),
+html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { display: none !important; }
 </style>
+<!-- Nothing ever replaces the skeletons without JS, so don't leave a permanently
+     "loading" grid sitting there for a no-JS visitor or a crawler. -->
+<noscript><style>.skel-card { display: none !important; }</style></noscript>
 <!-- The hero slideshow starts on a random slide (app.js), so the LCP image
      isn't known until we've picked one — decide it here (as early as possible)
      and preload THAT exact image at highest priority, instead of always
@@ -135,7 +152,16 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=53" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=54" onload="document.documentElement.classList.remove('no-flash')">
+  <!-- These two live at the very bottom of <body> (they need the DOM), but the
+       page can't finish rendering until they've run, so start fetching them
+       NOW — in parallel with the stylesheet — instead of when the parser
+       eventually reaches them. Shortens the window in which the loading
+       skeletons are on screen. URLs must match the <script> tags below
+       character-for-character (version query included) or the browser fetches
+       each file twice. -->
+  <link rel="preload" as="script" href="/products.js?v=34">
+  <link rel="preload" as="script" href="/app.js?v=35">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
 </head>
 <body>
@@ -385,7 +411,74 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
     </div>
     <div class="home-carousel-wrap" id="prodCarouselWrap">
       <button class="carousel-btn carousel-prev disabled" id="prodCarouselPrev" aria-label="Previous">&#8249;</button>
-      <div class="products-grid" id="homeProducts"></div>
+      <!-- LOADING SKELETON — these placeholder cards are static HTML so the Best Sellers carousel
+           has its FINAL height from the very first paint, before products.js has
+           even downloaded. Without them the empty grid was 0px tall and everything
+           below it (the footer / next section) rendered high up and then jumped
+           down the moment the real cards appeared — a visible layout shift on
+           every reload. They are wiped by the first innerHTML render.
+           Each skeleton mirrors ONE real product (same classes, same number of
+           colour swatches + size pills) so it reserves EXACTLY the height that
+           product's card will occupy — swatch rows wrap and size pills stack in
+           2 columns, so the counts really do change card height. If you add,
+           remove or re-colour a product, update these too (order: 2, 3, 8, 1, 6). -->
+      <div class="products-grid" id="homeProducts">
+        <!-- Retractable Dog Leash (5 colours, 2 sizes) -->
+        <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+        <!-- Collapsible Dog Bowl (6 colours) -->
+        <div class="product-card skel-card" data-cat="water" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+        <!-- Poop Bag Holder (3 colours) -->
+        <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+        <!-- 2-in-1 Dog Water Bottle (3 colours, 2 sizes) -->
+        <div class="product-card skel-card" data-cat="water" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+        <!-- Light Up Dog Collar (5 colours, 4 sizes) -->
+        <div class="product-card skel-card" data-cat="safety" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+      </div>
       <button class="carousel-btn carousel-next" id="prodCarouselNext" aria-label="Next">&#8250;</button>
     </div>
   </section>
@@ -583,7 +676,96 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
       <button class="filter-btn" onclick="filterProducts('leash', this)">Leashes</button>
       <button class="filter-btn" onclick="filterProducts('safety', this)">Safety Gear</button>
     </div>
-    <div class="shop-grid" id="shopProducts"></div>
+    <!-- LOADING SKELETON — these placeholder cards are static HTML so the shop grid
+         has its FINAL height from the very first paint, before products.js has
+         even downloaded. Without them the empty grid was 0px tall and everything
+         below it (the footer / next section) rendered high up and then jumped
+         down the moment the real cards appeared — a visible layout shift on
+         every reload. They are wiped by the first innerHTML render.
+         Each skeleton mirrors ONE real product (same classes, same number of
+         colour swatches + size pills) so it reserves EXACTLY the height that
+         product's card will occupy — swatch rows wrap and size pills stack in
+         2 columns, so the counts really do change card height. If you add,
+         remove or re-colour a product, update these too (order: 1, 2, 3, 4, 5, 6, 8). -->
+    <div class="shop-grid" id="shopProducts">
+      <!-- 2-in-1 Dog Water Bottle (3 colours, 2 sizes) -->
+      <div class="product-card skel-card" data-cat="water" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Retractable Dog Leash (5 colours, 2 sizes) -->
+      <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Collapsible Dog Bowl (6 colours) -->
+      <div class="product-card skel-card" data-cat="water" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Dog AirTag Holder (6 colours) -->
+      <div class="product-card skel-card" data-cat="safety" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Poop Bag Clip (7 colours) -->
+      <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Light Up Dog Collar (5 colours, 4 sizes) -->
+      <div class="product-card skel-card" data-cat="safety" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div><div class="mini-sizes"><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span><span class="mini-size">&nbsp;</span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+      <!-- Poop Bag Holder (3 colours) -->
+      <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <div class="card-opts"><div class="mini-swatches"><span class="mini-swatch"></span><span class="mini-swatch"></span><span class="mini-swatch"></span></div></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
+    </div>
   </div>
   <footer>
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
@@ -991,11 +1173,16 @@ html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-produ
 
 
 
-  <!-- Loaded here (not in <head>) so it never blocks styles.css/fonts; products.js
-       calls emailjs.init() at the top level, so this must stay synchronous and precede it. -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="/products.js?v=33"></script>
+  <script src="/products.js?v=34"></script>
   <script src="/app.js?v=35"></script>
+  <!-- EmailJS is only needed once someone actually submits the contact form or
+       the 10%-off box, so it's deferred and loaded LAST. It used to sit above
+       products.js and run synchronously (products.js called emailjs.init() at
+       its top level) — which meant a render-blocking third-party CDN request
+       stood between first paint and the product grids being rendered: the
+       longer jsdelivr took, the longer the page sat there un-rendered.
+       products.js now calls ensureEmailjs() on demand instead. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
   <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/
        images, shop grid contents, cart/wishlist contents — all of which

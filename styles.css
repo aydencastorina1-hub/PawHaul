@@ -23,6 +23,11 @@
      (which on mobile can be the deep-navy body — read as a "black flash"). */
   --img-placeholder: #f0ede6;
 
+  /* Fill for the product-card loading skeletons (see the very bottom of this
+     file) — one notch darker than --line-soft so the placeholder bars read as
+     content-shaped, not as empty card. */
+  --skel: #ECE6DC;
+
   --radius: 20px;
   --radius-sm: 12px;
 
@@ -3522,3 +3527,76 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    same pattern as the nav search bar and contact form inputs. */
 .chat-input { border: 2px solid rgba(26,26,46,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
 .chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(232,99,10,0.14); }
+
+/* ==================== PRODUCT-GRID LOADING SKELETON ====================
+   The shop grid and the Best Sellers carousel are rendered by products.js,
+   which can only run once it has downloaded — until then those containers
+   used to be EMPTY and therefore 0px tall, so the footer/next section sat
+   high up on the page and then jumped down as the real cards appeared.
+   index.html now ships one static `.skel-card` per real product inside both
+   containers. Each one reuses the real card's classes (and the real number
+   of swatches / size pills), so it occupies exactly the height the real card
+   will — nothing below the grid ever moves. The first innerHTML render
+   replaces them, so none of this survives past load.
+   These rules only change how the reserved boxes LOOK; they must never
+   change a size, a margin or a border WIDTH, or the reservation stops
+   matching the real thing. Colour-only, by design. */
+.skel-card { pointer-events: none; cursor: default; }
+
+/* The pulse is on the grey FILLS, never on the card itself: Best Sellers sits
+   on the navy band, and fading a whole white card there just turns it grey. */
+.skel-card .product-img,
+.skel-card .btn-black,
+.skel-card .mini-swatch,
+.skel-card .mini-size,
+.skel-card .product-name::after,
+.skel-card .product-stars::after,
+.skel-card .product-price::after { animation: skelPulse 1.5s ease-in-out infinite; }
+@keyframes skelPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) {
+  .skel-card .product-img,
+  .skel-card .btn-black,
+  .skel-card .mini-swatch,
+  .skel-card .mini-size,
+  .skel-card .product-name::after,
+  .skel-card .product-stars::after,
+  .skel-card .product-price::after { animation: none; }
+}
+
+.skel-card .product-img { background: var(--skel); }
+/* Text is kept in the DOM (a non-breaking space, a star, a price span) so the
+   line boxes are the same height as the real card's — it's just invisible. */
+.skel-card .product-name,
+.skel-card .product-stars,
+/* the review count carries its own colour, so it needs naming explicitly */
+.skel-card .product-stars span,
+.skel-card .product-price,
+.skel-card .btn-black { color: transparent; }
+.skel-card .product-stars svg { fill: transparent; }
+.skel-card .btn-black { background: var(--skel); }
+.skel-card .mini-swatch,
+.skel-card .mini-size { background: var(--skel); border-color: transparent; }
+/* A pill holding one blank space would be as round as a colour swatch and read
+   as one. Widening it is purely cosmetic — .mini-sizes is a fixed 2-column
+   grid, so pill width can't change how many rows it takes (i.e. the height). */
+.skel-card .mini-size { min-width: 46px; }
+
+/* The grey bars. Drawn as absolutely-positioned pseudo-elements (zero effect
+   on layout) rather than backgrounds, so they can be rounded and inset. */
+.skel-card .product-name,
+.skel-card .product-stars,
+.skel-card .product-price { position: relative; }
+.skel-card .product-name::after,
+.skel-card .product-stars::after,
+.skel-card .product-price::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 5px;
+  background: var(--skel);
+}
+.skel-card .product-name::after  { width: 82%; height: 11px; }
+.skel-card .product-stars::after { width: 54%; height: 8px; }
+.skel-card .product-price::after { width: 44%; height: 15px; }

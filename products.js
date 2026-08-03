@@ -409,9 +409,25 @@ var EMAILJS_CONTACT_TEMPLATE = 'template_t5ark9a';
 var EMAILJS_WELCOME_TEMPLATE = ''; // e.g. 'template_yyyyyy'  (10% off -> customer)
 var DISCOUNT_CODE = 'WELCOME10';   // Your 10% off code (change this anytime) — also shown by the offer popup
 
-if (EMAILJS_PUBLIC_KEY) {
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+// EmailJS is initialised LAZILY — the first time a form actually sends. It used
+// to run here, at the top level, which forced its <script> tag to load (render-
+// blocking, from a third-party CDN) BEFORE this file could execute. The browser
+// paints while that CDN request is in flight, so every visitor saw the product
+// grids in their un-rendered state for as long as jsdelivr took to answer.
+// Nothing on first paint needs EmailJS, so it's deferred and initialised here
+// on demand instead. Returns false when it isn't configured/available.
+var __emailjsReady = false;
+function ensureEmailjs() {
+  if (!EMAILJS_PUBLIC_KEY || typeof emailjs === 'undefined') return false;
+  if (!__emailjsReady) {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    __emailjsReady = true;
+  }
+  return true;
 }
+// True in the (very short) window where EmailJS IS configured but its deferred
+// script hasn't arrived yet — so a send can never silently report success.
+function emailjsPending() { return !!EMAILJS_PUBLIC_KEY && typeof emailjs === 'undefined'; }
 
 // ==================== CART STATE ====================
 var cart = [];
@@ -558,6 +574,11 @@ function showPage(page, filter, opts) {
 }
 
 // ==================== RENDER PRODUCTS ====================
+// NOTE: both grids ship static loading-skeleton cards in index.html that
+// reserve the exact height these renders will produce (see the LOADING
+// SKELETON comments there). If you change the featured list below, the
+// product catalogue, a product's colours or its sizes, update the skeletons
+// to match — otherwise the page starts jumping on load again.
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
   // Home carousel = these 5 specific products (best sellers), in this exact
@@ -1583,7 +1604,7 @@ function submitEmail() {
     showToast('Please enter a valid email!');
     return;
   }
-  if (!EMAILJS_PUBLIC_KEY) {
+  if (!ensureEmailjs()) {
     showToast('Your code: ' + DISCOUNT_CODE + ' — 10% off your order!');
     input.value = '';
     return;
@@ -1619,7 +1640,11 @@ function submitContact() {
   var message    = document.querySelector('#page-contact .form-textarea');
   message = message ? message.value.trim() : '';
 
-  if (!EMAILJS_PUBLIC_KEY) {
+  if (!ensureEmailjs()) {
+    if (emailjsPending()) {
+      showToast('Just a moment — still loading. Tap Send Message again.');
+      return;
+    }
     showToast('Message sent! We\'ll reply within 24 hours.');
     inputs.forEach(function(el) { el.value = ''; });
     return;
