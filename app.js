@@ -429,9 +429,6 @@ showPage = function(page, filter, opts) {
   _origShowPage(page, filter, opts);
   closeMobileMenu();
   closeSearch();
-  // Each page view gets its own shot at the offer, so closing it here doesn't
-  // suppress it on the next page. No-op once the offer has been claimed.
-  if (typeof window.armOfferPopup === 'function') window.armOfferPopup();
   // Leaving the product page: hide the sticky Add To Cart bar immediately
   // rather than waiting on the next IntersectionObserver callback.
   if (page !== 'product') {
@@ -1200,26 +1197,34 @@ function markOfferClaimed() {
   if (typeof window.disarmOfferPopup === 'function') window.disarmOfferPopup();
 }
 
-// Shows on EVERY page view until the visitor actually submits an email: 5s
-// after the view starts, or sooner on exit intent (mouse leaving via the top
-// of the viewport, the classic "heading for the tab bar" tell).
+// Shows ONCE PER VISIT until the visitor actually submits an email: 5s after
+// the site loads, or sooner on exit intent (mouse leaving via the top of the
+// viewport, the classic "heading for the tab bar" tell).
 //
-// Appearing, timing out and being closed are all deliberately consequence-free
-// — dismissing only ends the current view's appearance. The single thing that
-// retires it is a real submission (see markOfferClaimed above), through either
-// this popup or the home page's 10% off box.
+// Two independent layers of suppression, and they are not interchangeable:
 //
-// "Page view" means an SPA navigation too, not just a document load: showPage
-// re-arms (see the navigation hooks), since the whole point is that closing it
-// on one page doesn't suppress it on the next.
+//  1. THIS VISIT — the in-memory `shownThisVisit` below. Once the popup has
+//     appeared, it will not appear again no matter how many pages the visitor
+//     navigates to, because SPA navigation doesn't re-arm anything and the
+//     variable outlives it. It is deliberately NOT in localStorage or
+//     sessionStorage: a plain closure variable dies with the page load, which
+//     is exactly the "until the tab is closed or hard-reloaded" boundary. A
+//     reload is a new visit and gets a fresh appearance.
+//
+//  2. FOREVER — the localStorage claim flag (markOfferClaimed above), set only
+//     by a real submission through this popup or the home page's 10% off box.
+//     It outranks everything: a device that has claimed never sees the popup
+//     again, reload or not.
+//
+// Appearing, timing out and being closed still write nothing permanent.
 (function () {
   var TRIGGER_MS = 5000;
   var timer = null;
-  var shownThisView = false;
+  var shownThisVisit = false;
   var listening = false;
 
   function reveal() {
-    if (shownThisView || offerAlreadyClaimed()) return;
+    if (shownThisVisit || offerAlreadyClaimed()) return;
 
     // This runs from a timer / an exit-intent event, so the popup markup
     // (which sits BELOW app.js's own <script> tag in index.html) is always
@@ -1228,19 +1233,18 @@ function markOfferClaimed() {
     var popup = document.getElementById('offerPopup');
     if (!overlay || !popup) return;
 
-    shownThisView = true;
+    shownThisVisit = true;
     stopListening();
 
     // Close controls are bound HERE, not at script-execution time. The popup
     // markup comes after this file's <script> tag, so an early
     // getElementById returned null and the X button and backdrop silently
     // never got a listener — the popup opened with no way to close it except
-    // Escape or the two inline-onclick buttons.
-    // { once: true } because reveal() can now run many times per document:
-    // without it every re-arm would stack another identical listener.
-    overlay.addEventListener('click', dismissOffer, { once: true });
+    // Escape or the two inline-onclick buttons. Bound once and only once,
+    // since reveal() can't run twice in a visit (shownThisVisit above).
+    overlay.addEventListener('click', dismissOffer);
     var closeBtn = document.getElementById('offerClose');
-    if (closeBtn) closeBtn.addEventListener('click', dismissOffer, { once: true });
+    if (closeBtn) closeBtn.addEventListener('click', dismissOffer);
 
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
@@ -1261,20 +1265,17 @@ function markOfferClaimed() {
     if (listening) { document.removeEventListener('mouseleave', exitIntent); listening = false; }
   }
 
-  // Re-arms for a new page view. Safe to call on every navigation: it's a
-  // no-op once the offer is claimed, and it never double-arms.
-  function arm() {
-    stopListening();
-    if (offerAlreadyClaimed()) return;
-    shownThisView = false;
+  // Exposed so a claim through the home-page 10% off box can cancel a
+  // countdown already running on this visit (see markOfferClaimed).
+  window.disarmOfferPopup = stopListening;
+
+  // Armed exactly once, here, for the whole visit. Nothing re-arms it — that's
+  // what keeps SPA navigation from starting a fresh countdown on every page.
+  if (!offerAlreadyClaimed()) {
     timer = setTimeout(reveal, TRIGGER_MS);
     document.addEventListener('mouseleave', exitIntent);
     listening = true;
   }
-
-  window.armOfferPopup = arm;
-  window.disarmOfferPopup = stopListening;
-  arm();
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).
