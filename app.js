@@ -474,6 +474,81 @@ window.addEventListener('pageshow', function () {
   window.scrollTo(0, 0);
 });
 
+// ── NEW-BUILD DETECTION ───────────────────────────────────────
+// Symptom this exists to fix: a deploy goes out, but a phone that already had
+// the site open keeps showing the previous build — only a brand-new tab (a
+// private window, say) picks it up. That is NOT an HTTP caching problem;
+// vercel.json already sends `no-cache, no-store, must-revalidate` on every
+// route, and a normal profile re-fetches correctly on any real navigation.
+// It's that iOS Safari can restore a suspended tab, or a bfcache entry, as a
+// finished render with no request to the server at all — no response header
+// can reach a page that is never requested. So the page checks for itself
+// whenever it comes back to the foreground.
+//
+// The signal is the ETag of "/", which Vercel derives from index.html's
+// content: it changes on every deploy that touches the page (the ?v= bumps on
+// styles/app guarantee that) and is byte-identical across repeat requests and
+// edge nodes — verified, and it matters, because a value that flapped would
+// mean a reload loop.
+(function () {
+  var RECHECK_MS = 30000;
+  var loadedTag = null;
+  var lastCheck = 0;
+  var busy = false;
+
+  function headTag() {
+    return fetch('/', { method: 'HEAD', cache: 'no-store' })
+      .then(function (r) { return r.ok ? r.headers.get('etag') : null; })
+      .catch(function () { return null; }); // offline/blocked: try again later
+  }
+
+  // Deferred: this must never compete with first paint (see the hero/flash
+  // notes elsewhere in this file for how sensitive that window is here).
+  setTimeout(function () { headTag().then(function (t) { loadedTag = t; }); }, 2000);
+
+  // Reloading under someone's fingers is worse than showing them a stale page,
+  // so anything that would throw away real work vetoes it — the next
+  // foreground check picks the update up once they're done. The cart survives
+  // regardless (it rehydrates from Shopify), but a half-typed message doesn't.
+  function safeToReload() {
+    var chat = document.getElementById('chatWindow');
+    if (chat && chat.style.display === 'block') return false;
+    var typed = false;
+    document.querySelectorAll('input, textarea').forEach(function (el) {
+      if (el.type !== 'hidden' && el.value && el.value.trim()) typed = true;
+    });
+    return !typed;
+  }
+
+  function check() {
+    if (busy || !loadedTag) return;
+    // Vetoed before the request, not after: this way a user who is mid-way
+    // through typing doesn't burn the throttle window, so the update lands on
+    // their very next return rather than 30s later.
+    if (!safeToReload()) return;
+    if (Date.now() - lastCheck < RECHECK_MS) return;
+    lastCheck = Date.now();
+    busy = true;
+    headTag().then(function (tag) {
+      busy = false;
+      if (!tag || tag === loadedTag) return;
+      if (!safeToReload()) return; // re-checked: they may have started typing
+      // Belt and braces: never reload twice for the same build, so even a
+      // pathological mismatch between served and rendered HTML can't loop.
+      try {
+        if (sessionStorage.getItem('pawhaul_reloaded_for') === tag) return;
+        sessionStorage.setItem('pawhaul_reloaded_for', tag);
+      } catch (e) {}
+      location.reload();
+    });
+  }
+
+  // Both paths matter: `persisted` is a true bfcache restore, while a tab that
+  // was merely backgrounded and re-shown only fires visibilitychange.
+  window.addEventListener('pageshow', function (e) { if (e.persisted) check(); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
+})();
+
 // ==================== SEARCH ====================
 // In-place overlay search: a fixed scrim + fixed panel, so opening/closing
 // never reflows the page or moves the scroll position. Desktop/tablet gets a
