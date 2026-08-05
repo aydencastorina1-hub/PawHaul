@@ -401,12 +401,13 @@ var products = [
 // ==================== EMAILJS CONFIG ====================
 // Step 1: Sign up free at emailjs.com
 // Step 2: Add a Gmail service, copy the Service ID below
-// Step 3: Create two templates (see instructions), copy their IDs below
+// Step 3: Create the contact template (see instructions), copy its ID below
 // Step 4: Go to Account > API Keys, copy your Public Key below
+// EmailJS now backs the CONTACT FORM ONLY. The 10% off box and the offer popup
+// both go through /api/customer (Shopify) instead — see submitEmail below.
 var EMAILJS_PUBLIC_KEY    = 'Ejew9NO0SiQgXbDAU';
 var EMAILJS_SERVICE_ID    = 'service_qqcrtoe';
 var EMAILJS_CONTACT_TEMPLATE = 'template_t5ark9a';
-var EMAILJS_WELCOME_TEMPLATE = ''; // e.g. 'template_yyyyyy'  (10% off -> customer)
 var DISCOUNT_CODE = 'WELCOME10';   // Your 10% off code (change this anytime) — also shown by the offer popup
 
 // EmailJS is initialised LAZILY — the first time a form actually sends. It used
@@ -1597,31 +1598,52 @@ function showTrackOrder() {
   showToast('Check the confirmation email we sent you for your tracking number. Need help? Email pawhaulsupport@gmail.com', 6000);
 }
 
+// The home page's 10% off box. This is the SAME action as the offer popup and
+// now runs the same path: /api/customer (Shopify customerCreate) + the same
+// format validation + the same "already used" answer, and a success here sets
+// the shared claim flag so the popup stops appearing everywhere.
+//
+// It used to be a different thing wearing the same label: emailjs.send() to
+// EMAILJS_WELCOME_TEMPLATE, which was never configured (empty string), so every
+// submission failed into a catch that showed the code anyway and told the
+// visitor it had been "sent to your email" when nothing was sent and no
+// customer record was created. There was also no real success/failure to hang
+// a claim flag on — everything, including total failure, ended the same way.
 function submitEmail() {
   var input = document.querySelector('.email-input');
-  var email = input.value.trim();
-  if (!email || !email.includes('@')) {
-    showToast('Please enter a valid email!');
-    return;
-  }
-  if (!ensureEmailjs()) {
-    showToast('Your code: ' + DISCOUNT_CODE + ' — 10% off your order!');
-    input.value = '';
-    return;
-  }
   var btn = document.querySelector('.email-submit');
-  if (btn) btn.disabled = true;
-  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_WELCOME_TEMPLATE, {
-    to_email: email,
-    discount_code: DISCOUNT_CODE
-  }).then(function() {
-    showToast('10% off code sent to your email!');
+  var email = input ? input.value.trim() : '';
+
+  if (!email) { showToast('Please enter your email address.'); return; }
+  // Same validator the popup uses (app.js), so the two can't disagree about
+  // what a valid address is. Guarded: app.js loads after this file.
+  if (typeof isValidEmailFormat === 'function' && !isValidEmailFormat(email)) {
+    showToast("That doesn't look like a valid email address — please check and try again.");
+    return;
+  }
+
+  var label = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+  function restore() { if (btn) { btn.disabled = false; btn.textContent = label; } }
+
+  fetch('/api/customer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  }).then(function (res) { return res.json(); }).then(function (data) {
+    restore();
+    if (!data || !data.ok) {
+      showToast((data && data.error) || 'Something went wrong — please try again.');
+      return; // no claim flag: nothing was actually recorded
+    }
     input.value = '';
-    if (btn) btn.disabled = false;
-  }).catch(function() {
-    showToast('Your code is: ' + DISCOUNT_CODE + ' — 10% off!');
-    input.value = '';
-    if (btn) btn.disabled = false;
+    if (typeof markOfferClaimed === 'function') markOfferClaimed();
+    showToast(data.alreadyExists
+      ? 'This email was already used.'
+      : "You're in! Use code " + DISCOUNT_CODE + " at checkout for 10% off.");
+  }).catch(function () {
+    restore();
+    showToast('Something went wrong — please try again.');
   });
 }
 

@@ -429,6 +429,9 @@ showPage = function(page, filter, opts) {
   _origShowPage(page, filter, opts);
   closeMobileMenu();
   closeSearch();
+  // Each page view gets its own shot at the offer, so closing it here doesn't
+  // suppress it on the next page. No-op once the offer has been claimed.
+  if (typeof window.armOfferPopup === 'function') window.armOfferPopup();
   // Leaving the product page: hide the sticky Add To Cart bar immediately
   // rather than waiting on the next IntersectionObserver callback.
   if (page !== 'product') {
@@ -1129,20 +1132,13 @@ function showOfferResult(alreadyExists) {
   }
   if (success) success.style.display = 'block';
 
-  // Permanently retire the popup on this device. It's already flagged at
-  // reveal time, but re-committing it here means a successful submission is
-  // recorded even if the reveal-time write was lost (a storage quota error,
-  // a since-cleared flag, an unusual privacy setting). Both outcomes flag it:
-  // the "already used" customer has had their answer and shouldn't be asked
-  // again either. No expiry is written anywhere — the flag is permanent.
-  //
-  // Skipped entirely under ?offer=always so reviewing the popup — including
-  // running a submission through it — never retires the reviewer's browser.
-  if (OFFER_PREVIEW) return;
-  try { localStorage.setItem('pawhaul_offer_seen', '1'); } catch (e) {}
-  if (!alreadyExists) {
-    try { localStorage.setItem('pawhaul_offer_claimed', '1'); } catch (e) {}
-  }
+  // The ONE thing that retires the popup on this device — reaching here means
+  // /api/customer returned ok. Both outcomes flag it: the "already used"
+  // visitor gave a real address and has had their answer, so continuing to ask
+  // them on every page would be nuisance, not marketing. No expiry is written
+  // anywhere; the flag is permanent. markOfferClaimed() no-ops under
+  // ?offer=always so reviewing the popup never retires the reviewer's browser.
+  markOfferClaimed();
 }
 
 function copyOfferCode() {
@@ -1174,59 +1170,77 @@ function copyOfferCode() {
 // the moment the query string is gone.
 var OFFER_PREVIEW = /[?&]offer=always\b/.test(location.search);
 
-// Shows once per visitor: after 5s, or sooner on exit intent (mouse leaving
-// via the top of the viewport, the classic "heading for the tab bar" tell).
-// The localStorage flag is set the moment it's shown (not on submit/dismiss)
-// so a visitor who ignores or closes it is never nagged again either.
+// ── OFFER CLAIM STATE (shared by BOTH entry points) ───────────
+// One flag, one meaning: this device has actually handed over an email
+// address. Nothing else retires the popup — not seeing it, not timing out,
+// not closing it. Set by the popup's own form AND by the 10% off box on the
+// home page (submitEmail in products.js), because they are the same action
+// and claiming through one must silence the other.
+//
+// There used to be a second flag, `pawhaul_offer_seen`, written the moment the
+// popup appeared. That is what made it show once per device ever; it's gone
+// (along with the `?offer=reset` hatch, which existed only to clear it and
+// would now be a no-op). Devices still carrying the old flag are simply
+// ignored, so they start seeing the popup again — intended.
+var OFFER_CLAIMED_KEY = 'pawhaul_offer_claimed';
+
+function offerAlreadyClaimed() {
+  if (OFFER_PREVIEW) return false; // review mode never reads the flag
+  try { return !!localStorage.getItem(OFFER_CLAIMED_KEY); } catch (e) { return false; }
+}
+
+// Called only on a confirmed ok:true from /api/customer. `alreadyExists` still
+// counts: that visitor gave a real address and has been told it was already
+// used, so asking again on every page would be pure nuisance.
+function markOfferClaimed() {
+  if (OFFER_PREVIEW) return; // reviewing must never retire the reviewer's browser
+  try { localStorage.setItem(OFFER_CLAIMED_KEY, '1'); } catch (e) {}
+  // Kill any armed timer too, or a submission through the home-page box would
+  // still be followed by the popup firing seconds later on this same view.
+  if (typeof window.disarmOfferPopup === 'function') window.disarmOfferPopup();
+}
+
+// Shows on EVERY page view until the visitor actually submits an email: 5s
+// after the view starts, or sooner on exit intent (mouse leaving via the top
+// of the viewport, the classic "heading for the tab bar" tell).
+//
+// Appearing, timing out and being closed are all deliberately consequence-free
+// — dismissing only ends the current view's appearance. The single thing that
+// retires it is a real submission (see markOfferClaimed above), through either
+// this popup or the home page's 10% off box.
+//
+// "Page view" means an SPA navigation too, not just a document load: showPage
+// re-arms (see the navigation hooks), since the whole point is that closing it
+// on one page doesn't suppress it on the next.
 (function () {
-  var SEEN_KEY = 'pawhaul_offer_seen';
-  var CLAIMED_KEY = 'pawhaul_offer_claimed';
+  var TRIGGER_MS = 5000;
+  var timer = null;
+  var shownThisView = false;
+  var listening = false;
 
-  if (!OFFER_PREVIEW) {
-    // A device that actually submitted an email and got the code is done for
-    // good — no reset, no expiry, no second look. Checked before anything
-    // else so nothing below can resurrect the popup for it.
-    try { if (localStorage.getItem(CLAIMED_KEY)) return; } catch (e) {}
-
-    // Escape hatch for testing on a browser that was flagged merely by having
-    // SEEN the popup: ?offer=reset on any URL brings it back. Deliberately
-    // powerless against CLAIMED_KEY above, so it can't be used to re-harvest
-    // the code — clear site data / use a private window for that.
-    try {
-      if (/[?&]offer=reset\b/.test(location.search)) localStorage.removeItem(SEEN_KEY);
-    } catch (e) {}
-
-    var alreadySeen = false;
-    try { alreadySeen = !!localStorage.getItem(SEEN_KEY); } catch (e) { /* privacy mode etc. — just show once per tab */ }
-    if (alreadySeen) return;
-  }
-
-  var shown = false;
   function reveal() {
-    if (shown) return;
+    if (shownThisView || offerAlreadyClaimed()) return;
 
-    // This runs from a 5s timer / an exit-intent event, so the popup markup
+    // This runs from a timer / an exit-intent event, so the popup markup
     // (which sits BELOW app.js's own <script> tag in index.html) is always
-    // parsed by now — but resolve it before committing to anything, and bail
-    // without burning the "seen" flag if it somehow isn't there. Setting the
-    // flag first would permanently mark a visitor who was never actually
-    // shown the offer.
+    // parsed by now — but resolve it before committing to anything.
     var overlay = document.getElementById('offerOverlay');
     var popup = document.getElementById('offerPopup');
     if (!overlay || !popup) return;
 
-    shown = true;
-    if (!OFFER_PREVIEW) { try { localStorage.setItem(SEEN_KEY, '1'); } catch (e) {} }
-    document.removeEventListener('mouseleave', exitIntent);
+    shownThisView = true;
+    stopListening();
 
     // Close controls are bound HERE, not at script-execution time. The popup
     // markup comes after this file's <script> tag, so an early
     // getElementById returned null and the X button and backdrop silently
     // never got a listener — the popup opened with no way to close it except
     // Escape or the two inline-onclick buttons.
-    overlay.addEventListener('click', dismissOffer);
+    // { once: true } because reveal() can now run many times per document:
+    // without it every re-arm would stack another identical listener.
+    overlay.addEventListener('click', dismissOffer, { once: true });
     var closeBtn = document.getElementById('offerClose');
-    if (closeBtn) closeBtn.addEventListener('click', dismissOffer);
+    if (closeBtn) closeBtn.addEventListener('click', dismissOffer, { once: true });
 
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
@@ -1236,12 +1250,31 @@ var OFFER_PREVIEW = /[?&]offer=always\b/.test(location.search);
       });
     });
   }
+
   function exitIntent(e) {
     if (e.clientY <= 0) reveal();
   }
 
-  document.addEventListener('mouseleave', exitIntent);
-  setTimeout(reveal, 5000);
+  function stopListening() {
+    clearTimeout(timer);
+    timer = null;
+    if (listening) { document.removeEventListener('mouseleave', exitIntent); listening = false; }
+  }
+
+  // Re-arms for a new page view. Safe to call on every navigation: it's a
+  // no-op once the offer is claimed, and it never double-arms.
+  function arm() {
+    stopListening();
+    if (offerAlreadyClaimed()) return;
+    shownThisView = false;
+    timer = setTimeout(reveal, TRIGGER_MS);
+    document.addEventListener('mouseleave', exitIntent);
+    listening = true;
+  }
+
+  window.armOfferPopup = arm;
+  window.disarmOfferPopup = stopListening;
+  arm();
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).
