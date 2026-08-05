@@ -84,6 +84,19 @@ body {
 
 ::selection { background: var(--orange); color: #fff; }
 
+/* ==================== FORM FIELD BASE (iOS AUTO-ZOOM) ====================
+   iOS Safari zooms the whole viewport in whenever you focus a field whose
+   computed font-size is under 16px — the page visibly jumps and stays
+   zoomed after the keyboard closes. 16px is therefore a FUNCTIONAL floor
+   for every text field on this site, not a stylistic choice: if a field
+   needs to look smaller, change its padding/width, never its font-size.
+   This element-level rule catches any field that has no class of its own
+   (or a future one whose class forgets to set a size); the per-component
+   rules below (.email-input, .form-input/.form-textarea/.form-select,
+   .offer-input, .nav-search-input, .chat-input) each restate 16px so the
+   floor survives their higher specificity. */
+input, textarea, select { font-size: 16px; }
+
 /* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
    rotation driven from app.js). Every slide stays centered on its subject.
    Light placeholder fallback so a slow-loading image never flashes black/navy
@@ -1204,7 +1217,7 @@ img.reviewer-av {
   border: 2px solid var(--line);
   border-radius: 50px;
   font-family: 'Nunito', sans-serif;
-  font-size: 14px;
+  font-size: 16px; /* >=16px so iOS never auto-zooms on focus — see form field base */
   font-weight: 600;
   outline: none;
   transition: border-color 0.2s;
@@ -2014,7 +2027,7 @@ img.reviewer-av {
   border: 2px solid var(--line);
   border-radius: var(--radius-sm);
   font-family: 'Nunito', sans-serif;
-  font-size: 14px;
+  font-size: 16px; /* >=16px so iOS never auto-zooms on focus — see form field base */
   font-weight: 600;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -3536,7 +3549,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    the one rule that needs an actual class, since :focus can't be expressed
    as an inline style attribute. Navy border at rest, orange glow on focus —
    same pattern as the nav search bar and contact form inputs. */
-.chat-input { border: 2px solid rgba(26,26,46,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+/* The chat input also carries font-size:16px inline in index.html (which
+   wins over this rule); it's restated here so the anti-zoom floor survives
+   if that inline style is ever cleaned up. */
+.chat-input { font-size: 16px; border: 2px solid rgba(26,26,46,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
 .chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(232,99,10,0.14); }
 
 /* ==================== PRODUCT-GRID LOADING SKELETON ====================

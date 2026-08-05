@@ -46,6 +46,20 @@ function stripMarkdown(text) {
   return t;
 }
 
+// A reply is often taller than the 220px message pane, and scrolling the pane
+// to its bottom (what a chat log normally does) dropped the reader at the LAST
+// line of an answer they hadn't read yet. Put the TOP of the new reply at the
+// top of the pane instead, so reading starts at the beginning.
+// Short replies need no scroll at all: the browser clamps scrollTop to its
+// maximum, which still leaves the whole reply — beginning included — on screen.
+function scrollReplyToTop(msgs, row) {
+  // Rect math rather than offsetTop: #chatMessages isn't positioned, so the
+  // row's offsetParent is some ancestor of the pane, not the pane itself.
+  var delta = row.getBoundingClientRect().top - msgs.getBoundingClientRect().top;
+  // 12px = the pane's own padding, so the bubble sits at its natural inset.
+  msgs.scrollTop = msgs.scrollTop + delta - 12;
+}
+
 function addMsg(text, isUser) {
   var msgs = document.getElementById('chatMessages');
   var row = document.createElement('div');
@@ -63,7 +77,10 @@ function addMsg(text, isUser) {
   row.appendChild(av);
   row.appendChild(bub);
   msgs.appendChild(row);
-  msgs.scrollTop = msgs.scrollHeight;
+  // Your own message: the bottom of the thread is where you expect to land.
+  // The bot's reply: land on its first line, not its last (see above).
+  if (isUser) msgs.scrollTop = msgs.scrollHeight;
+  else scrollReplyToTop(msgs, row);
 }
 
 
@@ -238,8 +255,9 @@ function sendChat() {
   sendChatToAI(msg).then(function(aiReply) {
     var t = document.getElementById("typing");
     if (t) t.remove();
+    // No scroll call here: addMsg positions the pane on the top of the reply.
+    // A scrollHeight jump at this point would put it back at the bottom.
     addMsg(aiReply || CHAT_FALLBACK, false);
-    msgs.scrollTop = msgs.scrollHeight;
   });
 }
 
