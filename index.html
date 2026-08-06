@@ -152,7 +152,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=56" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=57" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -160,9 +160,18 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        skeletons are on screen. URLs must match the <script> tags below
        character-for-character (version query included) or the browser fetches
        each file twice. -->
-  <link rel="preload" as="script" href="/products.js?v=35">
-  <link rel="preload" as="script" href="/app.js?v=42">
+  <link rel="preload" as="script" href="/products.js?v=36">
+  <link rel="preload" as="script" href="/app.js?v=43">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
+  <!-- The home page's 10% off box is pointless once this device has submitted
+       an email, so it's hidden BEFORE first paint rather than by JS after the
+       fact, which would flash the whole section in and straight back out. Same
+       permanent claim flag the offer popup uses — one flag, both entry points.
+       The :not() exempts the section on the visit where the visitor submitted
+       through the box itself: that one stays put showing them their code
+       (products.js adds .email-claimed-now), and is gone by the next load. -->
+  <script>try{if(localStorage.getItem('pawhaul_offer_claimed'))document.documentElement.classList.add('offer-claimed');}catch(e){}</script>
+  <style>html.offer-claimed .email-section:not(.email-claimed-now){display:none!important}</style>
 </head>
 <body>
 
@@ -633,10 +642,27 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
   <!-- EMAIL -->
   <section class="email-section">
     <h2>Get 10% Off Your First Order</h2>
-    <p>Sign up for walk gear updates, new products, and the occasional dog photo.</p>
+    <p class="email-pitch">Sign up for walk gear updates, new products, and the occasional dog photo.</p>
     <div class="email-form">
       <input type="email" class="email-input" placeholder="Enter your email...">
       <button class="email-submit" onclick="submitEmail()">Claim 10% Off →</button>
+    </div>
+    <!-- Revealed in place by submitEmail() once /api/customer confirms, and
+         then left alone: this is the customer's code, not a toast, so it must
+         not time out from under them. It only goes when they navigate away or
+         reload — and on any later visit the whole section is hidden instead
+         (html.offer-claimed, see <head>), since the email is already on file.
+         Reuses the popup's .offer-code-row/.offer-code/.offer-copy-btn so the
+         code box looks identical in both places. -->
+    <div class="email-success" id="emailSuccess" style="display:none;">
+      <p class="email-success-msg" id="emailSuccessMsg"></p>
+      <!-- Hidden when the address was already used, exactly as in the popup —
+           that customer has had the code once and doesn't get it again. -->
+      <div class="offer-code-row" id="emailCodeRow">
+        <span class="offer-code" id="emailCode">WELCOME10</span>
+        <button type="button" class="offer-copy-btn" id="emailCopyBtn"
+                onclick="copyOfferCode('emailCode','emailCopyBtn')">Copy Code</button>
+      </div>
     </div>
   </section>
 
@@ -1173,8 +1199,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
 
 
 
-  <script src="/products.js?v=35"></script>
-  <script src="/app.js?v=42"></script>
+  <script src="/products.js?v=36"></script>
+  <script src="/app.js?v=43"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

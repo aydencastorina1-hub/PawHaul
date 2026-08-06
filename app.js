@@ -1138,10 +1138,12 @@ function showOfferResult(alreadyExists) {
   markOfferClaimed();
 }
 
-function copyOfferCode() {
-  var codeEl = document.getElementById('offerCode');
+// Shared by both places a code is shown: the popup (default ids) and the home
+// page's 10% off box, which passes its own.
+function copyOfferCode(codeElId, btnElId) {
+  var codeEl = document.getElementById(codeElId || 'offerCode');
   var code = codeEl ? codeEl.textContent.trim() : DISCOUNT_CODE;
-  var btn = document.getElementById('offerCopyBtn');
+  var btn = document.getElementById(btnElId || 'offerCopyBtn');
   function done(ok) {
     if (!btn) return;
     btn.textContent = ok ? 'Copied!' : 'Select & copy manually';
@@ -1192,6 +1194,12 @@ function offerAlreadyClaimed() {
 function markOfferClaimed() {
   if (OFFER_PREVIEW) return; // reviewing must never retire the reviewer's browser
   try { localStorage.setItem(OFFER_CLAIMED_KEY, '1'); } catch (e) {}
+  // Retires the home page's 10% off box too, immediately and not just from the
+  // next load — claiming through the popup while looking at the home page
+  // should not leave a signup form asking for the address they just gave.
+  // The section that just claimed through itself carries .email-claimed-now
+  // and is exempted by the rule in <head>, so it keeps showing their code.
+  document.documentElement.classList.add('offer-claimed');
   // Kill any armed timer too, or a submission through the home-page box would
   // still be followed by the popup firing seconds later on this same view.
   if (typeof window.disarmOfferPopup === 'function') window.disarmOfferPopup();

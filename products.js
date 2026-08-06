@@ -1598,6 +1598,43 @@ function showTrackOrder() {
   showToast('Check the confirmation email we sent you for your tracking number. Need help? Email pawhaulsupport@gmail.com', 6000);
 }
 
+// Swaps the 10% off box's form for the code, in place and permanently — no
+// timeout, because this is the customer's discount code and it must not vanish
+// while they're reaching for it. Returns false if the markup isn't there, so
+// the caller can fall back to a toast rather than showing nothing.
+//
+// `alreadyExists` means the address was already a Shopify customer, so the code
+// row is hidden: identical to the popup's rule, since revealing WELCOME10 again
+// to a repeat address would make "one per customer" meaningless.
+function revealEmailSectionSuccess(alreadyExists) {
+  var section = document.querySelector('.email-section');
+  var success = document.getElementById('emailSuccess');
+  if (!section || !success) return false;
+
+  // Exempts this section from the site-wide hide rule for the rest of the
+  // visit (see the <head> block in index.html). On the next load the class is
+  // gone with the fresh markup, and the section hides for good.
+  section.classList.add('email-claimed-now');
+
+  var form = section.querySelector('.email-form');
+  var pitch = section.querySelector('.email-pitch');
+  var codeRow = document.getElementById('emailCodeRow');
+  var code = document.getElementById('emailCode');
+  var msg = document.getElementById('emailSuccessMsg');
+
+  if (form) form.style.display = 'none';
+  if (pitch) pitch.style.display = 'none'; // "Sign up for..." no longer applies
+  if (code) code.textContent = DISCOUNT_CODE;
+  if (codeRow) codeRow.style.display = alreadyExists ? 'none' : '';
+  if (msg) {
+    msg.textContent = alreadyExists
+      ? 'This email was already used.'
+      : "You're in! Use this code at checkout.";
+  }
+  success.style.display = 'block';
+  return true;
+}
+
 // The home page's 10% off box. This is the SAME action as the offer popup and
 // now runs the same path: /api/customer (Shopify customerCreate) + the same
 // format validation + the same "already used" answer, and a success here sets
@@ -1637,10 +1674,18 @@ function submitEmail() {
       return; // no claim flag: nothing was actually recorded
     }
     input.value = '';
+    // Reveal BEFORE marking claimed: markOfferClaimed() adds the site-wide
+    // "hide this section" class, and the reveal is what exempts this section
+    // from it for the rest of the visit.
+    var revealed = revealEmailSectionSuccess(!!data.alreadyExists);
     if (typeof markOfferClaimed === 'function') markOfferClaimed();
-    showToast(data.alreadyExists
-      ? 'This email was already used.'
-      : "You're in! Use code " + DISCOUNT_CODE + " at checkout for 10% off.");
+    // Toast only as a fallback — if the success markup is somehow missing, the
+    // customer must still be told their code rather than nothing at all.
+    if (!revealed) {
+      showToast(data.alreadyExists
+        ? 'This email was already used.'
+        : "You're in! Use code " + DISCOUNT_CODE + " at checkout for 10% off.");
+    }
   }).catch(function () {
     restore();
     showToast('Something went wrong — please try again.');

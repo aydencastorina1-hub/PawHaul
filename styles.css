@@ -1225,6 +1225,23 @@ img.reviewer-av {
 
 .email-input:focus { border-color: var(--orange); }
 
+/* Success state for the home page's 10% off box, revealed in place of the
+   form. The code box itself reuses the popup's .offer-code-row/.offer-code/
+   .offer-copy-btn so both entry points show an identical code; only the
+   message needs its own rule, since the popup's is tuned for white-on-navy
+   and this section sits on the light cream band. */
+.email-success { max-width: 520px; margin: 0 auto; }
+/* Scoped to .email-section so it outranks `.email-section p` (0,1,1), which
+   would otherwise win on specificity and quietly grey this back out. */
+.email-section .email-success-msg {
+  color: var(--black);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+.email-success .offer-code-row { margin-bottom: 0; }
+
 .email-submit {
   background: var(--orange);
   color: white;
