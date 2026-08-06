@@ -152,7 +152,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=57" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=58" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -959,7 +959,10 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
 
 <!-- ==================== ABOUT PAGE ==================== -->
 <div id="page-about" class="page" style="background:white;">
-  <div style="position:relative;width:100%;height:350px;overflow:hidden;background:var(--img-placeholder);">
+  <!-- .about-hero-wrap is styling-only (mirrors .contact-hero-wrap): the band
+       needs a taller crop at desktop widths and an unclassed div can't be
+       targeted from CSS. Inline height stays as the mobile value. -->
+  <div class="about-hero-wrap" style="position:relative;width:100%;height:350px;overflow:hidden;background:var(--img-placeholder);">
     <!-- eager (not lazy) so this page's own hero never flashes on navigation (an
          SPA where every page's markup already exists in the DOM, so lazy-load's
          viewport check doesn't fire cleanly on nav — see the Contact hero note

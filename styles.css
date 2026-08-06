@@ -3644,3 +3644,114 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .skel-card .product-name::after  { width: 82%; height: 11px; }
 .skel-card .product-stars::after { width: 54%; height: 8px; }
 .skel-card .product-price::after { width: 44%; height: 15px; }
+
+/* ============================================================
+   DESKTOP LAYOUT PASS
+   ------------------------------------------------------------
+   Every rule below is min-width only, so none of it can reach
+   the ≤900 / ≤767 / ≤480 blocks earlier in this file — the
+   mobile layout is signed off and must stay byte-identical.
+   Appended last on purpose: it supersedes earlier min-width
+   rules it deliberately replaces (notably the 1440px hero
+   height), which same-specificity source order settles.
+
+   The through-line: several numbers here were mobile values
+   that were never re-thought for a wide viewport. Held at
+   1920px they don't read as "big" — they read as a phone
+   layout stretched, with letterboxed photos and text columns
+   marooned in whitespace.
+   ============================================================ */
+
+@media (min-width: 901px) {
+  /* PRODUCT GALLERY — the dots were laying out BESIDE the photo.
+     .main-img is display:flex in the base rules (it used to centre a 130px
+     emoji placeholder) and .det-dots is its second child, so at desktop the
+     dots became a flex ROW item: 56px stolen off the image and a bare
+     --orange-pale strip down the right of every product photo. The ≤900
+     block already restructured exactly this ("main-img becomes auto-height
+     wrapper; det-carousel provides the image area") — desktop never got the
+     same treatment. Radius moves to the carousel, which is what now clips. */
+  .main-img { display: block; height: auto; background: transparent; }
+  .det-carousel { height: 520px; border-radius: var(--radius); }
+}
+
+@media (min-width: 1024px) {
+  /* ---------- HERO ---------- */
+  /* Height was a flat inline 520px — a mobile number. Held at desktop widths
+     it crops the two PORTRAIT hero photos (natural 2:3) to a 2.5-3.2:1
+     letterbox, i.e. ~20% of the source height survives. A taller box keeps a
+     taller slice, which is most of the "hero image isn't cropped right on
+     desktop" problem. */
+  #heroSection { height: 640px !important; }
+  /* The copy block was still on mobile measurements too: a 180px-wide
+     paragraph (four words a line) pinned against the right edge. */
+  #heroSection > div:last-child { padding: 0 7% !important; }
+  #heroSection > div:last-child p {
+    max-width: 430px !important;
+    font-size: 17px !important;
+    line-height: 1.75 !important;
+  }
+
+  /* ---------- SECTION HEADERS ---------- */
+  /* A 480px measure orphaned the last word of every section subtitle at
+     desktop ("...walks with your / dog"). */
+  .collections-header .section-sub,
+  .why-header .section-sub,
+  .about-values-header .section-sub { max-width: 640px !important; }
+
+  /* ---------- THE PAWHAUL PROMISE ---------- */
+  /* A 940px column marooned in the middle of a wide screen. */
+  .walk-route { max-width: 1080px; }
+
+  /* ---------- LANDSCAPE / LIFESTYLE BANDS ---------- */
+  /* All three held mobile heights at desktop widths, so they degraded into
+     letterbox strips as the viewport grew — the mission banner was a 7.7:1
+     sliver at 1920. Product photography is untouched; these are the
+     full-bleed scenic bands only. */
+  .lifestyle-banner { height: 360px !important; }
+  .about-hero-wrap { height: 440px !important; }
+  .contact-hero-wrap { height: 440px; }
+
+  /* ---------- CART ---------- */
+  /* The only main page with no width cap: at 1920 the item row ran the full
+     1728px, leaving the price at the far left and the quantity stepper
+     ~1000px away from it. Capped to match every other section. */
+  .cart-page { max-width: 1400px; margin-left: auto; margin-right: auto; }
+}
+
+@media (min-width: 1440px) {
+  #heroSection { height: 680px !important; }
+  #heroSection > div:last-child h1 { font-size: 64px !important; }
+  .lifestyle-banner { height: 400px !important; }
+  .about-hero-wrap { height: 480px !important; }
+  .contact-hero-wrap { height: 480px; }
+  /* Collections slides get the extra room too, so the band doesn't stay a
+     thin strip while everything around it grows. */
+  .col-slide { height: 460px; }
+}
+
+/* Very wide monitors: the 1400px cap starts to look like a narrow ribbon
+   down the middle of the screen, so it (and the things measured against it)
+   step up once. Kept to a single step — beyond this, line lengths stop being
+   comfortable to read and the layout would need a different design, not a
+   bigger number. */
+@media (min-width: 1728px) {
+  .collections-header, .col-carousel-wrap,
+  .products-header, #prodCarouselWrap,
+  .why-header, .reviews-header, .reviews-grid-wrap,
+  .shop-page, .product-detail,
+  .cart-page,
+  .footer-grid, .footer-bottom {
+    max-width: 1560px;
+  }
+  .mission-section {
+    padding-left: max(5%, calc((100% - 1560px) / 2));
+    padding-right: max(5%, calc((100% - 1560px) / 2));
+  }
+  #heroSection { height: 760px !important; }
+  #heroSection > div:last-child h1 { font-size: 72px !important; }
+  #heroSection > div:last-child p { max-width: 480px !important; font-size: 18px !important; }
+  .col-slide { height: 500px; }
+  .lifestyle-banner { height: 440px !important; }
+  .det-carousel { height: 600px; }
+}
