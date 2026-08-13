@@ -441,26 +441,26 @@ var STORE_URL = 'https://pawhaul.myshopify.com';
 // palette. Each is the brand's own colour on a neutral chip.
 var PAYMENT_MARKS = [
   { name: 'Visa', svg:
-    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
-    '<text x="17" y="15.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="9.5" font-weight="700" font-style="italic" fill="#1434CB">VISA</text>' },
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E0E0E0"/>' +
+    '<text x="17" y="15.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="9.5" font-weight="700" font-style="italic" fill="#4A4A4A">VISA</text>' },
   { name: 'Mastercard', svg:
-    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
-    '<circle cx="14" cy="11" r="6" fill="#EB001B"/><circle cx="20" cy="11" r="6" fill="#F79E1B" fill-opacity="0.85"/>' },
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E0E0E0"/>' +
+    '<circle cx="14" cy="11" r="6" fill="#757575"/><circle cx="20" cy="11" r="6" fill="#B2B2B2" fill-opacity="0.85"/>' },
   { name: 'American Express', svg:
-    '<rect width="34" height="22" rx="3" fill="#006FCF"/>' +
+    '<rect width="34" height="22" rx="3" fill="#6F6F6F"/>' +
     '<text x="17" y="14.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7" font-weight="700" fill="#fff">AMEX</text>' },
   // The ball sits AFTER the wordmark, as it does in the real Discover logo —
   // centring the text and dropping a circle at x=26 overlapped the final "C".
   { name: 'Discover', svg:
-    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E0E0E0"/>' +
     '<text x="4" y="14.3" font-family="Arial,Helvetica,sans-serif" font-size="6.2" font-weight="700" fill="#4D4D4D">DISC</text>' +
-    '<circle cx="27.5" cy="11" r="4" fill="#FF6000"/>' },
+    '<circle cx="27.5" cy="11" r="4" fill="#949494"/>' },
   { name: 'Shop Pay', svg:
-    '<rect width="34" height="22" rx="3" fill="#5A31F4"/>' +
+    '<rect width="34" height="22" rx="3" fill="#5D5D5D"/>' +
     '<text x="17" y="14.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8" font-weight="700" fill="#fff">shop</text>' },
   { name: 'PayPal', svg:
-    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
-    '<text x="17" y="14.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7.5" font-weight="700" fill="#003087">PayPal</text>' }
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E0E0E0"/>' +
+    '<text x="17" y="14.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7.5" font-weight="700" fill="#373737">PayPal</text>' }
 ];
 
 function paymentMarksHtml() {
@@ -849,6 +849,16 @@ function variantUnavailable(p, size, color) {
 // Tiny color swatches + size pills rendered between the reviews and the
 // price. Selection lives in the card's own DOM (active classes), so every
 // card picks independently; cardAdd() reads it back at add-to-cart time.
+// DELIBERATE EXCEPTION TO THE BLACK & WHITE SCHEME (task 53).
+// These are not site chrome — they are the PRODUCT's real colours, the same
+// information the (full-colour) product photography carries, and the only way
+// a shopper can tell the Red leash from the Blue one on a card. Greyscaled,
+// red/blue/green/teal all collapse to within a few percent of each other
+// (#717171 / #6D6D6D / #8E8E8E / #848484) and variant selection stops working.
+// Everything AROUND them — the ring, the border, the selected state — is
+// black and white, so no UI meaning depends on hue. Each swatch also carries
+// title + aria-label with the colour name.
+// (The former 'orange' entry was a product colour too, not the old brand accent.)
 var SWATCH_COLORS = {
   red: '#D63031', maroon: '#7B1E24', pink: '#F06292', blue: '#2563EB',
   teal: '#0D9488', green: '#16A34A', gray: '#9CA3AF', grey: '#9CA3AF',
@@ -1017,7 +1027,7 @@ function productCard(p) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews})</span></div>
+        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews})</span></div>
         <div class="product-price">${priceDisplayHtml(p)}</div>
         ${cardOptionsHtml(p)}
         <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
@@ -1383,7 +1393,7 @@ function renderWishlist() {
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
       '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
-      '<div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(' + p.reviews + ' reviews)</span></div>' +
+      '<div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#111111" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(' + p.reviews + ' reviews)</span></div>' +
       '<div class="product-price">' + priceDisplayHtml(p) + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
   }).join('') + '</div>';

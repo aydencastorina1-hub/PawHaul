@@ -1,0 +1,6 @@
+index.html: 1 corrupted entities
+    &#128062; -> &#717171;   (original codepoint U+1F43E)
+products.js: entities intact (2 found)
+app.js: entities intact (3 found)
+blog.js: entities intact (0 found)
+styles.css: entities intact (0 found)

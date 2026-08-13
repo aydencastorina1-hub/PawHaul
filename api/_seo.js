@@ -671,7 +671,7 @@ function buildHead(meta, isProdHost) {
     '<meta name="twitter:title" content="' + esc(meta.title) + '">',
     '<meta name="twitter:description" content="' + esc(meta.description) + '">',
     '<meta name="twitter:image" content="' + esc(meta.ogImage) + '">',
-    '<meta name="theme-color" content="#1a1a2e">'
+    '<meta name="theme-color" content="#000000">'
   ];
 
   // Ownership proofs — see SITE_VERIFICATION at the top of this file.
