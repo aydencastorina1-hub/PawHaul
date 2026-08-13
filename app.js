@@ -354,6 +354,8 @@ showProduct = function(id, opts) {
   // the URL.
   originalShowProduct(id, opts);
   showBundle(id);
+  var p = products.find(function (pr) { return pr.id === id; });
+  if (p) setSpaTitle(p.name);
 };
 
 function showBundle(productId) {
@@ -423,12 +425,177 @@ function addBundleToCart() {
   showToast('Bundle added to cart!');
 }
 
+// ==================== BLOG ====================
+// Post content lives in blog.js. The SERVER (api/_seo.js) already renders the
+// same markup into #blogIndex / #blogPost for a direct URL load, because the
+// entire point of the blog is being read by crawlers that do not run
+// JavaScript. These functions produce byte-comparable markup and cover
+// in-site navigation, where no new document is ever fetched.
+//
+// KEEP IN SYNC with renderBlogIndexHtml()/renderPostHtml() in api/_seo.js —
+// if the two drift, a post looks different depending on whether you arrived
+// by link or by clicking through the site.
+
+function blogEsc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function blogFmtDate(iso) {
+  // Parsed as UTC and formatted as UTC on purpose: a bare "2026-08-08" parsed
+  // as local time renders as the 7th for anyone west of UTC, which would then
+  // disagree with the datetime attribute and with the server-rendered copy.
+  var d = new Date(iso + 'T00:00:00Z');
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+}
+
+function blogCardHtml(p) {
+  return '<a class="blog-card" href="/blog/' + blogEsc(p.slug) + '" onclick="goToPost(event,\'' + blogEsc(p.slug) + '\')">' +
+    '<div class="blog-card-img"><img src="' + blogEsc(p.image) + '" alt="' + blogEsc(p.imageAlt) + '" loading="lazy" width="1200" height="630"></div>' +
+    '<div class="blog-card-body">' +
+    '<div class="blog-card-tags">' + (p.tags || []).map(function (t) { return '<span>' + blogEsc(t) + '</span>'; }).join('') + '</div>' +
+    '<h2>' + blogEsc(p.title) + '</h2>' +
+    '<p>' + blogEsc(p.excerpt) + '</p>' +
+    '<div class="blog-card-meta"><time datetime="' + blogEsc(p.date) + '">' + blogEsc(blogFmtDate(p.date)) + '</time><span>·</span><span>' + blogEsc(p.readMins) + ' min read</span></div>' +
+    '</div></a>';
+}
+
+function renderBlogIndex() {
+  var el = document.getElementById('blogIndex');
+  if (!el || typeof blogPosts === 'undefined') return;
+  el.innerHTML = '<div class="blog-grid">' + blogPosts.map(blogCardHtml).join('') + '</div>';
+}
+
+function blogPostHtml(post) {
+  return '<article class="blog-article">' +
+    '<nav class="blog-crumbs"><a href="/blog" onclick="goTo(event,\'blog\')">Blog</a><span>/</span><span>' + blogEsc(post.title) + '</span></nav>' +
+    '<h1 class="blog-article-title">' + blogEsc(post.title) + '</h1>' +
+    '<div class="blog-article-meta"><time datetime="' + blogEsc(post.date) + '">' + blogEsc(blogFmtDate(post.date)) + '</time>' +
+    '<span>·</span><span>' + blogEsc(post.readMins) + ' min read</span></div>' +
+    '<img class="blog-article-img" src="' + blogEsc(post.image) + '" alt="' + blogEsc(post.imageAlt) + '" width="1200" height="630">' +
+    '<div class="blog-body">' + post.body + '</div>' +
+    '<div class="blog-article-foot">' +
+    '<a class="btn-primary" href="/shop" onclick="goTo(event,\'shop\')">Shop Walk Gear</a>' +
+    '<a class="blog-back" href="/blog" onclick="goTo(event,\'blog\')">← All articles</a>' +
+    '</div></article>';
+}
+
+// Returns false for an unknown slug so dispatchRoute (products.js) can fall
+// back to Home and correct the address bar, exactly as it does for a stale
+// product slug.
+function showPost(slug, opts) {
+  if (typeof blogPosts === 'undefined') return false;
+  var post = blogPosts.find(function (p) { return p.slug === slug; });
+  if (!post) return false;
+
+  var el = document.getElementById('blogPost');
+  if (!el) return false;
+  el.innerHTML = blogPostHtml(post);
+
+  // Same bootstrap-class teardown showPage does — without it the pre-paint
+  // !important rule from the <head> keeps pinning whichever page the hard
+  // reload landed on (see the ROUTE_BOOTSTRAP_CLASSES comment in products.js).
+  document.documentElement.classList.remove.apply(
+    document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
+  document.querySelectorAll('.page').forEach(function (p) { p.classList.remove('active', 'page-transition'); });
+  document.getElementById('page-blog-post').classList.add('active', 'page-transition');
+
+  closeMobileMenu();
+  closeSearch();
+  setSpaTitle(post.metaTitle || post.title);
+  navigateUrl('/blog/' + post.slug, opts);
+
+  document.documentElement.style.scrollBehavior = 'auto';
+  requestAnimationFrame(function () {
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = '';
+  });
+  return true;
+}
+
+// Link handler for post links, mirroring goTo() — lets ctrl/cmd/middle-click
+// open a real new tab from the href instead of being hijacked.
+function goToPost(e, slug) {
+  if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
+  if (e) e.preventDefault();
+  showPost(slug);
+}
+
+// Tab/bookmark/history title for CLIENT-SIDE navigation only. The server owns
+// the real SEO <head> (api/_seo.js) — it is what every crawler and link
+// scraper sees, since none of them navigate an SPA. This is deliberately a
+// short human-facing label rather than a duplicate of the full meta table,
+// so there is no second copy of that copywriting to keep in sync.
+var SPA_PAGE_TITLES = {
+  home: 'PawHaul — Built For Every Walk',
+  shop: 'Shop Walk Gear',
+  about: 'Our Story',
+  contact: 'Contact',
+  blog: 'The PawHaul Blog',
+  cart: 'Your Cart',
+  wishlist: 'Your Wishlist'
+};
+
+function setSpaTitle(label) {
+  document.title = (label && label.indexOf('PawHaul') !== -1) ? label : (label ? label + ' | PawHaul' : 'PawHaul');
+}
+
+// ==================== ANALYTICS ====================
+// Every function here is a no-op unless GA4_ID has been filled in (see the
+// ANALYTICS comment in index.html). Nothing below throws when analytics is
+// off, so the site behaves identically either way — which is the point:
+// tracking must never be able to break a purchase.
+//
+// Vercel Web Analytics needs none of this; it records page views by itself.
+// GA4 does, because automatic pageview tracking fires once per DOCUMENT load
+// and this SPA changes route without one.
+
+function gaReady() { return typeof gtag === 'function' && !!window.GA4_ID; }
+
+function trackPageView() {
+  if (!gaReady()) return;
+  gtag('event', 'page_view', {
+    page_path: location.pathname,
+    page_location: location.href,
+    page_title: document.title
+  });
+}
+
+function trackEvent(name, params) {
+  if (!gaReady()) return;
+  gtag('event', name, params || {});
+}
+
+// GA4's recommended ecommerce event shape, so the standard Monetisation
+// reports populate rather than these landing as unmapped custom events.
+function trackAddToCart(product, price, size, color) {
+  if (!gaReady() || !product) return;
+  trackEvent('add_to_cart', {
+    currency: 'USD',
+    value: Number(price) || Number(product.price) || 0,
+    items: [{
+      item_id: 'PH-' + product.id,
+      item_name: product.name,
+      item_category: product.category,
+      item_variant: [size, color].filter(Boolean).join(' / ') || undefined,
+      price: Number(price) || Number(product.price) || 0,
+      quantity: 1
+    }]
+  });
+}
+
+// The wrappers that feed these live at the very bottom of this file — they
+// have to be applied AFTER the page-navigation hooks below, so that a
+// page_view is only sent once the hook has finished setting document.title.
+
 // ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
 showPage = function(page, filter, opts) {
   _origShowPage(page, filter, opts);
   closeMobileMenu();
   closeSearch();
+  if (SPA_PAGE_TITLES[page]) setSpaTitle(SPA_PAGE_TITLES[page]);
   // Leaving the product page: hide the sticky Add To Cart bar immediately
   // rather than waiting on the next IntersectionObserver callback.
   if (page !== 'product') {
@@ -1292,3 +1459,76 @@ document.addEventListener('keydown', function(e) {
   if (searchIsOpen()) { closeSearch(); }
   else if (offerIsOpen()) { dismissOffer(); }
 });
+
+// ==================== ANALYTICS WRAPPERS ====================
+// Applied at the very END of this file, deliberately. Each of these functions
+// is already wrapped earlier (page-navigation hooks, the bundle hook), and
+// those wrappers set document.title as part of navigating. Wrapping last makes
+// these the OUTERMOST layer, so a page_view is sent after the title is
+// correct rather than reporting the previous page's title.
+//
+// All of these are inert while GA4_ID is empty — see the ANALYTICS section in
+// index.html and the helpers further up this file.
+
+var _trackOrigShowPage = showPage;
+showPage = function (page, filter, opts) {
+  _trackOrigShowPage(page, filter, opts);
+  trackPageView();
+};
+
+var _trackOrigShowProduct = showProduct;
+showProduct = function (id, opts) {
+  _trackOrigShowProduct(id, opts);
+  var p = products.find(function (pr) { return pr.id === id; });
+  if (p) {
+    var lv = lowestVariant(p);
+    trackEvent('view_item', {
+      currency: 'USD',
+      value: lv.price,
+      items: [{ item_id: 'PH-' + p.id, item_name: p.name, item_category: p.category, price: lv.price }]
+    });
+  }
+  trackPageView();
+};
+
+var _trackOrigShowPost = showPost;
+showPost = function (slug, opts) {
+  var ok = _trackOrigShowPost(slug, opts);
+  if (ok) trackPageView();
+  return ok;
+};
+
+// addToCart(product) takes a fully-resolved item — a copy of the product with
+// the chosen variant's price/size/color already merged in (see products.js) —
+// so everything the event needs is on the single argument. Wrapping the one
+// function covers every entry point: detail page, quick-add, bundles,
+// wishlist, and the chatbot's tool call.
+var _trackOrigAddToCart = addToCart;
+addToCart = function (product) {
+  var result = _trackOrigAddToCart.apply(this, arguments);
+  try {
+    if (product) trackAddToCart(product, product.price, product.size, product.color);
+  } catch (e) { /* analytics must never be able to break a real add */ }
+  return result;
+};
+
+// Checkout hand-off to Shopify. This is the last event we can observe — GA4
+// cannot follow the visitor onto Shopify's hosted checkout, so purchases are
+// NOT tracked here (see MARKETING-SETUP.md for how to close that loop).
+if (typeof checkout === 'function') {
+  var _trackOrigCheckout = checkout;
+  checkout = function () {
+    try {
+      var items = (typeof cart !== 'undefined' ? cart : []).map(function (i) {
+        return {
+          item_id: 'PH-' + i.id, item_name: i.name, item_category: i.category,
+          item_variant: [i.size, i.color].filter(Boolean).join(' / ') || undefined,
+          price: Number(i.price) || 0, quantity: i.qty || 1
+        };
+      });
+      var value = items.reduce(function (s, i) { return s + i.price * i.quantity; }, 0);
+      trackEvent('begin_checkout', { currency: 'USD', value: Number(value.toFixed(2)), items: items });
+    } catch (e) { /* never block checkout */ }
+    return _trackOrigCheckout.apply(this, arguments);
+  };
+}

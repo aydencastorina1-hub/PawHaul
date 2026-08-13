@@ -1,16 +1,24 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/((?!api/)(?!.*\\.).*)", "destination": "/index.html" }
-  ],
-  "headers": [
+  "functions": {
+    "api/render.js": { "includeFiles": "{index.html,products.js,blog.js}" },
+    "api/sitemap.js": { "includeFiles": "{products.js,blog.js}" },
+    "api/feed.js": { "includeFiles": "{products.js,blog.js}" }
+  },
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-        { "key": "Pragma", "value": "no-cache" },
-        { "key": "Expires", "value": "0" }
-      ]
-    }
+      "src": "/(.*)",
+      "headers": {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      },
+      "continue": true
+    },
+    { "src": "/", "dest": "/api/render?path=/" },
+    { "src": "/sitemap\\.xml", "dest": "/api/sitemap" },
+    { "src": "/feed\\.xml", "dest": "/api/feed" },
+    { "handle": "filesystem" },
+    { "src": "/((?!api/)(?!.*\\.).*)", "dest": "/api/render?path=/$1" }
   ]
 }

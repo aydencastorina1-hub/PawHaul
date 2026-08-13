@@ -1,0 +1,38 @@
+# PawHaul — https://pawhaul.vercel.app
+# Static file: paths containing a dot are excluded from the SPA catch-all
+# rewrite in vercel.json, so this is served as-is.
+
+User-agent: *
+Allow: /
+
+# Per-visitor state with no indexable content. Also marked noindex in the
+# server-rendered <head> (api/_seo.js) — this just saves the crawl.
+Disallow: /cart
+Disallow: /wishlist
+
+# Serverless endpoints, not pages.
+Disallow: /api/
+
+# /feed.xml is deliberately NOT disallowed here. It is for Merchant Center /
+# Bing / Pinterest ingestion and has no business in a search index — but a
+# robots.txt Disallow is the wrong tool for that twice over: it does not
+# actually prevent the URL being indexed, and Merchant Center's scheduled
+# fetch reads robots.txt before pulling the file, so blocking it here is a
+# good way to make the feed silently stop updating. api/feed.js sends
+# `X-Robots-Tag: noindex` instead, which keeps it out of the index while
+# leaving it fetchable.
+
+# Common SEO crawlers that provide no traffic and only consume bandwidth.
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+Sitemap: https://pawhaul.vercel.app/sitemap.xml

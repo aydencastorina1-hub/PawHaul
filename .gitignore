@@ -7,3 +7,6 @@ desktop.ini
 
 .vercel
 .env*
+
+# Claude Code scratch worktrees
+.claude/

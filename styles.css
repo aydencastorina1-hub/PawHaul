@@ -3755,3 +3755,202 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .lifestyle-banner { height: 440px !important; }
   .det-carousel { height: 600px; }
 }
+
+/* ============================================================
+   BLOG
+   Self-contained: every selector below is a new .blog-* class, so this block
+   cannot collide with the existing cascade and is appended at the very end
+   (after the min-width desktop passes) purely for locality. Written
+   desktop-first with ≤900/≤600 overrides, matching the rest of the file.
+
+   The measure is capped at 720px on purpose — long-form body text is the one
+   place on this site where the wide content cap would hurt, since a 1400px
+   line length is unreadable. See the note about .faq-wrap in the desktop
+   layout pass: same reasoning, deliberate reading width, not a leftover.
+   ============================================================ */
+
+.blog-hero {
+  background: var(--navy);
+  color: white;
+  padding: 110px 5% 70px;
+  text-align: center;
+}
+.blog-hero .section-tag { color: var(--orange); }
+.blog-hero h1 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 46px;
+  line-height: 1.15;
+  margin: 10px 0 14px;
+  color: white;
+}
+.blog-hero p {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: 17px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.82);
+}
+
+.blog-wrap { padding: 70px 5% 90px; }
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.blog-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+}
+.blog-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
+.blog-card-img { height: 200px; background: var(--img-placeholder); overflow: hidden; }
+.blog-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.blog-card-body { padding: 22px 24px 24px; }
+.blog-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.blog-card-tags span {
+  background: var(--orange-pale);
+  color: var(--orange-dark);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 50px;
+}
+.blog-card h2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 21px;
+  line-height: 1.25;
+  color: var(--navy);
+  margin: 0 0 10px;
+}
+.blog-card p { font-size: 15px; line-height: 1.6; color: var(--gray); margin: 0 0 14px; }
+.blog-card-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; color: var(--gray);
+}
+
+/* ---------- article ---------- */
+
+.blog-article { max-width: 720px; margin: 0 auto; }
+
+/* GOTCHA: styles.css has a bare `nav { }` rule (the site navbar was written as
+   an unclassed element) which applies to EVERY <nav> on the page — including a
+   breadcrumb inside article content. Without these resets the crumbs render as
+   a full-width navy sticky bar at z-index 500 floating over the article. Any
+   future <nav> in page content needs the same treatment. */
+.blog-crumbs {
+  display: flex; align-items: center; gap: 8px;
+  justify-content: flex-start;
+  background: none;
+  padding: 0;
+  position: static;
+  box-shadow: none;
+  z-index: auto;
+  font-size: 13px; font-weight: 700; color: var(--gray); margin-bottom: 18px;
+}
+.blog-crumbs a { color: var(--orange); text-decoration: none; }
+.blog-crumbs a:hover { text-decoration: underline; }
+
+.blog-article-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 42px;
+  line-height: 1.15;
+  color: var(--navy);
+  margin: 0 0 14px;
+}
+.blog-article-meta {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; font-weight: 700; color: var(--gray); margin-bottom: 28px;
+}
+.blog-article-img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+  margin-bottom: 36px;
+  background: var(--img-placeholder);
+}
+
+.blog-body { font-size: 17px; line-height: 1.75; color: #333; }
+.blog-body h2 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 27px;
+  line-height: 1.25;
+  color: var(--navy);
+  margin: 44px 0 14px;
+}
+.blog-body h3 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--navy);
+  margin: 30px 0 10px;
+}
+.blog-body p { margin: 0 0 18px; }
+.blog-body ul, .blog-body ol { margin: 0 0 20px; padding-left: 24px; }
+.blog-body li { margin-bottom: 10px; }
+.blog-body strong { color: var(--navy); font-weight: 800; }
+.blog-body a { color: var(--orange); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.blog-body a:hover { color: var(--orange-dark); }
+
+/* In-article product callout. Visually distinct from the body copy so it
+   reads as a recommendation rather than as smuggled-in body text. */
+.blog-cta {
+  background: var(--light-gray);
+  border-left: 4px solid var(--orange);
+  border-radius: var(--radius-sm);
+  padding: 18px 22px;
+  margin: 30px 0;
+}
+.blog-cta p { margin: 0; font-size: 16px; }
+
+.blog-note {
+  font-size: 14px;
+  color: var(--gray);
+  font-style: italic;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 28px;
+}
+
+.blog-article-foot {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  margin-top: 44px; padding-top: 30px; border-top: 1px solid var(--line);
+}
+.blog-back { color: var(--gray); font-weight: 700; text-decoration: none; font-size: 15px; }
+.blog-back:hover { color: var(--orange); }
+
+@media (max-width: 900px) {
+  .blog-hero { padding: 90px 5% 50px; }
+  .blog-hero h1 { font-size: 34px; }
+  .blog-hero p { font-size: 15px; }
+  .blog-wrap { padding: 44px 5% 60px; }
+  .blog-grid { gap: 20px; }
+  .blog-article-title { font-size: 30px; }
+  .blog-article-img { height: 240px; margin-bottom: 26px; }
+  .blog-body { font-size: 16px; }
+  .blog-body h2 { font-size: 23px; margin: 34px 0 12px; }
+  .blog-body h3 { font-size: 18px; }
+}
+
+@media (max-width: 600px) {
+  .blog-grid { grid-template-columns: minmax(0, 1fr); }
+  .blog-card-img { height: 180px; }
+  .blog-hero h1 { font-size: 28px; }
+  .blog-article-title { font-size: 26px; }
+  .blog-article-img { height: 200px; }
+  .blog-cta { padding: 15px 17px; }
+  .blog-article-foot { gap: 14px; }
+}

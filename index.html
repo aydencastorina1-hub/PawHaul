@@ -55,6 +55,9 @@ function parseRoute(pathname) {
   if (path === '/about') return { type: 'page', page: 'about' };
   if (path === '/wishlist') return { type: 'page', page: 'wishlist' };
   if (path === '/cart') return { type: 'page', page: 'cart' };
+  if (path === '/blog') return { type: 'page', page: 'blog' };
+  m = path.match(/^\/blog\/([a-z0-9-]+)$/);
+  if (m) return { type: 'post', slug: m[1] };
   m = path.match(/^\/product\/([a-z0-9-]+)$/);
   if (m) return { type: 'product', slug: m[1] };
   return { type: 'unknown' };
@@ -65,6 +68,7 @@ window.parseRoute = parseRoute;
   window.__initialRoute = route;
   var routeClass = 'route-home';
   if (route.type === 'product') routeClass = 'route-product';
+  else if (route.type === 'post') routeClass = 'route-blog-post';
   else if (route.type === 'page' && route.page !== 'home') routeClass = 'route-' + route.page;
   document.documentElement.classList.add(routeClass);
   // A category deep-link (/shop/leash) shows FEWER products than /shop, so the
@@ -82,9 +86,11 @@ window.parseRoute = parseRoute;
    the .page/.page.active rule in styles.css but must be inline+in-head to
    win before first paint (styles.css itself hasn't loaded yet at this point). */
 html.route-shop #page-home, html.route-contact #page-home, html.route-about #page-home,
-html.route-wishlist #page-home, html.route-cart #page-home, html.route-product #page-home { display: none !important; }
+html.route-wishlist #page-home, html.route-cart #page-home, html.route-product #page-home,
+html.route-blog #page-home, html.route-blog-post #page-home { display: none !important; }
 html.route-shop #page-shop, html.route-contact #page-contact, html.route-about #page-about,
-html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-product #page-product { display: block !important; }
+html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-product #page-product,
+html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: block !important; }
 /* Category deep-links: keep only that category's loading skeletons, so the
    reserved height matches the filtered grid exactly (see the .skel-card block
    in styles.css). Inline + in-head for the same reason as the rule above —
@@ -152,7 +158,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=58" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=59" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -160,8 +166,9 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        skeletons are on screen. URLs must match the <script> tags below
        character-for-character (version query included) or the browser fetches
        each file twice. -->
-  <link rel="preload" as="script" href="/products.js?v=36">
-  <link rel="preload" as="script" href="/app.js?v=43">
+  <link rel="preload" as="script" href="/blog.js?v=1">
+  <link rel="preload" as="script" href="/products.js?v=37">
+  <link rel="preload" as="script" href="/app.js?v=44">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box is pointless once this device has submitted
        an email, so it's hidden BEFORE first paint rather than by JS after the
@@ -194,6 +201,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <li><a href="/" onclick="goTo(event,'home')">Home</a></li>
       <li><a href="/shop" onclick="goTo(event,'shop')">Shop<span class="nav-full"> Walk Gear</span></a></li>
       <li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li>
+      <li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li>
       <li><a href="/contact" onclick="goTo(event,'contact')">Contact</a></li>
     </ul>
   </div>
@@ -286,6 +294,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
   <a href="/" onclick="goTo(event,'home');closeMobileMenu()">Home</a>
   <a href="/shop" onclick="goTo(event,'shop');closeMobileMenu()">Shop Walk Gear</a>
   <a href="/about" onclick="goTo(event,'about');closeMobileMenu()">Our Story</a>
+  <a href="/blog" onclick="goTo(event,'blog');closeMobileMenu()">Blog</a>
   <a href="/contact" onclick="goTo(event,'contact');closeMobileMenu()">Contact</a>
   <a href="/wishlist" onclick="goTo(event,'wishlist');closeMobileMenu()">Wishlist</a>
   <div class="mob-menu-footer">
@@ -680,7 +689,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       </div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom">
       <p>© 2026 <span>PawHaul</span> — Built For Every Walk</p>
@@ -799,7 +808,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a><a class="social-btn" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
@@ -944,7 +953,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div><span class="footer-brand-logo">Paw<span>Haul</span></span><p>Walk gear built for dog owners.</p></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> — Built For Every Walk</p></div>
   </footer>
@@ -1048,7 +1057,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water & Food</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
@@ -1134,13 +1143,54 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></a><a class="social-btn" aria-label="TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></a></div></div>
       <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
-      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
     <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
+<!-- BLOG INDEX -->
+<!-- Exists for SEO: these pages target informational searches ("how to stop a
+     dog pulling on the leash") that product pages can never rank for, and each
+     post links into the relevant products. Content lives in blog.js, which is
+     read BOTH by app.js (client render) and by api/_seo.js (server render).
+     The SSR comment below is a placeholder the server swaps for the real
+     markup, so the article text is in the served HTML for crawlers that do not
+     execute JavaScript — which is most of them other than Googlebot. If JS is
+     on, app.js renders the identical markup over the top. -->
+<div id="page-blog" class="page" style="background:white;">
+  <div class="blog-hero">
+    <span class="section-tag">The PawHaul Blog</span>
+    <h1>Dog walking, done properly</h1>
+    <p>Practical guides on training, night safety, hydration and what to actually carry — written for people who walk a dog every day.</p>
+  </div>
+  <div class="blog-wrap" id="blogIndex"><!--SSR-BLOG-INDEX--></div>
+  <footer>
+    <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+    <div class="footer-grid">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water &amp; Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+  </footer>
+</div>
 
+<!-- BLOG POST -->
+<div id="page-blog-post" class="page" style="background:white;">
+  <div class="blog-wrap" id="blogPost"><!--SSR-BLOG-POST--></div>
+  <footer>
+    <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+    <div class="footer-grid">
+      <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><div style="width:46px;height:46px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/shop/water" onclick="goTo(event,'shop','water')">Water &amp; Food</a></li><li><a href="/shop/leash" onclick="goTo(event,'shop','leash')">Leashes</a></li><li><a href="/shop/safety" onclick="goTo(event,'shop','safety')">Safety Gear</a></li></ul></div>
+      <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
+    </div>
+    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+  </footer>
+</div>
 
 <!-- CHATBOT -->
 <div id="chatWidget" style="position:fixed;bottom:24px;right:16px;z-index:9999;font-family:Nunito,sans-serif;display:flex;flex-direction:column;align-items:flex-end;max-width:320px;width:calc(100vw - 32px);">
@@ -1202,8 +1252,12 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
 
 
 
-  <script src="/products.js?v=36"></script>
-  <script src="/app.js?v=43"></script>
+  <!-- Blog post data. Must precede app.js (which renders it) and is separate
+       from products.js so the server-side renderer can read one file for
+       posts and one for products — see api/_seo.js. -->
+  <script src="/blog.js?v=1"></script>
+  <script src="/products.js?v=37"></script>
+  <script src="/app.js?v=44"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
@@ -1212,6 +1266,51 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        longer jsdelivr took, the longer the page sat there un-rendered.
        products.js now calls ensureEmailjs() on demand instead. -->
   <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- ==================== ANALYTICS ====================
+       Loaded LAST and deferred, for the same reason EmailJS is: nothing here
+       is needed to render the page, and this site has repeatedly been bitten
+       by third-party scripts sitting in front of first paint.
+
+       1) VERCEL WEB ANALYTICS — privacy-friendly page views and referrers, no
+          cookies, no consent banner needed. Served from our own origin
+          (/_vercel/insights) so no ad blocker treats it as third-party.
+          REQUIRES A ONE-TIME TOGGLE: Vercel dashboard -> pawhaul -> Analytics
+          -> Enable. Until that is switched on, this 404s harmlessly.
+
+       2) VERCEL SPEED INSIGHTS — real-visitor Core Web Vitals (LCP/CLS/INP).
+          Worth having specifically because those are Google ranking signals
+          and because this site's hero/image work has repeatedly needed real
+          field numbers rather than lab guesses. Same one-time dashboard
+          toggle, under Speed Insights.
+
+       3) GOOGLE ANALYTICS 4 — richer behaviour reporting than the above, and
+          the only one of the three that can attribute a Shopify checkout back
+          to a traffic source. INERT UNTIL CONFIGURED: paste the Measurement ID
+          (looks like G-XXXXXXXXXX) from analytics.google.com -> Admin -> Data
+          Streams into GA4_ID below and nothing else needs changing. Left empty
+          on purpose so no half-configured tag ships. -->
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+  <script>
+  window.GA4_ID = ''; // <-- paste your G-XXXXXXXXXX here to switch GA4 on
+  (function () {
+    if (!window.GA4_ID) return;
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.GA4_ID;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag('js', new Date());
+    // send_page_view is off because this is an SPA: GA's automatic pageview
+    // fires once on load and would never record the /shop, /product/... and
+    // /blog/... views that follow. trackPageView() in app.js sends them on
+    // every route change instead.
+    window.gtag('config', window.GA4_ID, { send_page_view: false });
+    if (typeof trackPageView === 'function') trackPageView();
+  })();
+  </script>
 
   <!-- ROUTING bootstrap: syncs the actual page STATE (product name/price/
        images, shop grid contents, cart/wishlist contents — all of which

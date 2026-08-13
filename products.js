@@ -461,7 +461,10 @@ function pageToPath(page, filter) {
   if (page === 'about') return '/about';
   if (page === 'wishlist') return '/wishlist';
   if (page === 'cart') return '/cart';
-  return null; // 'product' owns its own URL (see showProduct) — never routed here
+  if (page === 'blog') return '/blog';
+  // 'product' and 'blog-post' own their own URLs (showProduct / showPost) —
+  // they need a slug, not just a page name, so they are never routed here.
+  return null;
 }
 
 // opts.sync: this is the browser CORRECTING us to match a URL it already
@@ -486,6 +489,16 @@ function navigateUrl(path, opts) {
 // loads) and the popstate (back/forward) listener below.
 function dispatchRoute(route, opts) {
   if (!route) return;
+  if (route.type === 'post') {
+    // showPost lives in app.js (blog rendering sits with the other content
+    // rendering there). Both files have loaded by the time anything calls
+    // dispatchRoute, but guard anyway so a load failure degrades to Home
+    // instead of throwing.
+    if (typeof showPost === 'function' && showPost(route.slug, opts)) return;
+    showPage('home', null, opts);
+    if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
+    return;
+  }
   if (route.type === 'product') {
     var p = products.find(function (pr) { return slugify(pr.name) === route.slug; });
     if (p) { showProduct(p.id, opts); return; }
@@ -523,7 +536,7 @@ function goTo(e, page, filter) {
 // keeps pinning the ORIGINAL load page's display forever, even after this
 // function removes/adds .active on the correct elements, so every nav
 // button/link appears stuck showing whatever page a hard reload landed on.
-var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product'];
+var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product', 'route-blog', 'route-blog-post'];
 
 function showPage(page, filter, opts) {
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
@@ -559,6 +572,10 @@ function showPage(page, filter, opts) {
   }
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
+  // The server already put the post cards in #blogIndex for a direct /blog
+  // load; this re-render covers in-site navigation to it (and a JS-only
+  // client that never saw the server markup). Same markup either way.
+  if (page === 'blog' && typeof renderBlogIndex === 'function') renderBlogIndex();
 
   // page==='product' is deliberately NOT routed here — showProduct() (which
   // is the only caller that ever passes 'product') owns that URL itself,
