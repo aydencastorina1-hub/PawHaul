@@ -4272,3 +4272,88 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
   .nav-right { gap: 10px; }
 }
+
+/* ============================================================
+   HERO TEXT CENTRED — DESKTOP ONLY (task 51)
+
+   The hero copy block is 100% INLINE styles in index.html
+   (align-items:flex-end + text-align:right on the container,
+   margin-left:auto + text-align:right on the paragraph,
+   justify-content:flex-end on the CTA row), so every rule here
+   needs !important to reach it. Appended LAST on purpose: the
+   min-1024 / min-1440 / min-1728 hero blocks above set some of
+   these same properties, and same-specificity source order is
+   what settles it.
+
+   Scoped min-width:901px — the SAME boundary the mobile hero
+   block (max-width:900px) ends at, so the two never overlap and
+   the mobile hero, which was already centred and correct, is
+   not touched by any of this.
+
+   Target children by :last-child / :nth-child WITHIN the copy
+   block only. Never position-match #heroSection's own children:
+   the slideshow <img>s are its first children and adding them
+   is what broke the old div:nth-child(2) overlay selector.
+   ============================================================ */
+
+@media (min-width: 901px) {
+  /* The block itself: centred in the hero, with its own text centred to
+     match. A left-aligned ragged edge inside a centred block reads as a
+     mistake — the whole point of moving it off the right edge is that it
+     now has no edge to align to. */
+  #heroSection > div:last-child {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* The paragraph was pinned right with margin-left:auto. It needs BOTH
+     margins auto now, and its own inline text-align:right undone. The
+     max-width set by the blocks above is kept — it's a reading measure,
+     and it's what stops the sentence spanning the full 1920px. */
+  #heroSection > div:last-child p {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  /* CTA row: inline justify-content:flex-end. */
+  #heroSection > div:last-child > div:last-child {
+    justify-content: center !important;
+  }
+
+  /* The overlay was built FOR right-aligned text: a one-way gradient, 0.7
+     black at the right edge fading to fully transparent at the left. Centred
+     text sits where that gradient has thinned to ~0.35, and its left half
+     runs out over bare photo — measurably worse contrast than the old
+     right-aligned copy enjoyed.
+
+     So: symmetric, with a FLAT 0.68 plateau across the middle 36% rather
+     than a single midpoint stop. A plain 3-stop gradient peaks only at the
+     exact centre, which leaves the outer thirds of a ~500px-wide text block
+     on a visibly thinner scrim; the plateau is a little wider than the block
+     at every desktop width, so the whole of it sits on peak darkness. The
+     edges keep 0.32 so the photograph still reads instead of flattening to
+     grey. Measured against the pre-change build: headline and body copy now
+     score at or above what the right-aligned version had. */
+  #heroSection .hero-overlay {
+    background: linear-gradient(to right,
+      rgba(0, 0, 0, 0.32) 0%,
+      rgba(0, 0, 0, 0.68) 32%,
+      rgba(0, 0, 0, 0.68) 68%,
+      rgba(0, 0, 0, 0.32) 100%) !important;
+  }
+}
+
+/* 901-1023 was never given desktop hero measurements: the earlier desktop
+   pass starts its hero rules at min-width:1024, so this band still runs the
+   mobile 180px paragraph — four words a line. Pinned to the right edge that
+   merely looked cramped; centred under a 56px headline it reads as broken.
+
+   Deliberately bounded at 1023 rather than folded into the block above:
+   this file's LAST matching rule wins, and an unbounded max-width here would
+   override the 430px (min-1024) and 480px (min-1728) measures set earlier. */
+@media (min-width: 901px) and (max-width: 1023px) {
+  #heroSection > div:last-child p {
+    max-width: 340px !important;
+  }
+}
