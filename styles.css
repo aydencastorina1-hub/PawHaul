@@ -4454,7 +4454,17 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   min-height: 46px;
   display: block;
 }
-.shop-pay-wrap shop-pay-button { display: block; width: 100%; }
+/* The host element already spans the full summary width, but the real button
+   lives in Shopify's SHADOW ROOT at a fixed 260px and sits flush LEFT inside
+   it — so it drew ~32px left of the Checkout Securely button's centre. Shadow
+   content still lays out inside the host's box, so making the host a centring
+   flex container moves it without needing to reach into the shadow root
+   (which CSS can't do anyway). Measured: centre offset 32px -> 0px. */
+.shop-pay-wrap shop-pay-button {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
 
 /* ---- Footer policy links ----
    Previously only the HOME footer carried the full policy set: shop had
