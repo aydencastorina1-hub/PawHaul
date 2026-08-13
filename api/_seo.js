@@ -105,8 +105,44 @@ const RETURN_POLICY = {
 //
 // When a real review system exists (Shopify Product Reviews, Judge.me free
 // tier, etc.), set this to true and point ratingFor() at the real data.
-const ENABLE_AGGREGATE_RATING = false;
-function ratingFor(/* product */) { return null; }
+// AGGREGATE RATING (updated task 56)
+//
+// This used to be a hard `false`, because marking up ratings nobody had
+// actually given risks a site-wide structured-data manual action. There is now
+// a real review system (/api/reviews), so the rule is per-product and
+// data-driven instead of a global switch: a product gets aggregateRating in
+// its JSON-LD if and ONLY if it has at least one genuine submitted review.
+//
+// Ratings are fetched by the caller (buildMeta) and passed in, because reading
+// them is async and productSchema() is not.
+async function fetchRatings(ids) {
+  const url = (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || '').replace(/\/$/, '');
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '';
+  if (!url || !token || !ids.length) return {};
+  try {
+    const res = await fetch(url + '/pipeline', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(ids.map(id => ['HGETALL', 'pawhaul:agg:' + id]))
+    });
+    if (!res.ok) return {};
+    const rows = await res.json();
+    const out = {};
+    ids.forEach((id, i) => {
+      const raw = rows[i] && rows[i].result;
+      const o = {};
+      if (Array.isArray(raw)) { for (let k = 0; k < raw.length - 1; k += 2) o[raw[k]] = raw[k + 1]; }
+      else if (raw && typeof raw === 'object') Object.assign(o, raw);
+      const n = parseInt(o.n, 10) || 0;
+      const sum = parseInt(o.sum, 10) || 0;
+      if (n > 0) out[id] = { value: Math.round((sum / n) * 10) / 10, count: n };
+    });
+    return out;
+  } catch (e) {
+    // Never let a ratings lookup break page rendering.
+    return {};
+  }
+}
 
 // ------------------------------------------------------------ file loading
 
@@ -393,7 +429,7 @@ function breadcrumbSchema(trail) {
   };
 }
 
-function productSchema(p) {
+function productSchema(p, rating) {
   const url = ORIGIN + '/product/' + slugify(p.name);
   const range = priceRange(p);
   const images = [].concat(Object.values(p.images || {}), p.extraImages || [])
@@ -432,18 +468,15 @@ function productSchema(p) {
   if (p.material) schema.material = p.material;
   if (p.colors && p.colors.length) schema.color = p.colors.join(', ');
 
-  // Off by default — see ENABLE_AGGREGATE_RATING above.
-  if (ENABLE_AGGREGATE_RATING) {
-    const r = ratingFor(p);
-    if (r) {
-      schema.aggregateRating = {
-        '@type': 'AggregateRating',
-        ratingValue: r.value,
-        reviewCount: r.count,
-        bestRating: 5,
-        worstRating: 1
-      };
-    }
+  // Present only when this product genuinely has reviews — see fetchRatings.
+  if (rating && rating.count > 0) {
+    schema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: rating.value,
+      reviewCount: rating.count,
+      bestRating: 5,
+      worstRating: 1
+    };
   }
   return schema;
 }
@@ -496,7 +529,10 @@ function titleWithBrand(t) {
   return t.indexOf(BRAND) === 0 || t.indexOf('| ' + BRAND) !== -1 ? t : t + ' | ' + BRAND;
 }
 
-function metaFor(route, products, posts) {
+// ASYNC as of task 56: product routes look up their real review aggregate
+// before building JSON-LD. renderPage() is the only caller and was already
+// async; the export is now async too.
+async function metaFor(route, products, posts) {
   const meta = {
     title: PAGE_COPY.home.title,
     description: PAGE_COPY.home.description,
@@ -525,7 +561,8 @@ function metaFor(route, products, posts) {
     meta.path = '/product/' + slugify(p.name);
     meta.ogImage = ogImageFor(p);
     meta.ogType = 'product';
-    meta.schemas.push(productSchema(p));
+    const ratings = await fetchRatings([p.id]);
+    meta.schemas.push(productSchema(p, ratings[p.id]));
     meta.schemas.push(breadcrumbSchema([
       { name: 'Home', path: '/' },
       { name: 'Shop', path: '/shop' },
@@ -702,7 +739,7 @@ async function renderPage(pathname, baseUrl, hostHeader) {
   const products = await getProducts(baseUrl);
   const posts = await getPosts(baseUrl);
   const route = parseRoute(pathname);
-  const meta = metaFor(route, products, posts);
+  const meta = await metaFor(route, products, posts);
   const isProdHost = String(hostHeader || '').toLowerCase() === PROD_HOST;
 
   // Function replacers, not string ones: the generated head and the article

@@ -4620,3 +4620,115 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .social-btn { color: #fff; }
 .social-btn:hover, .social-btn:focus-visible { color: #fff; }
 .social-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
+
+/* ============================================================
+   USER-SUBMITTED REVIEWS (task 56)
+
+   Lives inside the product page's Reviews accordion. Everything
+   here is rendered from /api/reviews — there is no static or
+   seeded state, which is why the empty case gets real design
+   attention rather than being an afterthought.
+   ============================================================ */
+
+.rv-star { width: 15px; height: 15px; display: inline-block; vertical-align: -0.15em; }
+
+.rv-loading, .rv-offline {
+  font-size: 13px; color: var(--gray); font-weight: 600; margin: 0;
+}
+
+/* The zero-review state is the DEFAULT state of a new shop, so it is styled
+   as an invitation rather than as an error. */
+.rv-empty {
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  background: var(--light-gray);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray);
+  line-height: 1.6;
+}
+.rv-empty strong { color: var(--black); font-weight: 800; }
+
+.rv-summary {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 18px; padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.rv-summary-score {
+  font-family: 'Fredoka One', cursive;
+  font-size: 40px; line-height: 1; color: var(--black);
+}
+.rv-summary-stars { display: flex; gap: 2px; margin-bottom: 4px; }
+.rv-summary-count { font-size: 13px; font-weight: 700; color: var(--gray); }
+
+.rv-list { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.rv-item { border-bottom: 1px solid var(--line-soft); padding-bottom: 16px; }
+.rv-item:last-child { border-bottom: none; padding-bottom: 0; }
+.rv-item-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.rv-item-stars { display: inline-flex; gap: 1px; }
+.rv-item-name { font-weight: 800; font-size: 14px; color: var(--black); }
+.rv-item-date { font-size: 12px; font-weight: 600; color: var(--gray); margin-left: auto; }
+.rv-item-text { margin: 0; font-size: 14px; line-height: 1.65; color: var(--gray); overflow-wrap: anywhere; }
+
+.rv-photo { display: inline-block; margin-top: 10px; border-radius: var(--radius-sm); overflow: hidden; }
+.rv-photo img {
+  display: block; width: 92px; height: 92px; object-fit: cover;
+  border-radius: var(--radius-sm); background: var(--img-placeholder);
+  transition: transform 0.2s var(--ease);
+}
+.rv-photo:hover img { transform: scale(1.04); }
+
+/* ---- write a review ---- */
+.rv-write { border-top: 1px solid var(--line); padding-top: 20px; }
+.rv-write-title { font-family: 'Fredoka One', cursive; font-size: 17px; margin: 0 0 14px; color: var(--black); }
+.rv-form { display: flex; flex-direction: column; gap: 14px; }
+.rv-field { display: flex; flex-direction: column; gap: 6px; }
+.rv-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); }
+.rv-label em { font-style: normal; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--gray); }
+
+/* Star picker: real buttons in a radiogroup so it is keyboard- and
+   screen-reader-operable, not a row of decorative glyphs. */
+.rv-starpick { display: flex; gap: 4px; }
+.rv-starbtn {
+  background: none; border: none; padding: 2px; cursor: pointer; line-height: 0;
+  border-radius: 6px; transition: transform 0.15s var(--ease);
+}
+.rv-starbtn .rv-star { width: 28px; height: 28px; }
+.rv-starbtn:hover { transform: scale(1.12); }
+.rv-starbtn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
+.rv-form input[type="text"], .rv-form textarea {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif; font-size: 16px;   /* 16px: iOS focus-zoom floor */
+  font-weight: 600; color: var(--black); background: #fff;
+  transition: border-color 0.2s var(--ease);
+}
+.rv-form textarea { resize: vertical; min-height: 92px; line-height: 1.6; }
+.rv-form input[type="text"]:focus, .rv-form textarea:focus { outline: none; border-color: var(--orange); }
+.rv-form input[type="file"] { font-size: 13px; font-weight: 600; color: var(--gray); }
+
+.rv-submit {
+  align-self: flex-start;
+  background: var(--orange); color: #fff; border: none;
+  padding: 12px 26px; border-radius: 50px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+  cursor: pointer; transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.rv-submit:hover { background: var(--orange-light); }
+.rv-submit:active { background: var(--orange-dark); transform: translateY(0); }
+.rv-submit:disabled { opacity: 0.6; cursor: default; }
+
+.rv-form-note { margin: 0; font-size: 13px; font-weight: 700; color: var(--gray); min-height: 1em; }
+.rv-form-note--err { color: #C0392B; }
+
+/* Card rating row when a product has no reviews yet — deliberately quiet,
+   since it is the honest default for a new shop rather than a warning. */
+.product-stars--empty { color: var(--gray); font-weight: 600; font-style: normal; }
+
+@media (max-width: 600px) {
+  .rv-summary-score { font-size: 34px; }
+  .rv-item-date { margin-left: 0; width: 100%; }
+  .rv-submit { align-self: stretch; text-align: center; }
+}

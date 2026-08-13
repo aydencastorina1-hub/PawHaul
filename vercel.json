@@ -3,7 +3,8 @@
   "functions": {
     "api/render.js": { "includeFiles": "{index.html,products.js,blog.js}" },
     "api/sitemap.js": { "includeFiles": "{products.js,blog.js}" },
-    "api/feed.js": { "includeFiles": "{products.js,blog.js}" }
+    "api/feed.js": { "includeFiles": "{products.js,blog.js}" },
+    "api/reviews.js": { "includeFiles": "products.js" }
   },
   "routes": [
     {

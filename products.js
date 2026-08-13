@@ -1017,7 +1017,7 @@ function productCard(p) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(${p.reviews})</span></div>
+        ${cardRatingHtml(p)}
         <div class="product-price">${priceDisplayHtml(p)}</div>
         ${cardOptionsHtml(p)}
         <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
@@ -1115,9 +1115,10 @@ function showProduct(id, opts) {
   }
   document.getElementById('detailDesc').textContent = currentProduct.desc;
   document.getElementById('detailTagline').textContent = currentProduct.tagline || '';
-  document.getElementById('detailReviews').textContent = `(${currentProduct.reviews} reviews)`;
-  var reviewsCountEl = document.getElementById('detailReviewsCount');
-  if (reviewsCountEl) reviewsCountEl.textContent = currentProduct.reviews + ' reviews';
+  // Rating text/stars are set from REAL data by syncDetailRating(); renderReviews()
+  // fills the section and calls it once the fetch lands.
+  syncDetailRating(currentProduct.id);
+  renderReviews(currentProduct.id);
   document.getElementById('qtyNum').textContent = '1';
 
   var cats = { walk: 'Walk Essentials', car: 'Car & Travel', treats: 'Health & Treats', home: 'Home & Grooming' };
@@ -1383,7 +1384,7 @@ function renderWishlist() {
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
       '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
-      '<div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(' + p.reviews + ' reviews)</span></div>' +
+      cardRatingHtml(p) +
       '<div class="product-price">' + priceDisplayHtml(p) + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
   }).join('') + '</div>';
@@ -1958,5 +1959,256 @@ function submitContact() {
   });
 }
 
+// ==================== REAL PRODUCT REVIEWS (task 56) ====================
+// Backed by /api/reviews (Upstash Redis + optional Vercel Blob). Nothing here
+// is seeded: a product with no reviews says so, and no star average is shown
+// for it anywhere on the site until a real one exists.
+//
+// reviewStats is fetched ONCE per page load for every product at boot, so the
+// shop grid and carousel can show real ratings without a request per card.
+var reviewStats = {};          // { <productId>: { count, average } }
+var reviewsConfigured = null;  // null = unknown yet, false = backend not set up
+var reviewPhotosEnabled = false;
+
+function starSvg(fill) {
+  return '<svg viewBox="0 0 24 24" fill="' + fill + '" class="rv-star" aria-hidden="true">' +
+    '<path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg>';
+}
+
+// Rounded to the nearest whole star — half-star clipping is not worth the
+// markup here, and the numeric average is always shown beside it.
+function starsHtml(avg) {
+  var full = Math.round(Number(avg) || 0);
+  var out = '';
+  for (var i = 1; i <= 5; i++) out += starSvg(i <= full ? '#FFB800' : '#D8D4CC');
+  return out;
+}
+
+function ratingFor(id) { return reviewStats[id] || null; }
+
+// Used by product cards. No reviews yet => no rating row at all, rather than
+// five decorative stars implying a score nobody gave.
+function cardRatingHtml(p) {
+  var r = ratingFor(p.id);
+  if (!r) return '<div class="product-stars product-stars--empty">No reviews yet</div>';
+  return '<div class="product-stars">' + starsHtml(r.average) +
+    ' <span>' + r.average.toFixed(1) + ' (' + r.count + ')</span></div>';
+}
+
+async function loadReviewStats() {
+  try {
+    var ids = products.map(function (p) { return p.id; }).join(',');
+    var res = await fetch('/api/reviews?stats=' + encodeURIComponent(ids), { cache: 'no-store' });
+    var data = await res.json();
+    if (data && data.ok) {
+      reviewStats = data.stats || {};
+      reviewsConfigured = !!data.configured;
+    }
+  } catch (e) {
+    reviewsConfigured = false;   // leave stats empty; cards fall back to "No reviews yet"
+  }
+  // Re-render whatever is on screen so ratings appear as soon as they arrive.
+  try {
+    if (document.getElementById('shopProducts')) renderShopProducts(currentShopFilter);
+    if (document.getElementById('homeProducts')) renderHomeProducts();
+  } catch (e) { /* pages not built yet — boot renders with stats already present */ }
+}
+
+function reviewsEscape(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function reviewDateLabel(iso) {
+  var d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function reviewCardHtml(r) {
+  var alt = 'Photo from a review by ' + reviewsEscape(r.name);
+  var photo = r.photo
+    ? '<a class="rv-photo" href="' + reviewsEscape(r.photo) + '" target="_blank" rel="noopener noreferrer">' +
+      '<img src="' + reviewsEscape(r.photo) + '" alt="' + alt + '" loading="lazy"></a>'
+    : '';
+  return '<li class="rv-item" data-review-id="' + reviewsEscape(r.id) + '">' +
+    '<div class="rv-item-head">' +
+      '<span class="rv-item-stars" aria-label="' + r.rating + ' out of 5 stars">' + starsHtml(r.rating) + '</span>' +
+      '<span class="rv-item-name">' + reviewsEscape(r.name) + '</span>' +
+      '<span class="rv-item-date">' + reviewsEscape(reviewDateLabel(r.createdAt)) + '</span>' +
+    '</div>' +
+    (r.text ? '<p class="rv-item-text">' + reviewsEscape(r.text) + '</p>' : '') +
+    photo +
+  '</li>';
+}
+
+function reviewFormHtml(productId) {
+  var photoField = reviewPhotosEnabled
+    ? '<label class="rv-field"><span class="rv-label">Photo <em>(optional)</em></span>' +
+      '<input type="file" id="rvPhoto" accept="image/jpeg,image/png,image/webp"></label>'
+    : '';
+  var starButtons = [1, 2, 3, 4, 5].map(function (n) {
+    return '<button type="button" class="rv-starbtn" role="radio" aria-checked="false" ' +
+      'aria-label="' + n + ' star' + (n > 1 ? 's' : '') + '" data-star="' + n + '" ' +
+      'onclick="pickReviewStar(' + n + ')">' + starSvg('#D8D4CC') + '</button>';
+  }).join('');
+  return '<form class="rv-form" id="rvForm" onsubmit="return submitReview(event,' + productId + ')">' +
+    '<div class="rv-field">' +
+      '<span class="rv-label">Your rating <em>(required)</em></span>' +
+      '<div class="rv-starpick" id="rvStars" role="radiogroup" aria-label="Rating out of 5">' + starButtons + '</div>' +
+    '</div>' +
+    '<label class="rv-field"><span class="rv-label">Your name</span>' +
+      '<input type="text" id="rvName" maxlength="40" placeholder="e.g. Sam" autocomplete="name"></label>' +
+    '<label class="rv-field"><span class="rv-label">Your review</span>' +
+      '<textarea id="rvText" maxlength="1500" rows="4" placeholder="How did it work out on your walks?"></textarea></label>' +
+    photoField +
+    '<button type="submit" class="rv-submit" id="rvSubmit">Post Review</button>' +
+    '<p class="rv-form-note" id="rvNote" role="status" aria-live="polite"></p>' +
+  '</form>';
+}
+
+var rvSelectedStars = 0;
+
+function pickReviewStar(n) {
+  rvSelectedStars = n;
+  var wrap = document.getElementById('rvStars');
+  if (!wrap) return;
+  wrap.querySelectorAll('.rv-starbtn').forEach(function (b) {
+    var v = parseInt(b.dataset.star, 10);
+    b.setAttribute('aria-checked', v === n ? 'true' : 'false');
+    b.innerHTML = starSvg(v <= n ? '#FFB800' : '#D8D4CC');
+  });
+  var note = document.getElementById('rvNote');
+  if (note && note.dataset.err === '1') { note.textContent = ''; note.dataset.err = ''; }
+}
+
+async function renderReviews(productId) {
+  var root = document.getElementById('reviewsRoot');
+  if (!root) return;
+  rvSelectedStars = 0;
+  root.innerHTML = '<p class="rv-loading">Loading reviews...</p>';
+
+  var data = null;
+  try {
+    var res = await fetch('/api/reviews?product=' + productId, { cache: 'no-store' });
+    data = await res.json();
+  } catch (e) { data = null; }
+
+  // Ignore a response that arrived after the shopper moved to another product.
+  if (!currentProduct || currentProduct.id !== productId) return;
+
+  if (!data || !data.ok) {
+    root.innerHTML = '<p class="rv-loading">Reviews are unavailable right now.</p>';
+    return;
+  }
+  reviewsConfigured = !!data.configured;
+  reviewPhotosEnabled = !!data.photos;
+  if (data.count > 0) reviewStats[productId] = { count: data.count, average: data.average };
+  else delete reviewStats[productId];
+
+  var summary = data.count > 0
+    ? '<div class="rv-summary">' +
+        '<div class="rv-summary-score">' + Number(data.average).toFixed(1) + '</div>' +
+        '<div><div class="rv-summary-stars">' + starsHtml(data.average) + '</div>' +
+        '<div class="rv-summary-count">' + data.count + ' review' + (data.count === 1 ? '' : 's') + '</div></div>' +
+      '</div>'
+    : '<p class="rv-empty">No reviews yet &mdash; <strong>be the first to review this product.</strong></p>';
+
+  var list = data.reviews && data.reviews.length
+    ? '<ul class="rv-list">' + data.reviews.map(reviewCardHtml).join('') + '</ul>'
+    : '';
+
+  var form = reviewsConfigured
+    ? reviewFormHtml(productId)
+    : '<p class="rv-offline">Reviews cannot be submitted yet &mdash; the store owner still needs to finish setting this up.</p>';
+
+  root.innerHTML = summary + list +
+    '<div class="rv-write"><h4 class="rv-write-title">Write a review</h4>' + form + '</div>';
+
+  syncDetailRating(productId);
+}
+
+// Keeps the price-block rating line honest and in step with the section below.
+function syncDetailRating(productId) {
+  var r = ratingFor(productId);
+  var starWrap = document.querySelector('#page-product .detail-stars');
+  var countEl = document.getElementById('detailReviews');
+  if (starWrap) {
+    starWrap.querySelectorAll('svg').forEach(function (s) { s.remove(); });
+    if (r) starWrap.insertAdjacentHTML('afterbegin', starsHtml(r.average));
+  }
+  if (countEl) {
+    countEl.textContent = r
+      ? '(' + r.average.toFixed(1) + ' · ' + r.count + ' review' + (r.count === 1 ? '' : 's') + ')'
+      : '(No reviews yet)';
+  }
+}
+
+async function submitReview(ev, productId) {
+  ev.preventDefault();
+  var note = document.getElementById('rvNote');
+  var btn = document.getElementById('rvSubmit');
+  var setNote = function (msg, isErr) {
+    if (!note) return;
+    note.textContent = msg;
+    note.dataset.err = isErr ? '1' : '';
+    note.className = 'rv-form-note' + (isErr ? ' rv-form-note--err' : '');
+  };
+
+  if (!rvSelectedStars) { setNote('Please pick a star rating first.', true); return false; }
+
+  var photoInput = document.getElementById('rvPhoto');
+  var payload = {
+    productId: productId,
+    rating: rvSelectedStars,
+    name: (document.getElementById('rvName') || {}).value || '',
+    text: (document.getElementById('rvText') || {}).value || ''
+  };
+
+  if (photoInput && photoInput.files && photoInput.files[0]) {
+    var f = photoInput.files[0];
+    if (f.size > 2 * 1024 * 1024) { setNote('That photo is over 2MB - please pick a smaller one.', true); return false; }
+    try {
+      payload.photo = await new Promise(function (resolve, reject) {
+        var fr = new FileReader();
+        fr.onload = function () { resolve(fr.result); };
+        fr.onerror = reject;
+        fr.readAsDataURL(f);
+      });
+    } catch (e) { /* post the review without the photo rather than losing it */ }
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
+  setNote('');
+  try {
+    var res = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    var data = await res.json();
+    if (!data || !data.ok) {
+      setNote((data && data.error) || 'Could not post your review - please try again.', true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Post Review'; }
+      return false;
+    }
+    showToast('Thanks for your review!');
+    reviewStats[productId] = { count: data.count, average: data.average };
+    await renderReviews(productId);
+    // The card grids show the average too, so refresh them with the new number.
+    try {
+      if (document.getElementById('shopProducts')) renderShopProducts(currentShopFilter);
+      if (document.getElementById('homeProducts')) renderHomeProducts();
+    } catch (e) { /* not fatal */ }
+  } catch (e) {
+    setNote('Could not post your review - please try again.', true);
+    if (btn) { btn.disabled = false; btn.textContent = 'Post Review'; }
+  }
+  return false;
+}
+
 // ==================== INIT ====================
 renderHomeProducts();
+// Real review aggregates for every product, one request, then a re-render.
+loadReviewStats();
