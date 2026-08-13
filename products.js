@@ -473,9 +473,42 @@ function pageToPath(page, filter) {
 // opts.replace: an explicit non-sync replace (e.g. filter pills — see
 // filterProducts()) — updates the URL without growing browser history.
 // default: a real user-driven navigation — pushState (adds a back-button step).
+// Which nav entry should read as "you are here" for a given path. Product
+// pages count as Shop and a blog post counts as Blog — the section is what a
+// nav highlight is for, not the exact URL.
+function navKeyFor(path) {
+  var p = String(path || '/').split('?')[0].replace(/\/+$/, '') || '/';
+  if (p === '/') return 'home';
+  if (p === '/shop' || p.indexOf('/shop/') === 0 || p.indexOf('/product/') === 0) return 'shop';
+  if (p === '/blog' || p.indexOf('/blog/') === 0) return 'blog';
+  if (p === '/about') return 'about';
+  if (p === '/contact') return 'contact';
+  if (p === '/wishlist') return 'wishlist';
+  return ''; // /cart and anything unknown highlight nothing
+}
+
+// Drives the active state on BOTH the desktop nav and the mobile menu (they
+// share the data-nav attribute). This cannot be done with the html.route-*
+// classes the <head> sets: showPage() strips those the moment client-side
+// routing takes over, so they only ever describe the first page loaded.
+function markActiveNav(path) {
+  var key = navKeyFor(path);
+  var els = document.querySelectorAll('[data-nav]');
+  for (var i = 0; i < els.length; i++) {
+    var el = els[i];
+    var on = el.getAttribute('data-nav') === key;
+    el.classList.toggle('is-active', on);
+    if (on) el.setAttribute('aria-current', 'page');
+    else el.removeAttribute('aria-current');
+  }
+}
+
 function navigateUrl(path, opts) {
   opts = opts || {};
   if (!path) return;
+  // Before the early returns below: the destination is known here on every
+  // call, including the ones that don't end up touching history at all.
+  markActiveNav(path);
   if (opts.sync) {
     if (location.pathname !== path) history.replaceState({ p: 1 }, '', path);
     return;
