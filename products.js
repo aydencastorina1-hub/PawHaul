@@ -410,6 +410,150 @@ var EMAILJS_SERVICE_ID    = 'service_qqcrtoe';
 var EMAILJS_CONTACT_TEMPLATE = 'template_t5ark9a';
 var DISCOUNT_CODE = 'WELCOME10';   // Your 10% off code (change this anytime) — also shown by the offer popup
 
+// ==================== TRUST / PAYMENT SIGNALS ====================
+// EVERY signal here is verified against the real store — nothing decorative,
+// nothing aspirational. Two independent sources were used:
+//
+//   1. /api/shop  -> shop.paymentSettings.acceptedCardBrands reported
+//      VISA, MASTERCARD, AMERICAN_EXPRESS, DISCOVER, DINERS_CLUB.
+//   2. The REAL checkout page for a real cart was loaded and read, because
+//      paymentSettings alone is misleading: it reported
+//      shopifyPaymentsAccountId as null (which would suggest Shop Pay is
+//      off) while the live checkout in fact offers Shop Pay as its first
+//      express option. It also OMITS PayPal and Venmo entirely, since those
+//      are PayPal-provided rather than Shopify digital wallets.
+//
+// Shown: the four card networks a US shopper will actually recognise, plus
+// the two express methods that render on every device. DELIBERATELY LEFT OUT
+// to keep the row honest and uncluttered rather than maximal:
+//   - Diners Club: accepted, but vanishingly rare in this market.
+//   - Apple Pay:   real, but only ever renders on Apple devices/Safari, so a
+//                  static badge would be a lie on most of the traffic.
+//   - Venmo/Google Pay: real, but they push the row past the point where it
+//                  reads as reassurance instead of clutter.
+// Re-check with `curl https://pawhaul.vercel.app/api/shop` if payment
+// providers change in the Shopify admin.
+var STORE_URL = 'https://pawhaul.myshopify.com';
+
+// Small, restrained marks. Deliberately NOT full-colour reproductions of each
+// brand's logo — approximating trademarked artwork badly looks cheaper than
+// not using it, and a row of six saturated logos fights the navy/orange
+// palette. Each is the brand's own colour on a neutral chip.
+var PAYMENT_MARKS = [
+  { name: 'Visa', svg:
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
+    '<text x="17" y="15.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="9.5" font-weight="700" font-style="italic" fill="#1434CB">VISA</text>' },
+  { name: 'Mastercard', svg:
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
+    '<circle cx="14" cy="11" r="6" fill="#EB001B"/><circle cx="20" cy="11" r="6" fill="#F79E1B" fill-opacity="0.85"/>' },
+  { name: 'American Express', svg:
+    '<rect width="34" height="22" rx="3" fill="#006FCF"/>' +
+    '<text x="17" y="14.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7" font-weight="700" fill="#fff">AMEX</text>' },
+  // The ball sits AFTER the wordmark, as it does in the real Discover logo —
+  // centring the text and dropping a circle at x=26 overlapped the final "C".
+  { name: 'Discover', svg:
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
+    '<text x="4" y="14.3" font-family="Arial,Helvetica,sans-serif" font-size="6.2" font-weight="700" fill="#4D4D4D">DISC</text>' +
+    '<circle cx="27.5" cy="11" r="4" fill="#FF6000"/>' },
+  { name: 'Shop Pay', svg:
+    '<rect width="34" height="22" rx="3" fill="#5A31F4"/>' +
+    '<text x="17" y="14.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="8" font-weight="700" fill="#fff">shop</text>' },
+  { name: 'PayPal', svg:
+    '<rect width="34" height="22" rx="3" fill="#fff" stroke="#E3E0D9"/>' +
+    '<text x="17" y="14.8" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="7.5" font-weight="700" fill="#003087">PayPal</text>' }
+];
+
+function paymentMarksHtml() {
+  return PAYMENT_MARKS.map(function (m) {
+    return '<svg class="pay-mark" viewBox="0 0 34 22" role="img" aria-label="' + m.name + '">' +
+      '<title>' + m.name + '</title>' + m.svg + '</svg>';
+  }).join('');
+}
+
+var LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+  'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+  '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
+
+// One component, used on both the cart and the product page. `variant`
+// controls how much it says: the cart is where payment actually matters, the
+// product page gets the quieter one-line version.
+function trustBadgesHtml(variant) {
+  var full = variant === 'full';
+  return '<div class="trust-badges' + (full ? ' trust-badges--full' : '') + '">' +
+    '<p class="trust-badges-line">' + LOCK_SVG +
+      '<span>Secure checkout powered by <strong>Shopify</strong></span></p>' +
+    '<div class="pay-marks">' + paymentMarksHtml() + '</div>' +
+    (full ? '<p class="trust-badges-note">Payment is taken by Shopify — this site never sees your card details.</p>' : '') +
+    '</div>';
+}
+
+// The checkout button's label lives in its own span so a status change
+// ("Preparing checkout...") can't wipe out sibling markup inside the button.
+function setCheckoutBtnLabel(btn, text) {
+  var label = btn.querySelector('.checkout-btn-label');
+  if (label) label.textContent = text; else btn.textContent = text;
+}
+
+// ---- Buy with Shop Pay (real accelerated checkout) ----------------------
+// <shop-pay-button> is Shopify's own custom element. Verified working for
+// THIS store from a plain non-Shopify origin with nothing but the script
+// below — no app install, no extra Storefront API scope, no Shop Pay Wallet
+// plan. (The separate "Shop Pay Component"/ShopPayPaymentRequestSession API
+// in Shopify's docs is a different, heavier product and is NOT needed here.)
+//
+// It takes a literal variant list and opens its own accelerated checkout, so
+// it deliberately does NOT reuse the synced Shopify cart id. That is safe
+// here only because nothing is ever attached to the cart server-side — the
+// WELCOME10 discount is typed in by the customer at checkout, and no cart
+// attributes/notes are set. If cart-level discounts are ever added, this
+// button must be revisited or it will silently drop them.
+//
+// Rendered only when every line resolves to a real Shopify variant; a cart
+// that can't be fully resolved falls back to the standard button alone,
+// which is the same guard checkout() applies.
+function shopPayVariantList() {
+  if (!cart.length) return '';
+  var parts = [];
+  for (var i = 0; i < cart.length; i++) {
+    var gid = resolveShopifyVariantId(cart[i]);
+    if (!gid) return '';
+    var numeric = String(gid).split('/').pop();
+    if (!/^\d+$/.test(numeric)) return '';
+    parts.push(numeric + ':' + cart[i].qty);
+  }
+  return parts.join(',');
+}
+
+function shopPayBlockHtml() {
+  var variants = shopPayVariantList();
+  if (!variants) return '';
+  // The wrapper carries a fixed height in CSS. The custom element is unknown
+  // to the browser until the module lands from Shopify's CDN, and an unknown
+  // element is an inline 0-height box — without reserved space the whole
+  // summary below it would jump once the button upgrades.
+  return '<div class="shop-pay-or"><span>or</span></div>' +
+    '<div class="shop-pay-wrap">' +
+      '<shop-pay-button store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
+    '</div>';
+}
+
+// Loaded on demand, never at boot: it is ~16 module chunks from Shopify's CDN
+// and only the cart page has anything to show it on.
+var shopPayLoaded = false;
+function loadShopPay() {
+  if (shopPayLoaded || !document.querySelector('shop-pay-button')) return;
+  shopPayLoaded = true;
+  var s = document.createElement('script');
+  s.type = 'module';
+  s.src = 'https://cdn.shopify.com/shopifycloud/shop-js/modules/v2/loader.pay-button.esm.js';
+  s.onerror = function () {
+    // Shopify unreachable/blocked — drop the reserved space rather than leave
+    // an empty gap and an orphaned "or" divider above it.
+    document.querySelectorAll('.shop-pay-wrap, .shop-pay-or').forEach(function (el) { el.remove(); });
+  };
+  document.head.appendChild(s);
+}
+
 // EmailJS is initialised LAZILY — the first time a form actually sends. It used
 // to run here, at the top level, which forced its <script> tag to load (render-
 // blocking, from a third-party CDN) BEFORE this file could execute. The browser
@@ -1004,6 +1148,9 @@ function showProduct(id, opts) {
     item.classList.toggle('open', i === 0);
   });
 
+  var trustEl = document.getElementById('detailTrustBadges');
+  if (trustEl && !trustEl.childElementCount) trustEl.innerHTML = trustBadgesHtml('compact');
+
   document.getElementById('stickyName').textContent = currentProduct.name;
   initStickyAtc();
 
@@ -1310,10 +1457,13 @@ function renderCart() {
         <div class="summary-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
         <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
         <div class="summary-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
-        <button class="checkout-btn" onclick="checkout()">Checkout Securely →</button>
-        <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px;font-weight:600">Secure checkout • 30 day returns</p>
+        <button class="checkout-btn" onclick="checkout()"><span class="checkout-btn-label">Checkout Securely →</span></button>
+        ${shopPayBlockHtml()}
+        <p class="cart-returns-line">30-day returns • Free shipping on every order</p>
+        ${trustBadgesHtml('full')}
       </div>
     </div>`;
+  loadShopPay();
 }
 
 function updateCartQty(idx, delta) {
@@ -1584,7 +1734,7 @@ async function checkout() {
     return;
   }
 
-  if (btn) { btn.disabled = true; btn.textContent = 'Preparing checkout...'; }
+  if (btn) { btn.disabled = true; setCheckoutBtnLabel(btn, 'Preparing checkout...'); }
   showToast('Redirecting to secure checkout...');
 
   try {
@@ -1603,10 +1753,10 @@ async function checkout() {
       window.location.href = data.checkoutUrl;
       return;
     }
-    if (btn) { btn.disabled = false; btn.textContent = 'Checkout Securely →'; }
+    if (btn) { btn.disabled = false; setCheckoutBtnLabel(btn, 'Checkout Securely →'); }
     showToast((data && data.error) || 'Could not start checkout — please try again.', 5000);
   } catch (e) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Checkout Securely →'; }
+    if (btn) { btn.disabled = false; setCheckoutBtnLabel(btn, 'Checkout Securely →'); }
     showToast('Could not start checkout — please try again.', 5000);
   }
 }

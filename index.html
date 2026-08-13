@@ -158,7 +158,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=65" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=66" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -167,7 +167,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=39">
+  <link rel="preload" as="script" href="/products.js?v=40">
   <link rel="preload" as="script" href="/app.js?v=45">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box is pointless once this device has submitted
@@ -715,6 +715,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
         <button type="button" class="offer-copy-btn" id="emailCopyBtn"
                 onclick="copyOfferCode('emailCode','emailCopyBtn')">Copy Code</button>
       </div>
+      <p class="offer-where">Enter this at checkout — our checkout is hosted &amp; secured by <strong>Shopify</strong>.</p>
     </div>
   </section>
 
@@ -735,6 +736,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
     <div class="footer-bottom">
+      <nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav>
       <p>© 2026 <span>PawHaul</span> — Built For Every Walk</p>
       <p>Made for dog owners everywhere</p>
     </div>
@@ -853,7 +855,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -896,6 +898,10 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Free Shipping</span>
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>30-Day Returns</span>
         </div>
+        <!-- Filled by showProduct() via trustBadgesHtml() so the payment row
+             is defined in exactly one place (products.js) and can't drift
+             between the product page and the cart. -->
+        <div id="detailTrustBadges"></div>
 
       <!-- BUNDLE SUGGESTION -->
       <div id="bundleSuggestion" style="display:none;margin-top:24px;background:var(--orange-pale);border-radius:var(--radius);padding:20px;border:2px solid var(--orange);">
@@ -998,7 +1004,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span> — Built For Every Walk</p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span> — Built For Every Walk</p></div>
   </footer>
 </div>
 <div id="page-cart" class="page" style="background:white;">
@@ -1102,7 +1108,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -1188,7 +1194,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -1216,7 +1222,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -1231,7 +1237,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
-    <div class="footer-bottom"><p>© 2026 <span>PawHaul</span></p></div>
+    <div class="footer-bottom"><nav class="footer-policies" aria-label="Policies"><a onclick="showPolicy('shipping')">Shipping Policy</a><a onclick="showPolicy('refund')">Refund Policy</a><a onclick="showPolicy('privacy')">Privacy Policy</a><a onclick="showPolicy('terms')">Terms of Service</a></nav><p>© 2026 <span>PawHaul</span></p></div>
   </footer>
 </div>
 
@@ -1299,7 +1305,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=39"></script>
+  <script src="/products.js?v=40"></script>
   <script src="/app.js?v=45"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
@@ -1402,6 +1408,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
           <span class="offer-code" id="offerCode">WELCOME10</span>
           <button type="button" class="offer-copy-btn" id="offerCopyBtn" onclick="copyOfferCode()">Copy Code</button>
         </div>
+        <p class="offer-where">Enter this at checkout — our checkout is hosted &amp; secured by <strong>Shopify</strong>.</p>
         <button type="button" class="offer-continue" onclick="dismissOffer()">Continue Shopping →</button>
       </div>
     </div>

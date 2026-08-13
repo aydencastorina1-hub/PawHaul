@@ -4357,3 +4357,165 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     max-width: 340px !important;
   }
 }
+
+/* ============================================================
+   TRUST / PAYMENT SIGNALS (task 52)
+
+   Every mark in this row corresponds to a payment method the
+   store genuinely accepts — verified against the Storefront
+   API's shop.paymentSettings AND against the real checkout
+   page (see the comment above PAYMENT_MARKS in products.js).
+   Nothing here is decorative.
+
+   Restraint is the point: a wall of saturated card logos reads
+   as try-hard and fights the navy/orange palette, so the marks
+   are small, on neutral chips, and capped at six.
+   ============================================================ */
+
+.trust-badges { margin-top: 16px; }
+
+.trust-badges-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--gray);
+  text-align: center;
+  margin: 0;
+}
+.trust-badges-line svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--green); }
+.trust-badges-line strong { color: var(--black); font-weight: 800; }
+
+.pay-marks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+/* Fixed box so the row's height never depends on how many marks render. */
+.pay-mark {
+  width: 34px;
+  height: 22px;
+  display: block;
+  flex: 0 0 auto;
+  border-radius: 3px;
+}
+
+.trust-badges-note {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--gray);
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Cart-only: the returns line that used to read "Secure checkout • 30 day
+   returns". "Secure checkout" moved into the badge block above, where it now
+   says who actually secures it, so repeating it here would be noise. */
+.cart-returns-line {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+/* ---- Buy with Shop Pay ---- */
+.shop-pay-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 12px;
+  color: var(--gray);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.shop-pay-or::before, .shop-pay-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+/* HEIGHT IS RESERVED ON PURPOSE. <shop-pay-button> is unknown to the browser
+   until Shopify's module arrives from their CDN, and an unknown element is an
+   inline 0-height box — without this the trust badges and everything under
+   them would jump ~46px when it upgrades. 46px = the button's own rendered
+   height (42px, measured) plus its internal margin. If Shopify ever changes
+   that height, this number is what keeps the page still. */
+.shop-pay-wrap {
+  min-height: 46px;
+  display: block;
+}
+.shop-pay-wrap shop-pay-button { display: block; width: 100%; }
+
+/* ---- Footer policy links ----
+   Previously only the HOME footer carried the full policy set: shop had
+   privacy alone, and wishlist/about/contact/blog/blog-post had none at all.
+   They now live in .footer-bottom, which is the one structure all seven
+   footers share. */
+/* THE BARE-<nav> TRAP, HIT AGAIN. styles.css styles the element selector
+   `nav {}` near the top of this file as the site header — navy background,
+   sticky, z-index 500, padding 14px 5%, justify-content:space-between. ANY
+   <nav> added anywhere in this document inherits all of it: this row first
+   rendered as a navy bar floating at the left of the footer, and collapsed
+   to invisible on mobile. Task 49's mobile menu hit the identical thing.
+   Every one of these declarations is undoing that rule, not styling choice. */
+.footer-policies {
+  background: none;
+  padding: 0;
+  position: static;
+  top: auto;
+  z-index: auto;
+  box-shadow: none;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 20px;
+  margin-bottom: 12px;
+}
+.footer-policies a {
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  transition: color 0.2s var(--ease);
+}
+.footer-policies a:hover { color: var(--orange); }
+.footer-policies a:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Sits under the revealed WELCOME10 code in both the popup and the home
+   10% off box, telling the customer where the code is actually used. */
+.offer-where {
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--gray);
+  text-align: center;
+}
+.offer-where strong { color: var(--black); font-weight: 800; }
+
+/* Product page: quieter than the cart's. The detail column is narrow, so the
+   marks get their own line under the existing shipping/returns pair. */
+#detailTrustBadges .trust-badges { margin-top: 14px; }
+#detailTrustBadges .pay-marks { justify-content: flex-start; }
+#detailTrustBadges .trust-badges-line { justify-content: flex-start; text-align: left; }
+
+@media (max-width: 900px) {
+  #detailTrustBadges .pay-marks,
+  #detailTrustBadges .trust-badges-line { justify-content: center; text-align: center; }
+}
