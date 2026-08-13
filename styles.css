@@ -2631,7 +2631,29 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* ── SMOOTH SCROLLING & GPU ACCELERATION ──────────────── */
   html { scroll-behavior: smooth; }
   nav { transform: translateZ(0); will-change: transform; }
-  .page { -webkit-overflow-scrolling: touch; }
+
+  /* `.page { -webkit-overflow-scrolling: touch }` USED TO BE HERE. Removed —
+     it is the cause of the "first tap on a card does nothing until you scroll"
+     bug (task 54), and it was doing no work in exchange.
+
+     .page is `display:block` and has NO overflow property anywhere in this
+     file, so it is not a scroll container — and this property only affects
+     overflow:auto/scroll elements. Worse, on iOS it forces the element into
+     its own accelerated compositing layer, and content inside such a layer is
+     a known source of taps landing nowhere until a scroll forces the layer to
+     resync. That is exactly the reported symptom, on exactly the element that
+     wraps EVERY page, which is why it showed up on the shop grid, the home
+     carousel and product pages alike.
+
+     It also explains why this was never reproducible in any local tool: neither
+     Chromium nor Playwright's Windows WebKit implements the property, so the
+     layer is never created and the bug cannot appear there.
+
+     Nothing is lost by deleting it: since iOS 13 momentum scrolling is the
+     default everywhere and the property is deprecated. The three REMAINING
+     uses in this file are all on real overflow:auto containers (nav search
+     results, trust bar, shop filters) and are left alone. Do not reintroduce
+     this on a non-scrolling element. */
 
   /* ── DISABLE DOUBLE-TAP ZOOM ───────────────────────────── */
   * { touch-action: manipulation; }
