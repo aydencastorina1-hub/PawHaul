@@ -1,62 +1,43 @@
 ﻿:root {
-  /* ===== BLACK & WHITE PALETTE (task 53) =====
-     The site was navy + orange. Every token below keeps its ORIGINAL NAME so
-     the ~200 var() call sites across this file resolve without being touched
-     one by one — only the values changed. The names are now historical, not
-     descriptive: --orange is the accent, and the accent is black.
-
-     THE ONE THING THAT DOESN'T SURVIVE A STRAIGHT SWAP: the old design used
-     orange as an accent ON NAVY (nav links, cart pill, footer, hero badge,
-     mobile menu). Accent-black on near-black is invisible, so every dark
-     surface flips its accent to white in the "DARK-SURFACE ACCENTS" block at
-     the end of this file. Change one, check the other. */
-
-  /* Accent. On light surfaces it is near-black; --orange-dark is the PRESSED
-     state and is deeper still, so press feedback survives without colour. */
-  --orange: #111111;
-  --orange-light: #3A3A3A;
-  --orange-dark: #000000;
-  --orange-pale: #EDEDED;      /* was a warm tint behind accent chips */
-
-  /* Accent as it must appear on any dark surface. */
-  --accent-on-dark: #FFFFFF;
-
-  --black: #111111;
-  --navy: #111111;             /* nav / dark bands */
-  --navy-2: #1C1C1C;           /* cards on dark */
-  --navy-deep: #000000;        /* footer, body behind bounce */
-
-  /* Text greys. --gray is body-secondary and must stay >= 4.5:1 on white:
-     #595959 measures 7.0:1. Anything lighter is decoration, not text. */
-  --gray: #595959;
-  --gray-soft: #767676;        /* 4.6:1 on white — smallest still-readable */
-
-  --light-gray: #F4F4F4;
-  --offwhite: #F4F4F4;
+  --orange: #E8630A;
+  --orange-light: #FF7A2E;
+  --orange-dark: #C95608;
+  --orange-pale: #FCEADD;
+  --black: #1a1a2e;        /* repurposed as primary navy */
+  --navy: #1a1a2e;
+  --navy-2: #16213e;
+  --navy-deep: #0d0d1a;
+  --gray: #6B6B6B;
+  --light-gray: #f8f6f2;   /* off-white for light sections */
+  --offwhite: #f8f6f2;
   --white: #FFFFFF;
+  --green: #22C55E;
 
-  /* Was green (#ACACAC) for "FREE" and the sale badge. Both now carry their
-     meaning with weight and a chip, not hue. */
-  --green: #111111;
+  /* Warm neutrals for borders/dividers — tinted toward the off-white so
+     light UI chrome feels cohesive instead of cool-gray. */
+  --line: #E9E4DB;
+  --line-soft: #F1EEE7;
 
-  --line: #E2E2E2;
-  --line-soft: #EFEFEF;
+  /* Shown behind every <img> until it decodes, so a slow connection reveals
+     a soft neutral placeholder instead of whatever's behind the element
+     (which on mobile can be the deep-navy body — read as a "black flash"). */
+  --img-placeholder: #f0ede6;
 
-  --img-placeholder: #EFEFEF;
-  --skel: #E4E4E4;
+  /* Fill for the product-card loading skeletons (see the very bottom of this
+     file) — one notch darker than --line-soft so the placeholder bars read as
+     content-shaped, not as empty card. */
+  --skel: #ECE6DC;
 
   --radius: 20px;
   --radius-sm: 12px;
 
-  /* Neutral black shadows — the old ones were navy-tinted. */
-  --shadow-xs: 0 1px 3px rgba(0,0,0,0.07);
-  --shadow-sm: 0 2px 10px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
-  --shadow: 0 8px 30px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.05);
-  --shadow-hover: 0 24px 48px -12px rgba(0,0,0,0.20), 0 8px 20px -8px rgba(0,0,0,0.12);
-  /* Was an orange glow. A coloured glow has no greyscale equivalent, so the
-     lift is carried by a deeper neutral shadow instead. */
-  --shadow-orange: 0 8px 24px rgba(0,0,0,0.30);
-  --shadow-orange-hover: 0 14px 32px rgba(0,0,0,0.40);
+  /* Layered navy-tinted shadows: soft, diffuse, never muddy. */
+  --shadow-xs: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-sm: 0 2px 10px rgba(26,26,46,0.06), 0 1px 3px rgba(26,26,46,0.04);
+  --shadow: 0 8px 30px rgba(26,26,46,0.09), 0 2px 8px rgba(26,26,46,0.04);
+  --shadow-hover: 0 24px 48px -12px rgba(26,26,46,0.18), 0 8px 20px -8px rgba(26,26,46,0.1);
+  --shadow-orange: 0 8px 24px rgba(232,99,10,0.28);
+  --shadow-orange-hover: 0 14px 32px rgba(232,99,10,0.38);
 
   /* Signature easing — snappy start, silky landing. */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -386,7 +367,7 @@ nav {
 
 /* HERO */
 .hero {
-  background: radial-gradient(ellipse at 25% 45%, #E9E9E9 0%, #E1E1E1 45%, #D9D9D9 100%);
+  background: radial-gradient(ellipse at 25% 45%, #FFE4CC 0%, #FFDBBE 45%, #FFD0AD 100%);
   padding: 70px 5% 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -468,7 +449,7 @@ nav {
 .hero-dog {
   width: 100%;
   height: 360px;
-  background: linear-gradient(135deg, #DCDCDC 0%, #CDCDCD 100%);
+  background: linear-gradient(135deg, #FFD4B8 0%, #FFBF99 100%);
   border-radius: 24px 24px 0 0;
   display: flex;
   align-items: center;
@@ -556,14 +537,14 @@ nav {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, transparent 60%, rgba(0, 0, 0,0.04) 100%);
+  background: linear-gradient(135deg, transparent 60%, rgba(232,99,10,0.04) 100%);
   pointer-events: none;
 }
 
 .collection-card:hover {
   transform: translateY(-8px);
   border-color: var(--orange);
-  box-shadow: 0 20px 40px rgba(0, 0, 0,0.15);
+  box-shadow: 0 20px 40px rgba(232,99,10,0.15);
 }
 
 .col-emoji {
@@ -615,7 +596,7 @@ nav {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  box-shadow: 0 1px 2px rgba(0, 0, 0,0.04), 0 6px 20px -4px rgba(0, 0, 0,0.10);
+  box-shadow: 0 1px 2px rgba(26,26,46,0.04), 0 6px 20px -4px rgba(26,26,46,0.10);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -623,12 +604,12 @@ nav {
 
 .product-card:active {
   transform: scale(0.98);
-  box-shadow: 0 1px 2px rgba(0, 0, 0,0.04), 0 2px 8px -2px rgba(0, 0, 0,0.10);
+  box-shadow: 0 1px 2px rgba(26,26,46,0.04), 0 2px 8px -2px rgba(26,26,46,0.10);
 }
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0,0.06), 0 16px 32px -8px rgba(0, 0, 0,0.16);
+  box-shadow: 0 4px 12px rgba(26,26,46,0.06), 0 16px 32px -8px rgba(26,26,46,0.16);
 }
 
 .product-img-wrap { position: relative; overflow: hidden; flex-shrink: 0; }
@@ -636,7 +617,7 @@ nav {
 .product-img {
   width: 100%;
   height: 300px;
-  background: linear-gradient(145deg, #ECECEC 0%, #E0E0E0 100%);
+  background: linear-gradient(145deg, #FFE8D5 0%, #FFD9C0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -668,11 +649,11 @@ nav {
   border-radius: 50%;
   cursor: pointer;
   font-size: 14px;
-  color: #7F7F7F; /* hearts always solid red */
+  color: #FF0000; /* hearts always solid red */
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(0, 0, 0,0.18);
+  box-shadow: 0 1px 4px rgba(26,26,46,0.18);
   transition: all 0.2s var(--ease);
   opacity: 0;
 }
@@ -704,7 +685,7 @@ nav {
      (invisible) instead of visibly overflowing. Keep it un-shrinkable. */
   flex-shrink: 0;
 }
-.product-stars { color: #111111; font-size: 11px; margin-bottom: 8px; flex-shrink: 0; }
+.product-stars { color: #FFB800; font-size: 11px; margin-bottom: 8px; flex-shrink: 0; }
 .product-stars span { color: var(--gray); font-size: 11px; font-weight: 600; }
 
 .product-price {
@@ -731,7 +712,7 @@ nav {
   width: 17px;
   height: 17px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(26, 26, 46, 0.18);
   padding: 0;
   cursor: pointer;
   flex-shrink: 0;
@@ -756,7 +737,7 @@ nav {
 .mini-size:hover { border-color: var(--orange); }
 .mini-size.active {
   border-color: var(--orange);
-  background: rgba(0, 0, 0, 0.10);
+  background: rgba(232, 99, 10, 0.10);
   color: var(--orange);
 }
 .mini-size-oos {
@@ -787,7 +768,7 @@ nav {
 .why-section {
   /* Subtle depth: barely-there navy gradient instead of a flat fill.
      Stays well within readable contrast for the white text on top. */
-  background: linear-gradient(160deg, #1A1A1A 0%, var(--navy) 55%, #0D0D0D 100%);
+  background: linear-gradient(160deg, #1f2040 0%, var(--navy) 55%, #14152b 100%);
   padding: 140px 5%;
   color: white;
 }
@@ -812,7 +793,7 @@ nav {
 }
 
 .why-card:hover {
-  background: rgba(0, 0, 0,0.12);
+  background: rgba(232,99,10,0.12);
   border-color: var(--orange);
   border-top: 3px solid var(--orange);
   transform: translateY(-6px);
@@ -897,7 +878,7 @@ nav {
 
 /* ── 10% OFF POPUP ─────────────────────────────────────────── */
 .offer-overlay {
-  position: fixed; inset: 0; background: rgba(0, 0, 0,0.62);
+  position: fixed; inset: 0; background: rgba(13,13,26,0.62);
   z-index: 1000; opacity: 0; pointer-events: none;
   transition: opacity 0.4s ease;
 }
@@ -909,7 +890,7 @@ nav {
   position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -50%) scale(0.92);
   width: min(820px, calc(100% - 40px));
-  background: #111111; border-radius: 24px;
+  background: #1a1a2e; border-radius: 24px;
   overflow: hidden; display: flex; box-sizing: border-box;
   box-shadow: 0 40px 90px -20px rgba(0,0,0,0.55);
   z-index: 1001;
@@ -925,7 +906,7 @@ nav {
 
 .offer-photo {
   position: relative; width: 45%; min-height: 480px; flex-shrink: 0;
-  background: #111111; /* same as the card: a raster gap can never flash a lighter color */
+  background: #1a1a2e; /* same as the card: a raster gap can never flash a lighter color */
   overflow: hidden;
 }
 .offer-photo img {
@@ -939,30 +920,30 @@ nav {
      navy fallback behind it — reintroducing the light-flash-on-navy-card
      mismatch this component was already built to avoid. This image also
      reuses the already-preloaded hero slide, so it's never really "loading". */
-  background: #111111;
+  background: #1a1a2e;
   animation: none;
 }
 /* Blend the photo edge into the navy body so the two halves read as one card */
 .offer-photo::after {
   content: ''; position: absolute; inset: 0;
-  background: linear-gradient(to right, transparent 62%, #111111 100%);
+  background: linear-gradient(to right, transparent 62%, #1a1a2e 100%);
 }
 
 .offer-close {
   position: absolute; top: 14px; right: 14px; z-index: 5;
-  background: rgba(0, 0, 0,0.55); border: none; color: #fff;
+  background: rgba(13,13,26,0.55); border: none; color: #fff;
   width: 38px; height: 38px; border-radius: 50%; font-size: 16px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.2s, transform 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.offer-close:hover { background: rgba(0, 0, 0,0.8); }
+.offer-close:hover { background: rgba(13,13,26,0.8); }
 .offer-close:active { transform: scale(0.92); }
 
 .offer-body {
   flex: 1; display: flex; flex-direction: column; justify-content: center;
   padding: 48px 44px; min-width: 0;
-  position: relative; background: #111111; /* paint over any seam at the photo edge */
+  position: relative; background: #1a1a2e; /* paint over any seam at the photo edge */
 }
 .offer-kicker {
   color: var(--orange); font-size: 12px; font-weight: 900;
@@ -989,12 +970,12 @@ nav {
    submit button; [hidden] keeps it out of the layout entirely when clean, so
    the popup doesn't reserve a gap for an error that usually never shows. */
 .offer-error {
-  color: #ACACAC; font-size: 13px; font-weight: 700; line-height: 1.45;
+  color: #FF8A80; font-size: 13px; font-weight: 700; line-height: 1.45;
   margin: -4px 0 12px; display: block;
 }
 .offer-error[hidden] { display: none; }
-.offer-input[aria-invalid="true"] { border-color: #ACACAC; }
-.offer-input[aria-invalid="true"]:focus { border-color: #ACACAC; }
+.offer-input[aria-invalid="true"] { border-color: #FF8A80; }
+.offer-input[aria-invalid="true"]:focus { border-color: #FF8A80; }
 
 .offer-btn {
   width: 100%; padding: 16px; background: var(--orange); color: #fff;
@@ -1002,7 +983,7 @@ nav {
   cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-.offer-btn:hover { background: #000000; }
+.offer-btn:hover { background: #cf5800; }
 .offer-btn:disabled { opacity: 0.65; cursor: default; }
 
 .offer-dismiss {
@@ -1021,8 +1002,8 @@ nav {
 }
 .offer-code-row {
   display: flex; align-items: center; gap: 10px;
-  border: 2px dashed rgba(0, 0, 0,0.55);
-  background: rgba(0, 0, 0,0.10);
+  border: 2px dashed rgba(232,99,10,0.55);
+  background: rgba(232,99,10,0.10);
   border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;
 }
 .offer-code {
@@ -1035,7 +1016,7 @@ nav {
   cursor: pointer; font-family: inherit; white-space: nowrap;
   transition: background 0.2s; -webkit-tap-highlight-color: transparent;
 }
-.offer-copy-btn:hover { background: #000000; }
+.offer-copy-btn:hover { background: #cf5800; }
 .offer-continue {
   width: 100%; padding: 16px; background: transparent; color: #fff;
   border: 1.5px solid rgba(255,255,255,0.35); border-radius: 12px;
@@ -1043,7 +1024,7 @@ nav {
   transition: border-color 0.2s, background 0.2s;
   -webkit-tap-highlight-color: transparent;
 }
-.offer-continue:hover { border-color: var(--orange); background: rgba(0, 0, 0,0.08); }
+.offer-continue:hover { border-color: var(--orange); background: rgba(232,99,10,0.08); }
 
 /* Near full-screen on mobile: photo banner on top, content below.
    Internal scroll (rare, tiny screens) instead of overflowing the viewport. */
@@ -1057,7 +1038,7 @@ nav {
     border-radius: 20px;
   }
   .offer-photo { width: 100%; height: min(40dvh, 360px); min-height: 220px; }
-  .offer-photo::after { background: linear-gradient(to bottom, transparent 55%, #111111 100%); }
+  .offer-photo::after { background: linear-gradient(to bottom, transparent 55%, #1a1a2e 100%); }
   /* overlap the body 1px onto the photo so no hairline can open between them */
   .offer-body { padding: 9px 22px 28px; margin-top: -1px; }
   .offer-headline { font-size: clamp(27px, 7.5vw, 34px); }
@@ -1110,7 +1091,7 @@ nav {
   box-shadow: var(--shadow-hover);
 }
 
-.review-stars { color: #111111; font-size: 16px; margin-bottom: 12px; }
+.review-stars { color: #FFB800; font-size: 16px; margin-bottom: 12px; }
 .review-text { font-size: 14px; line-height: 1.7; color: var(--black); font-weight: 600; margin-bottom: 18px; font-style: italic; }
 
 .reviewer { display: flex; align-items: center; gap: 10px; }
@@ -1191,7 +1172,7 @@ img.reviewer-av {
 
 /* EMAIL SIGNUP */
 .email-section {
-  background: linear-gradient(135deg, #F1F1F1 0%, #E6E6E6 100%);
+  background: linear-gradient(135deg, #FFEEE3 0%, #FFE0CC 100%);
   padding: 130px 5%;
   text-align: center;
   position: relative;
@@ -1358,7 +1339,7 @@ img.reviewer-av {
   position: absolute; top: 50%; transform: translateY(-50%);
   width: 40px; height: 40px; border-radius: 50%;
   background: rgba(255,255,255,0.92); border: none;
-  box-shadow: 0 2px 10px rgba(0, 0, 0,0.18);
+  box-shadow: 0 2px 10px rgba(26,26,46,0.18);
   align-items: center; justify-content: center;
   font-size: 24px; color: var(--black); z-index: 5;
   cursor: pointer; padding: 0; line-height: 1; transition: opacity 0.2s, background 0.2s;
@@ -1417,7 +1398,7 @@ img.reviewer-av {
 
 .product-detail-info h1 { font-family: 'Fredoka One', cursive; font-size: 36px; margin-bottom: 12px; line-height: 1.2; }
 
-.detail-stars { color: #111111; font-size: 16px; margin-bottom: 16px; }
+.detail-stars { color: #FFB800; font-size: 16px; margin-bottom: 16px; }
 .detail-stars span { color: var(--gray); font-size: 13px; font-weight: 600; }
 
 .detail-price {
@@ -1486,7 +1467,7 @@ img.reviewer-av {
 
 .detail-case-note {
   display: inline-block;
-  background: rgba(0, 0, 0, 0.10);
+  background: rgba(232, 99, 10, 0.10);
   color: var(--orange);
   font-size: 12px;
   font-weight: 800;
@@ -1691,7 +1672,7 @@ img.reviewer-av {
   z-index: 900;
   background: white;
   border-top: 2px solid var(--line-soft);
-  box-shadow: 0 -6px 24px rgba(0, 0, 0,0.10);
+  box-shadow: 0 -6px 24px rgba(26,26,46,0.10);
   padding: 10px 16px;
   display: flex;
   align-items: center;
@@ -1792,7 +1773,7 @@ img.reviewer-av {
   transition: color 0.2s;
 }
 
-.remove-btn:hover { color: #848484; }
+.remove-btn:hover { color: #EF4444; }
 
 .cart-summary {
   background: var(--light-gray);
@@ -1949,8 +1930,8 @@ img.reviewer-av {
 }
 .value-row:nth-child(even) { flex-direction: row-reverse; }
 .value-row:hover {
-  background: rgba(0, 0, 0,0.07);
-  border-color: rgba(0, 0, 0,0.55);
+  background: rgba(232,99,10,0.07);
+  border-color: rgba(232,99,10,0.55);
   transform: translateY(-3px);
   box-shadow: 0 14px 34px rgba(0,0,0,0.35);
 }
@@ -1962,8 +1943,8 @@ img.reviewer-av {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(0, 0, 0,0.24), rgba(0, 0, 0,0.07));
-  border: 1px solid rgba(0, 0, 0,0.42);
+  background: linear-gradient(135deg, rgba(232,99,10,0.24), rgba(232,99,10,0.07));
+  border: 1px solid rgba(232,99,10,0.42);
   color: var(--orange);
 }
 .value-visual svg { width: 42px; height: 42px; display: block; }
@@ -2012,7 +1993,7 @@ img.reviewer-av {
   box-shadow: var(--shadow-sm);
   transition: all 0.25s var(--ease);
 }
-.contact-method:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: rgba(0, 0, 0,0.3); }
+.contact-method:hover { box-shadow: var(--shadow); transform: translateY(-3px); border-color: rgba(232,99,10,0.3); }
 
 .contact-method-icon-tile {
   width: 46px;
@@ -2022,8 +2003,8 @@ img.reviewer-av {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0,0.16), rgba(0, 0, 0,0.05));
-  border: 1px solid rgba(0, 0, 0,0.28);
+  background: linear-gradient(135deg, rgba(232,99,10,0.16), rgba(232,99,10,0.05));
+  border: 1px solid rgba(232,99,10,0.28);
   color: var(--orange);
 }
 .contact-method-icon-tile svg { width: 21px; height: 21px; display: block; }
@@ -2078,7 +2059,7 @@ img.reviewer-av {
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   border-color: var(--orange);
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 0 0 4px rgba(232, 99, 10, 0.14);
 }
 .form-textarea { height: 120px; resize: vertical; }
 
@@ -2086,7 +2067,7 @@ img.reviewer-av {
 
 /* ==================== FOOTER ==================== */
 footer {
-  /* Subtle navy gradient. Bottom stays --navy-deep (#000000) to match the
+  /* Subtle navy gradient. Bottom stays --navy-deep (#0d0d1a) to match the
      body background so the mobile overscroll bounce never flashes a seam. */
   background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
   color: white;
@@ -2254,7 +2235,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* Dim the page behind the open search panel. Fixed, so the page itself
    never shifts, reflows or loses its scroll position. */
 .search-scrim {
-  position: fixed; inset: 0; background: rgba(0, 0, 0,0.45);
+  position: fixed; inset: 0; background: rgba(13,13,26,0.45);
   z-index: 895; opacity: 0; pointer-events: none;
   transition: opacity 0.28s ease;
   touch-action: none;
@@ -2270,7 +2251,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   background: white;
   z-index: 905;
   padding: 16px 5% 10px;
-  box-shadow: 0 24px 48px -16px rgba(0, 0, 0,0.28);
+  box-shadow: 0 24px 48px -16px rgba(13,13,26,0.28);
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -2295,7 +2276,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   align-items: center;
   gap: 10px;
   background: var(--light-gray);
-  border: 1.5px solid #E3E3E3;
+  border: 1.5px solid #E7E3DD;
   border-radius: 50px;
   padding: 11px 18px;
   width: 100%;
@@ -2318,12 +2299,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* Soft orange glow while the input is active */
 .nav-search-inner:focus-within {
   border-color: var(--orange);
-  box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 0 0 4px rgba(232, 99, 10, 0.14);
   background: #fff;
 }
 .nav-search-paw {
   flex-shrink: 0;
-  color: #B3B3B3;
+  color: #B9B2A9;
   transition: color 0.25s ease;
 }
 .nav-search-inner:focus-within .nav-search-paw { color: var(--orange); }
@@ -2457,16 +2438,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .search-cat-card:hover {
   border-color: var(--orange);
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 10px 24px rgba(26, 26, 46, 0.10);
 }
 .search-cat-card:active { transform: scale(0.97); border-color: var(--orange); }
 .search-cat-img {
   aspect-ratio: 16 / 9;
-  background: linear-gradient(135deg, #F1F1F1 0%, #E8E8E8 100%);
+  background: linear-gradient(135deg, #F4F1EC 0%, #ECE7E0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #BCBCBC;
+  color: #C4BBAE;
 }
 .search-cat-img svg { width: 30px; height: 30px; }
 .search-cat-img img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
@@ -2660,8 +2641,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari shows the html/body background when you pull past the top or bottom.
-     Deep navy (#000000) matches the footer so there is no white gap below it on overscroll. */
-  html, body { background-color: #000000; }
+     Deep navy (#0d0d1a) matches the footer so there is no white gap below it on overscroll. */
+  html, body { background-color: #0d0d1a; }
 
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
@@ -2707,7 +2688,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
   /* padding-top clears the 60px fixed nav. padding-bottom:0 so a white page never
      shows a strip below its footer — the footer sits flush and the deep-navy body
-     (#000000, same as the footer) extends below it on overscroll with no white gap. */
+     (#0d0d1a, same as the footer) extends below it on overscroll with no white gap. */
   .page { padding-top: 60px; padding-bottom: 0; }
   /* Home: push the hero below the 60px fixed nav so the top is never cut off */
   #page-home { padding-top: 60px; }
@@ -2955,7 +2936,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    color: #111111;
+    color: #1a1a2e;
     cursor: pointer;
     z-index: 10;
     transition: opacity 0.2s;
@@ -3373,7 +3354,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   align-items: center;
   justify-content: center;
   font-size: 22px;
-  color: #111111;
+  color: #1a1a2e;
   cursor: pointer;
   z-index: 10;
   padding: 0;
@@ -3429,9 +3410,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   overflow: hidden;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='120' height='120'%3E%3Cg fill='%23ffffff' fill-opacity='0.022' transform='rotate(-18 50 50)'%3E%3Cellipse cx='50' cy='67' rx='20' ry='16'/%3E%3Cellipse cx='27' cy='47' rx='9' ry='12'/%3E%3Cellipse cx='42' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='58' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='73' cy='47' rx='9' ry='12'/%3E%3C/g%3E%3C/svg%3E") repeat,
-    radial-gradient(640px 340px at 88% 6%, rgba(0, 0, 0, 0.10), transparent 70%),
-    radial-gradient(520px 340px at 4% 96%, rgba(0, 0, 0, 0.07), transparent 70%),
-    linear-gradient(160deg, #1A1A1A 0%, #111111 55%, #0D0D0D 100%);
+    radial-gradient(640px 340px at 88% 6%, rgba(232, 99, 10, 0.10), transparent 70%),
+    radial-gradient(520px 340px at 4% 96%, rgba(232, 99, 10, 0.07), transparent 70%),
+    linear-gradient(160deg, #1f2040 0%, #1a1a2e 55%, #14152b 100%);
   background-size: 150px, auto, auto, auto;
 }
 .why-content { position: relative; z-index: 1; }
@@ -3448,7 +3429,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   top: 12px;
   bottom: 30px;
   left: 25px;
-  border-left: 2px dashed rgba(0, 0, 0, 0.45);
+  border-left: 2px dashed rgba(232, 99, 10, 0.45);
 }
 /* ...and the route ends at a paw. You arrived. */
 .walk-route::after {
@@ -3477,8 +3458,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-family: 'Fredoka One', cursive;
   font-size: 19px;
   color: white;
-  background: linear-gradient(135deg, #2E2E2E 0%, var(--orange) 55%, var(--orange-dark) 100%);
-  box-shadow: 0 0 0 5px rgba(0, 0, 0, 0.16), 0 8px 20px rgba(0, 0, 0, 0.35);
+  background: linear-gradient(135deg, #F58138 0%, var(--orange) 55%, var(--orange-dark) 100%);
+  box-shadow: 0 0 0 5px rgba(232, 99, 10, 0.16), 0 8px 20px rgba(232, 99, 10, 0.35);
 }
 
 .route-card {
@@ -3489,8 +3470,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   transition: all 0.3s var(--ease);
 }
 .route-card:hover {
-  background: rgba(0, 0, 0, 0.07);
-  border-color: rgba(0, 0, 0, 0.55);
+  background: rgba(232, 99, 10, 0.07);
+  border-color: rgba(232, 99, 10, 0.55);
   transform: translateY(-3px);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
 }
@@ -3508,8 +3489,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.14);
-  border: 1px solid rgba(0, 0, 0, 0.38);
+  background: rgba(232, 99, 10, 0.14);
+  border: 1px solid rgba(232, 99, 10, 0.38);
   color: var(--orange-light);
 }
 .route-icon svg { width: 20px; height: 20px; display: block; }
@@ -3518,7 +3499,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-weight: 400;
   font-size: 20px;
   line-height: 1.2;
-  color: #F6F6F6;
+  color: #f8f6f2;
 }
 .route-desc {
   font-size: 14.5px;
@@ -3537,7 +3518,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-weight: 400;
   font-size: clamp(20px, 3.2vw, 27px);
   line-height: 1.3;
-  color: #F6F6F6;
+  color: #f8f6f2;
   max-width: 520px;
   margin: 0 auto 22px;
 }
@@ -3594,8 +3575,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* The chat input also carries font-size:16px inline in index.html (which
    wins over this rule); it's restated here so the anti-zoom floor survives
    if that inline style is ever cleaned up. */
-.chat-input { font-size: 16px; border: 2px solid rgba(0, 0, 0,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
-.chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(0, 0, 0,0.14); }
+.chat-input { font-size: 16px; border: 2px solid rgba(26,26,46,0.22); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.chat-input:focus { border-color: var(--orange); box-shadow: 0 0 0 4px rgba(232,99,10,0.14); }
 
 /* ==================== PRODUCT-GRID LOADING SKELETON ====================
    The shop grid and the Best Sellers carousel are rendered by products.js,
@@ -4001,7 +3982,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    why the old menu felt abrupt. */
 .mob-menu-overlay {
   display: block;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(13, 13, 26, 0.5);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.34s var(--ease), visibility 0.34s;
@@ -4015,7 +3996,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mob-menu {
     width: min(330px, 88vw);
     background: #fff;
-    box-shadow: -24px 0 60px -20px rgba(0, 0, 0, 0.45), -2px 0 0 rgba(0, 0, 0, 0.06);
+    box-shadow: -24px 0 60px -20px rgba(13, 13, 26, 0.45), -2px 0 0 rgba(13, 13, 26, 0.06);
     transition: transform 0.44s var(--ease), visibility 0.44s;
     overscroll-behavior: contain;
   }
@@ -4049,7 +4030,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     height: 38px;
     border-radius: 50%;
     background: var(--orange);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 4px 14px rgba(232, 99, 10, 0.35);
     flex-shrink: 0;
   }
   .mob-menu-brand-copy { display: flex; flex-direction: column; gap: 1px; }
@@ -4137,16 +4118,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     height: 38px;
     flex-shrink: 0;
     border-radius: 12px;
-    /* A shade deeper than --light-gray: at #F6F6F6 the tiles all but vanished
+    /* A shade deeper than --light-gray: at #f8f6f2 the tiles all but vanished
        against the white panel and the icons read as floating. */
-    background: #ECECEC;
+    background: #F1ECE3;
     color: var(--navy);
     transition: background 0.2s var(--ease), color 0.2s var(--ease);
   }
   .mob-link-label { flex: 1; min-width: 0; }
   .mob-link-chev {
     flex-shrink: 0;
-    color: #C5C5C5;
+    color: #C9C4BC;
     transition: transform 0.2s var(--ease), color 0.2s var(--ease);
   }
 
@@ -4164,7 +4145,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mob-menu a.mob-link.is-active .mob-link-icon {
     background: var(--orange);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(232, 99, 10, 0.3);
   }
   .mob-menu a.mob-link.is-active .mob-link-chev { color: var(--orange); }
 
@@ -4257,13 +4238,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* The two states are told apart by KIND, not by intensity: hover is a pill,
      current page is an orange label with a bar under it. An orange-tinted pill
      was tried first and is not an option — any orange at a low alpha over
-     #111111 mixes to a muddy brown that reads as a dirty box rather than as
+     #1a1a2e mixes to a muddy brown that reads as a dirty box rather than as
      the brand colour. */
   .nav-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
   .nav-links a:hover::after { width: 0; }
 
   .nav-links a.is-active { color: var(--orange); background: none; }
-  .nav-links a.is-active::after { width: 22px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.55); }
+  .nav-links a.is-active::after { width: 22px; box-shadow: 0 1px 6px rgba(232, 99, 10, 0.55); }
   .nav-links a.is-active:hover { color: var(--orange-light); background: rgba(255, 255, 255, 0.08); }
   .nav-links a.is-active:hover::after { width: 22px; }
 
@@ -4548,157 +4529,3 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   #detailTrustBadges .pay-marks,
   #detailTrustBadges .trust-badges-line { justify-content: center; text-align: center; }
 }
-
-/* ============================================================
-   DARK-SURFACE ACCENTS (task 53)
-
-   The old design used ORANGE as its accent, and used it most on
-   NAVY: the nav links, the cart pill, the footer wordmark, the
-   hero badge, the mobile menu. Turning the accent black made
-   every one of those black-on-near-black — invisible.
-
-   So the rule for this palette is: the accent is BLACK on light
-   surfaces and WHITE on dark ones. Everything below is the
-   second half of that rule. If you change --orange, come back
-   here; these are the same accent, inverted.
-
-   Appended last so it wins same-specificity source order over
-   the rules it is correcting.
-   ============================================================ */
-
-/* ---- Announcement bar: was orange band, now black band ---- */
-.announce-bar { background: #000; color: #fff; }
-.announce-bar span { color: rgba(255,255,255,0.5); }
-
-/* ---- Nav ---- */
-.logo-text span { color: #fff; }              /* the "Haul" half of the wordmark */
-.nav-links a { color: rgba(255,255,255,0.78); }
-.nav-links a:hover { color: #fff; }
-.nav-links a::after,
-.nav-links a.is-active::after { background: #fff; }
-.nav-links a.is-active,
-.nav-links a.is-active:hover { color: #fff; }
-
-/* Cart pill was a solid orange lozenge on navy. Inverted: white pill, black
-   text — still the single loudest control in the bar. */
-.cart-btn { background: #fff; color: #111; box-shadow: 0 4px 14px rgba(0,0,0,0.35); }
-.cart-btn:hover { background: #fff; color: #000; box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
-.cart-btn:active, .email-submit:active { background: #E8E8E8; }
-.cart-btn:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-/* Count badge sits ON the white pill, so it inverts back to black. */
-.cart-count { background: #111; color: #fff; border: 2px solid #fff; }
-.nav-search-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
-.nav-search-inner:focus-within { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.18); }
-.nav-search-inner:focus-within .nav-search-paw { color: #fff; }
-
-/* ---- Hero (text sits on photography + a dark scrim) ---- */
-.hero-badge { background: #fff !important; color: #111 !important; }
-.hero-badge svg { color: #111; }
-/* "Every Dog." was the orange line of the headline. White-on-white would
-   erase the emphasis, so the accent line keeps full white while the other
-   two lines step back to 78% — the hierarchy is now tonal, not chromatic. */
-#heroSection h1 { color: rgba(255,255,255,0.78) !important; }
-#heroSection h1 span { color: #fff !important; }
-
-/* ---- Dark bands: Best Sellers / mission / reviews / about hero ---- */
-.bestsellers .section-title span,
-.reviews-section .section-title span { color: #fff; }
-/* .about-hero (About + Contact) is a LIGHT #EDEDED band, NOT a dark one —
-   it was wrongly grouped with the dark surfaces above and its accent word
-   ("Walk", "Hear From You") rendered white-on-light, i.e. invisible. */
-.about-hero h1 span { color: #111; }
-/* .about-values IS dark (#111): its accent word and its eyebrow both have to
-   come up, not down. */
-.about-values .section-title span { color: #fff; }
-.about-values .section-tag { color: rgba(255,255,255,0.72); }
-
-/* ---- Footer ---- */
-.footer-brand-logo span { color: #fff; }
-.footer-col ul li a:hover { color: #fff; }
-.footer-bottom p span { color: #fff; }
-.footer-policies a:hover { color: #fff; }
-.footer-policies a:focus-visible { outline-color: #fff; }
-.social-btn:hover { background: #fff; color: #111; }
-
-/* ---- Mobile menu (task 49's panel; header is dark, rows are light) ---- */
-.mob-menu-brand-text span { color: #fff; }
-.mob-menu-brand-icon { background: #fff; color: #111; }
-/* Rows sit on WHITE, so their active state stays black — and gains a bar and
-   a heavier label so "selected" survives without colour. */
-.mob-menu a.mob-link.is-active { color: #111; font-weight: 800; }
-.mob-menu a.mob-link.is-active .mob-link-icon { background: #111; color: #fff; }
-.mob-menu a.mob-link.is-active .mob-link-chev { color: #111; }
-.mob-menu a:active { color: #000; }
-.mob-menu a.mob-link:active .mob-link-icon { background: #111; color: #fff; }
-.mob-menu a.mob-link:active .mob-link-chev { color: #111; }
-
-/* ---- Chat launcher/header sit on dark ---- */
-#chatToggle { background: #111; color: #fff; }
-#chatToggle:hover { background: #000; }
-
-/* ---- Hero CTAs: hierarchy has to invert with the surface ----
-   .btn-primary is black, which is correct everywhere on the site EXCEPT here.
-   The hero sits on photography behind a dark scrim, so a black primary button
-   reads as recessed while the ghost/outline secondary next to it reads as
-   brighter — the hierarchy lands upside down. On this surface the primary
-   becomes the white one and the secondary stays a translucent outline. */
-#heroSection .btn-primary {
-  background: #fff;
-  color: #111;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-}
-#heroSection .btn-primary:hover {
-  background: #fff;
-  color: #000;
-  box-shadow: 0 14px 32px rgba(0,0,0,0.55);
-}
-#heroSection .btn-primary:active { background: #E6E6E6; }
-
-/* The logo is a real <a> with no colour of its own, so it inherits the
-   browser's default link blue. Nothing visible paints it today (the wordmark
-   and paw both set their own colour) but any text added here later would
-   come out blue. */
-.logo { color: #fff; }
-
-/* ---- Readability floors found by the contrast audit ----
-   With hue gone, these were the only places left below WCAG AA. Each was a
-   light grey chosen when colour was carrying some of the load. */
-.mob-menu-group { color: #6B6B6B; }      /* was #9A9A9A on white — 2.81:1 */
-.mob-menu-tagline { color: #5F5F5F; }    /* was #8A8A8A on #F4F4F4 — 3.14:1 */
-
-/* ---- Shop Pay button ----
-   Shopify renders it in Shop Pay purple (#5A31F4) inside a closed shadow root,
-   so the colour cannot be restyled — greyscale() is the only lever. Applied
-   deliberately: the task calls for no colour anywhere in the UI, and a single
-   purple lozenge in an otherwise black-and-white cart was the one thing left
-   breaking the scheme. It stays fully legible (white wordmark on dark grey)
-   and still reads as the Shop Pay button by its shape and lockup. */
-.shop-pay-wrap shop-pay-button { filter: grayscale(1); }
-
-/* ---- Value cards (About) ----
-   The tile is a translucent BLACK gradient sitting on the near-black
-   .about-values band, and the icon inside it drew in the accent — which is now
-   also near-black, so the icon vanished. On this surface the tile lightens and
-   the icon inverts. (These have no text node, so the text-contrast audit could
-   not see them; they were caught by a separate icon sweep.) */
-.value-visual {
-  background: linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.06));
-  border: 1px solid rgba(255,255,255,0.14);
-  color: #fff;
-}
-.value-visual svg { stroke: #fff; }
-
-/* ---- Hero star rating ----
-   Star ratings were given a deliberate solid near-black so they read as a
-   rating rather than the washed-out grey that luminance-mapping gold produced.
-   That is right on every white card — and wrong in exactly one place: the hero,
-   where the stars sit on photography behind a dark scrim and disappeared.
-   The badge is the exception to the exception: it is a WHITE pill, so its paw
-   stays dark. (Higher specificity, so it wins regardless of order.) */
-#heroSection svg { fill: #fff; }
-#heroSection .hero-badge svg { fill: #111; }
-
-/* The menu header's paw carries fill="white" as a presentation attribute, so
-   inverting the disc to white via `color` left a white paw on a white disc.
-   The CSS fill property beats the attribute. */
-.mob-menu-brand-icon svg { fill: #111; }
