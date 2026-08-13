@@ -917,13 +917,25 @@ function renderDetailGallery(color) {
     return;
   }
 
+  // The dot row ships WITH its dots already in it (first one active), rather
+  // than as an empty div for initDetailCarousel() to fill on its 30ms timer.
+  // An empty .det-dots is exactly one dot shorter than a filled one (8px —
+  // it's a padding-only flex row), so filling it a paint later made this
+  // whole block shrink then re-grow, jolting the colour swatches, sizes,
+  // price and Add To Cart button 8px up and back on every colour tap. That
+  // was the "screen shakes when selecting a colour" bug. styles.css also
+  // carries a min-height on .det-dots as a structural backstop.
+  var dotsHtml = urls.map(function (_, i) {
+    return '<span class="det-dot' + (i === 0 ? ' active' : '') + '"></span>';
+  }).join('');
+
   detailImg.innerHTML =
     '<div class="det-carousel">' +
       '<div class="det-track" id="detTrack">' + slidesHtml + '</div>' +
-      '<button class="det-prev" id="detPrev" aria-label="Previous">&#8249;</button>' +
+      '<button class="det-prev disabled" id="detPrev" aria-label="Previous">&#8249;</button>' +
       '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
     '</div>' +
-    '<div class="det-dots" id="detDots"></div>';
+    '<div class="det-dots" id="detDots">' + dotsHtml + '</div>';
   setTimeout(function () { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
 }
 

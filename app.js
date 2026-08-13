@@ -1010,7 +1010,14 @@ function initDetailCarousel() {
   var touchStartY = 0;
   var touchStartLeft = 0;
   var touchAxis = null; // 'x' once a swipe is confirmed horizontal, 'y' once confirmed vertical
-  if (dotsWrap) dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
+  // renderDetailGallery() already ships the dots in the markup so the row is
+  // never empty for a paint (that emptiness was the colour-tap layout shake).
+  // Only build them here if this ran against markup that lacks them, and
+  // never rebuild a row that already has the right number — replacing them
+  // for nothing would reintroduce the same shrink/re-grow.
+  if (dotsWrap && dotsWrap.children.length !== total) {
+    dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
+  }
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
 
   function step() { return track.offsetWidth || 300; }
