@@ -4551,3 +4551,72 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   #detailTrustBadges .pay-marks,
   #detailTrustBadges .trust-badges-line { justify-content: center; text-align: center; }
 }
+
+/* ============================================================
+   SOCIAL LINKS IN THE MOBILE MENU (task 55)
+
+   The footer's .social-btn is built for the DARK footer (a
+   translucent-white disc that turns orange on hover). The menu
+   panel's footer is light (#fff / #F5F5F5 border), so those
+   values would render a near-invisible white disc on white.
+   This is the same control re-tuned for a light surface.
+   ============================================================ */
+.mob-social-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 2px;
+}
+.mob-social-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--black);
+  background: #F1ECE3;          /* the menu's own icon-tile fill, from task 49 */
+  text-decoration: none;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.mob-social-btn:hover,
+.mob-social-btn:active {
+  background: var(--orange);
+  color: #fff;
+}
+.mob-social-btn:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mob-social-btn { transition: none; }
+}
+
+/* ============================================================
+   MENU STACKING ABOVE THE CHAT WIDGET (task 55)
+
+   The menu panel was z-index 1000 and the chat widget is
+   z-index 9999 (inline, in index.html), so the widget sat ON
+   TOP of the panel's bottom-right corner. Task 49 dealt with
+   the VISIBLE half of that by fading #chatToggle out while the
+   menu is open — but #chatWidget, the container, kept
+   pointer-events:auto and went on silently swallowing taps in
+   that corner. Nothing interactive lived there until the social
+   icons were added, which is why it surfaced only now.
+
+   Fixed at the stacking level rather than with another :has()
+   rule: the menu is a modal (role="dialog" aria-modal="true"),
+   so it belongs above a floating action button, and this also
+   works in browsers without :has() support.
+   ============================================================ */
+.mob-menu { z-index: 10001; }
+.mob-menu-overlay { z-index: 10000; }
+
+/* .social-btn never set a colour. That was harmless while these were <a>
+   elements with NO href — the UA's :link blue only applies to real links — but
+   wiring up the TikTok/Facebook URLs turned them into links and the glyphs
+   (fill="currentColor") started rendering in default browser blue on the dark
+   footer. Same trap as the .logo anchor. */
+.social-btn { color: #fff; }
+.social-btn:hover, .social-btn:focus-visible { color: #fff; }
+.social-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
