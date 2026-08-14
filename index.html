@@ -95,9 +95,11 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: bloc
    reserved height matches the filtered grid exactly (see the .skel-card block
    in styles.css). Inline + in-head for the same reason as the rule above —
    it has to win before the first paint. */
-html.route-shop-water  #shopProducts .skel-card:not([data-cat="water"]),
-html.route-shop-leash  #shopProducts .skel-card:not([data-cat="leash"]),
-html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { display: none !important; }
+/* ~= (not =) because a product can sit in two aisles: data-cat holds a
+   space-separated list, e.g. data-cat="leash safety". */
+html.route-shop-water  #shopProducts .skel-card:not([data-cat~="water"]),
+html.route-shop-leash  #shopProducts .skel-card:not([data-cat~="leash"]),
+html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { display: none !important; }
 </style>
 <!-- Nothing ever replaces the skeletons without JS, so don't leave a permanently
      "loading" grid sitting there for a no-JS visitor or a crawler. -->
@@ -828,8 +830,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat="safety"]) { displ
           <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
         </div>
       </div>
-      <!-- Anti-Drop Leash Wrist Strap (6 colours) -->
-      <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+      <!-- Anti-Drop Leash Wrist Strap (6 colours) — in BOTH leash and safety -->
+      <div class="product-card skel-card" data-cat="leash safety" aria-hidden="true">
         <div class="product-img-wrap"><div class="product-img"></div></div>
         <div class="product-info">
           <div class="product-name">&nbsp;</div>

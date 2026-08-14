@@ -600,7 +600,13 @@ async function metaFor(route, products, posts) {
     meta.noindex = !!copy.noindex;
 
     if (route.page === 'shop') {
-      const list = route.filter ? products.filter(function (p) { return p.category === route.filter; }) : products;
+      // Mirrors productInCategory() in products.js: a product may declare a
+      // `categories` array and belong to more than one aisle.
+      const inCat = function (p, f) {
+        const cats = (Array.isArray(p.categories) && p.categories.length) ? p.categories : (p.category ? [p.category] : []);
+        return cats.indexOf(f) !== -1;
+      };
+      const list = route.filter ? products.filter(function (p) { return inCat(p, route.filter); }) : products;
       meta.schemas.push(itemListSchema(list, copy.path, copy.title));
       meta.schemas.push(breadcrumbSchema(
         route.filter

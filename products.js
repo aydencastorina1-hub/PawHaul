@@ -359,6 +359,12 @@ var products = [
     // rating field — star ratings come only from real customer reviews via
     // /api/reviews — so this stays a comment, same as the id 7 listing did.
     id: 9, name: "Anti-Drop Leash Wrist Strap", price: 8.99, was: 13.99, emoji: "🔗", image: "", category: "leash",
+    // Genuinely belongs in two aisles: it is a leash accessory AND a
+    // loss-prevention/safety item. `category` stays the PRIMARY one (it drives
+    // the breadcrumb, the detail-page eyebrow and the Merchant Center product
+    // type, all of which need a single value); `categories` is what filtering
+    // and search read. Any product without this field just uses `category`.
+    categories: ["leash", "safety"],
     badge: "New", badgeClass: "badge-new",
     desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
     tagline: "If the leash slips, it stays on your wrist.",
@@ -808,11 +814,27 @@ function renderHomeProducts() {
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
 
+// A product can legitimately sit in more than one aisle (the Anti-Drop Leash
+// Wrist Strap is both a leash accessory and a safety/loss-prevention item), so
+// membership is read from `categories` when present and falls back to the
+// single `category` otherwise. Everything that filters or searches by category
+// goes through these two helpers so the rules can't drift apart.
+function productCategories(p) {
+  if (!p) return [];
+  if (Array.isArray(p.categories) && p.categories.length) return p.categories;
+  return p.category ? [p.category] : [];
+}
+
+function productInCategory(p, f) {
+  if (!f || f === 'all') return true;
+  return productCategories(p).indexOf(f) !== -1;
+}
+
 function renderShopProducts(filter) {
   var container = document.getElementById('shopProducts');
   if (!container) return;
   var f = filter || 'all';
-  var filtered = (f === 'all') ? products.slice() : products.filter(function(p) { return p.category === f; });
+  var filtered = (f === 'all') ? products.slice() : products.filter(function(p) { return productInCategory(p, f); });
   container.innerHTML = filtered.map(function(p) { return productCard(p); }).join('');
 }
 
@@ -1149,6 +1171,7 @@ function showProduct(id, opts) {
   syncDetailRating(currentProduct.id);
   renderReviews(currentProduct.id);
   document.getElementById('qtyNum').textContent = '1';
+  renderDetailShopPay();
 
   var cats = { walk: 'Walk Essentials', car: 'Car & Travel', treats: 'Health & Treats', home: 'Home & Grooming' };
   document.getElementById('detailCategory').textContent = cats[currentProduct.category] || 'PawHaul';
@@ -1205,6 +1228,7 @@ function selectColorOption(btn) {
   currentColor = btn.textContent.trim();
   updateVariantAvailability();
   renderDetailGallery(currentColor);
+  renderDetailShopPay();
 }
 
 // Greys out any size that's unavailable in the currently-selected color, and
@@ -1270,6 +1294,7 @@ function selectSize(btn) {
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
   setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
+  renderDetailShopPay();
 }
 
 // ==================== DESCRIPTION/REVIEWS/SHIPPING ACCORDION ====================
@@ -1278,7 +1303,7 @@ function togglePdAccordion(btn) {
 }
 
 // ==================== STICKY ADD TO CART BAR ====================
-// Shows once the main "Add To Cart"/"Buy It Now" row scrolls out of view, so
+// Shows once the main Add To Cart / Shop Pay row scrolls out of view, so
 // the action is always reachable without scrolling back up. A plain scroll
 // listener (not IntersectionObserver) is deliberate: a fast fling/flick or a
 // programmatic scrollTo can jump the anchor from "below the viewport" straight
@@ -1316,6 +1341,8 @@ function initStickyAtc() {
 function changeQty(delta) {
   currentQty = Math.max(1, currentQty + delta);
   document.getElementById('qtyNum').textContent = currentQty;
+  // The Shop Pay button carries the quantity in its variants attribute.
+  renderDetailShopPay();
 }
 
 function addToCartDetail() {
@@ -1336,8 +1363,44 @@ function addToCartDetail() {
   return true;
 }
 
-function buyNow() {
-  if (addToCartDetail()) showPage('cart');
+// ---- Shop Pay on the product page --------------------------------------
+// Replaces the old "Buy It Now", which only did addToCartDetail() + navigate
+// to the cart. This is Shop Pay's real accelerated checkout for the single
+// variant currently selected, using the same <shop-pay-button> element and
+// loader already proven on the cart page (see shopPayBlockHtml above).
+//
+// Returns '' — which renders nothing at all — when the variant can't be
+// resolved to a real Shopify variant or that exact combo is out of stock, so
+// the customer can never be sent to a checkout that would reject them. The
+// ordinary Add To Cart button is untouched in every case.
+function detailShopPayVariants() {
+  if (!currentProduct) return '';
+  if (variantUnavailable(currentProduct, currentSize, currentColor)) return '';
+  var gid = resolveShopifyVariantId({ id: currentProduct.id, size: currentSize, color: currentColor });
+  if (!gid) return '';
+  var numeric = String(gid).split('/').pop();
+  if (!/^\d+$/.test(numeric)) return '';
+  return numeric + ':' + Math.max(1, currentQty || 1);
+}
+
+// Rebuild only when the value actually changes: colour/size/qty clicks fire
+// this a lot, and re-creating the custom element needlessly would flicker.
+var _detailShopPayKey = null;
+function renderDetailShopPay() {
+  var host = document.getElementById('detailShopPay');
+  if (!host) return;
+  var variants = detailShopPayVariants();
+  if (!variants) {
+    _detailShopPayKey = null;
+    host.innerHTML = '';
+    return;
+  }
+  if (variants === _detailShopPayKey && host.querySelector('shop-pay-button')) return;
+  _detailShopPayKey = variants;
+  host.innerHTML = '<div class="shop-pay-wrap">' +
+    '<shop-pay-button store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
+  '</div>';
+  loadShopPay();
 }
 
 // ==================== CART ====================

@@ -835,7 +835,10 @@ function doSearch(val) {
   var nameHits = [], otherHits = [];
   list.forEach(function(p) {
     if (p.name.toLowerCase().indexOf(q) !== -1) { nameHits.push(p); return; }
-    var haystack = ((p.category || '') + ' ' + (p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
+    // productCategories() so a dual-category product is findable by BOTH of
+    // its aisles, not just the primary one.
+    var cats = (typeof productCategories === 'function') ? productCategories(p).join(' ') : (p.category || '');
+    var haystack = (cats + ' ' + (p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
     if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
   var matches = nameHits.concat(otherHits);
