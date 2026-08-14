@@ -17,7 +17,8 @@
 // depends on how the integration was provisioned):
 //   UPSTASH_REDIS_REST_URL   | KV_REST_API_URL
 //   UPSTASH_REDIS_REST_TOKEN | KV_REST_API_TOKEN
-//   BLOB_READ_WRITE_TOKEN    (optional — photos)
+//   BLOB_READ_WRITE_TOKEN    (optional — photos, classic Blob provisioning)
+//   BLOB_STORE_ID            (optional — photos, OIDC Blob provisioning)
 //
 // KEYS
 //   pawhaul:rev:<productId>  LIST  newest-first JSON review objects
@@ -131,11 +132,43 @@ function makeId() {
 }
 
 // ------------------------------------------------------------------- photos
-// Vercel Blob's REST upload. Returns a public URL, or null when Blob is not
-// configured / the payload is not an acceptable image.
-async function uploadPhoto(dataUrl, productId) {
-  var token = resolveEnv(['BLOB_READ_WRITE_TOKEN']);
-  if (!token || !dataUrl) return null;
+// Vercel Blob auth comes in two shapes, and which one you get depends on how
+// the store was provisioned:
+//
+//   1. BLOB_READ_WRITE_TOKEN — a long-lived token, injected by the classic
+//      "connect store to project" flow. It encodes the store id itself.
+//   2. OIDC — newer provisioning injects only BLOB_STORE_ID, and Vercel hands
+//      each individual REQUEST a short-lived OIDC token in the
+//      `x-vercel-oidc-token` header. The store id is NOT encoded in that
+//      token, so it has to travel separately in `x-vercel-blob-store-id`.
+//
+// This store is provisioned the second way, so the token cannot be read from
+// process.env at all — it only exists per-request. Both are supported below so
+// that adding a BLOB_READ_WRITE_TOKEN later also just works.
+//
+// No SDK: this repo has no package.json (see the header comment), so the wire
+// format is written out by hand. It matches @vercel/blob 2.8.0 exactly —
+// PUT https://vercel.com/api/blob/?pathname=... with x-api-version 12.
+var BLOB_API = 'https://vercel.com/api/blob';
+var BLOB_API_VERSION = '12';
+
+// Returns null when Blob is unavailable, which is what keeps the photo field
+// hidden instead of erroring. Needs `req` because of the per-request OIDC case.
+function blobAuth(req) {
+  var storeId = resolveEnv(['BLOB_STORE_ID']);
+  var rw = resolveEnv(['BLOB_READ_WRITE_TOKEN']);
+  if (rw) return { token: rw, storeId: storeId };
+  var oidc = req && req.headers && req.headers['x-vercel-oidc-token'];
+  if (oidc && storeId) return { token: cleanValue(oidc), storeId: storeId };
+  return null;
+}
+
+// Returns a public URL, or null when Blob is not configured / the payload is
+// not an acceptable image. Never throws — a photo problem must not cost the
+// customer their review.
+async function uploadPhoto(dataUrl, productId, req) {
+  var auth = blobAuth(req);
+  if (!auth || !dataUrl) return null;
   var m = /^data:([a-z/+.-]+);base64,([A-Za-z0-9+/=]+)$/i.exec(String(dataUrl));
   if (!m) return null;
   var mime = m[1].toLowerCase();
@@ -144,19 +177,23 @@ async function uploadPhoto(dataUrl, productId) {
   var bytes = Buffer.from(m[2], 'base64');
   if (!bytes.length || bytes.length > MAX_PHOTO_BYTES) return null;
 
-  var path = 'reviews/' + productId + '/' + makeId() + '.' + ext;
-  var res = await fetch('https://blob.vercel-storage.com/' + path, {
+  var pathname = 'reviews/' + productId + '/' + makeId() + '.' + ext;
+  var headers = {
+    authorization: 'Bearer ' + auth.token,
+    'x-api-version': BLOB_API_VERSION,
+    'x-vercel-blob-access': 'public',
+    'x-content-type': mime,
+    'x-add-random-suffix': '1'
+  };
+  if (auth.storeId) headers['x-vercel-blob-store-id'] = auth.storeId;
+
+  var res = await fetch(BLOB_API + '/?' + new URLSearchParams({ pathname: pathname }).toString(), {
     method: 'PUT',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'x-content-type': mime,
-      'x-add-random-suffix': '1',
-      'x-api-version': '7'
-    },
+    headers: headers,
     body: bytes
   });
   if (!res.ok) {
-    console.error('[reviews] blob upload failed', res.status);
+    console.error('[reviews] blob upload failed', res.status, (await res.text().catch(function () { return ''; })).slice(0, 200));
     return null;
   }
   var out = await res.json().catch(function () { return null; });
@@ -232,14 +269,14 @@ module.exports = async function handler(req, res) {
       }
       var pid = parseInt((req.query && req.query.product) || '', 10);
       if (!(pid > 0)) {
-        res.status(200).json({ ok: true, configured: configured, photos: !!resolveEnv(['BLOB_READ_WRITE_TOKEN']) });
+        res.status(200).json({ ok: true, configured: configured, photos: !!blobAuth(req) });
         return;
       }
       var data = await readProduct(pid);
       res.status(200).json({
         ok: true, configured: data.configured, productId: pid,
         count: data.count, average: data.average, reviews: data.reviews,
-        photos: !!resolveEnv(['BLOB_READ_WRITE_TOKEN'])
+        photos: !!blobAuth(req)
       });
       return;
     }
@@ -296,7 +333,7 @@ module.exports = async function handler(req, res) {
     }
 
     var photoUrl = null;
-    try { photoUrl = await uploadPhoto(body.photo, productId); }
+    try { photoUrl = await uploadPhoto(body.photo, productId, req); }
     catch (e) { console.error('[reviews] photo error', e && e.message); }
 
     var review = {
