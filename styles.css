@@ -4724,8 +4724,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   gap: 16px;
   /* Slides are rendered by JS. Without a reserved height the Best Sellers
      band below jumps up the moment they land — the same layout shift the
-     card skeletons exist to prevent. Matches the mobile slide height. */
-  min-height: 396px;
+     card skeletons exist to prevent. Matches the mobile slide height, which
+     is measured from a real render (stage + body), not assumed. */
+  min-height: 516px;
 }
 #problemCarousel::-webkit-scrollbar { display: none; }
 
@@ -4743,22 +4744,42 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .prob-slide:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--orange); }
 
+/* PRODUCT STAGE. Tall and white on purpose: six of the eight source photos are
+   cutouts on a pure white backdrop, so a white stage makes them read as one
+   clean surface with the product sitting on it — no visible frame, no band.
+   The two that carry their own backdrop (the bag holder's peach, the LED
+   leash's night sky) are rounded by the img rule below so they read as a
+   deliberate photo tile instead of a stray rectangle. */
 .prob-slide-img {
-  height: 180px;
+  height: 250px;
   flex-shrink: 0;
   overflow: hidden;
-  /* White, not the cream placeholder: these are product shots on white, so a
-     contained image blends into the panel instead of sitting on a tinted band. */
   background: #fff;
-  padding: 10px;
+  padding: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-/* CONTAIN, not cover. The sources are square (900x900) and the frame is
-   landscape, so cover was cutting ~42% off the product — measured. contain
-   shows the whole item, which is the point of a "here is the product" slide. */
-.prob-slide-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+/* CONTAIN, not cover. Measured every source: the water bottle, the bag clip and
+   the LED leash all run edge-to-edge in their frame, so ANY crop clips them.
+   `width: auto` is the load-bearing part — it makes the <img> BOX shrink-wrap
+   the photo's own aspect ratio instead of spanning the full stage. Without it
+   the element stays stage-width while the picture is painted letterboxed in the
+   middle, and the global `img { background: var(--img-placeholder) }` shimmer
+   (written for object-fit: cover, where the photo covers it) paints cream bars
+   down both sides of every slide — permanently animating, because the shimmer
+   never stops. Shrink-wrapping kills the bars at the source and lets the radius
+   land on the picture's real edges. */
+.prob-slide-img img {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  border-radius: var(--radius-sm);
+  background: none;
+  animation: none;
+}
 .prob-emoji { font-size: 64px; }
 
 .prob-slide-body {
@@ -4806,7 +4827,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .prob-carousel-wrap .carousel-btn {
   display: flex;
   position: absolute;
-  top: 180px;
+  top: 250px;
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
@@ -4863,10 +4884,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 @media (min-width: 768px) {
   /* Two per view, and the taller slide needs a definite height so all cards
      in a row line up regardless of copy length. */
-  .prob-slide { flex-basis: calc(50% - 8px); height: 430px; }
-  .prob-slide-img { height: 210px; }
-  .prob-carousel-wrap .carousel-btn { top: 210px; }
-  #problemCarousel { min-height: 430px; }
+  .prob-slide { flex-basis: calc(50% - 8px); height: 520px; }
+  .prob-slide-img { height: 300px; }
+  .prob-carousel-wrap .carousel-btn { top: 300px; }
+  #problemCarousel { min-height: 520px; }
   .prob-head { font-size: 24px; }
 }
 @media (min-width: 1024px) {
