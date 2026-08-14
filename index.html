@@ -160,7 +160,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=71" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=72" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -169,8 +169,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=41">
-  <link rel="preload" as="script" href="/app.js?v=45">
+  <link rel="preload" as="script" href="/products.js?v=42">
+  <link rel="preload" as="script" href="/app.js?v=46">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box is pointless once this device has submitted
        an email, so it's hidden BEFORE first paint rather than by JS after the
@@ -888,7 +888,12 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
         </div>
         <div class="detail-btns">
           <button class="btn-add-cart" onclick="addToCartDetail()">Add To Cart</button>
-          <button class="btn-buy-now" onclick="buyNow()">Buy It Now</button>
+          <!-- Shop Pay's own branded button, filled by renderDetailShopPay()
+               in products.js for whichever variant is currently selected. It
+               replaced a plain "Buy It Now" that only added to the cart and
+               navigated to the cart page. Empty (and zero-height) whenever the
+               selected variant can't be resolved or is out of stock. -->
+          <div class="detail-shop-pay" id="detailShopPay"></div>
         </div>
         <div class="detail-trust-mini">
           <span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Free Shipping</span>
@@ -1302,8 +1307,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=41"></script>
-  <script src="/app.js?v=45"></script>
+  <script src="/products.js?v=42"></script>
+  <script src="/app.js?v=46"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

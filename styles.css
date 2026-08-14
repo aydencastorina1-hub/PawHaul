@@ -4732,3 +4732,21 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .rv-item-date { margin-left: 0; width: 100%; }
   .rv-submit { align-self: stretch; text-align: center; }
 }
+
+/* ---- SHOP PAY ON THE PRODUCT PAGE (task 58) ----
+   Replaced the old "Buy It Now" button. Shopify's <shop-pay-button> renders a
+   fixed ~260px button inside its own shadow root, which CSS here cannot
+   stretch, so it gets its OWN full-width row underneath Add To Cart — the
+   placement accelerated-checkout buttons normally take — rather than sharing
+   the flex row, where it would have been squeezed at mobile widths and sat
+   visually mismatched next to a full-width dark button.
+
+   .detail-btns therefore has to be allowed to wrap; flex-basis:100% on the
+   Shop Pay row is what forces Add To Cart to keep the first row to itself.
+
+   :empty matters — renderDetailShopPay() writes '' when the selected variant
+   is out of stock or can't be resolved, and without this the container would
+   still contribute the flex gap and leave a dead 12px band. */
+.detail-btns { flex-wrap: wrap; }
+.detail-shop-pay { flex: 1 1 100%; }
+.detail-shop-pay:empty { display: none; }
