@@ -177,49 +177,6 @@ var products = [
     whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
-    id: 4, name: "Dog AirTag Holder", price: 10.99, was: 16.99, emoji: "📍", image: "", category: "safety",
-    badge: "Safety", badgeClass: "badge-safety", reviews: 38,
-    desc: "A secure waterproof silicone holder that keeps your Apple AirTag attached to your dog's collar at all times — so you always know where they are. The twist-lock closure holds the AirTag firmly in place through daily walks, rain, mud, and rough play. Compatible with Apple AirTag 1st and 2nd generation. Fits any standard collar up to 1.5\" wide.",
-    tagline: "Always know where they are, rain or shine.",
-    // Shown as a callout on the product page + surfaced in the chatbot —
-    // this is the case only, not the AirTag itself.
-    caseOnlyNote: "Case only — AirTag sold separately",
-    sizes: ["Universal — fits all standard collars"],
-    colors: ["Black", "Transparent", "Pink", "Blue", "Green", "Purple"],
-
-    images: {
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9fc066621549467db87867143006b174g.webp?width=900",
-      "Transparent": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S43a2380c6d5a45ffa2a1743422529d30K.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S95dd5f8435454a1d9a33153ac34b3b10p.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0e0c88fc2c2a4504ba1362ebe8c19ae6B.webp?width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9056ad1490f74f2cb16aaa0efab4f25dv.webp?width=900",
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S44b6cdd7d98d431cb3a07d23fafa7b31A.webp?width=900"
-    },
-
-    // Real Shopify variant GIDs (Storefront API) for checkout.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276575488", byColor: {
-        "Black": "gid://shopify/ProductVariant/48945265049856",
-        "Transparent": "gid://shopify/ProductVariant/48945265017088",
-        "Pink": "gid://shopify/ProductVariant/48945264984320",
-        "Blue": "gid://shopify/ProductVariant/48945264951552",
-        "Green": "gid://shopify/ProductVariant/48945264918784",
-        "Purple": "gid://shopify/ProductVariant/48945264886016"
-      } },
-
-    features: [
-      "Compatible with Apple AirTag 1st & 2nd gen",
-      "Attaches securely to any collar up to 1.5\" wide",
-      "100% waterproof premium silicone",
-      "Twist-lock closure — won't pop off during play",
-      "Does not interfere with AirTag signal",
-      "Lightweight: under 15g",
-      "Built for daily wear — UV and weather resistant",
-      "Easy to transfer between collars"
-    ],
-    material: "Premium waterproof food-grade silicone · Stainless steel locking ring",
-    whatsInBox: "1× AirTag silicone collar holder (Apple AirTag not included)"
-  },
-  {
     id: 5, name: "Poop Bag Clip", price: 9.99, was: 14.99, emoji: "🧷", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 67,
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",

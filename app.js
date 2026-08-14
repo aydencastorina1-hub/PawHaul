@@ -341,9 +341,12 @@ var bundleMap = {
   1: [2, 3],    // Water Bottle → suggest Retractable Leash + Bowl
   2: [5, 8],    // Retractable Leash → suggest Poop Bag Clip + Poop Bag Holder
   3: [1, 2],    // Bowl → suggest Water Bottle + Retractable Leash
-  4: [6, 1],    // AirTag Holder → suggest Light Up Collar + Water Bottle
   5: [8, 2],    // Poop Bag Clip → suggest Poop Bag Holder + Retractable Leash
-  6: [4, 2],    // Light Up Collar → suggest AirTag Holder + Retractable Leash
+  // Light Up Collar used to also suggest the Dog AirTag Holder; that product
+  // was removed from the catalogue, so this is now a two-item pairing (which
+  // showBundle already handles — it switches to "Combined Price" / "Add Both
+  // To Cart"). No replacement was invented for it.
+  6: [2],       // Light Up Collar → suggest Retractable Leash
   8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
 };
 

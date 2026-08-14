@@ -135,7 +135,7 @@ var blogPosts = [
 
 <h3>Layer three: findability if the worst happens</h3>
 <p>Visibility gear stops accidents. It does nothing once a spooked dog has slipped its collar and bolted into the dark — and fireworks, thunder and a car backfiring all cause exactly that. A Bluetooth tracker on the collar means the difference between searching and knowing.</p>
-<p>The weak point of tracker setups is almost always the attachment. A tag that swings on a split ring works loose over months of movement. A <a href="/product/dog-airtag-holder">waterproof AirTag holder</a> with a twist-lock closure keeps the tracker fixed to the collar and sealed against rain and puddles — the two things that actually kill tracker setups.</p>
+<p>The weak point of tracker setups is almost always the attachment. A tag that swings on a split ring works loose over months of movement. A waterproof tracker holder with a twist-lock closure keeps the tracker fixed to the collar and sealed against rain and puddles — the two things that actually kill tracker setups.</p>
 
 <h2>Route choices matter as much as gear</h2>
 <ul>
@@ -203,7 +203,7 @@ var blogPosts = [
 <p>A <a href="/product/light-up-dog-collar">rechargeable LED collar</a> puts a light source on the dog that works from any angle and does not depend on anyone else's headlights. Charge it weekly on a fixed day; the usual failure mode is a flat light nobody noticed.</p>
 
 <h2>Off-leash areas: add a tracker</h2>
-<p>If your dog goes off leash anywhere, a Bluetooth tracker is the highest-value thing you can add. The attachment is the part that matters — a tag on a split ring works loose over months, and a soaked tracker is a dead tracker. A <a href="/product/dog-airtag-holder">waterproof holder with a twist-lock</a> handles both.</p>
+<p>If your dog goes off leash anywhere, a Bluetooth tracker is the highest-value thing you can add. The attachment is the part that matters — a tag on a split ring works loose over months, and a soaked tracker is a dead tracker. A waterproof holder with a twist-lock handles both.</p>
 
 <h2>Long walks and hikes (90+ minutes)</h2>
 <ul>

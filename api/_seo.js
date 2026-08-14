@@ -321,10 +321,6 @@ const PRODUCT_COPY = {
     title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
     description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $14.99 with free shipping.'
   },
-  4: {
-    title: 'Dog AirTag Holder — Waterproof Silicone Collar Case',
-    description: 'Waterproof silicone AirTag holder with a twist-lock closure that keeps an Apple AirTag secure on any standard dog collar. $10.99 with free shipping.'
-  },
   5: {
     title: 'Hands-Free Dog Poop Bag Clip for Leashes',
     description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $9.99, free shipping.'
@@ -347,7 +343,7 @@ const PAGE_COPY = {
   },
   shop: {
     title: 'Shop All Dog Walk Gear — Leashes, Bowls & Safety Gear',
-    description: 'Browse every PawHaul walk essential: retractable leashes, collapsible bowls, 2-in-1 water bottles, LED collars, AirTag holders and bag carriers. Free shipping.',
+    description: 'Browse every PawHaul walk essential: retractable leashes, collapsible bowls, 2-in-1 water bottles, LED collars and poop bag carriers. Free shipping.',
     path: '/shop'
   },
   'shop:water': {
@@ -361,8 +357,8 @@ const PAGE_COPY = {
     path: '/shop/leash'
   },
   'shop:safety': {
-    title: 'Dog Safety Gear — LED Collars & AirTag Holders',
-    description: 'Be seen and stay findable after dark: USB rechargeable light up dog collars and waterproof AirTag holders that lock onto any collar. Free shipping.',
+    title: 'Dog Safety Gear — USB Rechargeable LED Dog Collars',
+    description: 'Be seen after dark: USB rechargeable light up dog collars with three light modes, detachable and sized from small to extra large. Free shipping.',
     path: '/shop/safety'
   },
   about: {
