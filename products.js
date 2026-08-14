@@ -1397,9 +1397,14 @@ function renderDetailShopPay() {
   }
   if (variants === _detailShopPayKey && host.querySelector('shop-pay-button')) return;
   _detailShopPayKey = variants;
-  host.innerHTML = '<div class="shop-pay-wrap">' +
-    '<shop-pay-button store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
-  '</div>';
+  // Same "or" divider component the cart page uses, so the two pages read the
+  // same. The Shop Pay LOGO is kept (no button-text attribute) — the element
+  // renders `buttonText || <logo>`, never both, and the logo carries its own
+  // mx-auto so it stays centred once the button goes full width.
+  host.innerHTML = '<div class="shop-pay-or"><span>or buy now with</span></div>' +
+    '<div class="shop-pay-wrap">' +
+      '<shop-pay-button store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
+    '</div>';
   loadShopPay();
 }
 

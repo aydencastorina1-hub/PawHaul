@@ -4750,3 +4750,22 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .detail-btns { flex-wrap: wrap; }
 .detail-shop-pay { flex: 1 1 100%; }
 .detail-shop-pay:empty { display: none; }
+
+/* Match Add To Cart's width. Shopify's inner button is
+   `width: var(--shop-pay-button-width, 260px)` inside its shadow root, and
+   that custom property is the ONLY supported way in — the shadow root exposes
+   no ::part and its styles come from adoptedStyleSheets.
+
+   IT MUST BE SET FROM A STYLESHEET. Setting the same variable from JS after
+   the element renders (or forcing an inline width on the inner button) leaves
+   it stubbornly at 260px; declared here it just works.
+
+   --shop-pay-button-border-radius is the only other variable the element
+   reads, matched to --radius-sm so both buttons have the same corners. There
+   is no height hook, so Shop Pay keeps its own 42px against Add To Cart's
+   52px. The Shop Pay logo centres itself (mx-auto) at any width. */
+.detail-shop-pay {
+  --shop-pay-button-width: 100%;
+  --shop-pay-button-border-radius: var(--radius-sm);
+}
+.detail-shop-pay .shop-pay-wrap { width: 100%; }
