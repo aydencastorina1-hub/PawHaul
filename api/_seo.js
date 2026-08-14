@@ -321,6 +321,10 @@ const PRODUCT_COPY = {
     title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
     description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $14.99 with free shipping.'
   },
+  9: {
+    title: 'Anti-Drop Dog Leash Wrist Strap — Adjustable Safety Loop',
+    description: 'Adjustable wrist strap that clips to any dog leash so a slipped grip never means a loose dog. Six colours, fits retractable and standard leads. $8.99, free shipping.'
+  },
   5: {
     title: 'Hands-Free Dog Poop Bag Clip for Leashes',
     description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $9.99, free shipping.'
@@ -353,7 +357,7 @@ const PAGE_COPY = {
   },
   'shop:leash': {
     title: 'Dog Leashes & Walk Accessories',
-    description: 'Retractable dog leashes with one-touch locking, plus hands-free poop bag clips and canvas bag holders that keep both hands free on the walk. Free shipping.',
+    description: 'Retractable dog leashes with one-touch locking, anti-drop wrist straps, plus hands-free poop bag clips and canvas bag holders. Free shipping.',
     path: '/shop/leash'
   },
   'shop:safety': {

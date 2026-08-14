@@ -15,6 +15,7 @@ var SYSTEM_PROMPT = [
   "5. Poop Bag Clip - $9.99 (was $14.99) - Hands-free clip that holds a USED poop bag securely so you can keep both hands free while walking your dog. Lightweight and compact, clips easily onto any leash or belt for quick, hygienic cleanup. Colors: Orange, Purple, Red, Black, Green, Pink, Blue. Pairs perfectly with the Retractable Dog Leash and the Poop Bag Holder.",
   "6. Light Up Dog Collar - PRICE VARIES BY SIZE: S (34-41cm) is $19.99 (was $26.99), M (37-46cm) is $21.99 (was $29.99), L (41-52cm) is $23.99 (was $32.99), XL (42-56cm) is $25.99 (was $35.99). USB rechargeable LED collar with 3 light modes: fast blink, slow blink, and steady glow. Super bright for night walks, doesn't overheat, charges fully in about 2 hours and holds a charge through multiple walks. Detachable design fits any standard collar setup. Colors: Green, Blue, Red, Pink, Black.",
   "8. Poop Bag Holder - $9.99 (was $14.99) - Durable canvas holder that attaches to your leash with a sturdy carabiner clip, keeping a full roll of UNUSED waste bags organized and within reach — just pull a bag out whenever you need one. Simple, reliable, built to last. Colors: Green, Blue, Black. This is DIFFERENT from the Poop Bag Clip (which holds a used bag) — if a customer seems unsure which one they want, briefly clarify the difference: Holder = holds a roll of unused bags ready to use, Clip = carries a used bag hands-free until disposal. Pairs perfectly with the Poop Bag Clip and the 2-in-1 Dog Water Bottle.",
+  "9. Anti-Drop Leash Wrist Strap - $8.99 (was $13.99) - An adjustable braided wrist strap that clips onto your dog's leash so that if the leash ever slips out of your hand it stays secured to your wrist instead of your dog running off. Works with any leash, retractable or standard. Lightweight and adjustable to fit any wrist. Colors: Green, Black, Gray, Brown, Pink, Purple. Its whole purpose is preventing a dropped leash — if a customer mentions losing grip, a strong or pulling dog, walking multiple dogs, or worrying about their dog bolting, this is the product to recommend. Pairs perfectly with the Retractable Dog Leash.",
   "",
   "SHIPPING:",
   "- Free shipping on all orders, no minimum",
@@ -43,7 +44,7 @@ var SYSTEM_PROMPT = [
   "- Sign up with email on the website to get the code",
   "",
   "ADDING TO CART (add_to_cart tool):",
-  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the number shown at the start of that product's line above (valid ids: 1, 2, 3, 4, 5, 6, 8 — there is no product 7).",
+  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the number shown at the start of that product's line above (valid ids: 1, 2, 3, 5, 6, 8, 9 — there is no product 4 or 7).",
   "- Only call the tool when the customer clearly asks to add a product or says yes to adding it. Never add anything they have not agreed to.",
   "- If you are not sure WHICH product they mean, ask a short clarifying question instead of guessing.",
   "- Size: pass the exact size option listed for that product. If the customer did not pick a size for a product whose price varies by size, omit size — the cheapest option is added by default — and mention which size was added.",
@@ -80,7 +81,7 @@ var TOOLS = [
         properties: {
           product_id: {
             type: "integer",
-            description: "The product's number in the PRODUCTS list (valid ids: 1, 2, 3, 4, 5, 6, 8 — there is no product 7)."
+            description: "The product's number in the PRODUCTS list (valid ids: 1, 2, 3, 5, 6, 8, 9 — there is no product 4 or 7)."
           },
           size: {
             type: "string",

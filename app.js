@@ -103,7 +103,7 @@ function chatbotAddToCart(args) {
   var id = parseInt(args && args.product_id, 10);
   var product = products.find(function (p) { return p.id === id; });
   if (!product) {
-    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are 1, 2, 3, 4, 5, 6, 8." };
+    return { ok: false, error: "No product with id " + (args && args.product_id) + ". Valid ids are " + products.map(function (p) { return p.id; }).join(", ") + "." };
   }
 
   var qty = parseInt(args && args.quantity, 10);
@@ -339,7 +339,10 @@ function closePolicyModal() {
 // ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
 var bundleMap = {
   1: [2, 3],    // Water Bottle → suggest Retractable Leash + Bowl
-  2: [5, 8],    // Retractable Leash → suggest Poop Bag Clip + Poop Bag Holder
+  // The wrist strap clips onto the leash itself, so it leads the leash's
+  // suggestions. Added rather than swapped — the existing bag pairings were
+  // not removed to make room.
+  2: [9, 5, 8], // Retractable Leash → suggest Wrist Strap + Poop Bag Clip + Poop Bag Holder
   3: [1, 2],    // Bowl → suggest Water Bottle + Retractable Leash
   5: [8, 2],    // Poop Bag Clip → suggest Poop Bag Holder + Retractable Leash
   // Light Up Collar used to also suggest the Dog AirTag Holder; that product
@@ -348,6 +351,7 @@ var bundleMap = {
   // To Cart"). No replacement was invented for it.
   6: [2],       // Light Up Collar → suggest Retractable Leash
   8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
+  9: [2, 5],    // Wrist Strap → suggest Retractable Leash + Poop Bag Clip
 };
 
 var originalShowProduct = showProduct;

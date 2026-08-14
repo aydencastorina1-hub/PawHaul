@@ -352,6 +352,71 @@ var products = [
     ],
     material: "Durable canvas pouch · Sturdy metal carabiner clip",
     whatsInBox: "1× Poop Bag Holder pouch (bag roll not included)"
+  },
+  {
+    // Sourcing note (NOT surfaced in the UI): the supplier listing shows 4.9
+    // stars and 3,000+ sold. The site deliberately has no per-product supplier
+    // rating field — star ratings come only from real customer reviews via
+    // /api/reviews — so this stays a comment, same as the id 7 listing did.
+    id: 9, name: "Anti-Drop Leash Wrist Strap", price: 8.99, was: 13.99, emoji: "🔗", image: "", category: "leash",
+    badge: "New", badgeClass: "badge-new",
+    desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
+    tagline: "If the leash slips, it stays on your wrist.",
+    // Single option in Shopify (Color only). A non-empty sizes array is
+    // required — showProduct() maps over it unconditionally — and a lone size
+    // is hidden from the card pickers by cardOptionsHtml.
+    sizes: ["Universal — adjustable, fits any leash"],
+    colors: ["Green", "Black", "Gray", "Brown", "Pink", "Purple"],
+
+    // Search matches name/category/desc, none of which contain the phrases
+    // people actually type for this thing.
+    tags: ["wrist strap", "wristband", "anti drop", "anti-drop", "hands free leash", "leash strap", "dog walking strap"],
+
+    // The six variant-assigned Shopify photos — one clean white-background
+    // studio shot per colour. The wider 28-image pool was audited and four
+    // images were rejected outright: a multi-strap collage, a shot with a
+    // misspelled text overlay ("Porvides"), one with a burned-in
+    // "22cm/8.6inch" measurement diagram, and one stamped "4Pcs" (which would
+    // imply a four-pack). No Chinese text was present anywhere in this pool.
+    images: {
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb2ac92f1728c4d60b6b829cb49350f44o.webp?width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb0cde838dcae46548021fd92b632f2caN.webp?width=900",
+      "Gray": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S677376f94420460abab02ced06ed2667M.webp?width=900",
+      "Brown": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa66f58d267df4b3b9cdb14e68d83e891z.webp?width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S7dc7107a6f8a466bb78a46f2a05bf3c05_2ec00128-e5e9-41e5-9145-12481b27a139.webp?width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9d3b04c34a364c71954fe739a24ee96eN_725b41ce-da4f-4f49-bc90-dbefbc05d203.webp?width=900"
+    },
+
+    // Extra gallery slides: all three show the strap actually in use on a
+    // wrist with a retractable leash, which is the whole point of the product
+    // and is not obvious from a studio shot of a loop of cord.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S6f41f4569a8b4c66812bd7c76ca26683D.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0d26b16360be468a904ee320f7f3f001m.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S142247eaa0d94974a8e4f61798de608b4.webp?width=900"
+    ],
+
+    // Real Shopify variant GIDs (Storefront API) for checkout. Every one of
+    // these was confirmed with a real cartCreate before being written here.
+    shopifyVariants: { productGid: "gid://shopify/Product/9608724742400", byColor: {
+        "Green": "gid://shopify/ProductVariant/49180679176448",
+        "Black": "gid://shopify/ProductVariant/49180679045376",
+        "Gray": "gid://shopify/ProductVariant/49180679143680",
+        "Brown": "gid://shopify/ProductVariant/49180679241984",
+        "Pink": "gid://shopify/ProductVariant/49180679209216",
+        "Purple": "gid://shopify/ProductVariant/49180679110912"
+      } },
+
+    features: [
+      "Keeps the leash secured to your wrist if it slips",
+      "Adjustable — tightens to fit any wrist",
+      "Clips onto any leash, retractable or standard",
+      "Lightweight braided cord, barely noticeable to wear",
+      "Frees up your grip without letting go of your dog",
+      "6 colors to choose from"
+    ],
+    material: "Braided nylon paracord · Adjustable slide · Metal clip",
+    whatsInBox: "1× Anti-Drop Leash Wrist Strap"
   }
 ];
 
@@ -809,7 +874,14 @@ function variantUnavailable(p, size, color) {
 var SWATCH_COLORS = {
   red: '#D63031', maroon: '#7B1E24', pink: '#F06292', blue: '#2563EB',
   teal: '#0D9488', green: '#16A34A', gray: '#9CA3AF', grey: '#9CA3AF',
-  black: '#15151F', coffee: '#6F4E37', orange: '#E8630A'
+  black: '#15151F', coffee: '#6F4E37', orange: '#E8630A',
+  // Added for the Anti-Drop Leash Wrist Strap's colourway. Without these,
+  // "Brown" and "Purple" fell through to the #CCCCCC fallback — Brown would
+  // have rendered as a grey circle sitting next to the strap's real Gray.
+  // Note: adding `purple` also corrects the Poop Bag Clip's Purple swatch,
+  // which was silently grey for the same reason. ("White" is still missing and
+  // still falls back for the Bowl/Leash — left alone, out of scope here.)
+  brown: '#8B5E3C', purple: '#7C3AED'
 };
 
 // "Teal/Blue" style dual names render as a split circle.
