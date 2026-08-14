@@ -1397,10 +1397,47 @@ function renderDetailShopPay() {
   }
   if (variants === _detailShopPayKey && host.querySelector('shop-pay-button')) return;
   _detailShopPayKey = variants;
+  // button-text replaces the Shop Pay logo with this label — the element
+  // renders `buttonText || <logo>`, never both (confirmed in shop-js's own
+  // client.pay-button module, which registers props
+  // {buttonText, channel, disabled, paymentOption, source, sourceToken,
+  // storeUrl, variants}). The screen-reader label stays "Buy with Shop Pay"
+  // either way.
   host.innerHTML = '<div class="shop-pay-wrap">' +
-    '<shop-pay-button store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
+    '<shop-pay-button button-text="Buy with Shop" store-url="' + STORE_URL + '" variants="' + variants + '"></shop-pay-button>' +
   '</div>';
   loadShopPay();
+  centerShopPayLabel(host.querySelector('shop-pay-button'));
+}
+
+// The element only reads --shop-pay-button-width and
+// --shop-pay-button-border-radius; there is no hook for content alignment. With
+// a custom button-text the label is an anonymous flex item, so in a full-width
+// button it sits hard left while Add To Cart's label is centred. Its shadow
+// root is open (shadow:"open" in shop-js's own registration), so one cosmetic
+// rule goes in once the element upgrades.
+//
+// Deliberately not load-bearing: it is wrapped in try/catch, gives up after a
+// few seconds, and if Shopify ever changes the internals the button still
+// works exactly as before — the label just sits left again.
+function centerShopPayLabel(host) {
+  if (!host) return;
+  var tries = 0;
+  (function attempt() {
+    try {
+      var sr = host.shadowRoot;
+      if (sr && sr.querySelector('button')) {
+        if (!sr.querySelector('style[data-pawhaul-align]')) {
+          var st = document.createElement('style');
+          st.setAttribute('data-pawhaul-align', '1');
+          st.textContent = 'button{justify-content:center;}';
+          sr.appendChild(st);
+        }
+        return;
+      }
+    } catch (e) { return; }
+    if (++tries < 40) setTimeout(attempt, 100);
+  })();
 }
 
 // ==================== CART ====================

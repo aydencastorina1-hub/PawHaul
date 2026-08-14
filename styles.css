@@ -4750,3 +4750,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .detail-btns { flex-wrap: wrap; }
 .detail-shop-pay { flex: 1 1 100%; }
 .detail-shop-pay:empty { display: none; }
+
+/* Match Add To Cart's width. Shopify's inner button is
+   `width: var(--shop-pay-button-width, 260px)` inside its shadow root — that
+   custom property is the ONLY supported way in, since the shadow root exposes
+   no ::part and its styles come from adoptedStyleSheets. Custom properties
+   inherit through the shadow boundary, so setting it out here reaches it.
+   (--shop-pay-button-border-radius is the only other variable the element
+   reads; there is no height hook, so the button keeps its own 42px height.) */
+.detail-shop-pay {
+  --shop-pay-button-width: 100%;
+  --shop-pay-button-border-radius: 10px;
+}
+.detail-shop-pay .shop-pay-wrap { width: 100%; }
