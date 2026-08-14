@@ -169,8 +169,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=48">
-  <link rel="preload" as="script" href="/app.js?v=46">
+  <link rel="preload" as="script" href="/products.js?v=49">
+  <link rel="preload" as="script" href="/app.js?v=47">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box is pointless once this device has submitted
        an email, so it's hidden BEFORE first paint rather than by JS after the
@@ -695,6 +695,14 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
         <div class="faq-a">We offer a 30 day hassle free return policy on all products. Not happy for any reason? We'll make it right — no questions asked.</div>
       </div>
       <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">Does the LED Flashlight Retractable Dog Leash come with batteries?<span class="faq-icon">+</span></div>
+        <div class="faq-a">No — it takes 2 AAA batteries and they are not included, so grab a pair before your first night walk. The batteries power both the LED light ring and the flashlight; the leash itself works normally without them.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What is the difference between the two retractable leashes?<span class="faq-icon">+</span></div>
+        <div class="faq-a">Both retract and lock with one touch. The Retractable Dog Leash is the budget option with no lighting, from $12.99. The LED Flashlight Retractable Dog Leash adds a light ring that keeps your dog visible after dark plus a flashlight for the path ahead, from $22.99 — it needs 2 AAA batteries, not included.</div>
+      </div>
+      <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Does the Anti-Drop Leash Wrist Strap fit any leash?<span class="faq-icon">+</span></div>
         <div class="faq-a">Yes. It clips onto any leash — retractable or standard — and the braided loop adjusts to fit any wrist. If the leash ever slips out of your hand, it stays on your wrist instead of hitting the ground.</div>
       </div>
@@ -774,7 +782,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
          Cards no longer carry colour swatches or size pills, so every card
          is the same height and the skeletons are identical apart from
          their data-cat. Keep ONE per real product, in the same order the
-         grid renders them (1, 2, 3, 5, 6, 8, 9) — add or remove one whenever the
+         grid renders them (1, 2, 3, 5, 6, 8, 9, 10) — add or remove one whenever the
          catalogue changes, or the grid will jump as the cards render. -->
     <div class="shop-grid" id="shopProducts">
       <!-- 2-in-1 Dog Water Bottle -->
@@ -846,6 +854,16 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
           <div class="product-price"><span class="price-now">&nbsp;</span></div>
           <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
         </div>
+      <!-- LED Flashlight Retractable Dog Leash — in BOTH leash and safety -->
+      <div class="product-card skel-card" data-cat="leash safety" aria-hidden="true">
+        <div class="product-img-wrap"><div class="product-img"></div></div>
+        <div class="product-info">
+          <div class="product-name">&nbsp;</div>
+          <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+          <div class="product-price"><span class="price-now">&nbsp;</span></div>
+          <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -1318,8 +1336,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=48"></script>
-  <script src="/app.js?v=46"></script>
+  <script src="/products.js?v=49"></script>
+  <script src="/app.js?v=47"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

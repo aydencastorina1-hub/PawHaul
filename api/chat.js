@@ -10,7 +10,9 @@ var SYSTEM_PROMPT = [
   "",
   "PRODUCTS:",
   "1. 2-in-1 Dog Water Bottle - Portable 2-in-1 bottle that keeps your dog hydrated and fed on every walk. Leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable and great for walks, hikes and travel. Ideal for small to medium dogs. PRICE VARIES BY SIZE: 350ml is $19.99 (was $27.99) and 550ml is $24.99 (was $34.99). Colors: Pink, White, Blue.",
-  "2. Retractable Dog Leash - PRICE VARIES BY LENGTH: 3m (10ft) is $17.99 (was $24.99) and 5m (16ft) is $21.99 (was $28.99). Retractable leash with a smooth, jam-free mechanism and a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes. Comfortable ergonomic grip. Colors: Red, Green, Blue, White, Pink. IMPORTANT: Pink is OUT OF STOCK in the 5m (16ft) length only — Pink in 3m (10ft) is fully available. If a customer asks for Pink in 5m, let them know that combo is currently out of stock and offer Pink in 3m or another color in 5m instead. Pairs perfectly with the Poop Bag Clip and Poop Bag Holder.",
+  "2. Retractable Dog Leash - PRICE VARIES BY LENGTH: 3m (10ft) is $12.99 (was $19.99) and 5m (16ft) is $15.99 (was $22.99). This is the BUDGET leash: a plain retractable leash with a smooth, jam-free mechanism and a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes. Comfortable ergonomic grip. It has NO lighting of any kind. Colors: Red, Green, Blue, White, Pink — every color is available in both lengths. Pairs perfectly with the Poop Bag Clip and Poop Bag Holder.",
+  "10. LED Flashlight Retractable Dog Leash - PRICE VARIES BY LENGTH: 3M is $22.99 (was $32.99) and 5M is $25.99 (was $35.99). This is the PREMIUM leash. Retractable like product 2, but it adds a built-in LED light ring that keeps your dog visible on night walks AND a built-in flashlight that lights the path ahead. Touch control cycles the flashlight, the light ring and off. Quick-release design, suits dogs and cats of all sizes. Colors: Purple, Green, Orange — but note only PURPLE comes in the 3M length; Green and Orange are 5M only. IMPORTANT: it REQUIRES 2 AAA BATTERIES which are NOT INCLUDED. Always mention that when discussing this product so nobody is surprised. Pairs perfectly with the Light Up Dog Collar and the Anti-Drop Leash Wrist Strap.",
+  "CHOOSING BETWEEN THE TWO LEASHES: both are retractable with a one-touch lock. Pick the Retractable Dog Leash ($12.99-$15.99) for the cheapest reliable option with no lighting. Pick the LED Flashlight Retractable Dog Leash ($22.99-$25.99) for walks after dark, because it lights up the dog and the path — just remember it needs 2 AAA batteries that are not included.",
   "3. Collapsible Dog Bowl - $14.99 (was $21.99) - Silicone collapsible bowl that folds flat for easy storage and pops open in seconds for food or water. Built-in carabiner clip hooks onto your bag, belt, or leash. Size: 5.12in diameter x 1.97in height. Durable, lightweight, easy to clean. Colors: Red, Blue, Orange, Green, White, Black.",
   "5. Poop Bag Clip - $9.99 (was $14.99) - Hands-free clip that holds a USED poop bag securely so you can keep both hands free while walking your dog. Lightweight and compact, clips easily onto any leash or belt for quick, hygienic cleanup. Colors: Orange, Purple, Red, Black, Green, Pink, Blue. Pairs perfectly with the Retractable Dog Leash and the Poop Bag Holder.",
   "6. Light Up Dog Collar - PRICE VARIES BY SIZE: S (34-41cm) is $19.99 (was $26.99), M (37-46cm) is $21.99 (was $29.99), L (41-52cm) is $23.99 (was $32.99), XL (42-56cm) is $25.99 (was $35.99). USB rechargeable LED collar with 3 light modes: fast blink, slow blink, and steady glow. Super bright for night walks, doesn't overheat, charges fully in about 2 hours and holds a charge through multiple walks. Detachable design fits any standard collar setup. Colors: Green, Blue, Red, Pink, Black.",
@@ -44,7 +46,7 @@ var SYSTEM_PROMPT = [
   "- Sign up with email on the website to get the code",
   "",
   "ADDING TO CART (add_to_cart tool):",
-  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the number shown at the start of that product's line above (valid ids: 1, 2, 3, 5, 6, 8, 9 — there is no product 4 or 7).",
+  "- You can add products to the customer's REAL shopping cart by calling the add_to_cart tool. product_id is the number shown at the start of that product's line above (valid ids: 1, 2, 3, 5, 6, 8, 9, 10 — there is no product 4 or 7).",
   "- Only call the tool when the customer clearly asks to add a product or says yes to adding it. Never add anything they have not agreed to.",
   "- If you are not sure WHICH product they mean, ask a short clarifying question instead of guessing.",
   "- Size: pass the exact size option listed for that product. If the customer did not pick a size for a product whose price varies by size, omit size — the cheapest option is added by default — and mention which size was added.",
@@ -59,7 +61,7 @@ var SYSTEM_PROMPT = [
   "2-in-1 Dog Water Bottle - $19.99 (350ml) or $24.99 (550ml)",
   "Keeps water and food in one leak-proof container with a flip-out spout",
   "",
-  "Retractable Dog Leash - $17.99 (3m) or $21.99 (5m)",
+  "Retractable Dog Leash - $12.99 (3m) or $15.99 (5m)",
   "Jam-free retractable leash with one-touch lock",
   "- Just clean conversational text with simple line breaks. A hyphen between a name and its price is fine; special symbols are not.",
   "",
@@ -81,7 +83,7 @@ var TOOLS = [
         properties: {
           product_id: {
             type: "integer",
-            description: "The product's number in the PRODUCTS list (valid ids: 1, 2, 3, 5, 6, 8, 9 — there is no product 4 or 7)."
+            description: "The product's number in the PRODUCTS list (valid ids: 1, 2, 3, 5, 6, 8, 9, 10 — there is no product 4 or 7)."
           },
           size: {
             type: "string",

@@ -315,11 +315,15 @@ const PRODUCT_COPY = {
   },
   2: {
     title: 'Retractable Dog Leash — 10ft & 16ft with One-Touch Lock',
-    description: 'Jam-free retractable dog leash with a one-touch lock button and an anti-slip ergonomic grip. 10ft and 16ft lengths, five colours. From $17.99, free shipping.'
+    description: 'Jam-free retractable dog leash with a one-touch lock button and an anti-slip ergonomic grip. 10ft and 16ft lengths, five colours. From $12.99, free shipping.'
   },
   3: {
     title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
     description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $14.99 with free shipping.'
+  },
+  10: {
+    title: 'LED Flashlight Retractable Dog Leash — Light Up Night Lead',
+    description: 'Retractable dog leash with a built-in LED light ring and a flashlight for the path ahead. 3M and 5M lengths. From $22.99, free shipping. Needs 2 AAA batteries.'
   },
   9: {
     title: 'Anti-Drop Dog Leash Wrist Strap — Adjustable Safety Loop',
@@ -357,12 +361,12 @@ const PAGE_COPY = {
   },
   'shop:leash': {
     title: 'Dog Leashes & Walk Accessories',
-    description: 'Retractable dog leashes with one-touch locking, anti-drop wrist straps, plus hands-free poop bag clips and canvas bag holders. Free shipping.',
+    description: 'Retractable dog leashes with one-touch locking, an LED flashlight leash for night walks, anti-drop wrist straps and hands-free poop bag carriers. Free shipping.',
     path: '/shop/leash'
   },
   'shop:safety': {
-    title: 'Dog Safety Gear — USB Rechargeable LED Dog Collars',
-    description: 'Be seen after dark: USB rechargeable light up dog collars with three light modes, detachable and sized from small to extra large. Free shipping.',
+    title: 'Dog Safety Gear — Light Up Collars & LED Leashes',
+    description: 'Be seen after dark: USB rechargeable light up dog collars with three light modes, an LED flashlight retractable leash that lights the path ahead, and anti-drop leash wrist straps. Free shipping.',
     path: '/shop/safety'
   },
   about: {

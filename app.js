@@ -352,6 +352,9 @@ var bundleMap = {
   6: [2],       // Light Up Collar → suggest Retractable Leash
   8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
   9: [2, 5],    // Wrist Strap → suggest Retractable Leash + Poop Bag Clip
+  // The LED leash is the night-visibility option, so it pairs with the
+  // other two things that make a dark walk safer.
+  10: [6, 9],   // LED Leash → suggest Light Up Collar + Wrist Strap
 };
 
 var originalShowProduct = showProduct;

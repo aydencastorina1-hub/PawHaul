@@ -80,43 +80,47 @@ var products = [
     },
 
     // Extra detail-page gallery slides — general/non-color-specific shots
-    // from Shopify's wider image pool (a hardware close-up, an in-use
-    // hand-hold hero shot, and a full flat-lay). Picked after auditing all
-    // 24 other pool images: excluded spec/measurement diagrams with text
-    // overlays, a multi-color grid collage, and a mechanism close-up whose
-    // composition left too much empty background above the subject on a
-    // mobile crop.
+    // from Shopify's wider image pool: an in-use hand-hold shot, a carabiner
+    // close-up and a handle close-up. RE-AUDITED against the RE-CREATED
+    // product's 17-image pool (the old product's pool is gone, and one former
+    // extra no longer exists at all). Excluded: a multi-color grid collage
+    // with a stock dog photo, a numbered feature-callout overlay that also
+    // carries the line "3m Handle Prefer For Female", and a cm measurement
+    // diagram. The six unused clean shots are colors this product does not
+    // sell (grey, yellow, brown, coral, teal, pink/grey).
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0bac281c54e342e885cd09dd407d2182w.webp?width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sbdc750f0c22f49f19f834493fa8c1e8aJ.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sf813f54ca9f64fea9a4899c3006cf291s.webp?width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0bac281c54e342e885cd09dd407d2182w.webp?width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9a7394d555e045648b5710b0c3fc1f9fQ.webp?width=900"
     ],
 
     sizePrices: {
-      "3m (10ft)": { price: 17.99, was: 24.99 },
-      "5m (16ft)": { price: 21.99, was: 28.99 }
+      "3m (10ft)": { price: 12.99, was: 19.99 },
+      "5m (16ft)": { price: 15.99, was: 22.99 }
     },
-    price: 17.99, was: 24.99,
+    price: 12.99, was: 19.99,
 
-    // Pink is out of stock in the 5m length only — Pink in 3m is fully
-    // purchasable. Checked against on card pickers, the detail page, and
-    // both add-to-cart paths (see variantUnavailable()).
-    unavailableVariants: [
-      { size: "5m (16ft)", color: "Pink" }
-    ],
+    // NOTE: no unavailableVariants. This product was deleted and re-created
+    // in Shopify, and every combo — including Pink / 5m, which used to be out
+    // of stock — reports availableForSale and was confirmed with a real
+    // cartCreate. Do not reinstate the old Pink/5m rule without re-checking.
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276641024", byVariant: {
-        "3m (10ft)|Red": "gid://shopify/ProductVariant/48945265508608",
-        "5m (16ft)|Red": "gid://shopify/ProductVariant/48945265475840",
-        "3m (10ft)|Green": "gid://shopify/ProductVariant/48945265574144",
-        "5m (16ft)|Green": "gid://shopify/ProductVariant/48945265541376",
-        "3m (10ft)|Blue": "gid://shopify/ProductVariant/48945265705216",
-        "5m (16ft)|Blue": "gid://shopify/ProductVariant/48945265639680",
-        "3m (10ft)|White": "gid://shopify/ProductVariant/48945265803520",
-        "5m (16ft)|White": "gid://shopify/ProductVariant/48945265770752",
-        "3m (10ft)|Pink": "gid://shopify/ProductVariant/48945265934592",
-        "5m (16ft)|Pink": "gid://shopify/ProductVariant/48945265967360"
+    // Real Shopify variant GIDs (Storefront API) for checkout. REGENERATED:
+    // the original product was deleted and re-created, so the previous
+    // product id and every variant GID were stale and would have failed
+    // checkout. All ten below were confirmed with a real cartCreate.
+    shopifyVariants: { productGid: "gid://shopify/Product/9609088532736", byVariant: {
+        "3m (10ft)|Blue": "gid://shopify/ProductVariant/49182685298944",
+        "5m (16ft)|Blue": "gid://shopify/ProductVariant/49182685331712",
+        "3m (10ft)|Green": "gid://shopify/ProductVariant/49182685364480",
+        "5m (16ft)|Green": "gid://shopify/ProductVariant/49182685397248",
+        "3m (10ft)|Pink": "gid://shopify/ProductVariant/49182685430016",
+        "5m (16ft)|Pink": "gid://shopify/ProductVariant/49182685462784",
+        "3m (10ft)|Red": "gid://shopify/ProductVariant/49182685495552",
+        "5m (16ft)|Red": "gid://shopify/ProductVariant/49182685528320",
+        "3m (10ft)|White": "gid://shopify/ProductVariant/49182685561088",
+        "5m (16ft)|White": "gid://shopify/ProductVariant/49182685626624"
       } },
 
     features: [
@@ -458,6 +462,88 @@ var products = [
     ],
     material: "Braided nylon paracord · Adjustable slide · Metal clip",
     whatsInBox: "1× Anti-Drop Leash Wrist Strap"
+  },
+  {
+    // Sourcing note (NOT surfaced in the UI): the supplier listing shows 4.8
+    // stars and 1,000+ sold. Star ratings on this site come only from real
+    // customer reviews via /api/reviews, so this stays a comment.
+    //
+    // MODELLING NOTE: Shopify sells this as ONE "Color" option with four flat
+    // combo values (3M Purple, 5M Green, 5M Orange, 5M Purple). It is modelled
+    // here on the normal colour x size axes instead, because that is what the
+    // rest of the engine already understands — sizePrices drives the price,
+    // images{} drives the photo, and unavailableVariants greys out the two
+    // combos Shopify does not sell (3M Green and 3M Orange). The purchasable
+    // set is therefore exactly Shopify's four, and every one maps to a real
+    // variant GID below; the two blocked combos have no GID at all, so they
+    // are refused twice over.
+    id: 10, name: "LED Flashlight Retractable Dog Leash", emoji: "🔦", image: "", category: "leash",
+    categories: ["leash", "safety"],
+    badge: "New", badgeClass: "badge-new",
+    desc: "See and be seen on every walk. This retractable leash features a built-in LED light for visibility on nighttime walks, plus a built-in flashlight to help you spot what's ahead in the dark. Quick-release design and durable build fit dogs and cats of all sizes. Note: requires 2 AAA batteries, not included.",
+    tagline: "A leash that lights the dog and the path.",
+    problem: "Can't see your dog — or the path — after dark?",
+    solution: "A glowing light ring keeps your dog visible while the built-in flashlight shows you what's underfoot.",
+
+    // Shown as a pill under the tagline and surfaced by the chatbot.
+    disclaimer: "Requires 2 AAA batteries (not included)",
+
+    sizes: ["3M", "5M"],
+    colors: ["Purple", "Green", "Orange"],
+    tags: ["led leash", "light up leash", "flashlight leash", "night walk leash", "glow leash", "retractable led"],
+
+    // Shopify carries FOUR variant-assigned shots (one per combo). Only three
+    // are used, because productImageFor() keys on colour alone: Purple takes
+    // the 3M shot, which is the length Purple is cheapest in and the one the
+    // card price shows. The unused 5M Purple shot is the same photo with a
+    // different corner badge.
+    images: {
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1fc509f25675421892595e607faa06dch.webp?width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sf06f940e379d451590a75f97afe0063cU.webp?width=900",
+      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S46783238ae1444fc92edaa7ab931d011v.webp?width=900"
+    },
+
+    // Only one of the six non-variant images passed the audit: a clean
+    // hand-held shot with the flashlight beam lit. Rejected a marketing
+    // collage, a "Don't be afraid of the dark" text overlay, a "Touch
+    // Lighting" instruction panel (which also misspells "2st/3st/4st Touch"),
+    // a "U-shaped rope outlet" spec-callout overlay and a labelled parts
+    // diagram. The variant shots each carry a small, accurate size badge
+    // (3M/5M) and were kept.
+    extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Safa5a04096834eaabb20f35ecf452b60n.webp?width=900"
+    ],
+
+    sizePrices: {
+      "3M": { price: 22.99, was: 32.99 },
+      "5M": { price: 25.99, was: 35.99 }
+    },
+    price: 22.99, was: 32.99,
+
+    // Shopify only sells Purple in 3M — there is no 3M Green or 3M Orange.
+    unavailableVariants: [
+      { size: "3M", color: "Green" },
+      { size: "3M", color: "Orange" }
+    ],
+
+    // Real Shopify variant GIDs, all four confirmed with a real cartCreate.
+    shopifyVariants: { productGid: "gid://shopify/Product/9608952119552", byVariant: {
+        "5M|Green": "gid://shopify/ProductVariant/49181846569216",
+        "5M|Orange": "gid://shopify/ProductVariant/49181846601984",
+        "3M|Purple": "gid://shopify/ProductVariant/49181846634752",
+        "5M|Purple": "gid://shopify/ProductVariant/49181846667520"
+      } },
+
+    features: [
+      "Built-in LED light ring keeps your dog visible after dark",
+      "Built-in flashlight lights the path ahead",
+      "Touch control cycles flashlight, light ring and off",
+      "Quick-release brake and lock button",
+      "Suits dogs and cats of all sizes",
+      "Available in 3M and 5M lengths"
+    ],
+    material: "ABS housing · Durable nylon tape · LED light ring",
+    whatsInBox: "1× LED flashlight retractable leash (2 AAA batteries not included)"
   }
 ];
 
@@ -1166,10 +1252,13 @@ function showProduct(id, opts) {
   currentColor = currentProduct.colors && currentProduct.colors.length ? currentProduct.colors[0] : null;
   currentVariantPrice = cheapest.price;
   setDetailPrice(cheapest.price, cheapest.was);
+  // Generic disclaimer pill under the tagline — "requires 2 AAA batteries
+  // (not included)" today, previously the AirTag "case only" note. The DOM
+  // id/class still carry the older "case note" name.
   var caseNoteEl = document.getElementById('detailCaseNote');
   if (caseNoteEl) {
-    if (currentProduct.caseOnlyNote) {
-      caseNoteEl.textContent = currentProduct.caseOnlyNote;
+    if (currentProduct.disclaimer) {
+      caseNoteEl.textContent = currentProduct.disclaimer;
       caseNoteEl.style.display = '';
     } else {
       caseNoteEl.style.display = 'none';
