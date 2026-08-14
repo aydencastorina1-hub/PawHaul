@@ -5,6 +5,11 @@ var products = [
     badge: "Best Seller", badgeClass: "", reviews: 127,
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Halfway through the walk with a thirsty dog?",
+    solution: "One bottle carries the water and the food, and the spout folds out into a bowl that pours and drains in a second.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
     sizes: ["350ml", "550ml"],
@@ -56,6 +61,11 @@ var products = [
     badge: "New", badgeClass: "badge-new", reviews: 84,
     desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
     tagline: "Smooth, jam-free control that adapts to every walk.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Leash always too short, or way too long?",
+    solution: "Let out slack on the quiet stretch and lock it short at the kerb, all with one thumb on the button.",
 
     // Length drives the price (labels must exactly equal the sizePrices keys).
     sizes: ["3m (10ft)", "5m (16ft)"],
@@ -126,6 +136,11 @@ var products = [
     badge: "Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Water to give, and nothing to pour it into?",
+    solution: "Folds flat to the size of a coaster and clips onto the leash, so there is always a bowl on you.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
 
@@ -181,6 +196,11 @@ var products = [
     badge: "New", badgeClass: "badge-new", reviews: 67,
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
     tagline: "Hands-free carrying for used bags, every walk.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Stuck carrying a full bag the whole way home?",
+    solution: "Thread the knot through the clip and it hangs off the leash, so your hands are free again.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
 
@@ -237,6 +257,11 @@ var products = [
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Your dog vanishes the moment it gets dark?",
+    solution: "A rechargeable ring of light makes them visible to drivers and cyclists long before you are.",
     sizes: ["S (34-41cm)", "M (37-46cm)", "L (41-52cm)", "XL (42-56cm)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
@@ -312,6 +337,11 @@ var products = [
     badge: "New", badgeClass: "badge-new", reviews: 24,
     desc: "Always be ready for cleanup with a full roll of bags on hand. This durable canvas holder attaches to your leash with a sturdy carabiner clip, keeping unused waste bags organized and within reach on every walk — just pull a bag out whenever you need one. Simple, reliable, and built to last.",
     tagline: "A full roll of bags, always within reach.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "Reached for a bag and found the roll empty?",
+    solution: "A canvas pouch clips to the leash and keeps a whole roll where you can grab one without stopping.",
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
 
@@ -368,6 +398,11 @@ var products = [
     badge: "New", badgeClass: "badge-new",
     desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
     tagline: "If the leash slips, it stays on your wrist.",
+    // "The problem it solves" copy — shown on the home carousel and on
+    // this product's own page. Specific to what this product actually
+    // fixes on a real walk, not generic marketing filler.
+    problem: "One hard tug away from losing the leash?",
+    solution: "The strap keeps the handle secured to your wrist even if it gets pulled clean out of your hand.",
     // Single option in Shopify (Color only). A non-empty sizes array is
     // required — showProduct() maps over it unconditionally — and a lone size
     // is hidden from the size picker on the detail page.
@@ -814,6 +849,54 @@ function renderHomeProducts() {
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
 
+// ---- "The problem it solves" home carousel -----------------------------
+// One slide per product that has problem/solution copy, in catalogue order.
+// Rendered from JS (not static markup) so each slide reuses the same
+// per-colour photo the cards and detail page use; the track has a CSS
+// min-height so the space is reserved before this runs.
+function renderProblemCarousel() {
+  var track = document.getElementById('problemCarousel');
+  if (!track) return;
+  var slides = products.filter(function (p) { return p.problem && p.solution; });
+  track.innerHTML = slides.map(function (p) {
+    var img = productImageFor(p, p.colors && p.colors[0]);
+    var media = img
+      ? '<img loading="lazy" src="' + img + '" alt="' + reviewsEscape(p.name) + '">'
+      : '<span class="prob-emoji">' + p.emoji + '</span>';
+    // Clickable card rather than a link, matching the product cards: keeps
+    // modifier-click behaviour consistent and avoids nesting interactive
+    // content, and showProduct() still writes a real /product/<slug> URL.
+    return '<article class="prob-slide" onclick="showProduct(' + p.id + ')">' +
+        '<div class="prob-slide-img">' + media + '</div>' +
+        '<div class="prob-slide-body">' +
+          '<p class="prob-kicker">' + reviewsEscape(p.name) + '</p>' +
+          '<h3 class="prob-head">' + reviewsEscape(p.problem) + '</h3>' +
+          '<p class="prob-copy">' + reviewsEscape(p.solution) + '</p>' +
+          '<span class="prob-link">See how it works &rarr;</span>' +
+        '</div>' +
+      '</article>';
+  }).join('');
+  // initCarousel lives in app.js, which loads after this file — same deferred
+  // hook renderHomeProducts() uses.
+  setTimeout(function () {
+    if (typeof initCarousel === 'function') initCarousel('problemCarousel', 'probCarPrev', 'probCarNext');
+  }, 50);
+}
+
+// Single-product version of the same framing, on the product page.
+function renderDetailProblem() {
+  var el = document.getElementById('detailProblem');
+  if (!el) return;
+  if (!currentProduct || !currentProduct.problem || !currentProduct.solution) {
+    el.innerHTML = '';
+    return;
+  }
+  el.innerHTML =
+    '<p class="prob-detail-kicker">The problem it solves</p>' +
+    '<h3 class="prob-detail-head">' + reviewsEscape(currentProduct.problem) + '</h3>' +
+    '<p class="prob-detail-copy">' + reviewsEscape(currentProduct.solution) + '</p>';
+}
+
 // A product can legitimately sit in more than one aisle (the Anti-Drop Leash
 // Wrist Strap is both a leash accessory and a safety/loss-prevention item), so
 // membership is read from `categories` when present and falls back to the
@@ -1098,6 +1181,7 @@ function showProduct(id, opts) {
   // fills the section and calls it once the fetch lands.
   syncDetailRating(currentProduct.id);
   renderReviews(currentProduct.id);
+  renderDetailProblem();
   document.getElementById('qtyNum').textContent = '1';
   renderDetailShopPay();
 
@@ -2240,5 +2324,8 @@ async function submitReview(ev, productId) {
 
 // ==================== INIT ====================
 renderHomeProducts();
+// Rendered once at boot: the section lives in the SPA's DOM permanently,
+// so it does not need re-rendering on every return to the home page.
+renderProblemCarousel();
 // Real review aggregates for every product, one request, then a re-render.
 loadReviewStats();

@@ -160,7 +160,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=75" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=76" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -169,7 +169,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=46">
+  <link rel="preload" as="script" href="/products.js?v=47">
   <link rel="preload" as="script" href="/app.js?v=46">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box is pointless once this device has submitted
@@ -463,6 +463,24 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 
       </div>
       <button class="carousel-btn carousel-next" id="colCarNext" aria-label="Next category">&#8250;</button>
+    </div>
+  </section>
+
+  <!-- THE PROBLEM IT SOLVES -->
+  <!-- Slides are rendered by renderProblemCarousel() in products.js so the
+       photos come from the same per-colour image map everything else uses.
+       The track carries a min-height in CSS so the section reserves its space
+       before that render lands — otherwise Best Sellers below would jump. -->
+  <section class="problem-section">
+    <div class="problem-header">
+      <div class="section-tag">Why It Exists</div>
+      <h2 class="section-title">The Problem It <span>Solves</span></h2>
+      <p class="section-sub">Every product here started as something that went wrong on a walk.</p>
+    </div>
+    <div class="prob-carousel-wrap">
+      <button class="carousel-btn carousel-prev disabled" id="probCarPrev" aria-label="Previous problem">&#8249;</button>
+      <div id="problemCarousel"></div>
+      <button class="carousel-btn carousel-next" id="probCarNext" aria-label="Next problem">&#8250;</button>
     </div>
   </section>
 
@@ -899,6 +917,11 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
         <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart</button>
       </div>
 
+      <!-- THE PROBLEM IT SOLVES — single-product version of the home
+           carousel. Filled by showProduct() from this product's own
+           problem/solution copy; renders nothing if a product has none. -->
+      <div class="prob-detail" id="detailProblem"></div>
+
       <!-- DESCRIPTION / REVIEWS / SHIPPING — ACCORDION -->
       <div class="pd-accordion">
         <div class="pd-acc-item open">
@@ -1295,7 +1318,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=46"></script>
+  <script src="/products.js?v=47"></script>
   <script src="/app.js?v=46"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
