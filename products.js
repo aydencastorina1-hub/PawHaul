@@ -370,7 +370,7 @@ var products = [
     tagline: "If the leash slips, it stays on your wrist.",
     // Single option in Shopify (Color only). A non-empty sizes array is
     // required — showProduct() maps over it unconditionally — and a lone size
-    // is hidden from the card pickers by cardOptionsHtml.
+    // is hidden from the size picker on the detail page.
     sizes: ["Universal — adjustable, fits any leash"],
     colors: ["Green", "Black", "Gray", "Brown", "Pink", "Purple"],
 
@@ -930,119 +930,48 @@ function shortSizeLabel(s) {
   return s;
 }
 
-function cardOptionsHtml(p) {
-  var colorRow = '', sizeRow = '';
-  var defColor = p.colors && p.colors.length ? p.colors[0] : null;
-  if (p.colors && p.colors.length > 1) {
-    colorRow = '<div class="mini-swatches">' + p.colors.map(function (c, i) {
-      return '<button type="button" class="mini-swatch' + (i === 0 ? ' active' : '') +
-        '" data-color="' + c + '" title="' + c + '" aria-label="Color: ' + c +
-        '" style="' + swatchCss(c) + '" onmousedown="event.preventDefault()" onclick="cardSelectColor(event,this,' + p.id + ')"></button>';
-    }).join('') + '</div>';
-  }
-  // Only render a size row when there's actually a choice — single-size
-  // products carry long descriptive labels ("Universal — fits all leashes")
-  // that would just be noise on a card.
-  if (p.sizes && p.sizes.length > 1) {
-    var def = lowestVariant(p).size || p.sizes[0];
-    sizeRow = '<div class="mini-sizes">' + p.sizes.map(function (s) {
-      var oos = variantUnavailable(p, s, defColor);
-      return '<button type="button" class="mini-size' + (s === def ? ' active' : '') + (oos ? ' mini-size-oos' : '') +
-        '" data-size="' + s + '" title="' + (oos ? s + ' — out of stock in ' + defColor : s) +
-        '" onmousedown="event.preventDefault()" onclick="cardSelectSize(event,this,' + p.id + ')">' + shortSizeLabel(s) + '</button>';
-    }).join('') + '</div>';
-  }
-  if (!colorRow && !sizeRow) return '';
-  return '<div class="card-opts" onclick="event.stopPropagation()">' + colorRow + sizeRow + '</div>';
-}
-
-function cardSelectColor(ev, btn, id) {
-  ev.stopPropagation();
-  var card = btn.closest('.product-card');
-  if (!card) return;
-  card.querySelectorAll('.mini-swatch').forEach(function (b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  refreshCardSizeAvailability(card, id);
-
-  // Show that color's own product photo instead of the default color's.
-  var p = products.find(function (x) { return x.id === id; });
-  var color = btn.dataset.color;
-  var imgUrl = p ? productImageFor(p, color) : null;
-  var imgEl = card.querySelector('.product-img img');
-  if (imgUrl && imgEl) imgEl.src = imgUrl;
-}
-
-// After a color changes, grey out any size that's out of stock in that color
-// and — if the currently-selected size just became unavailable — jump to the
-// cheapest size that's still purchasable, re-pricing the card to match.
-function refreshCardSizeAvailability(card, id) {
-  var p = products.find(function (x) { return x.id === id; });
-  if (!p || !p.unavailableVariants) return;
-  var colorBtn = card.querySelector('.mini-swatch.active');
-  var color = colorBtn ? colorBtn.dataset.color : null;
-  var sizeBtns = card.querySelectorAll('.mini-size');
-  var activeWasOos = false;
-  sizeBtns.forEach(function (btn) {
-    var oos = variantUnavailable(p, btn.dataset.size, color);
-    btn.classList.toggle('mini-size-oos', oos);
-    btn.title = oos ? (btn.dataset.size + ' — out of stock in ' + color) : btn.dataset.size;
-    if (oos && btn.classList.contains('active')) activeWasOos = true;
-  });
-  if (!activeWasOos) return;
-  var available = p.sizes.filter(function (s) { return !variantUnavailable(p, s, color); });
-  if (!available.length) return;
-  var pick = available.reduce(function (best, s) {
-    var price = p.sizePrices ? p.sizePrices[s].price : p.price;
-    var bestPrice = p.sizePrices ? p.sizePrices[best].price : p.price;
-    return price < bestPrice ? s : best;
-  }, available[0]);
-  sizeBtns.forEach(function (btn) { btn.classList.toggle('active', btn.dataset.size === pick); });
-  var sp = p.sizePrices ? p.sizePrices[pick] : null;
-  var priceEl = card.querySelector('.product-price');
-  if (priceEl) priceEl.innerHTML = variantPriceHtml(sp ? sp.price : p.price, sp ? sp.was : p.was);
-}
-
-function cardSelectSize(ev, btn, id) {
-  ev.stopPropagation();
-  if (btn.classList.contains('mini-size-oos')) {
-    showToast('That size is out of stock in this color.');
-    return;
-  }
-  var card = btn.closest('.product-card');
-  if (!card) return;
-  card.querySelectorAll('.mini-size').forEach(function (b) { b.classList.remove('active'); });
-  btn.classList.add('active');
-  // Re-price the card instantly from the selected size variant.
-  var p = products.find(function (x) { return x.id === id; });
-  var priceEl = card.querySelector('.product-price');
-  if (!p || !priceEl) return;
-  var sp = p.sizePrices ? p.sizePrices[btn.dataset.size] : null;
-  priceEl.innerHTML = variantPriceHtml(sp ? sp.price : p.price, sp ? sp.was : p.was);
-}
-
 // Card Add To Cart: adds whatever size/color the card currently has
 // selected (falls back to the cheapest variant, same as quickAdd).
+// Cards carry no colour/size pickers any more, so an add from a card always
+// uses the product's DEFAULTS — the same ones the card itself is showing:
+// the first colour (whose photo is on the card) and the cheapest size (whose
+// price is on the card). Adding anything else would charge a price the
+// customer never saw.
+//
+// The defaults are in stock for every product today, but if a default ever
+// goes out of stock this steps to the cheapest size that is still available
+// for that colour rather than dead-ending on a toast.
+function defaultCardVariant(p) {
+  var color = (p.colors && p.colors.length) ? p.colors[0] : null;
+  var v = lowestVariant(p);
+  if (!variantUnavailable(p, v.size || '', color)) {
+    return { size: v.size || '', price: v.price, color: color };
+  }
+  var sizes = (p.sizes || []).slice().sort(function (a, b) {
+    var pa = p.sizePrices && p.sizePrices[a] ? p.sizePrices[a].price : p.price;
+    var pb = p.sizePrices && p.sizePrices[b] ? p.sizePrices[b].price : p.price;
+    return pa - pb;
+  });
+  for (var i = 0; i < sizes.length; i++) {
+    if (!variantUnavailable(p, sizes[i], color)) {
+      var sp = p.sizePrices ? p.sizePrices[sizes[i]] : null;
+      return { size: sizes[i], price: sp ? sp.price : p.price, color: color };
+    }
+  }
+  return null;
+}
+
 function cardAdd(ev, id) {
   if (ev) ev.stopPropagation();
   var p = products.find(function (x) { return x.id === id; });
   if (!p) return;
-  var card = ev && ev.target ? ev.target.closest('.product-card') : null;
-  var v = lowestVariant(p);
-  var size = v.size || '', price = v.price;
-  var sizeBtn = card ? card.querySelector('.mini-size.active') : null;
-  if (sizeBtn && sizeBtn.dataset.size) {
-    size = sizeBtn.dataset.size;
-    var sp = p.sizePrices ? p.sizePrices[size] : null;
-    price = sp ? sp.price : p.price;
-  }
-  var sw = card ? card.querySelector('.mini-swatch.active') : null;
-  var color = sw && sw.dataset.color ? sw.dataset.color : null;
-  if (variantUnavailable(p, size, color)) {
-    showToast('That size/color combo is out of stock — pick another.');
+  var v = defaultCardVariant(p);
+  if (!v) {
+    showToast('That one is out of stock right now.');
     return;
   }
-  var item = Object.assign({}, p, { price: price, size: size || '' });
-  if (color) item.color = color;
+  var item = Object.assign({}, p, { price: v.price, size: v.size });
+  if (v.color) item.color = v.color;
   addToCart(item);
 }
 
@@ -1070,7 +999,6 @@ function productCard(p) {
         <div class="product-name">${p.name}</div>
         ${cardRatingHtml(p)}
         <div class="product-price">${priceDisplayHtml(p)}</div>
-        ${cardOptionsHtml(p)}
         <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
       </div>
     </div>
@@ -1423,13 +1351,18 @@ function addToCart(product) {
   showToast(`${product.name} added to cart!`);
 }
 
+// Used by the wishlist cards, which have never had pickers either — so it
+// resolves the same defaults as cardAdd (first colour + cheapest in-stock
+// size) and records the colour on the line, keeping every card-originated
+// add identical regardless of which grid it came from.
 function quickAdd(id) {
   var product = products.find(p => p.id === id);
   if (!product) return;
-  // Card buttons add the LOWEST-priced variant (the price the card shows),
-  // tagged with its size so it lands on the right cart line.
-  var v = lowestVariant(product);
-  addToCart(Object.assign({}, product, { price: v.price, size: v.size || '' }));
+  var v = defaultCardVariant(product);
+  if (!v) { showToast('That one is out of stock right now.'); return; }
+  var item = Object.assign({}, product, { price: v.price, size: v.size });
+  if (v.color) item.color = v.color;
+  addToCart(item);
 }
 
 var wishlistItems = [];

@@ -699,71 +699,6 @@ nav {
 .price-was { font-size: 12px; color: var(--gray); text-decoration: line-through; font-weight: 600; }
 .price-from { font-size: 11px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
 
-/* COMPACT ON-CARD VARIANT PICKERS (home carousel + shop grid) */
-.card-opts {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin: 2px 0 16px;
-  cursor: default; /* taps here select options, never open the product */
-}
-.mini-swatches { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
-.mini-swatch {
-  width: 17px;
-  height: 17px;
-  border-radius: 50%;
-  border: 1px solid rgba(26, 26, 46, 0.18);
-  padding: 0;
-  cursor: pointer;
-  flex-shrink: 0;
-  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
-}
-.mini-swatch:hover { transform: scale(1.18); }
-.mini-swatch.active { box-shadow: 0 0 0 2px white, 0 0 0 3.5px var(--orange); }
-.mini-sizes { display: grid; grid-template-columns: repeat(2, auto); justify-content: start; gap: 5px 10px; }
-.mini-size {
-  font-family: 'Nunito', sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1;
-  padding: 4px 9px;
-  border-radius: 999px;
-  border: 1.5px solid var(--line);
-  background: white;
-  color: var(--black);
-  cursor: pointer;
-  transition: all 0.15s var(--ease);
-}
-.mini-size:hover { border-color: var(--orange); }
-.mini-size.active {
-  border-color: var(--orange);
-  background: rgba(232, 99, 10, 0.10);
-  color: var(--orange);
-}
-.mini-size-oos {
-  color: var(--gray);
-  background: var(--light-gray);
-  border-color: var(--line);
-  text-decoration: line-through;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-.mini-size-oos:hover { border-color: var(--line); }
-.mini-size-oos.active {
-  border-color: var(--line);
-  background: var(--light-gray);
-  color: var(--gray);
-}
-/* Pressing a swatch/pill must not "press" the whole card — :active
-   propagates to ancestors, so without this the card scale(0.97) press
-   feedback fires on every picker tap and the card visibly shakes.
-   (:has() outranks both the base and the hover:none :active rules.) */
-.product-card:active:has(.card-opts:active) {
-  transform: none;
-  box-shadow: var(--shadow-sm);
-  border-color: var(--line-soft);
-}
-
 /* WHY SECTION */
 .why-section {
   /* Subtle depth: barely-there navy gradient instead of a flat fill.
@@ -3173,14 +3108,19 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     flex: 0 0 230px;          /* fixed width — not a % of the viewport */
     width: 230px;
     min-width: 0;             /* long names can no longer stretch the card */
-    /* 270px image / 160px info. Info's natural content (name+stars+price+
-       swatches+button+padding, measured) is ~150px — 160px leaves a real
-       margin so nothing is ever flex-shrunk. .product-name in particular
-       has overflow:hidden for its ellipsis, which strips flexbox's normal
-       min-height:auto shrink protection, so it silently collapses to 0
-       height (invisible) instead of overflowing if the budget is too tight —
-       hit this for real during testing, hence the explicit margin here. */
-    height: 430px;
+    /* 270px image / 140px info. The swatch row that used to live here is gone,
+       so this comes down from 430px — leaving it would have left a dead ~20px
+       band under the button, since .product-info is space-between and would
+       just spread the remaining rows further apart.
+
+       410px is the MEASURED natural height of the new card (uniform across all
+       five), not a guess: too tight and the button is clipped rather than the
+       card growing, because .product-info is flex:1 1 auto/min-height:0 and
+       .product-name has overflow:hidden for its ellipsis — which strips
+       flexbox's usual min-height:auto shrink protection, so content silently
+       overflows instead of pushing the box open. 390px clipped the button by
+       6px during testing; re-measure here if the card's contents ever change. */
+    height: 410px;
   }
   #homeProducts .product-img-wrap,
   #homeProducts .product-img { height: 270px; }
@@ -3203,15 +3143,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     margin-bottom: 0;
   }
   #homeProducts .product-stars { margin-bottom: 0; }
-  /* Size pills are dropped on this compact teaser strip (still fully
-     selectable on the detail page) — color swatches stay, per spec. */
-  #homeProducts .mini-sizes { display: none; }
   /* space-between does the aligning now — auto margins would fight it, but a
      small explicit margin on each row still gives even, intentional breathing
      room instead of letting space-between squeeze everything to near-zero. */
   #homeProducts .product-info .btn-black { margin-top: 0; }
-  #homeProducts .product-price { margin-top: 0; margin-bottom: 4px; }
-  #homeProducts .card-opts { margin-top: 2px; margin-bottom: 10px; }
+  #homeProducts .product-price { margin-top: 0; margin-bottom: 6px; }
 }
 
 /* ============================================================
@@ -3619,8 +3555,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    on the navy band, and fading a whole white card there just turns it grey. */
 .skel-card .product-img,
 .skel-card .btn-black,
-.skel-card .mini-swatch,
-.skel-card .mini-size,
 .skel-card .product-name::after,
 .skel-card .product-stars::after,
 .skel-card .product-price::after { animation: skelPulse 1.5s ease-in-out infinite; }
@@ -3628,8 +3562,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   .skel-card .product-img,
   .skel-card .btn-black,
-  .skel-card .mini-swatch,
-  .skel-card .mini-size,
   .skel-card .product-name::after,
   .skel-card .product-stars::after,
   .skel-card .product-price::after { animation: none; }
@@ -3646,12 +3578,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .skel-card .btn-black { color: transparent; }
 .skel-card .product-stars svg { fill: transparent; }
 .skel-card .btn-black { background: var(--skel); }
-.skel-card .mini-swatch,
-.skel-card .mini-size { background: var(--skel); border-color: transparent; }
-/* A pill holding one blank space would be as round as a colour swatch and read
-   as one. Widening it is purely cosmetic — .mini-sizes is a fixed 2-column
-   grid, so pill width can't change how many rows it takes (i.e. the height). */
-.skel-card .mini-size { min-width: 46px; }
 
 /* The grey bars. Drawn as absolutely-positioned pseudo-elements (zero effect
    on layout) rather than backgrounds, so they can be rounded and inset. */
@@ -4769,3 +4695,4 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   --shop-pay-button-border-radius: var(--radius-sm);
 }
 .detail-shop-pay .shop-pay-wrap { width: 100%; }
+
