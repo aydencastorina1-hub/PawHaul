@@ -4713,7 +4713,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 #problemCarousel {
   display: flex;
-  overflow-x: hidden;
+  /* auto, not hidden: with hidden the track can ONLY be moved by the arrows
+     or initCarousel's drag handler, so a trackpad/wheel swipe does nothing and
+     the carousel reads as broken. auto keeps all of that working (initCarousel
+     drives scrollLeft either way) and adds native scrolling on top. The
+     scrollbar itself stays hidden by the two rules below. */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   gap: 16px;
   /* Slides are rendered by JS. Without a reserved height the Best Sellers
@@ -4741,12 +4747,18 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   height: 180px;
   flex-shrink: 0;
   overflow: hidden;
-  background: var(--img-placeholder);
+  /* White, not the cream placeholder: these are product shots on white, so a
+     contained image blends into the panel instead of sitting on a tinted band. */
+  background: #fff;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.prob-slide-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* CONTAIN, not cover. The sources are square (900x900) and the frame is
+   landscape, so cover was cutting ~42% off the product — measured. contain
+   shows the whole item, which is the point of a "here is the product" slide. */
+.prob-slide-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .prob-emoji { font-size: 64px; }
 
 .prob-slide-body {

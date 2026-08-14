@@ -1407,7 +1407,21 @@ function renderDetailShopPay() {
     host.innerHTML = '';
     return;
   }
-  if (variants === _detailShopPayKey && host.querySelector('shop-pay-button')) return;
+  // UPDATE IN PLACE when the button already exists. Re-writing innerHTML
+  // destroys the custom element and makes a fresh one re-upgrade from
+  // Shopify's CDN module, which is a visible flash on EVERY colour/size tap.
+  // shop-js registers `variants` as an observed prop, so setting the attribute
+  // is enough — and the checkout it opens is built from the attribute at click
+  // time, which is verified end-to-end (change colour -> click -> the new
+  // variant is what appears on shop.app).
+  var existing = host.querySelector('shop-pay-button');
+  if (existing) {
+    if (variants !== _detailShopPayKey) {
+      existing.setAttribute('variants', variants);
+      _detailShopPayKey = variants;
+    }
+    return;
+  }
   _detailShopPayKey = variants;
   // Same "or" divider component the cart page uses, so the two pages read the
   // same. The Shop Pay LOGO is kept (no button-text attribute) — the element
