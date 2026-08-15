@@ -1273,6 +1273,7 @@ function showProduct(id, opts) {
   renderDetailProblem();
   document.getElementById('qtyNum').textContent = '1';
   renderDetailShopPay();
+  initShareControl();
 
   var cats = { walk: 'Walk Essentials', car: 'Car & Travel', treats: 'Health & Treats', home: 'Home & Grooming' };
   document.getElementById('detailCategory').textContent = cats[currentProduct.category] || 'PawHaul';
@@ -2012,6 +2013,103 @@ function goToFaq(itemId) {
     el.classList.add('open');
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, 140);
+}
+
+// ==================== SHARE THIS PRODUCT ====================
+//
+// The origin is pinned to production rather than read from location.origin,
+// mirroring the same decision in api/_seo.js: a link shared out of a preview
+// deployment (or off a future custom domain alias) has to point somewhere a
+// stranger can actually open, and preview hosts sit behind Vercel Auth.
+var SHARE_ORIGIN = 'https://pawhaul.vercel.app';
+
+function productShareUrl(p) {
+  return SHARE_ORIGIN + '/product/' + slugify(p.name);
+}
+
+// Shows the button as "Share" or "Copy Link" depending on what the device can
+// actually do. Called from showProduct(), so it is re-evaluated per product
+// open and never runs before the markup exists; it is idempotent.
+function initShareControl() {
+  var btn = document.getElementById('detailShareBtn');
+  if (!btn) return;
+  var canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  btn.classList.toggle('is-copy', !canShare);
+  var label = document.getElementById('detailShareLabel');
+  if (label) label.textContent = canShare ? 'Share' : 'Copy Link';
+  var aria = canShare ? 'Share this product' : 'Copy link to this product';
+  btn.setAttribute('aria-label', aria);
+  btn.setAttribute('title', aria);
+}
+
+// Clipboard fallback. navigator.clipboard is unavailable on http:// and can
+// reject even on https:// (permission, or Safari outside a gesture), so the
+// off-screen textarea + execCommand path stays as the last resort. If even
+// that fails the URL itself goes in the toast, so the customer can still
+// select it by hand rather than being told nothing happened.
+function copyShareLink(url) {
+  function legacyCopy() {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = url;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, url.length);
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function () {
+      showToast('Link copied!');
+    }, function () {
+      showToast(legacyCopy() ? 'Link copied!' : url, 6000);
+    });
+    return;
+  }
+  showToast(legacyCopy() ? 'Link copied!' : url, 6000);
+}
+
+function shareProduct() {
+  if (!currentProduct) return;
+  var url = productShareUrl(currentProduct);
+  if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    // navigator.share MUST be invoked synchronously inside the click's user
+    // gesture. Awaiting anything first (a permission check, a fetch) spends
+    // the gesture and the OS refuses the sheet — so the call goes first and
+    // every failure is handled afterwards.
+    var pending;
+    try {
+      pending = navigator.share({
+        title: currentProduct.name,
+        // Deliberately no URL in the text: most targets append `url`
+        // themselves, and including it here posts the link twice.
+        text: 'Check out the ' + currentProduct.name + ' on PawHaul!',
+        url: url
+      });
+    } catch (e) {
+      copyShareLink(url);
+      return;
+    }
+    if (pending && typeof pending.catch === 'function') {
+      pending.catch(function (err) {
+        // Dismissing the share sheet is a normal outcome, not an error —
+        // falling back to a "Link copied!" toast there would be a lie about
+        // something the customer just cancelled. Anything else (including
+        // NotAllowedError, which means the sheet never opened) still needs
+        // the fallback, or the tap does nothing at all.
+        if (err && err.name === 'AbortError') return;
+        copyShareLink(url);
+      });
+    }
+    return;
+  }
+  copyShareLink(url);
 }
 
 function showToast(msg, duration) {

@@ -1333,6 +1333,41 @@ img.reviewer-av {
 
 .product-detail-info h1 { font-family: 'Fredoka One', cursive; font-size: 36px; margin-bottom: 12px; line-height: 1.2; }
 
+/* SHARE CONTROL — sits on the title's right, the way Amazon places it.
+   flex-start (not center) so a title that wraps to two or three lines keeps
+   the button beside the FIRST line instead of drifting to the middle; the
+   small margin-top optically centres it on that line against the 36px cap
+   height. The h1 keeps its own margin-bottom, so the row needs none. */
+.detail-title-row { display: flex; align-items: flex-start; gap: 14px; }
+.detail-title-row h1 { flex: 1 1 auto; min-width: 0; }
+.detail-share-btn {
+  flex: 0 0 auto;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 15px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: #fff;
+  color: var(--black);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.detail-share-btn svg { width: 17px; height: 17px; display: block; flex-shrink: 0; }
+/* Exactly one icon shows; is-copy is set by initShareControl() when the
+   device has no Web Share API and the button becomes "Copy Link". */
+.detail-share-btn .icon-link,
+.detail-share-btn.is-copy .icon-share { display: none; }
+.detail-share-btn.is-copy .icon-link { display: block; }
+.detail-share-btn:hover { color: var(--orange); border-color: var(--orange); background: rgba(232, 99, 10, 0.06); }
+.detail-share-btn:active { transform: scale(0.95); }
+.detail-share-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+
 .detail-stars { color: #FFB800; font-size: 16px; margin-bottom: 16px; }
 .detail-stars span { color: var(--gray); font-size: 13px; font-weight: 600; }
 
@@ -2806,6 +2841,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .det-prev { left: 10px; }
   .det-next { right: 10px; }
   .product-detail-info h1 { font-size: 26px; }
+  /* Titles here run long ("LED Flashlight Retractable Dog Leash"), so the
+     button drops its label and becomes a 40px tap target — comfortably over
+     the 44px-with-padding minimum once the row gap is counted, and it frees
+     the width the wrapped title needs. Mobile is also where the Web Share API
+     is essentially always present, so the "Copy Link" wording it would lose is
+     the branch that almost never renders here. */
+  .detail-title-row { gap: 10px; }
+  .detail-share-btn { padding: 0; width: 40px; height: 40px; justify-content: center; margin-top: 2px; }
+  .detail-share-btn span { display: none; }
   .detail-price .now { font-size: 28px; }
   .detail-btns { flex-direction: column; gap: 10px; }
   .btn-add-cart, .btn-buy-now { padding: 16px; min-height: 52px; }
