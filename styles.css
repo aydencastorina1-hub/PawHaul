@@ -1160,12 +1160,14 @@ img.reviewer-av {
 
 .email-input:focus { border-color: var(--orange); }
 
-/* Success state for the home page's 10% off box, revealed in place of the
-   form. The code box itself reuses the popup's .offer-code-row/.offer-code/
-   .offer-copy-btn so both entry points show an identical code; only the
-   message needs its own rule, since the popup's is tuned for white-on-navy
-   and this section sits on the light cream band. */
-.email-success { max-width: 520px; margin: 0 auto; }
+/* The claimed state of the home page's 10% off box — the standing "your code"
+   panel that replaces the form for good once an email is on file, from either
+   entry point. Which of the two states renders is decided pre-paint in the
+   <head> block, not here. The code box itself reuses the popup's
+   .offer-code-row/.offer-code/.offer-copy-btn so both entry points show an
+   identical code; only the message needs its own rule, since the popup's is
+   tuned for white-on-navy and this section sits on the light cream band. */
+.email-claimed { max-width: 520px; margin: 0 auto; }
 /* Scoped to .email-section so it outranks `.email-section p` (0,1,1), which
    would otherwise win on specificity and quietly grey this back out. */
 .email-section .email-success-msg {
@@ -1175,7 +1177,7 @@ img.reviewer-av {
   line-height: 1.6;
   margin: 0 0 18px;
 }
-.email-success .offer-code-row { margin-bottom: 0; }
+.email-claimed .offer-code-row { margin-bottom: 0; }
 
 .email-submit {
   background: var(--orange);

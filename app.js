@@ -1158,6 +1158,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // guarantees an image can never get stuck invisible even if load/error
 // somehow never fires — same safety-net philosophy as the reveal observer.
 document.addEventListener('DOMContentLoaded', function() {
+  // Keeps the 10% off panels showing whatever DISCOUNT_CODE actually is.
+  if (typeof syncDiscountCodeText === 'function') syncDiscountCodeText();
+
   var imgs = document.querySelectorAll('.lifestyle-img');
   function ready(img) { img.classList.add('img-ready'); }
   imgs.forEach(function(img) {
@@ -1381,11 +1384,12 @@ function offerAlreadyClaimed() {
 function markOfferClaimed() {
   if (OFFER_PREVIEW) return; // reviewing must never retire the reviewer's browser
   try { localStorage.setItem(OFFER_CLAIMED_KEY, '1'); } catch (e) {}
-  // Retires the home page's 10% off box too, immediately and not just from the
-  // next load — claiming through the popup while looking at the home page
-  // should not leave a signup form asking for the address they just gave.
-  // The section that just claimed through itself carries .email-claimed-now
-  // and is exempted by the rule in <head>, so it keeps showing their code.
+  // Switches the home page's 10% off box to its "your code" state too,
+  // immediately and not just from the next load — claiming through the popup
+  // while looking at the home page should not leave a signup form asking for
+  // the address they just gave. The section is never hidden: the same class
+  // drives the pre-paint swap in <head>, so from here on every visit lands on
+  // the standing code panel.
   document.documentElement.classList.add('offer-claimed');
   // Kill any armed timer too, or a submission through the home-page box would
   // still be followed by the popup firing seconds later on this same view.

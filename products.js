@@ -2134,32 +2134,42 @@ function showTrackOrder() {
 // `alreadyExists` means the address was already a Shopify customer, so the code
 // row is hidden: identical to the popup's rule, since revealing WELCOME10 again
 // to a repeat address would make "one per customer" meaningless.
+// The claimed panel's code is written into the static markup so a returning
+// visitor sees it pre-paint with no JS. DISCOUNT_CODE is documented as
+// changeable, so this re-stamps it at boot — otherwise editing the constant
+// would silently leave every returning visitor looking at the old code, which
+// is the one place on the site where being stale actually costs a sale.
+function syncDiscountCodeText() {
+  ['emailCode', 'offerCode'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el && el.textContent.trim() !== DISCOUNT_CODE) el.textContent = DISCOUNT_CODE;
+  });
+}
+
 function revealEmailSectionSuccess(alreadyExists) {
   var section = document.querySelector('.email-section');
-  var success = document.getElementById('emailSuccess');
-  if (!section || !success) return false;
+  var claimed = section && section.querySelector('.email-claimed');
+  if (!section || !claimed) return false;
 
-  // Exempts this section from the site-wide hide rule for the rest of the
-  // visit (see the <head> block in index.html). On the next load the class is
-  // gone with the fresh markup, and the section hides for good.
-  section.classList.add('email-claimed-now');
-
-  var form = section.querySelector('.email-form');
-  var pitch = section.querySelector('.email-pitch');
-  var codeRow = document.getElementById('emailCodeRow');
   var code = document.getElementById('emailCode');
   var msg = document.getElementById('emailSuccessMsg');
 
-  if (form) form.style.display = 'none';
-  if (pitch) pitch.style.display = 'none'; // "Sign up for..." no longer applies
   if (code) code.textContent = DISCOUNT_CODE;
-  if (codeRow) codeRow.style.display = alreadyExists ? 'none' : '';
   if (msg) {
+    // The code shows either way. An address already on file belongs to someone
+    // who signed up before and is now standing on the page asking for their
+    // code back — which is the whole reason this panel is permanent. Hiding it
+    // from exactly that person would defeat the point, and it enforces nothing:
+    // WELCOME10 is one fixed code and Shopify, not this page, is what holds a
+    // customer to one use of it. The wording still tells them the truth.
     msg.textContent = alreadyExists
-      ? 'This email was already used.'
+      ? "You're already signed up — here's your code again."
       : "You're in! Use this code at checkout.";
   }
-  success.style.display = 'block';
+  // Same class the pre-paint script in <head> sets from the stored flag, so
+  // this swap is the identical state the customer gets on every later visit —
+  // one rule drives both, and there is nothing to re-hide on reload.
+  document.documentElement.classList.add('offer-claimed');
   return true;
 }
 
@@ -2202,16 +2212,16 @@ function submitEmail() {
       return; // no claim flag: nothing was actually recorded
     }
     input.value = '';
-    // Reveal BEFORE marking claimed: markOfferClaimed() adds the site-wide
-    // "hide this section" class, and the reveal is what exempts this section
-    // from it for the rest of the visit.
+    // Both of these end up adding html.offer-claimed, so the order no longer
+    // matters for the swap; the reveal still runs first because its return
+    // value decides whether the toast fallback below is needed.
     var revealed = revealEmailSectionSuccess(!!data.alreadyExists);
     if (typeof markOfferClaimed === 'function') markOfferClaimed();
     // Toast only as a fallback — if the success markup is somehow missing, the
     // customer must still be told their code rather than nothing at all.
     if (!revealed) {
       showToast(data.alreadyExists
-        ? 'This email was already used.'
+        ? "You're already signed up — use code " + DISCOUNT_CODE + " at checkout for 10% off."
         : "You're in! Use code " + DISCOUNT_CODE + " at checkout for 10% off.");
     }
   }).catch(function () {
