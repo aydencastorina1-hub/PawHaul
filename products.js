@@ -28,10 +28,10 @@ var products = [
     // `price`/`was` below mirror the default (first) size so every other part
     // of the app (shop cards, home carousel, bundles, search) keeps working.
     sizePrices: {
-      "350ml": { price: 19.99, was: 27.99 },
-      "550ml": { price: 24.99, was: 34.99 }
+      "350ml": { price: 16.99, was: 24.99 },
+      "550ml": { price: 21.99, was: 29.99 }
     },
-    price: 19.99, was: 27.99,
+    price: 16.99, was: 24.99,
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Keyed
     // "size|color" to exactly match this product's own size/color labels.
@@ -136,7 +136,7 @@ var products = [
     whatsInBox: "1× retractable dog leash"
   },
   {
-    id: 3, name: "Collapsible Dog Bowl", price: 14.99, was: 21.99, emoji: "🥣", image: "", category: "water",
+    id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "", category: "water",
     badge: "Popular", badgeClass: "badge-popular", reviews: 91,
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
@@ -196,7 +196,7 @@ var products = [
     whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
-    id: 5, name: "Poop Bag Clip", price: 9.99, was: 14.99, emoji: "🧷", image: "", category: "leash",
+    id: 5, name: "Poop Bag Clip", price: 6.99, was: 10.99, emoji: "🧷", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 67,
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
     tagline: "Hands-free carrying for used bags, every walk.",
@@ -257,7 +257,7 @@ var products = [
     whatsInBox: "1× Poop Bag Clip"
   },
   {
-    id: 6, name: "Light Up Dog Collar", price: 19.99, was: 26.99, emoji: "💡", image: "", category: "safety",
+    id: 6, name: "Light Up Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "", category: "safety",
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
@@ -266,7 +266,7 @@ var products = [
     // fixes on a real walk, not generic marketing filler.
     problem: "Your dog vanishes the moment it gets dark?",
     solution: "A rechargeable ring of light makes them visible to drivers and cyclists long before you are.",
-    sizes: ["S (34-41cm)", "M (37-46cm)", "L (41-52cm)", "XL (42-56cm)"],
+    sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
     // Locally-hosted: Shopify's own variant photos for this product were all
@@ -294,34 +294,34 @@ var products = [
     ],
 
     sizePrices: {
-      "S (34-41cm)": { price: 19.99, was: 26.99 },
-      "M (37-46cm)": { price: 21.99, was: 29.99 },
-      "L (41-52cm)": { price: 23.99, was: 32.99 },
-      "XL (42-56cm)": { price: 25.99, was: 35.99 }
+      "S (13-16 in)": { price: 14.99, was: 21.99 },
+      "M (14-18 in)": { price: 16.99, was: 23.99 },
+      "L (16-20 in)": { price: 18.99, was: 26.99 },
+      "XL (16-22 in)": { price: 20.99, was: 29.99 }
     },
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
     shopifyVariants: { productGid: "gid://shopify/Product/9518276739328", byVariant: {
-        "S (34-41cm)|Green": "gid://shopify/ProductVariant/48945266360576",
-        "M (37-46cm)|Green": "gid://shopify/ProductVariant/48945266295040",
-        "L (41-52cm)|Green": "gid://shopify/ProductVariant/48945266327808",
-        "XL (42-56cm)|Green": "gid://shopify/ProductVariant/48945266753792",
-        "S (34-41cm)|Blue": "gid://shopify/ProductVariant/48945266491648",
-        "M (37-46cm)|Blue": "gid://shopify/ProductVariant/48945266524416",
-        "L (41-52cm)|Blue": "gid://shopify/ProductVariant/48945266426112",
-        "XL (42-56cm)|Blue": "gid://shopify/ProductVariant/48945266393344",
-        "S (34-41cm)|Red": "gid://shopify/ProductVariant/48945266458880",
-        "M (37-46cm)|Red": "gid://shopify/ProductVariant/48945266655488",
-        "L (41-52cm)|Red": "gid://shopify/ProductVariant/48945266557184",
-        "XL (42-56cm)|Red": "gid://shopify/ProductVariant/48945266917632",
-        "S (34-41cm)|Pink": "gid://shopify/ProductVariant/48945266589952",
-        "M (37-46cm)|Pink": "gid://shopify/ProductVariant/48945266786560",
-        "L (41-52cm)|Pink": "gid://shopify/ProductVariant/48945266688256",
-        "XL (42-56cm)|Pink": "gid://shopify/ProductVariant/48945266622720",
-        "S (34-41cm)|Black": "gid://shopify/ProductVariant/48945266884864",
-        "M (37-46cm)|Black": "gid://shopify/ProductVariant/48945266819328",
-        "L (41-52cm)|Black": "gid://shopify/ProductVariant/48945266852096",
-        "XL (42-56cm)|Black": "gid://shopify/ProductVariant/48945266721024"
+        "S (13-16 in)|Green": "gid://shopify/ProductVariant/48945266360576",
+        "M (14-18 in)|Green": "gid://shopify/ProductVariant/48945266295040",
+        "L (16-20 in)|Green": "gid://shopify/ProductVariant/48945266327808",
+        "XL (16-22 in)|Green": "gid://shopify/ProductVariant/48945266753792",
+        "S (13-16 in)|Blue": "gid://shopify/ProductVariant/48945266491648",
+        "M (14-18 in)|Blue": "gid://shopify/ProductVariant/48945266524416",
+        "L (16-20 in)|Blue": "gid://shopify/ProductVariant/48945266426112",
+        "XL (16-22 in)|Blue": "gid://shopify/ProductVariant/48945266393344",
+        "S (13-16 in)|Red": "gid://shopify/ProductVariant/48945266458880",
+        "M (14-18 in)|Red": "gid://shopify/ProductVariant/48945266655488",
+        "L (16-20 in)|Red": "gid://shopify/ProductVariant/48945266557184",
+        "XL (16-22 in)|Red": "gid://shopify/ProductVariant/48945266917632",
+        "S (13-16 in)|Pink": "gid://shopify/ProductVariant/48945266589952",
+        "M (14-18 in)|Pink": "gid://shopify/ProductVariant/48945266786560",
+        "L (16-20 in)|Pink": "gid://shopify/ProductVariant/48945266688256",
+        "XL (16-22 in)|Pink": "gid://shopify/ProductVariant/48945266622720",
+        "S (13-16 in)|Black": "gid://shopify/ProductVariant/48945266884864",
+        "M (14-18 in)|Black": "gid://shopify/ProductVariant/48945266819328",
+        "L (16-20 in)|Black": "gid://shopify/ProductVariant/48945266852096",
+        "XL (16-22 in)|Black": "gid://shopify/ProductVariant/48945266721024"
       } },
 
     features: [
@@ -331,13 +331,13 @@ var products = [
       "Long battery life — holds a charge through multiple walks",
       "Stays cool — doesn't overheat during wear",
       "Detachable design fits any standard collar setup",
-      "4 sizes from S (34-41cm) to XL (42-56cm)"
+      "4 sizes from S (13-16 in) to XL (16-22 in)"
     ],
     material: "Flexible LED light strip · USB rechargeable battery · Durable webbing band",
     whatsInBox: "1× LED light-up dog collar · 1× USB charging cable"
   },
   {
-    id: 8, name: "Poop Bag Holder", price: 9.99, was: 14.99, emoji: "🧺", image: "", category: "leash",
+    id: 8, name: "Poop Bag Holder", price: 7.99, was: 11.99, emoji: "🧺", image: "", category: "leash",
     badge: "New", badgeClass: "badge-new", reviews: 24,
     desc: "Always be ready for cleanup with a full roll of bags on hand. This durable canvas holder attaches to your leash with a sturdy carabiner clip, keeping unused waste bags organized and within reach on every walk — just pull a bag out whenever you need one. Simple, reliable, and built to last.",
     tagline: "A full roll of bags, always within reach.",

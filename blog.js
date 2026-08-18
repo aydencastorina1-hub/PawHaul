@@ -127,7 +127,7 @@ var blogPosts = [
 <p>This is the one that does the heavy lifting. A lit collar puts a light source at the dog's neck, which is the highest point of the dog and the part most likely to enter the road first.</p>
 <p>Look for three things when choosing one: <strong>USB rechargeable</strong> (coin-cell versions die without warning and get abandoned), <strong>multiple modes</strong>, and a <strong>proper fit for your dog's neck size</strong>. On mode: a steady glow is easier for a driver to track and judge distance against, while a blink is more attention-grabbing in busy traffic. Fast blink on roads, steady glow on paths is a reasonable default.</p>
 <div class="blog-cta">
-  <p><strong>Gear that helps:</strong> the <a href="/product/light-up-dog-collar">Light Up Dog Collar</a> is USB rechargeable with three modes — fast blink, slow blink and steady glow — and comes in four neck sizes from 34cm to 56cm. It's detachable, so it goes over the collar your dog already wears rather than replacing it.</p>
+  <p><strong>Gear that helps:</strong> the <a href="/product/light-up-dog-collar">Light Up Dog Collar</a> is USB rechargeable with three modes — fast blink, slow blink and steady glow — and comes in four neck sizes from 13 to 22 inches. It's detachable, so it goes over the collar your dog already wears rather than replacing it.</p>
 </div>
 
 <h3>Layer two: light on you</h3>

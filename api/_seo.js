@@ -311,7 +311,7 @@ function money(n) { return Number(n).toFixed(2); }
 const PRODUCT_COPY = {
   1: {
     title: '2-in-1 Dog Water Bottle — Leak-Proof Water & Food Bottle',
-    description: 'Portable 2-in-1 dog water bottle with a flip-out drinking spout and a sealed dry food compartment. 350ml and 550ml, BPA-free. From $19.99 with free shipping.'
+    description: 'Portable 2-in-1 dog water bottle with a flip-out drinking spout and a sealed dry food compartment. 350ml and 550ml, BPA-free. From $16.99 with free shipping.'
   },
   2: {
     title: 'Retractable Dog Leash — 10ft & 16ft with One-Touch Lock',
@@ -319,7 +319,7 @@ const PRODUCT_COPY = {
   },
   3: {
     title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
-    description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $14.99 with free shipping.'
+    description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $11.99 with free shipping.'
   },
   10: {
     title: 'LED Flashlight Retractable Dog Leash — Light Up Night Lead',
@@ -331,15 +331,15 @@ const PRODUCT_COPY = {
   },
   5: {
     title: 'Hands-Free Dog Poop Bag Clip for Leashes',
-    description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $9.99, free shipping.'
+    description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $6.99, free shipping.'
   },
   6: {
     title: 'Light Up Dog Collar — USB Rechargeable LED Night Collar',
-    description: 'USB rechargeable LED dog collar with three light modes for night walks. Four neck sizes from 34cm to 56cm, detachable. From $19.99 with free shipping.'
+    description: 'USB rechargeable LED dog collar with three light modes for night walks. Four neck sizes from 13 to 22 inches, detachable. From $14.99 with free shipping.'
   },
   8: {
     title: 'Dog Poop Bag Holder — Canvas Leash Pouch with Carabiner',
-    description: 'Durable canvas poop bag holder that clips to your leash with a carabiner, keeping a full roll of waste bags within reach. $9.99 with free shipping.'
+    description: 'Durable canvas poop bag holder that clips to your leash with a carabiner, keeping a full roll of waste bags within reach. $7.99 with free shipping.'
   }
 };
 
