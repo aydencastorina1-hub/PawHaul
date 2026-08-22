@@ -9,7 +9,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Halfway through the walk with a thirsty dog?",
-    solution: "One bottle carries the water and the food, and the spout folds out into a bowl that pours and drains in a second.",
+    agitate: "No tap in sight, and they're panting harder every block.",
+    solution: "Flip the spout out, pour, done in seconds — and the sealed compartment carries their food too.",
+    contrast: { without: "Cupped hands and a wet sleeve", "with": "Spout out, water down, walk on" },
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
     sizes: ["350ml", "550ml"],
@@ -65,7 +67,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Leash always too short, or way too long?",
-    solution: "Let out slack on the quiet stretch and lock it short at the kerb, all with one thumb on the button.",
+    agitate: "Wrapped round your legs one minute, dragging in the gutter the next.",
+    solution: "One thumb on the button: slack on the open stretch, locked short at the kerb.",
+    contrast: { without: "Slack you cannot control", "with": "Locked short in one click" },
 
     // Length drives the price (labels must exactly equal the sizePrices keys).
     sizes: ["3m (10ft)", "5m (16ft)"],
@@ -144,7 +148,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Water to give, and nothing to pour it into?",
-    solution: "Folds flat to the size of a coaster and clips onto the leash, so there is always a bowl on you.",
+    agitate: "The bottle is right there and it still ends up on the pavement.",
+    solution: "A real bowl that folds flat to a coaster and clips to the leash — open, fill, they drink.",
+    contrast: { without: "Water down the drain", "with": "A bowl on every walk" },
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
 
@@ -204,7 +210,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Stuck carrying a full bag the whole way home?",
-    solution: "Thread the knot through the clip and it hangs off the leash, so your hands are free again.",
+    agitate: "Ten more minutes of walking with one hand out of action.",
+    solution: "Knot it through the clip and it rides on the leash — hands free the rest of the way.",
+    contrast: { without: "One hand out of action", "with": "Both hands back" },
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
 
@@ -265,7 +273,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Your dog vanishes the moment it gets dark?",
-    solution: "A rechargeable ring of light makes them visible to drivers and cyclists long before you are.",
+    agitate: "A dark dog on an unlit street is invisible to a car until it is close.",
+    solution: "A rechargeable ring of light, three modes, seen by drivers and cyclists long before you are.",
+    contrast: { without: "A shadow on a dark street", "with": "Lit up the whole walk" },
     sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
@@ -345,7 +355,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "Reached for a bag and found the roll empty?",
-    solution: "A canvas pouch clips to the leash and keeps a whole roll where you can grab one without stopping.",
+    agitate: "Standing over a mess with nothing to pick it up with.",
+    solution: "A canvas pouch clips to the leash and keeps a full roll on you — pull one, keep moving.",
+    contrast: { without: "Bags left on the counter", "with": "A full roll on the leash" },
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
 
@@ -406,7 +418,9 @@ var products = [
     // this product's own page. Specific to what this product actually
     // fixes on a real walk, not generic marketing filler.
     problem: "One hard tug away from losing the leash?",
-    solution: "The strap keeps the handle secured to your wrist even if it gets pulled clean out of your hand.",
+    agitate: "A squirrel bolts, the handle is gone, and your dog is in the road.",
+    solution: "The strap holds the handle to your wrist, so a sudden pull never becomes a loose dog.",
+    contrast: { without: "One tug from a loose dog", "with": "Handle stays on your wrist" },
     // Single option in Shopify (Color only). A non-empty sizes array is
     // required — showProduct() maps over it unconditionally — and a lone size
     // is hidden from the size picker on the detail page.
@@ -483,7 +497,9 @@ var products = [
     desc: "See and be seen on every walk. This retractable leash features a built-in LED light for visibility on nighttime walks, plus a built-in flashlight to help you spot what's ahead in the dark. Quick-release design and durable build fit dogs and cats of all sizes. Note: requires 2 AAA batteries, not included.",
     tagline: "A leash that lights the dog and the path.",
     problem: "Can't see your dog — or the path — after dark?",
-    solution: "A glowing light ring keeps your dog visible while the built-in flashlight shows you what's underfoot.",
+    agitate: "You are guessing where they are and what they just picked up.",
+    solution: "The light ring keeps your dog visible while the built-in flashlight shows you the ground ahead.",
+    contrast: { without: "Walking blind after dark", "with": "Dog lit, path lit" },
 
     // Shown as a pill under the tagline and surfaced by the chatbot.
     disclaimer: "Requires 2 AAA batteries (not included)",
@@ -935,7 +951,64 @@ function renderHomeProducts() {
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
 
-// ---- "The problem it solves" home carousel -----------------------------
+// ---- "The problem it solves" (task 73) ---------------------------------
+// PROBLEM -> AGITATE -> SOLVE, then a WITHOUT/WITH contrast pair and a real
+// per-product CTA. The home carousel and the product-page block are built from
+// the same three helpers below so the two instances can never drift apart.
+
+// The CTA reads "Shop the <name>", so the two product names long enough to wrap
+// the button onto a second line carry a shorter label. Everything else uses the
+// real product name.
+var PROB_SHORT_NAME = {
+  9: "Anti-Drop Wrist Strap",
+  10: "LED Flashlight Leash"
+};
+function probCtaName(p) { return PROB_SHORT_NAME[p.id] || p.name; }
+
+// SUPPORTING DETAIL BESIDE THE IMAGE. Nothing here is invented: it is either a
+// REAL customer rating from /api/reviews, or facts already shown elsewhere on
+// this site for this exact product (the Save % the detail page computes from the
+// Shopify compare-at price, and the site-wide free shipping promise).
+// Deliberately NOT the supplier listing's "4.9 stars / 5,000+ sold" — those are
+// the supplier's numbers, not PawHaul's, which is why they live in a sourcing
+// comment and have never been surfaced. A star on this site means a real review.
+function probProofHtml(p) {
+  var r = ratingFor(p.id);
+  if (r) {
+    return '<span class="prob-proof">' + starSvg('#FFB800') +
+      '<strong>' + r.average.toFixed(1) + '</strong> \u00b7 ' + r.count +
+      ' review' + (r.count === 1 ? '' : 's') + '</span>';
+  }
+  var v = lowestVariant(p);
+  if (v.was && v.was > v.price) {
+    return '<span class="prob-proof"><strong>Save ' +
+      Math.round((1 - v.price / v.was) * 100) + '%</strong> \u00b7 Free shipping</span>';
+  }
+  return '<span class="prob-proof">Free shipping \u00b7 30-day returns</span>';
+}
+
+// WITHOUT / WITH strip. Cross-and-tick SVGs rather than emoji: every other icon
+// on this site is drawn this way, so they inherit the brand colours and stay
+// crisp instead of rendering as a different vendor's picture on each OS.
+var PROB_ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+var PROB_ICON_TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5.5 5.5L20 7"/></svg>';
+
+function probContrastHtml(p) {
+  var c = p.contrast;
+  // Bracketed: `with` is a reserved word, so it is quoted in the data too.
+  if (!c || !c.without || !c["with"]) return '';
+  return '<div class="prob-contrast">' +
+      '<div class="prob-vs prob-vs--without">' +
+        '<span class="prob-vs-ico">' + PROB_ICON_X + '</span>' +
+        '<span class="prob-vs-txt"><em>Without</em>' + reviewsEscape(c.without) + '</span>' +
+      '</div>' +
+      '<div class="prob-vs prob-vs--with">' +
+        '<span class="prob-vs-ico">' + PROB_ICON_TICK + '</span>' +
+        '<span class="prob-vs-txt"><em>With</em>' + reviewsEscape(c["with"]) + '</span>' +
+      '</div>' +
+    '</div>';
+}
+
 // One slide per product that has problem/solution copy, in catalogue order.
 // Rendered from JS (not static markup) so each slide reuses the same
 // per-colour photo the cards and detail page use; the track has a CSS
@@ -943,25 +1016,45 @@ function renderHomeProducts() {
 function renderProblemCarousel() {
   var track = document.getElementById('problemCarousel');
   if (!track) return;
+  // Whether the slides start hidden is decided ONCE, HERE, before the markup
+  // is built. Adding an opacity:0 class to already-painted content is exactly
+  // the fade-out-then-back-in flash the section reveal in app.js documents at
+  // length, and with no IntersectionObserver there would be nothing left to
+  // turn them back on.
+  var canReveal = ('IntersectionObserver' in window) &&
+    !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var slides = products.filter(function (p) { return p.problem && p.solution; });
-  track.innerHTML = slides.map(function (p) {
+  track.innerHTML = slides.map(function (p, i) {
     var img = productImageFor(p, p.colors && p.colors[0]);
     var media = img
       ? '<img loading="lazy" src="' + img + '" alt="' + reviewsEscape(p.name) + '">'
       : '<span class="prob-emoji">' + p.emoji + '</span>';
+    // Staggered by COLUMN, not by absolute index: a slide dragged in from the
+    // right is the first of its own group and must not inherit a 560ms delay
+    // just for sitting eighth in the catalogue.
+    var reveal = canReveal
+      ? ' prob-reveal" style="--prob-delay:' + ((i % 3) * 80) + 'ms'
+      : '';
     // Clickable card rather than a link, matching the product cards: keeps
-    // modifier-click behaviour consistent and avoids nesting interactive
-    // content, and showProduct() still writes a real /product/<slug> URL.
-    return '<article class="prob-slide" onclick="showProduct(' + p.id + ')">' +
-        '<div class="prob-slide-img">' + media + '</div>' +
+    // modifier-click behaviour consistent, and showProduct() still writes a
+    // real /product/<slug> URL. The CTA inside stops propagation so one tap is
+    // one showProduct() call — the same idiom the card Add To Cart button uses.
+    return '<article class="prob-slide' + reveal + '" onclick="showProduct(' + p.id + ')">' +
+        '<div class="prob-slide-img">' + media + probProofHtml(p) + '</div>' +
         '<div class="prob-slide-body">' +
           '<p class="prob-kicker">' + reviewsEscape(p.name) + '</p>' +
           '<h3 class="prob-head">' + reviewsEscape(p.problem) + '</h3>' +
+          '<p class="prob-agitate">' + reviewsEscape(p.agitate || '') + '</p>' +
           '<p class="prob-copy">' + reviewsEscape(p.solution) + '</p>' +
-          '<span class="prob-link">See how it works &rarr;</span>' +
+          probContrastHtml(p) +
+          '<button class="prob-cta" type="button" onclick="event.stopPropagation(); showProduct(' + p.id + ')">' +
+            'Shop the ' + reviewsEscape(probCtaName(p)) +
+            '<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
+          '</button>' +
         '</div>' +
       '</article>';
   }).join('');
+  if (canReveal) initProbReveal(track);
   // initCarousel lives in app.js, which loads after this file — same deferred
   // hook renderHomeProducts() uses.
   setTimeout(function () {
@@ -969,18 +1062,48 @@ function renderProblemCarousel() {
   }, 50);
 }
 
-// Single-product version of the same framing, on the product page.
+// Fades each slide up as it enters the viewport. Observed PER SLIDE rather than
+// per section: the track scrolls horizontally, so slides four and up are clipped
+// out of view sideways and get their own entrance when they are dragged in.
+// Same safety net as the section reveal in app.js — whatever happens, every
+// slide is visible after 1.2s.
+function initProbReveal(track) {
+  var slides = track.querySelectorAll('.prob-slide');
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) { e.target.classList.add('is-in'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  Array.prototype.forEach.call(slides, function (el) { obs.observe(el); });
+  setTimeout(function () {
+    Array.prototype.forEach.call(slides, function (el) { el.classList.add('is-in'); });
+  }, 1200);
+}
+
+// Single-product version of the same framing, on the product page. No photo and
+// no "Shop the ..." link here: the gallery is already on screen, and the
+// customer is standing on the page that CTA would have sent them to, so the
+// action that actually converts from this block is adding it to the cart.
 function renderDetailProblem() {
   var el = document.getElementById('detailProblem');
   if (!el) return;
-  if (!currentProduct || !currentProduct.problem || !currentProduct.solution) {
+  var p = currentProduct;
+  if (!p || !p.problem || !p.solution) {
     el.innerHTML = '';
     return;
   }
   el.innerHTML =
-    '<p class="prob-detail-kicker">The problem it solves</p>' +
-    '<h3 class="prob-detail-head">' + reviewsEscape(currentProduct.problem) + '</h3>' +
-    '<p class="prob-detail-copy">' + reviewsEscape(currentProduct.solution) + '</p>';
+    '<div class="prob-detail-top">' +
+      '<p class="prob-detail-kicker">The problem it solves</p>' +
+      probProofHtml(p) +
+    '</div>' +
+    '<h3 class="prob-detail-head">' + reviewsEscape(p.problem) + '</h3>' +
+    '<p class="prob-detail-agitate">' + reviewsEscape(p.agitate || '') + '</p>' +
+    '<p class="prob-detail-copy">' + reviewsEscape(p.solution) + '</p>' +
+    probContrastHtml(p) +
+    '<button class="prob-cta prob-cta--detail" type="button" onclick="addToCartDetail()">' +
+      'Add To Cart<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
+    '</button>';
 }
 
 // A product can legitimately sit in more than one aisle (the Anti-Drop Leash
@@ -2336,6 +2459,12 @@ async function loadReviewStats() {
   try {
     if (document.getElementById('shopProducts')) renderShopProducts(currentShopFilter);
     if (document.getElementById('homeProducts')) renderHomeProducts();
+    // The problem slides carry a proof chip that upgrades to a REAL star
+    // rating the moment one exists, so they need the same refresh. Guarded on
+    // stats actually having arrived: with none (the case today) a re-render
+    // would change nothing while resetting the carousel's scroll position and
+    // replaying the slide reveal.
+    if (Object.keys(reviewStats).length && document.getElementById('problemCarousel')) renderProblemCarousel();
   } catch (e) { /* pages not built yet — boot renders with stats already present */ }
 }
 

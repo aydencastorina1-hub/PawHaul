@@ -4744,10 +4744,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 /* ============================================================
    "THE PROBLEM IT SOLVES" — home carousel + product-page block
-   (task 60)
+   (task 60, rebuilt task 73)
 
-   Typography-led on purpose: the problem headline carries the section, the
-   photo supports it. Sits on WHITE between the off-white collections section
+   Problem -> Agitate -> Solve, a WITHOUT/WITH contrast pair, a real proof
+   chip and a real CTA. The photo is the focal point and the headline carries
+   the copy under it. Sits on WHITE between the off-white collections section
    and the navy Best Sellers band, so the page still alternates rather than
    running two identical surfaces together.
    ============================================================ */
@@ -4770,9 +4771,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   gap: 16px;
   /* Slides are rendered by JS. Without a reserved height the Best Sellers
      band below jumps up the moment they land — the same layout shift the
-     card skeletons exist to prevent. Matches the mobile slide height, which
-     is measured from a real render (stage + body), not assumed. */
-  min-height: 516px;
+     card skeletons exist to prevent. Matches the MEASURED mobile slide height
+     (stage + body with the tallest copy in the catalogue), not an estimate. */
+  min-height: 790px;
 }
 #problemCarousel::-webkit-scrollbar { display: none; }
 
@@ -4790,6 +4791,30 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .prob-slide:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--orange); }
 
+/* SCROLL-IN REVEAL. The class is only ever put on the slide by
+   renderProblemCarousel(), and only when IntersectionObserver exists and
+   motion is allowed — so a browser that cannot un-hide them never hides them
+   in the first place.
+
+   The lift is on the slide's CHILDREN, not the slide, on purpose: the slide's
+   own transform belongs to the hover lift, and animating both on one element
+   means the reveal's end state fights :hover. --prob-delay is the per-column
+   stagger, set inline; keeping it out of the base `transition` shorthand is
+   what stops it from also delaying the hover lift. */
+.prob-slide.prob-reveal {
+  opacity: 0;
+  transition: opacity 0.5s var(--ease) var(--prob-delay, 0ms),
+              transform 0.25s var(--ease),
+              box-shadow 0.25s var(--ease),
+              border-color 0.25s var(--ease);
+}
+.prob-slide.prob-reveal > * {
+  transform: translateY(16px);
+  transition: transform 0.5s var(--ease) var(--prob-delay, 0ms);
+}
+.prob-slide.prob-reveal.is-in { opacity: 1; }
+.prob-slide.prob-reveal.is-in > * { transform: none; }
+
 /* PRODUCT STAGE. Tall and white on purpose: six of the eight source photos are
    cutouts on a pure white backdrop, so a white stage makes them read as one
    clean surface with the product sitting on it — no visible frame, no band.
@@ -4797,7 +4822,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    leash's night sky) are rounded by the img rule below so they read as a
    deliberate photo tile instead of a stray rectangle. */
 .prob-slide-img {
-  height: 250px;
+  position: relative;          /* anchors the proof chip */
+  height: 270px;
   flex-shrink: 0;
   overflow: hidden;
   background: #fff;
@@ -4815,7 +4841,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    (written for object-fit: cover, where the photo covers it) paints cream bars
    down both sides of every slide — permanently animating, because the shimmer
    never stops. Shrink-wrapping kills the bars at the source and lets the radius
-   land on the picture's real edges. */
+   land on the picture's real edges. (task 66) */
 .prob-slide-img img {
   width: auto;
   max-width: 100%;
@@ -4827,6 +4853,34 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   animation: none;
 }
 .prob-emoji { font-size: 64px; }
+
+/* PROOF CHIP. Real data only — a genuine customer star average once one
+   exists, otherwise the Save % this product's own detail page computes plus
+   the site-wide free shipping promise. Never a supplier rating or a sold
+   count; see probProofHtml() in products.js. */
+.prob-proof {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: calc(100% - 28px);
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 8px rgba(26, 26, 46, 0.08);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gray);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prob-proof strong { color: var(--black); font-weight: 800; }
+.prob-proof .rv-star { width: 13px; height: 13px; flex-shrink: 0; }
 
 .prob-slide-body {
   padding: 22px 22px 24px;
@@ -4841,7 +4895,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--orange);
-  margin: 0 0 10px;
+  margin: 0 0 9px;
 }
 /* The weight contrast IS the design here — a heavy display headline against
    light grey body copy, with no decoration doing the work. */
@@ -4851,29 +4905,124 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-size: 22px;
   line-height: 1.25;
   color: var(--black);
-  margin: 0 0 10px;
+  margin: 0 0 9px;
+}
+/* AGITATE. Deliberately the darkest body line of the three and set slightly
+   larger than the solve copy: it is the sentence that has to land. */
+.prob-agitate {
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #4A4A55;
+  margin: 0 0 9px;
 }
 .prob-copy {
-  font-size: 14.5px;
+  font-size: 14px;
   line-height: 1.6;
   color: var(--gray);
   margin: 0 0 16px;
 }
-.prob-link {
-  margin-top: auto;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--black);
-  transition: color 0.2s var(--ease);
+
+/* WITHOUT / WITH. Two cells side by side with an arrow on the seam — the
+   muted cell states the walk without the product, the orange one the walk
+   with it. Stacks on the narrowest phones (see the 480 block). */
+.prob-contrast {
+  display: flex;
+  align-items: stretch;
+  gap: 20px;
+  margin: 0 0 18px;
 }
-.prob-slide:hover .prob-link { color: var(--orange); }
+.prob-vs {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 10px 11px;
+  border-radius: var(--radius-sm);
+}
+.prob-vs-ico {
+  flex-shrink: 0;
+  width: 15px;
+  height: 15px;
+  margin-top: 1px;
+}
+.prob-vs-ico svg { width: 100%; height: 100%; display: block; }
+.prob-vs-txt {
+  font-size: 12px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+.prob-vs-txt em {
+  display: block;
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  margin-bottom: 2px;
+}
+.prob-vs--without { background: #F4F1EC; color: var(--gray); }
+.prob-vs--without .prob-vs-ico { color: #B4ABA0; }
+.prob-vs--with { background: var(--orange-pale); color: var(--black); }
+.prob-vs--with .prob-vs-ico { color: var(--orange); }
+/* The arrow sits in the gap between the two cells rather than in the markup,
+   so the contrast strip stays two elements and the cells split the row evenly. */
+.prob-vs--without::after {
+  content: "\2192";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #C9C2B6;
+  line-height: 1;
+}
+
+/* CTA. Same primary button as the rest of the site (.btn-black: navy, orange
+   on hover, 2px lift) so this reads as one design system, with the arrow
+   nudging on hover. */
+.prob-cta {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background: var(--black);
+  color: #fff;
+  padding: 12px 18px;
+  min-height: 44px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13.5px;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.22s var(--ease), transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+}
+.prob-cta:hover {
+  background: var(--orange);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -10px rgba(232, 99, 10, 0.7);
+}
+.prob-cta:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.prob-cta-arrow { transition: transform 0.22s var(--ease); }
+.prob-cta:hover .prob-cta-arrow { transform: translateX(4px); }
 
 /* Arrows: same component as the collections carousel, centred on the seam
    where the slide image meets the body so they never sit over the text. */
 .prob-carousel-wrap .carousel-btn {
   display: flex;
   position: absolute;
-  top: 250px;
+  top: 270px;
   transform: translateY(-50%);
   width: 36px;
   height: 36px;
@@ -4895,23 +5044,38 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .prob-carousel-wrap .carousel-next { right: -10px; }
 .prob-carousel-wrap .carousel-btn.disabled { opacity: 0.3; cursor: default; }
 
-/* ---- product-page block ---- */
+/* ---- product-page block ----
+   Same copy structure as a slide, minus the photo and the "Shop the ..."
+   link: the gallery is already on screen and the customer is standing on the
+   page that CTA would have sent them to. */
 .prob-detail {
   margin-top: 24px;
-  padding: 22px 24px 24px;
+  padding: 20px 24px 22px;
   background: var(--light-gray);
   border-radius: var(--radius);
   border-left: 3px solid var(--orange);
 }
 .prob-detail:empty { display: none; }
+.prob-detail-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;   /* narrow phones: the chip drops to its own line rather
+                        than squeezing the kicker onto two and overflowing */
+  gap: 8px 12px;
+  margin-bottom: 8px;
+}
 .prob-detail-kicker {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--orange);
-  margin: 0 0 8px;
+  margin: 0;
 }
+/* The chip is absolutely positioned over the photo on a slide; in this block
+   it sits in normal flow on the kicker row. */
+.prob-detail .prob-proof { position: static; max-width: 100%; background: #fff; }
 .prob-detail-head {
   font-family: 'Fredoka One', cursive;
   font-weight: 400;
@@ -4920,25 +5084,50 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   color: var(--black);
   margin: 0 0 8px;
 }
+.prob-detail-agitate {
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 700;
+  color: #4A4A55;
+  margin: 0 0 8px;
+}
 .prob-detail-copy {
   font-size: 15px;
   line-height: 1.65;
   color: var(--gray);
-  margin: 0;
+  margin: 0 0 16px;
 }
+.prob-detail .prob-contrast { margin-bottom: 16px; }
+.prob-detail .prob-vs { background: #fff; }
+.prob-detail .prob-vs--with { background: var(--orange-pale); }
+.prob-cta--detail { margin-top: 0; }
 
 @media (min-width: 768px) {
   /* Two per view, and the taller slide needs a definite height so all cards
      in a row line up regardless of copy length. */
-  .prob-slide { flex-basis: calc(50% - 8px); height: 520px; }
+  .prob-slide { flex-basis: calc(50% - 8px); height: 730px; }
   .prob-slide-img { height: 300px; }
   .prob-carousel-wrap .carousel-btn { top: 300px; }
-  #problemCarousel { min-height: 520px; }
+  #problemCarousel { min-height: 730px; }
   .prob-head { font-size: 24px; }
 }
-@media (min-width: 1024px) {
-  /* Three per view on a real desktop grid. */
+@media (min-width: 1200px) {
+  /* Three per view, but only from 1200 up. At 1024 three columns left each
+     slide ~300px wide, which pushed the headline to three lines and clipped
+     the CTA clean off the bottom of the card. */
   .prob-slide { flex-basis: calc(33.333% - 11px); }
+}
+/* Below 360 the copy takes another line or two and the slide grows again.
+   Kept out of the 790 default so the common 360-480 phones reserve exactly
+   what they render rather than carrying 40px of dead space. */
+@media (max-width: 359px) {
+  #problemCarousel { min-height: 830px; }
+}
+/* Phablet band: the slides are auto-height here and settle at ~700, so the
+   790 reserve above (sized for a 360px phone) would otherwise stretch every
+   card with dead space. */
+@media (min-width: 481px) and (max-width: 767px) {
+  #problemCarousel { min-height: 710px; }
 }
 @media (max-width: 900px) {
   .problem-section { padding: 60px 5%; }
@@ -4946,4 +5135,19 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 @media (max-width: 480px) {
   .problem-section { padding: 48px 5%; }
+  /* One slide fills the phone, so the two contrast cells get a full row each
+     and the seam arrow turns to point down the stack. */
+  .prob-contrast { flex-direction: column; gap: 16px; }
+  .prob-vs--without::after {
+    left: 50%;
+    top: 100%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
+/* The reveal is skipped in JS when this is set (the class is never added), so
+   this block only has to cover a preference toggled AFTER the render. */
+@media (prefers-reduced-motion: reduce) {
+  .prob-slide.prob-reveal,
+  .prob-slide.prob-reveal > * { opacity: 1; transform: none; transition: none; }
+  .prob-cta, .prob-cta-arrow { transition: none; }
 }
