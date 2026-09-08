@@ -881,6 +881,11 @@ function goTo(e, page, filter) {
 var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product', 'route-blog', 'route-blog-post'];
 
 function showPage(page, filter, opts) {
+  // Read before the .active classes are rewritten below: the shop hero fades
+  // its content only when the visitor is already looking at the Shop page
+  // (see applyShopHero) — arriving from another page swaps it instantly.
+  var shopPageEl = document.getElementById('page-shop');
+  var shopWasActive = !!shopPageEl && shopPageEl.classList.contains('active');
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
@@ -903,7 +908,18 @@ function showPage(page, filter, opts) {
   if (page === 'home') renderHomeProducts();
   if (page === 'shop') {
     var f = filter || 'all';
+    // Arriving on the Shop page IS a filter change — currentShopFilter has to
+    // move with it, not just the grid. Anything that re-renders the grid later
+    // (the review-stats fetch landing, a review being posted) renders
+    // currentShopFilter, so leaving it on 'all' after a /shop/safety deep link
+    // silently repopulated the grid with every product while the pill — and
+    // now the hero — still said Safety.
+    currentShopFilter = f;
     renderShopProducts(f);
+    // Instant when the Shop page is only now becoming visible — there is no
+    // swap for anyone to watch. Already on Shop (a footer category link, a
+    // search-popup category tile) and it fades like a pill click.
+    applyShopHero(f, { instant: !shopWasActive });
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     var map = { all: 0, water: 1, leash: 2, safety: 3 };
     var idx = map[f];
@@ -2104,11 +2120,139 @@ async function checkout() {
 }
 
 // ==================== FILTERS ====================
+
+// ---------------------------------------------------------------------------
+// SHOP HERO CONTENT — EDIT HERE
+//
+// One entry per shop category pill; the keys are exactly the filter names the
+// pills pass to filterProducts() ('all' is the no-filter default). Each entry
+// is three editable fields plus the photo's alt text:
+//
+//   image       full URL of the band photo
+//   alt         what the photo shows (screen readers / broken-image text)
+//   heading     the big Fredoka headline
+//   description the line under it
+//
+// To swap a photo, replace that entry's `image` string — nothing else in this
+// file or in index.html needs to change. The markup in index.html holds a copy
+// of the 'all' entry only, as the pre-JS default; if you change 'all' here,
+// change it there too (search for "SHOP HERO").
+//
+// NOTE: all four images are currently the SAME placeholder URL, to be replaced
+// with real photography. applyShopHero() skips the crossfade when consecutive
+// states share a photo, so identical URLs simply mean the picture holds still
+// while the words change.
+// ---------------------------------------------------------------------------
+var SHOP_HERO = {
+  all: {
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    alt: 'A dog out on a walk in PawHaul gear',
+    heading: 'Shop Walk Gear',
+    description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
+  },
+  water: {
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    alt: 'A dog drinking on a walk',
+    heading: 'Water & Food',
+    description: 'Never run out mid-walk. Everything your dog needs to stay hydrated and fed on the go.'
+  },
+  leash: {
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    alt: 'A dog walking calmly on a leash',
+    heading: 'Leashes & Control',
+    description: 'Freedom for them, control for you. Built for calm, confident walks every time.'
+  },
+  safety: {
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    alt: 'A dog wearing a light up collar after dark',
+    heading: 'Safety & Visibility',
+    description: 'Seen and safe, day or night. Keep your dog visible and secure on every walk.'
+  }
+};
+
+// Timer for the copy's fade-out → swap → fade-in, kept module-level so a
+// second pill click mid-fade cancels the first one's pending text swap instead
+// of letting two of them land out of order.
+var shopHeroCopyTimer = null;
+
+// Points the hero band at one category's content.
+// opts.instant: apply with no animation — used when the Shop page is being
+// opened (arriving on a page should not play a transition the visitor never
+// saw start) and honoured automatically for reduced-motion visitors.
+function applyShopHero(filter, opts) {
+  var hero = document.getElementById('shopHero');
+  if (!hero) return;
+  var key = SHOP_HERO[filter] ? filter : 'all';
+  var cfg = SHOP_HERO[key];
+  if (hero.getAttribute('data-cat') === key) return; // already showing this one
+  // Set before any async work: an image that finishes loading after the
+  // visitor has clicked on to another pill checks this and bows out.
+  hero.setAttribute('data-cat', key);
+
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  var instant = !!(opts && opts.instant) || reduce;
+
+  // ---- copy
+  var copy = document.getElementById('shopHeroCopy');
+  var title = document.getElementById('shopHeroTitle');
+  var desc = document.getElementById('shopHeroDesc');
+  function setText() {
+    if (title) title.textContent = cfg.heading;
+    if (desc) desc.textContent = cfg.description;
+  }
+  clearTimeout(shopHeroCopyTimer);
+  if (instant || !copy) {
+    if (copy) copy.classList.remove('is-fading');
+    setText();
+  } else {
+    copy.classList.add('is-fading');
+    // Matches the 0.2s opacity transition on .shop-hero-copy in styles.css.
+    shopHeroCopyTimer = setTimeout(function () {
+      setText();
+      copy.classList.remove('is-fading');
+    }, 200);
+  }
+
+  // ---- photo
+  var layers = hero.querySelectorAll('.shop-hero-img');
+  if (!layers.length) return;
+  var shown = hero.querySelector('.shop-hero-img.is-active') || layers[0];
+  // Same photo as the one already up (true today: every entry shares the
+  // placeholder) — leave it completely alone, just keep the alt text honest.
+  if (shown.getAttribute('src') === cfg.image) { shown.alt = cfg.alt || ''; return; }
+
+  if (instant) {
+    shown.src = cfg.image;
+    shown.alt = cfg.alt || '';
+    return;
+  }
+
+  var next = (layers[0] === shown) ? layers[1] : layers[0];
+  if (!next) { shown.src = cfg.image; shown.alt = cfg.alt || ''; return; }
+  function reveal() {
+    if (hero.getAttribute('data-cat') !== key) return; // superseded mid-load
+    // The incoming layer becomes the labelled one; the outgoing layer fades
+    // out behind it and stops being announced.
+    next.alt = cfg.alt || '';
+    next.removeAttribute('aria-hidden');
+    shown.alt = '';
+    shown.setAttribute('aria-hidden', 'true');
+    next.classList.add('is-active');
+    shown.classList.remove('is-active');
+  }
+  next.onload = reveal;
+  next.onerror = reveal; // a dead URL must not leave the band stuck on the old photo forever
+  next.src = cfg.image;
+  if (next.complete) reveal(); // already cached: onload may never fire
+}
+
 function filterProducts(filter, btn) {
   currentShopFilter = filter || 'all';
   document.querySelectorAll('.shop-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
   if (btn) btn.classList.add('active');
   renderShopProducts(currentShopFilter);
+  applyShopHero(currentShopFilter);
   // replace (not push): switching filter pills WHILE already on Shop keeps
   // the URL correct for reload/sharing without spamming back-button history
   // with every pill click.

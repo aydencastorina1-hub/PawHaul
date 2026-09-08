@@ -766,11 +766,31 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 
 <!-- ==================== SHOP PAGE ==================== -->
 <div id="page-shop" class="page" style="background:white;">
-  <div class="shop-page">
-    <div class="shop-header">
-      <h1>Walk Gear</h1>
-      <p>Everything you need for the perfect walk with your dog</p>
+  <!-- SHOP HERO — photo band whose image/heading/description change with the
+       selected category pill. The copy for all four states (all / water /
+       leash / safety) lives in ONE place: the SHOP_HERO table at the top of
+       the FILTERS section in products.js — that is where photos get swapped,
+       not here. This markup only holds the DEFAULT ("all") state, so a first
+       paint (and a JS-less crawler) still sees a real heading; applyShopHero()
+       rewrites it from the table.
+       Two stacked <img> layers, not one: swapping a single src makes the band
+       flash its placeholder while the new photo downloads, so the incoming
+       photo loads on the hidden layer and the two crossfade once it is ready.
+       The band's height is fixed in CSS and the copy is absolutely positioned
+       inside it, so no swap can move the grid below.
+       eager + fetchpriority=low matches the About/Contact heroes: this page's
+       own hero never flashes on SPA navigation, but it also doesn't compete
+       with the home hero for bandwidth on a cold first load. -->
+  <section class="shop-hero" id="shopHero" data-cat="all">
+    <img class="shop-hero-img is-active" src="https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100" alt="A dog out on a walk in PawHaul gear" loading="eager" fetchpriority="low">
+    <img class="shop-hero-img" alt="" aria-hidden="true" loading="eager" fetchpriority="low">
+    <div class="shop-hero-overlay"></div>
+    <div class="shop-hero-copy" id="shopHeroCopy">
+      <h1 id="shopHeroTitle">Shop Walk Gear</h1>
+      <p id="shopHeroDesc">Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.</p>
     </div>
+  </section>
+  <div class="shop-page">
     <div class="shop-filters">
       <button class="filter-btn active" onclick="filterProducts('all', this)">All Walk Gear</button>
       <button class="filter-btn" onclick="filterProducts('water', this)">Water & Food</button>
