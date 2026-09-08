@@ -41,6 +41,12 @@
 
   /* Signature easing — snappy start, silky landing. */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Drawer/burger motion. --ease (quint-out) is right for something ARRIVING;
+     it is wrong for something leaving, where a long soft tail just reads as
+     lag — so the panel and scrim close on --ease-exit instead. --ease-burger
+     carries a small overshoot so the X snaps into place. */
+  --ease-exit: cubic-bezier(0.4, 0.02, 0.9, 0.55);
+  --ease-burger: cubic-bezier(0.34, 1.3, 0.5, 1);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -2530,18 +2536,37 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   -webkit-tap-highlight-color: transparent;
   width: 40px;
   height: 40px;
+  transition: transform 0.18s var(--ease);
 }
+/* The three bars morph into an X in TWO overlapping stages rather than all at
+   once: opening, the middle bar collapses first (fast, no delay) and the outer
+   two start rotating 70ms later, so the X forms into empty space instead of
+   sweeping through the bar it is replacing; closing runs the reverse, with the
+   middle bar waiting for the outer two to lie flat again. Two-stage timing is
+   the whole difference between this reading as a morph and reading as three
+   lines that happen to move at the same time.
+   The outer bars use a gentle overshoot so they settle into the X rather than
+   stopping dead on it. */
 .hamburger span {
   display: block;
   width: 22px; height: 2px;
   background: #fff;
   border-radius: 2px;
-  transition: transform 0.28s ease, opacity 0.28s ease;
   transform-origin: center;
+  transition: transform 0.34s var(--ease-burger), opacity 0.16s ease;
 }
+/* Closing: outer bars unfold immediately, middle bar comes back after them. */
+.hamburger span:nth-child(2) { transition-delay: 0.14s; }
+
 .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0.2); transition-delay: 0s; }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.hamburger.open span:nth-child(1),
+.hamburger.open span:nth-child(3) { transition-delay: 0.07s; }
+
+/* The button itself acknowledges the press — without it the only feedback on
+   a tap is the icon animation, which starts a frame or two later. */
+.hamburger:active { transform: scale(0.9); }
 
 /* Right-slide panel — enabled via mobile media query */
 .mob-menu {
@@ -4040,11 +4065,31 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   background: rgba(13, 13, 26, 0.5);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.34s var(--ease), visibility 0.34s;
+  /* Closing values. The dim leaves slightly AHEAD of the panel (0.26 vs 0.3)
+     so the page is already clear as the panel finishes sliding out. */
+  transition: opacity 0.26s var(--ease-exit), visibility 0.26s;
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
+  /* The blurred layer is recomposited every frame of the fade; the hint keeps
+     that on the compositor instead of repainting it on the main thread mid-
+     slide, which is where the stutter came from on slower phones. */
+  will-change: opacity;
+  /* A drag that starts on the scrim used to scroll the page along underneath
+     the open panel — the content sliding behind a still menu is the jankiest
+     thing about the old one. This kills the gesture at the source instead of
+     locking `body` (which iOS ignores for touch anyway, and which risks
+     losing the scroll position). Beats the `* { touch-action: manipulation }`
+     rule in the ≤900 block on specificity. */
+  touch-action: none;
 }
-.mob-menu-overlay.open { opacity: 1; visibility: visible; }
+/* Opening: the dim leads the panel in — it starts under it and is nearly
+   complete by the time the panel arrives, so the page darkens *because* the
+   menu is coming rather than a beat after it. */
+.mob-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s var(--ease), visibility 0.3s;
+}
 
 @media (max-width: 900px) {
   /* ---------- panel shell ---------- */
@@ -4052,8 +4097,21 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     width: min(330px, 88vw);
     background: #fff;
     box-shadow: -24px 0 60px -20px rgba(13, 13, 26, 0.45), -2px 0 0 rgba(13, 13, 26, 0.06);
-    transition: transform 0.44s var(--ease), visibility 0.44s;
+    /* Softened left edge — the panel reads as a card laid over the page
+       rather than a slab cut out of the viewport. */
+    border-radius: 20px 0 0 20px;
+    /* CLOSING timing. A drawer leaving on the same long quint-out it arrived
+       on is the single biggest reason a menu feels sluggish: the tail of that
+       curve creeps for ~150ms after the motion is visually over. Exits are
+       shorter and accelerate away. */
+    transition: transform 0.3s var(--ease-exit), visibility 0.3s;
     overscroll-behavior: contain;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+  /* ARRIVING: longer, decelerating, with the soft landing --ease is for. */
+  .mob-menu.open {
+    transition: transform 0.42s var(--ease), visibility 0.42s;
   }
 
   /* ---------- header: navy band carrying the brand and the close button ---------- */
@@ -4163,7 +4221,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     font-weight: 800;
     font-size: 15.5px;
     color: var(--navy);
-    transition: background 0.2s var(--ease), color 0.2s var(--ease), transform 0.2s var(--ease);
+    /* NO `transition` here on purpose — the row's transition list is declared
+       once, in the staggered-entrance block below, because the per-row delays
+       there are given PER PROPERTY and so have to match its property order.
+       This rule used to carry its own list, and being one element-selector
+       more specific than the entrance rule it silently won: the rows' opacity
+       was never in the transition at all, so they popped in at full opacity
+       while only the group labels animated. */
   }
   .mob-link-icon {
     display: flex;
@@ -4186,13 +4250,18 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     transition: transform 0.2s var(--ease), color 0.2s var(--ease);
   }
 
-  .mob-menu a.mob-link:active {
+  /* `.mob-menu.open`, not `.mob-menu`: the entrance rule below sets transform
+     on the open panel's rows, so the press state has to out-specify it or a
+     tapped row would not move. (It also now wins over .is-active, so the row
+     for the page you are on responds to a press like every other row.) */
+  .mob-menu.open a.mob-link:active {
     background: var(--light-gray);
     color: var(--navy);
     transform: scale(0.985);
+    transition-delay: 0s;
   }
-  .mob-menu a.mob-link:active .mob-link-icon { background: var(--orange-pale); color: var(--orange); }
-  .mob-menu a.mob-link:active .mob-link-chev { transform: translateX(2px); color: var(--orange); }
+  .mob-menu.open a.mob-link:active .mob-link-icon { background: var(--orange-pale); color: var(--orange); }
+  .mob-menu.open a.mob-link:active .mob-link-chev { transform: translateX(2px); color: var(--orange); }
 
   /* Current page. The icon tile carries the orange so the row stays legible
      instead of turning into a block of colour. */
@@ -4206,29 +4275,50 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
   /* ---------- staggered entrance ---------- */
   /* Rows start slightly right and transparent and settle in sequence behind
-     the panel itself. */
-  .mob-menu .mob-link,
-  .mob-menu .mob-menu-group {
+     the panel itself. The stagger used to run 0.10s → 0.42s in 40ms steps, so
+     the last row was still arriving 740ms after the tap — long after the panel
+     had stopped, which is what made the menu feel like it was still loading.
+     It now starts sooner and steps tighter (0.04s → 0.20s in 20ms, over
+     0.26s each), so the last row is in at ~0.46s — the cascade still reads as
+     a cascade, but the panel is never sitting there half-empty waiting for
+     it. Measured, not guessed: t77_menu.js samples every property per frame. */
+  /* THE ONE PLACE the rows' transition is declared (see the note in the row
+     rule above). Property ORDER matters: the delays below are per-property
+     lists, so that the entrance delay applies to opacity/transform WITHOUT
+     also delaying the press feedback by a third of a second. */
+  .mob-menu a.mob-link,
+  .mob-menu .mob-menu-group,
+  .mob-menu .mob-menu-footer {
     opacity: 0;
-    transform: translateX(14px);
-    transition: opacity 0.32s var(--ease), transform 0.32s var(--ease),
+    transform: translateX(16px);
+    transition: opacity 0.26s var(--ease), transform 0.26s var(--ease),
                 background 0.2s var(--ease), color 0.2s var(--ease);
   }
-  .mob-menu.open .mob-link,
-  .mob-menu.open .mob-menu-group { opacity: 1; transform: translateX(0); }
-  .mob-menu.open .mob-menu-nav > *:nth-child(1) { transition-delay: 0.10s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(2) { transition-delay: 0.14s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(3) { transition-delay: 0.18s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(4) { transition-delay: 0.22s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(5) { transition-delay: 0.26s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(6) { transition-delay: 0.30s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(7) { transition-delay: 0.34s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(8) { transition-delay: 0.38s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(9) { transition-delay: 0.42s; }
-  /* Closing must NOT stagger — the panel is sliding out, so the rows should go
-     with it rather than flickering out one by one behind it. */
-  .mob-menu:not(.open) .mob-link,
-  .mob-menu:not(.open) .mob-menu-group { transition-delay: 0s; }
+  .mob-menu.open a.mob-link,
+  .mob-menu.open .mob-menu-group,
+  .mob-menu.open .mob-menu-footer { opacity: 1; transform: translateX(0); }
+  .mob-menu.open .mob-menu-nav > *:nth-child(1) { transition-delay: 0.04s, 0.04s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(2) { transition-delay: 0.06s, 0.06s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(3) { transition-delay: 0.08s, 0.08s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(4) { transition-delay: 0.10s, 0.10s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(5) { transition-delay: 0.12s, 0.12s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(6) { transition-delay: 0.14s, 0.14s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(7) { transition-delay: 0.16s, 0.16s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(8) { transition-delay: 0.18s, 0.18s, 0s, 0s; }
+  .mob-menu.open .mob-menu-nav > *:nth-child(9) { transition-delay: 0.20s, 0.20s, 0s, 0s; }
+  /* The footer is the last thing to settle, just after the final row. */
+  .mob-menu.open .mob-menu-footer { transition-delay: 0.2s, 0.2s, 0s, 0s; }
+  /* Closing, the rows do not animate AT ALL: they ride out inside the panel
+     at full opacity and only snap back to their pre-open state once it is
+     off-screen (delay = the panel's exit duration, duration 0). Fading them
+     while the panel slides read as two separate things leaving — the panel
+     emptying itself on the way out — instead of one object being put away. */
+  .mob-menu:not(.open) a.mob-link,
+  .mob-menu:not(.open) .mob-menu-group,
+  .mob-menu:not(.open) .mob-menu-footer {
+    transition-delay: 0.3s;
+    transition-duration: 0s;
+  }
 
   /* ---------- footer ---------- */
   .mob-menu-footer {
@@ -4252,9 +4342,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    and the blur. */
 @media (prefers-reduced-motion: reduce) {
   .mob-menu,
+  .mob-menu.open,
   .mob-menu .mob-link,
   .mob-menu .mob-menu-group,
-  .mob-menu-overlay { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
+  .mob-menu .mob-menu-footer,
+  .hamburger span,
+  .mob-menu-overlay,
+  .mob-menu-overlay.open { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
   .mob-menu-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 
