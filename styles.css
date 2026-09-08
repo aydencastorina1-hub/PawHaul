@@ -4100,18 +4100,29 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     /* Softened left edge — the panel reads as a card laid over the page
        rather than a slab cut out of the viewport. */
     border-radius: 20px 0 0 20px;
-    /* CLOSING timing. A drawer leaving on the same long quint-out it arrived
-       on is the single biggest reason a menu feels sluggish: the tail of that
-       curve creeps for ~150ms after the motion is visually over. Exits are
-       shorter and accelerate away. */
-    transition: transform 0.3s var(--ease-exit), visibility 0.3s;
+
+    /* THE PANEL FADES IN; it does not slide across. The base .mob-menu rule
+       higher up this file parks it at translateX(100%) — a full panel-width
+       slide — and this overrides that with a fade plus a 14px drift, which is
+       just enough movement to give the fade a direction without turning it
+       back into a slide. Set the translate to 0 for a completely still fade.
+       (The base rule is left alone: it is what a browser that never reaches
+        this block still gets, and off-screen is the safe closed state.) */
+    opacity: 0;
+    transform: translateX(14px);
+    /* CLOSING timing — shorter, and accelerating away. A panel leaving on the
+       same long quint-out it arrived on is what made the old menu feel
+       sluggish: the tail of that curve creeps on after the motion looks over. */
+    transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit), visibility 0.24s;
     overscroll-behavior: contain;
-    will-change: transform;
+    will-change: opacity, transform;
     backface-visibility: hidden;
   }
   /* ARRIVING: longer, decelerating, with the soft landing --ease is for. */
   .mob-menu.open {
-    transition: transform 0.42s var(--ease), visibility 0.42s;
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.34s var(--ease), transform 0.34s var(--ease), visibility 0.34s;
   }
 
   /* ---------- header: navy band carrying the brand and the close button ---------- */
@@ -4250,10 +4261,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     transition: transform 0.2s var(--ease), color 0.2s var(--ease);
   }
 
-  /* `.mob-menu.open`, not `.mob-menu`: the entrance rule below sets transform
-     on the open panel's rows, so the press state has to out-specify it or a
-     tapped row would not move. (It also now wins over .is-active, so the row
-     for the page you are on responds to a press like every other row.) */
+  /* `.mob-menu.open`, not `.mob-menu`: this now out-specifies .is-active too,
+     so the row for the page you are on responds to a press like every other
+     row instead of sitting there inert. */
   .mob-menu.open a.mob-link:active {
     background: var(--light-gray);
     color: var(--navy);
@@ -4273,51 +4283,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
   .mob-menu a.mob-link.is-active .mob-link-chev { color: var(--orange); }
 
-  /* ---------- staggered entrance ---------- */
-  /* Rows start slightly right and transparent and settle in sequence behind
-     the panel itself. The stagger used to run 0.10s → 0.42s in 40ms steps, so
-     the last row was still arriving 740ms after the tap — long after the panel
-     had stopped, which is what made the menu feel like it was still loading.
-     It now starts sooner and steps tighter (0.04s → 0.20s in 20ms, over
-     0.26s each), so the last row is in at ~0.46s — the cascade still reads as
-     a cascade, but the panel is never sitting there half-empty waiting for
-     it. Measured, not guessed: t77_menu.js samples every property per frame. */
-  /* THE ONE PLACE the rows' transition is declared (see the note in the row
-     rule above). Property ORDER matters: the delays below are per-property
-     lists, so that the entrance delay applies to opacity/transform WITHOUT
-     also delaying the press feedback by a third of a second. */
-  .mob-menu a.mob-link,
-  .mob-menu .mob-menu-group,
-  .mob-menu .mob-menu-footer {
-    opacity: 0;
-    transform: translateX(16px);
-    transition: opacity 0.26s var(--ease), transform 0.26s var(--ease),
-                background 0.2s var(--ease), color 0.2s var(--ease);
-  }
-  .mob-menu.open a.mob-link,
-  .mob-menu.open .mob-menu-group,
-  .mob-menu.open .mob-menu-footer { opacity: 1; transform: translateX(0); }
-  .mob-menu.open .mob-menu-nav > *:nth-child(1) { transition-delay: 0.04s, 0.04s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(2) { transition-delay: 0.06s, 0.06s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(3) { transition-delay: 0.08s, 0.08s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(4) { transition-delay: 0.10s, 0.10s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(5) { transition-delay: 0.12s, 0.12s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(6) { transition-delay: 0.14s, 0.14s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(7) { transition-delay: 0.16s, 0.16s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(8) { transition-delay: 0.18s, 0.18s, 0s, 0s; }
-  .mob-menu.open .mob-menu-nav > *:nth-child(9) { transition-delay: 0.20s, 0.20s, 0s, 0s; }
-  /* The footer is the last thing to settle, just after the final row. */
-  .mob-menu.open .mob-menu-footer { transition-delay: 0.2s, 0.2s, 0s, 0s; }
-  /* Closing, the rows do not animate AT ALL: they ride out inside the panel
-     at full opacity and only snap back to their pre-open state once it is
-     off-screen (delay = the panel's exit duration, duration 0). Fading them
-     while the panel slides read as two separate things leaving — the panel
-     emptying itself on the way out — instead of one object being put away. */
-  .mob-menu:not(.open) a.mob-link,
-  .mob-menu:not(.open) .mob-menu-group,
-  .mob-menu:not(.open) .mob-menu-footer {
-    transition-delay: 0.3s;
-    transition-duration: 0s;
+  /* ---------- contents ---------- */
+  /* NO per-row entrance. The panel itself fades in as one piece, so the rows
+     arrive with it — a cascade on top of that gave the same content two
+     separate arrivals and left the bottom of the panel visibly empty while
+     the tail of it caught up. (The staggered version lived here until it was
+     replaced; if it ever comes back, note the trap it had: this rule set is
+     also the ONE place the rows' transition list is declared, because the
+     row rule above it is more specific and its own list silently won.) */
+  .mob-menu a.mob-link {
+    transition: background 0.2s var(--ease), color 0.2s var(--ease), transform 0.2s var(--ease);
   }
 
   /* ---------- footer ---------- */
@@ -4338,14 +4313,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
 }
 
-/* Reduced motion still gets the panel — just without the slide, the stagger
-   and the blur. */
+/* Reduced motion still gets the panel — just without the fade, the drift, the
+   burger morph and the blur. */
 @media (prefers-reduced-motion: reduce) {
   .mob-menu,
   .mob-menu.open,
-  .mob-menu .mob-link,
-  .mob-menu .mob-menu-group,
-  .mob-menu .mob-menu-footer,
   .hamburger span,
   .mob-menu-overlay,
   .mob-menu-overlay.open { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
