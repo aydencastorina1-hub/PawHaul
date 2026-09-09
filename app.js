@@ -617,6 +617,22 @@ showPage = function(page, filter, opts) {
 };
 
 // ==================== HAMBURGER MENU ====================
+// The closed panel is hidden with opacity + pointer-events, NOT with
+// `visibility: hidden` — see the long note on .mob-menu-overlay in styles.css:
+// the visibility flip is what destroys the overlay's compositing layer at the
+// end of a close, and iOS re-composites the fixed header a frame late when
+// that happens, flashing a strip of the page above it. Visibility was also
+// what kept the closed panel out of the accessibility tree and the tab order,
+// so that job moves here: aria-hidden for screen readers, inert (where
+// supported) so its links cannot be tabbed to or clicked while invisible.
+function setMenuHidden(menu, hidden) {
+  if (!menu) return;
+  menu.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+  // Assigning to .inert is a no-op on browsers that don't support it; the
+  // pointer-events:none in the stylesheet still covers pointer input there.
+  try { menu.inert = hidden; } catch (e) {}
+}
+
 function toggleMobileMenu() {
   var menu = document.getElementById('mobMenu');
   var overlay = document.getElementById('mobMenuOverlay');
@@ -627,6 +643,7 @@ function toggleMobileMenu() {
   menu.classList.toggle('open', !isOpen);
   overlay.classList.toggle('open', !isOpen);
   burger.classList.toggle('open', !isOpen);
+  setMenuHidden(menu, isOpen);
 }
 
 function closeMobileMenu() {
@@ -635,6 +652,7 @@ function closeMobileMenu() {
   menu.classList.remove('open');
   document.getElementById('mobMenuOverlay').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
+  setMenuHidden(menu, true);
 }
 
 // Some mobile browsers restore a page from the back/forward cache (e.g. after

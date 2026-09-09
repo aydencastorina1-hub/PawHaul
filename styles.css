@@ -2692,15 +2692,17 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   html { scroll-behavior: smooth; }
   nav { transform: translateZ(0); will-change: transform; }
 
-  /* NO `nav::before` NAVY HAT HERE. One was added to fill the strip iOS
-     exposes above the sticky header and it PAINTED OVER THE TOP OF THE OPEN
-     MOBILE MENU on iOS — the panel's navy header band (paw, "MENU / PawHaul",
-     the close button) went blank, even though the panel is z-index 1000 and
-     the nav is 500. `nav` carries `transform: translateZ(0)` + `will-change`
-     above, so on iOS it is a composited layer that can end up painting over a
-     later sibling regardless of z-index. Do not reintroduce a nav pseudo
-     element for this; if the strip has to be filled, use something that is
-     not inside the nav's compositing layer. */
+  /* The nav is ALREADY `position: fixed` on mobile — see the "NAV: fixed small
+     bar at the very top" rule further down this block — and `.page` /
+     `#page-home` already carry the 60px padding that compensates for it. Do
+     not add either again here: a second `body { padding-top: 60px }` double-
+     compensates and opens a 60px gap between the header and the hero.
+     It also means the strip of page that appears above the header on iOS is
+     NOT the sticky-vs-fixed problem it looks like. A fixed element is attached
+     to the layout viewport, and iOS lets the visual viewport extend above that
+     while Safari's top bar moves — so the band above the header shows the
+     scroller, which is painted in the taller space. See the mobile-menu
+     overlay rules near the end of this file for what is done about it. */
 
   /* `.page { -webkit-overflow-scrolling: touch }` USED TO BE HERE. Removed —
      it is the cause of the "first tap on a card does nothing until you scroll"
@@ -4076,29 +4078,38 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   display: block;
   background: rgba(13, 13, 26, 0.5);
   opacity: 0;
-  visibility: hidden;
-  /* CLOSING VALUES — deliberately the gentle 0.34s/--ease this scrim has always
-     used, NOT the quick --ease-exit the panel leaves on. The scrim sits over
-     the sticky nav, so its opacity IS the nav's brightness: dropping the dim
-     on an accelerating curve un-dims the top of the page almost within a
-     single frame, which reads as the whole header flashing at the end of every
-     close (reported, and only ever on close — the way in was always slow
-     enough not to show it). The panel can still leave quickly; the dim cannot. */
-  transition: opacity 0.34s var(--ease), visibility 0.34s;
-  /* NO `backdrop-filter` HERE ANY MORE. A full-viewport backdrop blur forces
-     the page underneath into a snapshot layer, and on iOS the sticky header
-     re-syncs a frame late when that layer is torn down — which is exactly the
-     reported symptom: a strip of the page (hero photo, hero copy) appearing
-     ABOVE the header at the end of every menu close. The dim alone reads
-     fine; the blur was never worth a repaint bug. */
-  /* NO `will-change: opacity` here, and none on the panel either. It was added
-     for smoothness and caused a REPORTED FLASH at the top of the page at the
-     END of every close: promoting these two full-viewport layers changes how
-     they are torn down when the transition finishes and `visibility` flips,
-     and on iOS the sticky nav underneath repaints for a frame when that
-     happens. The blur is expensive enough to want a hint; the flash is worse.
-     If a flash is ever reported here again, the next thing to try is dropping
-     the backdrop blur entirely and keeping only the dim. */
+
+  /* NO `visibility` ON EITHER OVERLAY ANY MORE, AND THAT IS THE POINT.
+     `visibility: hidden` at the end of the close is what lets the browser
+     DESTROY the scrim's and the panel's compositing layers. On iOS the fixed
+     header is re-composited a frame late when that happens: for that frame it
+     is drawn attached to the layout viewport while the page behind is painted
+     in the taller visual viewport Safari uses when its top bar is collapsed —
+     so a strip of the page (the hero photo, the hero copy) appears ABOVE the
+     header. That is the reported flash. It lands exactly at the end of every
+     close, which is why no timing or easing change could reach it. The layers
+     now stay alive, fully transparent and not interactive.
+     `pointer-events` does the work `visibility` used to; `aria-hidden` and
+     `inert` (set in app.js) keep the closed panel out of the accessibility
+     tree and out of the tab order. Anything that reintroduces `visibility`
+     here brings the flash back.
+     Ruled out on the way here, do not retry: the scrim's `backdrop-filter`
+     (removed — a full-viewport blur snapshots the page underneath, same class
+     of teardown), `will-change` on either layer (removed — promoting them
+     changes the teardown, and it is what the blur wanted), a `nav::before`
+     navy strip (reverted — the nav is a composited layer on mobile and it
+     painted over the OPEN DRAWER'S OWN HEADER on iOS), and a `theme-color`
+     meta (kept, correct on its own terms, but Safari only tints chrome it
+     owns). The header is already `position: fixed` on mobile, so this was
+     never a sticky-positioning problem. */
+  pointer-events: none;
+
+  /* The scrim sits over the header, so its opacity IS the header's
+     brightness: an accelerating exit un-dims the top of the page almost
+     within a single frame. It leaves on the gentle decelerating curve even
+     though the panel leaves quickly on --ease-exit. */
+  transition: opacity 0.34s var(--ease);
+
   /* A drag that starts on the scrim used to scroll the page along underneath
      the open panel — the content sliding behind a still menu is the jankiest
      thing about the old one. This kills the gesture at the source instead of
@@ -4113,8 +4124,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    0.55s fade: keep this shorter than that, never longer. */
 .mob-menu-overlay.open {
   opacity: 1;
-  visibility: visible;
-  transition: opacity 0.42s var(--ease), visibility 0.42s;
+  pointer-events: auto;
+  transition: opacity 0.42s var(--ease);
 }
 
 @media (max-width: 900px) {
@@ -4139,7 +4150,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     /* CLOSING timing — shorter, and accelerating away. A panel leaving on the
        same long quint-out it arrived on is what made the old menu feel
        sluggish: the tail of that curve creeps on after the motion looks over. */
-    transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit), visibility 0.24s;
+    /* Overrides the base rule's `visibility: hidden` — see the scrim's note
+       above for why neither overlay may flip visibility. opacity 0 plus the
+       base rule's `pointer-events: none` do the hiding. */
+    visibility: visible;
+    transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit);
     overscroll-behavior: contain;
     /* See the scrim's note above for why there is no will-change /
        backface-visibility here. */
@@ -4150,7 +4165,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mob-menu.open {
     opacity: 1;
     transform: translateX(0);
-    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), visibility 0.55s;
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
   }
 
   /* ---------- header: navy band carrying the brand and the close button ---------- */

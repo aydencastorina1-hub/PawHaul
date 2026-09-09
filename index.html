@@ -173,7 +173,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=87" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=89" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -183,7 +183,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
   <link rel="preload" as="script" href="/products.js?v=54">
-  <link rel="preload" as="script" href="/app.js?v=48">
+  <link rel="preload" as="script" href="/app.js?v=49">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -306,7 +306,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
      routing takes over, so an active state cannot be driven from those.
      Icons are the site's existing feather set (stroke 2, round caps); the
      only filled mark is the brand paw, as everywhere else. -->
-<div class="mob-menu" id="mobMenu" role="dialog" aria-modal="true" aria-label="Menu">
+<div class="mob-menu" id="mobMenu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true" inert>
   <div class="mob-menu-header">
     <div class="mob-menu-brand">
       <div class="mob-menu-brand-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="white" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
@@ -367,7 +367,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
     <p class="mob-menu-tagline">Every Walk. Every Dog. Every Time.</p>
   </div>
 </div>
-<div class="mob-menu-overlay" id="mobMenuOverlay" onclick="closeMobileMenu()"></div>
+<div class="mob-menu-overlay" id="mobMenuOverlay" onclick="closeMobileMenu()" aria-hidden="true"></div>
 
 
 <div id="page-home" class="page active">
@@ -1386,7 +1386,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
   <script src="/products.js?v=54"></script>
-  <script src="/app.js?v=48"></script>
+  <script src="/app.js?v=49"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
