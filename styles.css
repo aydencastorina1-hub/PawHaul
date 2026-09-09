@@ -4065,15 +4065,24 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   background: rgba(13, 13, 26, 0.5);
   opacity: 0;
   visibility: hidden;
-  /* Closing values. The dim leaves slightly AHEAD of the panel (0.26 vs 0.3)
-     so the page is already clear as the panel finishes sliding out. */
-  transition: opacity 0.26s var(--ease-exit), visibility 0.26s;
+  /* CLOSING VALUES — deliberately the gentle 0.34s/--ease this scrim has always
+     used, NOT the quick --ease-exit the panel leaves on. The scrim sits over
+     the sticky nav, so its opacity IS the nav's brightness: dropping the dim
+     on an accelerating curve un-dims the top of the page almost within a
+     single frame, which reads as the whole header flashing at the end of every
+     close (reported, and only ever on close — the way in was always slow
+     enough not to show it). The panel can still leave quickly; the dim cannot. */
+  transition: opacity 0.34s var(--ease), visibility 0.34s;
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  /* The blurred layer is recomposited every frame of the fade; the hint keeps
-     that on the compositor instead of repainting it on the main thread mid-
-     slide, which is where the stutter came from on slower phones. */
-  will-change: opacity;
+  /* NO `will-change: opacity` here, and none on the panel either. It was added
+     for smoothness and caused a REPORTED FLASH at the top of the page at the
+     END of every close: promoting these two full-viewport layers changes how
+     they are torn down when the transition finishes and `visibility` flips,
+     and on iOS the sticky nav underneath repaints for a frame when that
+     happens. The blur is expensive enough to want a hint; the flash is worse.
+     If a flash is ever reported here again, the next thing to try is dropping
+     the backdrop blur entirely and keeping only the dim. */
   /* A drag that starts on the scrim used to scroll the page along underneath
      the open panel — the content sliding behind a still menu is the jankiest
      thing about the old one. This kills the gesture at the source instead of
@@ -4116,8 +4125,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        sluggish: the tail of that curve creeps on after the motion looks over. */
     transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit), visibility 0.24s;
     overscroll-behavior: contain;
-    will-change: opacity, transform;
-    backface-visibility: hidden;
+    /* See the scrim's note above for why there is no will-change /
+       backface-visibility here. */
   }
   /* ARRIVING: slow and decelerating, with the soft landing --ease is for.
      Deliberately much longer than the exit (0.55s vs 0.24s) — the menu eases
