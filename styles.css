@@ -2690,6 +2690,32 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   html { scroll-behavior: smooth; }
   nav { transform: translateZ(0); will-change: transform; }
 
+  /* ── THE NAVY "HAT" ABOVE THE STICKY HEADER ───────────── */
+  /* iOS draws a band of the page ABOVE a position:sticky header whenever the
+     visual viewport and the layout viewport disagree — Safari's top bar
+     collapsing or returning, a rubber-band at the top, or the frame after a
+     full-screen overlay (the mobile menu) is dismissed. `top: 0` pins the nav
+     to the LAYOUT viewport, which in those moments sits lower than the top of
+     the screen, so a slice of whatever is behind the header — the hero photo,
+     the trust bar — appears above it. That slice is what was reported as "the
+     top of the site flashing" when the menu closes: the header was never
+     flashing, a strip of page was appearing above it.
+     This paints that strip the header's own navy, so there is nothing to see
+     no matter which of those moments causes it. 220px is far more than iOS
+     ever exposes. It is absolutely positioned (no layout effect, and it
+     cannot be scrolled to) and MOBILE-ONLY: above 900px the orange announce
+     bar sits above the nav and this would paint straight over it. */
+  nav::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 220px;
+    background: var(--navy);
+    pointer-events: none;
+  }
+
   /* `.page { -webkit-overflow-scrolling: touch }` USED TO BE HERE. Removed —
      it is the cause of the "first tap on a card does nothing until you scroll"
      bug (task 54), and it was doing no work in exchange.
