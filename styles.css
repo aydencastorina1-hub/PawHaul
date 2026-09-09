@@ -4084,11 +4084,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 /* Opening: the dim leads the panel in — it starts under it and is nearly
    complete by the time the panel arrives, so the page darkens *because* the
-   menu is coming rather than a beat after it. */
+   menu is coming rather than a beat after it. Paced against the panel's own
+   0.55s fade: keep this shorter than that, never longer. */
 .mob-menu-overlay.open {
   opacity: 1;
   visibility: visible;
-  transition: opacity 0.3s var(--ease), visibility 0.3s;
+  transition: opacity 0.42s var(--ease), visibility 0.42s;
 }
 
 @media (max-width: 900px) {
@@ -4118,11 +4119,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     will-change: opacity, transform;
     backface-visibility: hidden;
   }
-  /* ARRIVING: longer, decelerating, with the soft landing --ease is for. */
+  /* ARRIVING: slow and decelerating, with the soft landing --ease is for.
+     Deliberately much longer than the exit (0.55s vs 0.24s) — the menu eases
+     into view, but still gets out of the way promptly when dismissed. */
   .mob-menu.open {
     opacity: 1;
     transform: translateX(0);
-    transition: opacity 0.34s var(--ease), transform 0.34s var(--ease), visibility 0.34s;
+    transition: opacity 0.55s var(--ease), transform 0.55s var(--ease), visibility 0.55s;
   }
 
   /* ---------- header: navy band carrying the brand and the close button ---------- */
