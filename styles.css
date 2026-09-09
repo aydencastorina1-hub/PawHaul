@@ -2261,9 +2261,27 @@ footer {
   background: none;
   border: none;
   font-family: 'Nunito', sans-serif;
+  /* THE "FLASH ON PRESS" (task 78). This element was the one tappable thing
+     in the file that never zeroed the native tap highlight — measured on the
+     live site it was rgba(51,181,229,0.4), i.e. the browser painted its own
+     highlight box over the whole link the instant it was pressed, a frame or
+     two before the page swapped. Everything else here (product cards, nav
+     buttons, filter pills, search rows...) already sets this; .back-btn was
+     simply missed when it stopped being a <button> and became an <a>. */
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-.back-btn:hover { color: var(--orange); }
+/* The other half of the same flash: a touch device fires :hover on press, so
+   tapping ran grey -> orange through the 0.2s transition above and you saw
+   the label change colour in the instant before navigating. Behind
+   `hover: hover` the recolour is a mouse affordance again — where it is a
+   no-op on click anyway, because the pointer is already hovering. Touch gets
+   no press state at all, deliberately: this link navigates immediately, and
+   the new page IS the feedback. */
+@media (hover: hover) {
+  .back-btn:hover { color: var(--orange); }
+}
 
 /* ANIMATIONS */
 @keyframes fadeUp {
