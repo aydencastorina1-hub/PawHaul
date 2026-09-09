@@ -2679,7 +2679,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   inset: 0;
   background: rgba(0,0,0,0.4);
   z-index: 999;
-  backdrop-filter: blur(2px);
+  /* The blur that used to be here is gone too — see the note on the second
+     .mob-menu-overlay rule near the end of this file. Removing it there and
+     leaving it here would just have re-enabled it. */
 }
 .mob-menu-overlay.open { display: block; }
 .carousel-btn { display: none; }
@@ -2690,31 +2692,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   html { scroll-behavior: smooth; }
   nav { transform: translateZ(0); will-change: transform; }
 
-  /* ── THE NAVY "HAT" ABOVE THE STICKY HEADER ───────────── */
-  /* iOS draws a band of the page ABOVE a position:sticky header whenever the
-     visual viewport and the layout viewport disagree — Safari's top bar
-     collapsing or returning, a rubber-band at the top, or the frame after a
-     full-screen overlay (the mobile menu) is dismissed. `top: 0` pins the nav
-     to the LAYOUT viewport, which in those moments sits lower than the top of
-     the screen, so a slice of whatever is behind the header — the hero photo,
-     the trust bar — appears above it. That slice is what was reported as "the
-     top of the site flashing" when the menu closes: the header was never
-     flashing, a strip of page was appearing above it.
-     This paints that strip the header's own navy, so there is nothing to see
-     no matter which of those moments causes it. 220px is far more than iOS
-     ever exposes. It is absolutely positioned (no layout effect, and it
-     cannot be scrolled to) and MOBILE-ONLY: above 900px the orange announce
-     bar sits above the nav and this would paint straight over it. */
-  nav::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: 220px;
-    background: var(--navy);
-    pointer-events: none;
-  }
+  /* NO `nav::before` NAVY HAT HERE. One was added to fill the strip iOS
+     exposes above the sticky header and it PAINTED OVER THE TOP OF THE OPEN
+     MOBILE MENU on iOS — the panel's navy header band (paw, "MENU / PawHaul",
+     the close button) went blank, even though the panel is z-index 1000 and
+     the nav is 500. `nav` carries `transform: translateZ(0)` + `will-change`
+     above, so on iOS it is a composited layer that can end up painting over a
+     later sibling regardless of z-index. Do not reintroduce a nav pseudo
+     element for this; if the strip has to be filled, use something that is
+     not inside the nav's compositing layer. */
 
   /* `.page { -webkit-overflow-scrolling: touch }` USED TO BE HERE. Removed —
      it is the cause of the "first tap on a card does nothing until you scroll"
@@ -4099,8 +4085,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      close (reported, and only ever on close — the way in was always slow
      enough not to show it). The panel can still leave quickly; the dim cannot. */
   transition: opacity 0.34s var(--ease), visibility 0.34s;
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
+  /* NO `backdrop-filter` HERE ANY MORE. A full-viewport backdrop blur forces
+     the page underneath into a snapshot layer, and on iOS the sticky header
+     re-syncs a frame late when that layer is torn down — which is exactly the
+     reported symptom: a strip of the page (hero photo, hero copy) appearing
+     ABOVE the header at the end of every menu close. The dim alone reads
+     fine; the blur was never worth a repaint bug. */
   /* NO `will-change: opacity` here, and none on the panel either. It was added
      for smoothness and caused a REPORTED FLASH at the top of the page at the
      END of every close: promoting these two full-viewport layers changes how
@@ -4351,15 +4341,14 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
 }
 
-/* Reduced motion still gets the panel — just without the fade, the drift, the
-   burger morph and the blur. */
+/* Reduced motion still gets the panel — just without the fade, the drift and
+   the burger morph. (The scrim's blur is gone for everyone now.) */
 @media (prefers-reduced-motion: reduce) {
   .mob-menu,
   .mob-menu.open,
   .hamburger span,
   .mob-menu-overlay,
   .mob-menu-overlay.open { transition-duration: 0.01ms !important; transition-delay: 0s !important; }
-  .mob-menu-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 
 /* ==================== DESKTOP NAV (≥901px) ====================
