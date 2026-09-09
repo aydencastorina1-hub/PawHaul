@@ -17,14 +17,28 @@ var products = [
     sizes: ["350ml", "550ml"],
     colors: ["Pink", "White", "Blue"],
 
-    // Real product photos from Shopify, one per color (Shopify's data model
-    // gives exactly one image per variant — see per-product notes on why
-    // this is a flat color->url map, not a multi-angle gallery).
+    // Real product photos, hosted in this repo (see images/products/) rather
+    // than pulled from Shopify's CDN — one per color, so the card image, the
+    // detail hero and gallery slide 1 always match the selected color.
     images: {
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S3e62153a0359458e85ca8792786f892fS.webp?width=900",
-      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0905a11eba164092b57f7dd587d9eaf1d.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa7d924844a3d4013b1b397880dadfcadU.webp?width=900"
+      "Pink": "/images/products/water-bottle-pink-main.jpg",
+      "White": "/images/products/water-bottle-white-main.jpg",
+      "Blue": "/images/products/water-bottle-blue-main.jpg"
     },
+
+    // Extra detail-page gallery slides — the shared, non-color-specific shots
+    // shown after slide 1 for every color, in this order: the 350ml/550ml
+    // size comparison, the feature-callout panel, the gasket/leak-proof
+    // cutaway and the "reduce storage space" in-hand shot. All four are shot
+    // in the blue colorway (that is the only set that exists), which is why
+    // they live in the shared pool and never in the per-color map above —
+    // slide 1 is the only slide that claims to show the chosen color.
+    extraImages: [
+      "/images/products/water-bottle-size-comparison.jpg",
+      "/images/products/water-bottle-lifestyle-1.jpg",
+      "/images/products/water-bottle-lifestyle-2.jpg",
+      "/images/products/water-bottle-lifestyle-3.jpg"
+    ],
 
     // Per-size variant pricing — maps each size option to its price.
     // `price`/`was` below mirror the default (first) size so every other part
