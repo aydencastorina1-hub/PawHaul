@@ -632,11 +632,25 @@ nav {
   overflow: hidden;
 }
 
+/* Same trick as .det-slide:has(img): white behind a real photo so the gutter
+   `contain` opens up is invisible, gradient behind an emoji card. Without it
+   the card wears a peach band above the photo and nothing below (the photo's
+   own white runs into the card body), which reads as a misaligned image. */
+.product-img:has(img) { background: #fff; }
+
+/* CONTAIN for the same reason as the detail carousel: the card's photo area
+   is 300x~280 (and 220 / 190 tall further down), never square, so `cover`
+   cropped a band off every product photo — the one thing a shopper is here
+   to look at. width:auto + background:none keep the shimmer out of the
+   letterbox gutters; the card's own gradient shows there instead. */
 .product-img img {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
+  background: none;
+  animation: none;
 }
 
 .product-card:hover .product-img { transform: scale(1.06); }
@@ -1337,7 +1351,33 @@ img.reviewer-av {
 .det-carousel { width: 100%; align-self: stretch; position: relative; overflow: hidden; }
 .det-track { display: flex; width: 100%; height: 100%; overflow: hidden; }
 .det-slide { flex: 0 0 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--orange-pale); }
-.det-slide img { width: 100%; height: 100%; object-fit: cover; }
+/* A slide holding a real photo goes white, because `contain` (below) leaves a
+   gutter where `cover` used to leave none, and every product photo is shot on
+   white — so a white gutter is invisible and the slide looks exactly as it did
+   before the crop was removed. The peach stays for the emoji-only fallback
+   slide, which is the only thing it was ever really for. */
+.det-slide:has(img) { background: #fff; }
+/* CONTAIN, not cover — same reasoning (and the same three load-bearing
+   declarations) as .prob-slide-img img further down. The carousel box is
+   NEVER the photo's aspect ratio (546x520 at desktop, 390x380 on a phone),
+   so `cover` was silently clipping every slide: 4.8% off a square studio
+   shot and 9.2% off the taller feature-callout panel, whose text runs to
+   the edge. `width: auto` shrink-wraps the <img> BOX to the picture, which
+   is what stops the global `img { background: var(--img-placeholder) }`
+   shimmer from painting animated cream bars in the letterbox gutters.
+   SELECTOR: `.det-carousel` is in there to out-specify `.main-img img`
+   (further down at "main-img img", equal specificity but LATER in the file,
+   so it won and kept every slide on cover). The carousel is rendered INTO
+   #detailImg, which is a .main-img — both rules match every slide. */
+.det-carousel .det-slide img {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  background: none;
+  animation: none;
+}
 .det-prev, .det-next {
   display: flex;
   position: absolute; top: 50%; transform: translateY(-50%);

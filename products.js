@@ -1338,12 +1338,33 @@ function renderDetailGallery(color) {
   var c = color || (currentProduct.colors && currentProduct.colors[0]);
   var mainUrl = productImageFor(currentProduct, c);
 
-  // Slide 1 is always the selected color's own photo; the rest are general/
-  // non-color-specific shots from the product's wider Shopify image pool
-  // (lifestyle, detail, multi-color) — never another color's own photo.
-  var urls = [];
-  if (mainUrl) urls.push(mainUrl);
-  if (currentProduct.extraImages) urls = urls.concat(currentProduct.extraImages);
+  // Slide order, rebuilt on every colour tap:
+  //   1. the selected colour's own photo,
+  //   2. the shared non-colour-specific shots (lifestyle, detail, size
+  //      comparison) from extraImages, in the order the product lists them,
+  //   3. every OTHER colour this product sells, in catalogue order.
+  // Group 3 means the whole range is browsable from the gallery without
+  // hunting the swatches, while slide 1 stays the only slide the page
+  // presents as "the" selected colour. Each slide carries its own alt, so a
+  // slide that does show a specific colour says which one — an unlabelled
+  // alt on another colour's photo is exactly the mismatch this ordering is
+  // designed to avoid.
+  var slides = [];
+  function addSlide(url, colorName) {
+    if (!url) return;
+    for (var j = 0; j < slides.length; j++) if (slides[j].url === url) return;
+    slides.push({ url: url, color: colorName || null });
+  }
+  addSlide(mainUrl, c);
+  (currentProduct.extraImages || []).forEach(function (u) { addSlide(u, null); });
+  // Read `images` directly rather than through productImageFor(): its
+  // fallback to the default colour would re-add slide 1 under someone
+  // else's name for any colour that has no photo of its own.
+  (currentProduct.colors || []).forEach(function (other) {
+    if (other === c) return;
+    addSlide(currentProduct.images && currentProduct.images[other], other);
+  });
+  var urls = slides.map(function (s) { return s.url; });
 
   if (!urls.length) {
     detailImg.innerHTML = '<div class="det-carousel"><div class="det-track" id="detTrack"><div class="det-slide">' +
@@ -1351,9 +1372,9 @@ function renderDetailGallery(color) {
     return;
   }
 
-  var slidesHtml = urls.map(function (url, i) {
-    var alt = currentProduct.name + (i === 0 && c ? ' — ' + c : '');
-    return '<div class="det-slide"><img src="' + url + '" alt="' + alt + '"></div>';
+  var slidesHtml = slides.map(function (s) {
+    var alt = currentProduct.name + (s.color ? ' — ' + s.color : '');
+    return '<div class="det-slide"><img src="' + s.url + '" alt="' + alt + '"></div>';
   }).join('');
 
   if (urls.length === 1) {
