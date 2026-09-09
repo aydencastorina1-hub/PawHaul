@@ -293,28 +293,43 @@ var products = [
     sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
-    // Locally-hosted: Shopify's own variant photos for this product were all
-    // two-panel composites with a "USB Charging" text-and-checkmark banner
-    // stitched to the bottom — cropped down to just the clean product shot
-    // (see images/products/) so the card/detail/gallery photos look like a
-    // normal studio product shot instead of a supplier listing screenshot.
+    // The user's own photo set, hosted in this repo (see images/products/),
+    // one "-main" per colour. These are the supplier's TWO-PANEL composites
+    // — lit shot over studio shot, a colour-name label in the corner and a
+    // "USB Charging" banner across the bottom. That is deliberate on the
+    // user's part (task 79 supplied them by name); the previous local files,
+    // collar-<colour>.jpg, were the same photos CROPPED down to just the
+    // clean studio shot, and are left in images/products/ unreferenced in
+    // case that decision is revisited.
     images: {
-      "Green": "/images/products/collar-green.jpg",
-      "Blue": "/images/products/collar-blue.jpg",
-      "Red": "/images/products/collar-red.jpg",
-      "Pink": "/images/products/collar-pink.jpg",
-      "Black": "/images/products/collar-black.jpg"
+      "Green": "/images/products/collar-green-main.jpg",
+      "Blue": "/images/products/collar-blue-main.jpg",
+      "Red": "/images/products/collar-red-main.jpg",
+      "Pink": "/images/products/collar-pink-main.jpg",
+      "Black": "/images/products/collar-black-main.jpg"
     },
 
-    // Extra detail-page gallery slides — a night walk-in-progress shot (the
-    // product's core visibility use case) and a charging-cable detail shot.
-    // Picked after auditing all 30 other pool images: excluded size/spec
-    // diagrams, battery/rechargeable diagrams with text overlays, two
-    // separate rainbow "colors available" burst collages, a repeating-
-    // watermark shot, and an 11-panel photo montage.
+    // Extra detail-page gallery slides — the eight shared shots the user
+    // supplied, in their order: a black-collar feature callout, a green
+    // collar on a black lab, the multi-colour group shot, a green collar on
+    // a German shepherd, the green feature-callout ring, a blue collar on a
+    // beagle at dusk, a daylight walk with a benefit strip, and the size
+    // chart. Shared, so none of them belongs in the per-colour map above.
+    // KNOWN CONTENT MISMATCHES, all flagged to the user and kept on their
+    // instruction: the size chart advertises an XS this shop does not sell
+    // and prints lengths that differ slightly from the four size options;
+    // the group shot includes a yellow collar that is not sold; and two of
+    // the dog shots show CR2032 coin cells, while this listing sells the
+    // USB-rechargeable version.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S667ef3cbbee54b2eb1df60190cc6bee9k.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb54672fb152d4d6e95156fb5c6c85cabj.webp?width=900"
+      "/images/products/collar-lifestyle-1.jpg",
+      "/images/products/collar-lifestyle-2.jpg",
+      "/images/products/collar-lifestyle-3.jpg",
+      "/images/products/collar-lifestyle-4.jpg",
+      "/images/products/collar-lifestyle-5.jpg",
+      "/images/products/collar-lifestyle-6.jpg",
+      "/images/products/collar-lifestyle-7.jpg",
+      "/images/products/collar-lifestyle-8.jpg"
     ],
 
     sizePrices: {
@@ -1372,9 +1387,17 @@ function renderDetailGallery(color) {
     return;
   }
 
-  var slidesHtml = slides.map(function (s) {
+  // Slide 1 loads eagerly (it is the one on screen, and the page's largest
+  // image); everything after it is lazy. With the light-up collar the gallery
+  // is 13 slides / ~2.5MB of photos, and eagerly fetching all of them on
+  // every product view was pointless — most visitors never page past the
+  // first shot. The browser still starts the neighbouring slides early
+  // (lazy-loading's viewport margin covers the next slide or two), so paging
+  // one step at a time stays instant.
+  var slidesHtml = slides.map(function (s, i) {
     var alt = currentProduct.name + (s.color ? ' — ' + s.color : '');
-    return '<div class="det-slide"><img src="' + s.url + '" alt="' + alt + '"></div>';
+    return '<div class="det-slide"><img src="' + s.url + '" alt="' + alt + '"' +
+      (i === 0 ? '' : ' loading="lazy"') + ' decoding="async"></div>';
   }).join('');
 
   if (urls.length === 1) {
