@@ -12,6 +12,19 @@
 <!-- Site is light-only: without this, browsers in OS/browser dark mode paint the
      unstyled canvas black before styles.css applies, causing a flash on load. -->
 <meta name="color-scheme" content="light">
+<!-- iOS Safari tints the strip behind the status bar / around the notch. With
+     NO theme-color it derives that tint by SAMPLING the page itself — you can
+     literally read a blurred copy of whatever is at the top of the document up
+     there — and it re-samples whenever what covers the top of the viewport
+     changes. Opening and closing the mobile menu puts a full-screen dark scrim
+     over the page and takes it away again, so that strip changed colour at the
+     end of every close: reported as the top of the site flashing, above the
+     navy header, and it was never the header itself.
+     Pinning it to the navbar's own navy stops the sampling entirely, so the
+     top inset is one solid colour at all times — during the menu animation,
+     while scrolling, and on every page. Must match `nav`'s background
+     (--navy #1a1a2e); if that ever changes, change this with it. -->
+<meta name="theme-color" content="#1a1a2e">
 <!-- FOUC guard for elements whose "closed" look depends on styles.css: on WebKit
      (confirmed via Safari-engine testing, not reproducible on Chromium) these can
      render in their raw/unstyled state for the first render — and because
