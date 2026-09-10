@@ -3484,7 +3484,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* Per-slide vertical framing — mobile priority, since .col-slide-img's fixed
    200px height crops these square source photos hard. Tuned against a real
    390px-wide screenshot, not just desktop responsive mode. */
-#collectionsCarousel .col-slide:nth-child(1) .col-slide-img img { object-position: center 78%; } /* bowl sits low in frame */
+/* Slide 1 now carries the real Water & Food photo (the same file as the shop
+   hero and the search tile). Its box is ~1.8:1 on mobile and ~1.35:1 at
+   desktop against a 3:2 frame, so the crop is mild either way; 55% keeps the
+   dog's head and the bottle centred in both. The old 78% was tuned for the
+   Shopify bowl photo, which sat low in its frame. */
+#collectionsCarousel .col-slide:nth-child(1) .col-slide-img img { object-position: center 55%; }
 #collectionsCarousel .col-slide:nth-child(2) .col-slide-img img { object-position: center 38%; } /* hand+leash sits high in frame */
 #collectionsCarousel .col-slide:nth-child(3) .col-slide-img img { object-position: center 65%; } /* dog+collar sits low in frame — kept moderate: the source photo is capped at 800x800 (confirmed via the CDN, no higher-res version exists anywhere in this product's image pool), and a tighter crop filled the frame with more high-frequency fur/LED detail, making the mobile Retina upscale (the container needs ~15% more physical pixels than the source has) look noticeably softer. This value still centers the dog clearly without exaggerating that softness. */
 .col-slide-body {
