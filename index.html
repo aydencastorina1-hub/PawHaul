@@ -33,7 +33,7 @@
      "flashing open" on reload). Forcing display:none here is immune to stylesheet
      load timing since it's inline and parsed before anything else. Removed by the
      stylesheet's onload (plus a short fallback) once the real CSS is safely active. -->
-<style>html.no-flash #mobMenu, html.no-flash #mobMenuOverlay, html.no-flash #navSearchBar, html.no-flash #searchScrim { display: none !important; }</style>
+<style>html.no-flash #mobMenu, html.no-flash #mobMenuOverlay, html.no-flash #navSearchBar, html.no-flash #searchScrim, html.no-flash #offlineScreen { display: none !important; }</style>
 <title>PawHaul — Built For Every Walk</title>
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=4">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=4">
@@ -173,7 +173,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=91" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=92" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -182,8 +182,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=58">
-  <link rel="preload" as="script" href="/app.js?v=49">
+  <link rel="preload" as="script" href="/products.js?v=59">
+  <link rel="preload" as="script" href="/app.js?v=50">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -922,7 +922,12 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
     <a class="back-btn" href="/shop" onclick="goTo(event,'shop')">← Back to Shop</a>
     <div class="product-detail-grid">
       <div class="product-gallery">
-        <div class="main-img" id="detailImg">🧴</div>
+        <!-- Ships with the paw loader inside it: this is a script-only SPA, so
+             a direct /product/<slug> load has a real shell moment before
+             products.js fills the gallery in (see the ROUTING note in the
+             head). renderDetailGallery() replaces this wholesale on the first
+             render, so it is never seen once the page is live. -->
+        <div class="main-img" id="detailImg"><span class="paw-loader paw-loader--block" role="status" aria-live="polite"><span class="paw-loader-paws" aria-hidden="true"><span class="paw-loader-paw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span><span class="paw-loader-paw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span><span class="paw-loader-paw"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span></span><span class="paw-loader-text">Fetching the good stuff…</span></span></div>
       </div>
       <div class="product-detail-info">
         <div class="section-tag" id="detailCategory">Walk Essentials</div>
@@ -1385,8 +1390,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=58"></script>
-  <script src="/app.js?v=49"></script>
+  <script src="/products.js?v=59"></script>
+  <script src="/app.js?v=50"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
@@ -1493,6 +1498,27 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
       </div>
     </div>
   </div>
+<!-- ==================== OFFLINE SCREEN (task 81) ====================
+     Shown instead of the browser's own "no internet" page whenever the device
+     drops off the network, and taken down again by the `online` event or a
+     successful probe (see app.js) — no reload, the SPA is still exactly where
+     the visitor left it underneath. Hidden state is opacity + pointer-events +
+     aria-hidden/inert, never `visibility`, for the reason recorded on the
+     mobile drawer. "Keep browsing" is a deliberate escape hatch: the browser
+     can report offline when a page is perfectly usable, and this site's pages
+     are all already in the DOM, so nobody should ever be trapped behind it. -->
+<div class="offline-screen" id="offlineScreen" role="alertdialog" aria-modal="true"
+     aria-labelledby="offlineTitle" aria-describedby="offlineMsg" aria-hidden="true">
+  <div class="offline-inner">
+    <span class="offline-paw" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>
+    <h2 class="offline-title" id="offlineTitle">Looks like you've lost connection</h2>
+    <p class="offline-msg" id="offlineMsg">Check your wifi or data and we'll be right here when you're back.</p>
+    <p class="offline-note" id="offlineNote" role="status" aria-live="polite"></p>
+    <button class="offline-retry" id="offlineRetry" type="button" onclick="retryConnection()">Try Again</button>
+    <button class="offline-dismiss" id="offlineDismiss" type="button" onclick="dismissOffline()">Keep browsing anyway</button>
+  </div>
+</div>
+
 </body>
 </html>
 

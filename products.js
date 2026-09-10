@@ -683,13 +683,6 @@ function trustBadgesHtml(variant) {
     '</div>';
 }
 
-// The checkout button's label lives in its own span so a status change
-// ("Preparing checkout...") can't wipe out sibling markup inside the button.
-function setCheckoutBtnLabel(btn, text) {
-  var label = btn.querySelector('.checkout-btn-label');
-  if (label) label.textContent = text; else btn.textContent = text;
-}
-
 // ---- Buy with Shop Pay (real accelerated checkout) ----------------------
 // <shop-pay-button> is Shopify's own custom element. Verified working for
 // THIS store from a plain non-Shopify origin with nothing but the script
@@ -1312,6 +1305,49 @@ function cardAdd(ev, id) {
   var item = Object.assign({}, p, { price: v.price, size: v.size });
   if (v.color) item.color = v.color;
   addToCart(item);
+}
+
+// ==================== PAW LOADER (task 81) ====================
+// One loading visual for the whole site: three paw prints stepping in
+// sequence under a short line of copy. Pure markup + CSS (see styles.css) —
+// it costs nothing to show and, importantly, it is only ever rendered while
+// something real is genuinely in flight. Nothing here delays anything.
+var PAW_SVG = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' aria-hidden='true' focusable='false'>" +
+  "<ellipse cx='50' cy='67' rx='20' ry='16'/><ellipse cx='27' cy='47' rx='9' ry='12'/>" +
+  "<ellipse cx='42' cy='35' rx='9' ry='12'/><ellipse cx='58' cy='35' rx='9' ry='12'/>" +
+  "<ellipse cx='73' cy='47' rx='9' ry='12'/></svg>";
+
+// opts.inline — the compact form that goes inside a button in place of its
+// label. Everything else gets the stacked block form.
+function pawLoaderHtml(text, opts) {
+  var inline = !!(opts && opts.inline);
+  var paws = '';
+  for (var i = 0; i < 3; i++) paws += '<span class="paw-loader-paw">' + PAW_SVG + '</span>';
+  return '<span class="paw-loader ' + (inline ? 'paw-loader--inline' : 'paw-loader--block') + '"' +
+    ' role="status" aria-live="polite">' +
+    '<span class="paw-loader-paws" aria-hidden="true">' + paws + '</span>' +
+    '<span class="paw-loader-text">' + (text || 'Fetching the good stuff…') + '</span>' +
+    '</span>';
+}
+
+// Swaps a button's label for the walking paws and locks it while its own
+// request is in flight. Returns the markup it replaced, so the caller hands
+// exactly that back on failure — no rebuilding label spans by hand, which is
+// how the checkout button's inner <span> used to get wiped.
+function setBtnBusy(btn, text) {
+  if (!btn) return null;
+  var prev = btn.innerHTML;
+  btn.disabled = true;
+  btn.setAttribute('aria-busy', 'true');
+  btn.innerHTML = pawLoaderHtml(text, { inline: true });
+  return prev;
+}
+
+function clearBtnBusy(btn, prevHtml) {
+  if (!btn) return;
+  btn.disabled = false;
+  btn.removeAttribute('aria-busy');
+  if (prevHtml !== null && prevHtml !== undefined) btn.innerHTML = prevHtml;
 }
 
 // Resolves the photo for one color of a product, falling back to the
@@ -2152,7 +2188,7 @@ async function checkout() {
     return;
   }
 
-  if (btn) { btn.disabled = true; setCheckoutBtnLabel(btn, 'Preparing checkout...'); }
+  var prevCheckoutHtml = setBtnBusy(btn, 'Preparing checkout…');
   showToast('Redirecting to secure checkout...');
 
   try {
@@ -2171,10 +2207,10 @@ async function checkout() {
       window.location.href = data.checkoutUrl;
       return;
     }
-    if (btn) { btn.disabled = false; setCheckoutBtnLabel(btn, 'Checkout Securely →'); }
+    clearBtnBusy(btn, prevCheckoutHtml);
     showToast((data && data.error) || 'Could not start checkout — please try again.', 5000);
   } catch (e) {
-    if (btn) { btn.disabled = false; setCheckoutBtnLabel(btn, 'Checkout Securely →'); }
+    clearBtnBusy(btn, prevCheckoutHtml);
     showToast('Could not start checkout — please try again.', 5000);
   }
 }
@@ -2745,7 +2781,7 @@ async function renderReviews(productId) {
   var root = document.getElementById('reviewsRoot');
   if (!root) return;
   rvSelectedStars = 0;
-  root.innerHTML = '<p class="rv-loading">Loading reviews...</p>';
+  root.innerHTML = pawLoaderHtml('Sniffing out the reviews…');
 
   var data = null;
   try {
@@ -2837,7 +2873,7 @@ async function submitReview(ev, productId) {
     } catch (e) { /* post the review without the photo rather than losing it */ }
   }
 
-  if (btn) { btn.disabled = true; btn.textContent = 'Posting...'; }
+  var prevBtnHtml = setBtnBusy(btn, 'Posting your review…');
   setNote('');
   try {
     var res = await fetch('/api/reviews', {
@@ -2848,7 +2884,7 @@ async function submitReview(ev, productId) {
     var data = await res.json();
     if (!data || !data.ok) {
       setNote((data && data.error) || 'Could not post your review - please try again.', true);
-      if (btn) { btn.disabled = false; btn.textContent = 'Post Review'; }
+      clearBtnBusy(btn, prevBtnHtml);
       return false;
     }
     showToast('Thanks for your review!');
@@ -2861,7 +2897,7 @@ async function submitReview(ev, productId) {
     } catch (e) { /* not fatal */ }
   } catch (e) {
     setNote('Could not post your review - please try again.', true);
-    if (btn) { btn.disabled = false; btn.textContent = 'Post Review'; }
+    clearBtnBusy(btn, prevBtnHtml);
   }
   return false;
 }

@@ -771,7 +771,14 @@ function searchIsOpen() {
 // Hide the floating chat paw while the search overlay or offer popup is up
 // (it sits at z-index 9999 and would float on top of them).
 function syncOverlayChrome() {
-  document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen());
+  document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen() || offlineIsUp());
+}
+
+// Declared here (not only inside the offline IIFE further down) so
+// syncOverlayChrome can be called before that block has run.
+function offlineIsUp() {
+  var s = document.getElementById('offlineScreen');
+  return !!(s && s.classList.contains('active'));
 }
 
 // Rotating placeholder: cycles example searches while the input is empty
@@ -1289,7 +1296,7 @@ async function handleOfferSubmit(e) {
   clearOfferError();
 
   var btn = document.getElementById('offerBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+  var prevOfferHtml = setBtnBusy(btn, 'Signing you up…');
 
   try {
     var res = await fetch('/api/customer', {
@@ -1302,10 +1309,10 @@ async function handleOfferSubmit(e) {
       showOfferResult(!!data.alreadyExists);
       return;
     }
-    if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
+    clearBtnBusy(btn, prevOfferHtml);
     showOfferError((data && data.error) || 'Something went wrong — please try again.');
   } catch (err) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Claim My 10% Off →'; }
+    clearBtnBusy(btn, prevOfferHtml);
     showOfferError('Something went wrong — please try again.');
   }
 }
@@ -1574,3 +1581,136 @@ if (typeof checkout === 'function') {
     return _trackOrigCheckout.apply(this, arguments);
   };
 }
+
+
+// ==================== OFFLINE SCREEN (task 81) ====================
+// Replaces the browser's own "no internet" page with a branded one, and takes
+// itself down the moment the connection is back — no reload, because every
+// page of this SPA is already in the DOM behind the screen, exactly where the
+// visitor left it.
+//
+// navigator.onLine alone is not trustworthy in either direction: it reports
+// "online" for a laptop on a wifi network with no route to the internet, and
+// some browsers are slow to fire `online` when a phone comes off airplane
+// mode. So the events are the trigger, and a real HEAD request to this origin
+// is the proof — the same signal the new-build check above uses.
+(function () {
+  var POLL_MS = 5000;      // while the screen is up, keep checking quietly
+  var pollTimer = null;
+  var probing = false;
+  var dismissed = false;   // "Keep browsing anyway" — reset on the next drop
+
+  function el(id) { return document.getElementById(id); }
+
+  function setNote(text) {
+    var n = el('offlineNote');
+    if (n) n.textContent = text || '';
+  }
+
+  function visible() { return offlineIsUp(); }
+
+  function show() {
+    var s = el('offlineScreen');
+    if (!s || dismissed) return;
+    s.classList.add('active');
+    s.setAttribute('aria-hidden', 'false');
+    try { s.inert = false; } catch (e) {}
+    document.documentElement.classList.add('offline-locked');
+    setNote('');
+    // Anything else that owns the screen would fight this one for it.
+    closeMobileMenu();
+    closeSearch();
+    dismissOffer();
+    var btn = el('offlineRetry');
+    if (btn) setTimeout(function () { try { btn.focus(); } catch (e) {} }, 60);
+    // Fades the floating chat paw out, the same way the search overlay and
+    // the offer popup do — the chat needs the network this screen is about.
+    syncOverlayChrome();
+    startPolling();
+  }
+
+  function hide() {
+    var s = el('offlineScreen');
+    if (!s) return;
+    s.classList.remove('active');
+    s.setAttribute('aria-hidden', 'true');
+    try { s.inert = true; } catch (e) {}
+    document.documentElement.classList.remove('offline-locked');
+    syncOverlayChrome();
+    stopPolling();
+  }
+
+  function startPolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(function () {
+      if (!visible()) return stopPolling();
+      probe().then(function (ok) { if (ok) recovered(); });
+    }, POLL_MS);
+  }
+
+  function stopPolling() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  // A HEAD to this origin, cache-busted, with its own timeout so a hung
+  // request can't leave the Retry button spinning forever.
+  function probe() {
+    if (probing) return Promise.resolve(false);
+    probing = true;
+    var done = false;
+    return new Promise(function (resolve) {
+      var finish = function (ok) {
+        if (done) return;
+        done = true; probing = false;
+        resolve(ok);
+      };
+      setTimeout(function () { finish(false); }, 6000);
+      fetch('/?ping=' + Date.now(), { method: 'HEAD', cache: 'no-store' })
+        .then(function (r) { finish(!!r && r.ok); })
+        .catch(function () { finish(false); });
+    });
+  }
+
+  function recovered() {
+    if (!visible()) return;
+    hide();
+    dismissed = false;
+    if (typeof showToast === 'function') showToast("You're back online.");
+  }
+
+  // Pressed by the visitor. The paw loader goes into the button itself, so the
+  // site's one loading visual covers this wait too.
+  window.retryConnection = function () {
+    var btn = el('offlineRetry');
+    if (!btn || btn.disabled) return;
+    setNote('');
+    var prev = setBtnBusy(btn, 'Checking…');
+    probe().then(function (ok) {
+      if (ok) { clearBtnBusy(btn, prev); recovered(); return; }
+      clearBtnBusy(btn, prev);
+      setNote("Still nothing — we'll keep trying.");
+    });
+  };
+
+  window.dismissOffline = function () {
+    dismissed = true;
+    hide();
+  };
+
+  window.addEventListener('offline', function () { dismissed = false; show(); });
+  window.addEventListener('online', function () {
+    // Trust but verify: `online` can fire before the connection actually
+    // carries traffic, so only the probe takes the screen down.
+    probe().then(function (ok) { if (ok) recovered(); else if (!dismissed) show(); });
+  });
+
+  // A tab that was backgrounded through an outage comes back needing an answer.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden || !visible()) return;
+    probe().then(function (ok) { if (ok) recovered(); });
+  });
+
+  // Loaded while already offline (a bfcache restore, or the SPA shell served
+  // from disk cache).
+  if (navigator.onLine === false) show();
+})();

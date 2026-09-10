@@ -5378,3 +5378,200 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .prob-slide.prob-reveal > * { opacity: 1; transform: none; transition: none; }
   .prob-cta, .prob-cta-arrow { transition: none; }
 }
+
+/* ============================================================
+   PAW LOADER + OFFLINE SCREEN (task 81)
+   ------------------------------------------------------------
+   Both are built from the site's own paw mark and the live navy/orange
+   palette. The brief asked for the "black & white design system (task 53)";
+   that overhaul was reverted and the live brand is navy + orange, so these
+   follow what is actually on screen. The animation is CSS-only — no library,
+   no images, nothing that competes with a real load for bandwidth.
+   ============================================================ */
+
+/* Three paw prints stepping in sequence, like a trail being laid down.
+   Each paw carries its own --paw-tilt so left/right prints angle outwards
+   the way real tracks do. */
+@keyframes pawTrot {
+  0%, 62%, 100% { opacity: 0.16; transform: translateY(0) scale(0.9) rotate(var(--paw-tilt, 0deg)); }
+  18%, 42%      { opacity: 1;    transform: translateY(-5px) scale(1) rotate(var(--paw-tilt, 0deg)); }
+}
+
+.paw-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--black);
+  font-family: 'Nunito', sans-serif;
+}
+
+.paw-loader-paws { display: inline-flex; align-items: flex-end; gap: 5px; flex-shrink: 0; }
+
+.paw-loader-paw {
+  display: block;
+  width: 20px; height: 20px;
+  color: inherit;
+  opacity: 0.16;
+  animation: pawTrot 1.15s ease-in-out infinite;
+  transform-origin: 50% 70%;
+}
+.paw-loader-paw svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+.paw-loader-paw:nth-child(1) { --paw-tilt: -16deg; animation-delay: 0s; }
+.paw-loader-paw:nth-child(2) { --paw-tilt: 0deg;   animation-delay: 0.16s; }
+.paw-loader-paw:nth-child(3) { --paw-tilt: 16deg;  animation-delay: 0.32s; }
+
+.paw-loader-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray);
+  letter-spacing: 0.01em;
+}
+
+/* Block form: stacked and centred, for a region that is waiting on data
+   (the reviews list, the product gallery before its photos are wired up). */
+.paw-loader--block { flex-direction: column; gap: 14px; padding: 30px 16px; }
+.paw-loader--block .paw-loader-paw { width: 26px; height: 26px; }
+.paw-loader--block .paw-loader-text { font-size: 15px; }
+
+/* Inline form: sits inside a button in place of its label while the button's
+   own request is in flight. Inherits the button's colour, so it is white on
+   the navy checkout button and navy on a light one. */
+.paw-loader--inline { display: inline-flex; gap: 9px; color: inherit; }
+.paw-loader--inline .paw-loader-paw { width: 15px; height: 15px; }
+.paw-loader--inline .paw-loader-text { font-size: inherit; font-weight: inherit; color: inherit; }
+
+/* The product gallery's pre-render state. #detailImg ships with a loader
+   inside it, so a direct /product/<slug> load shows the brand doing something
+   during the shell moment before products.js fills the gallery in, instead of
+   a bare emoji on an empty box. renderDetailGallery() replaces it wholesale. */
+.main-img .paw-loader--block { color: var(--black); }
+
+/* Loading skeletons: a slow pulse of the paw mark in the card's photo area,
+   so the placeholder reads as PawHaul loading rather than as generic grey
+   bars. Purely decorative and behind the existing skeleton fill. */
+@keyframes pawPulse {
+  0%, 100% { opacity: 0.10; transform: scale(0.94); }
+  50%      { opacity: 0.30; transform: scale(1); }
+}
+.skel-card .product-img { position: relative; }
+.skel-card .product-img::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 54px; height: 54px;
+  margin: -27px 0 0 -27px;
+  background: no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='%231a1a2e'%3E%3Cellipse cx='50' cy='67' rx='20' ry='16'/%3E%3Cellipse cx='27' cy='47' rx='9' ry='12'/%3E%3Cellipse cx='42' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='58' cy='35' rx='9' ry='12'/%3E%3Cellipse cx='73' cy='47' rx='9' ry='12'/%3E%3C/svg%3E");
+  animation: pawPulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ---- OFFLINE SCREEN ----------------------------------------------------
+   Same overlay contract as the mobile drawer: opacity + pointer-events +
+   aria-hidden/inert, and NEVER visibility — tearing a full-screen layer out
+   of the compositor is what produced the iOS header flash this project spent
+   five rounds on. */
+.offline-screen {
+  position: fixed;
+  inset: 0;
+  /* Above the mobile drawer (10001) and the chat widget (inline 9999): this
+     is the one state that outranks everything else on the page. The chat paw
+     is also faded out via body.overlay-up while it is up, since the chat is
+     exactly the thing that cannot work without a connection. */
+  z-index: 10002;
+  background: var(--black);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.32s var(--ease);
+}
+.offline-screen.active { opacity: 1; pointer-events: auto; }
+
+.offline-inner { max-width: 420px; display: flex; flex-direction: column; align-items: center; }
+
+.offline-paw {
+  width: 72px; height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--orange);
+  margin-bottom: 22px;
+  flex-shrink: 0;
+}
+.offline-paw svg { width: 38px; height: 38px; fill: #fff; display: block; }
+
+.offline-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(24px, 6vw, 30px);
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.offline-msg {
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.72);
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.offline-note {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--orange);
+  min-height: 18px;
+  margin-bottom: 14px;
+}
+.offline-retry {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 34px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  min-width: 190px;
+}
+.offline-retry:active { transform: scale(0.97); }
+.offline-retry[disabled] { opacity: 0.75; cursor: default; }
+.offline-dismiss {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+@media (hover: hover) {
+  .offline-retry:hover { transform: translateY(-1px); }
+  .offline-dismiss:hover { color: #fff; }
+}
+
+/* The page behind must not scroll under the screen. */
+html.offline-locked, html.offline-locked body { overflow: hidden; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keep the loader legible as a loader, drop the motion: the paws breathe
+     instead of stepping, and nothing translates. */
+  .paw-loader-paw {
+    animation: pawPulse 1.6s ease-in-out infinite;
+    transform: rotate(var(--paw-tilt, 0deg));
+  }
+  .skel-card .product-img::after { animation: none; opacity: 0.16; }
+  .offline-screen { transition: none; }
+  .offline-retry:active, .offline-retry:hover { transform: none; }
+}
