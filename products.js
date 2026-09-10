@@ -294,19 +294,21 @@ var products = [
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
     // The user's own photo set, hosted in this repo (see images/products/),
-    // one "-main" per colour. These are the supplier's TWO-PANEL composites
-    // — lit shot over studio shot, a colour-name label in the corner and a
-    // "USB Charging" banner across the bottom. That is deliberate on the
-    // user's part (task 79 supplied them by name); the previous local files,
-    // collar-<colour>.jpg, were the same photos CROPPED down to just the
-    // clean studio shot, and are left in images/products/ unreferenced in
-    // case that decision is revisited.
+    // one "-main-v2" per colour: a clean lit studio shot of the collar on
+    // white, no colour-name label and no "USB Charging" banner. These
+    // REPLACED the task-79 "-main" composites outright (task 80) and those
+    // five files are deleted — do not resurrect the naming. Note the v2 set
+    // is 3:2 LANDSCAPE while the eight shared shots below are square, so the
+    // contain-fit gallery and cards letterbox them top and bottom.
+    // Still unreferenced from the pre-79 era: collar-<colour>.jpg, the same
+    // composites cropped to their studio panel. Left in place pending the
+    // user's word.
     images: {
-      "Green": "/images/products/collar-green-main.jpg",
-      "Blue": "/images/products/collar-blue-main.jpg",
-      "Red": "/images/products/collar-red-main.jpg",
-      "Pink": "/images/products/collar-pink-main.jpg",
-      "Black": "/images/products/collar-black-main.jpg"
+      "Green": "/images/products/collar-green-main-v2.jpg",
+      "Blue": "/images/products/collar-blue-main-v2.jpg",
+      "Red": "/images/products/collar-red-main-v2.jpg",
+      "Pink": "/images/products/collar-pink-main-v2.jpg",
+      "Black": "/images/products/collar-black-main-v2.jpg"
     },
 
     // Extra detail-page gallery slides — the eight shared shots the user
