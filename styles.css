@@ -334,7 +334,21 @@ nav {
   width: 100%;
 }
 
-.btn-black:hover { background: var(--orange); transform: translateY(-2px); }
+/* The product card's "Add To Cart". It used to go ORANGE on hover, which is
+   also what a touch device paints when a finger lands on it (a tap fires
+   :hover), so tapping a card flashed orange before the toast — the thing
+   reported in task 83. It now deepens into the secondary navy instead, and
+   the whole rule sits behind `hover: hover` so a touch paints no hover state
+   at all. Same reasoning as the back button in task 78.
+   NOTE: this is scoped to .btn-black (the card button). Orange remains the
+   brand's interaction accent everywhere else on the site — see the audit in
+   task 83's report; it is the live design system, not leftover styling. */
+@media (hover: hover) {
+  .btn-black:hover { background: var(--navy-2); transform: translateY(-2px); }
+}
+/* Touch press feedback for the same button, since it no longer gets one from
+   :hover: a slightly lighter navy and the site's standard 0.97 press. */
+.btn-black:active { background: var(--navy-2); }
 
 /* SECTION HELPERS */
 .section-tag {
@@ -1243,6 +1257,13 @@ img.reviewer-av {
   transition: opacity 0.45s var(--ease);
 }
 .shop-hero-img.is-active { opacity: 1; }
+
+/* The hero band is up to 3.4:1 while the Water & Food photo is 3:2, so `cover`
+   throws away better than half its height. Centred, that cut the top of the
+   dog's head; 35% keeps the face and the bottle whole and leaves the copy over
+   the quieter side of the frame. Keyed off the container's data-cat (set by
+   applyShopHero), so it only applies to this one category's photo. */
+#shopHero[data-cat="water"] .shop-hero-img { object-position: center 35%; }
 
 .shop-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26,26,46,0.55), rgba(26,26,46,0.35)); }
 
@@ -2550,10 +2571,22 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .search-cat-img img { width: 100%; height: 100%; object-fit: cover; object-position: center center; display: block; }
 .search-cat-card:hover .search-cat-img { color: var(--orange); }
 /* Same source photos as the home carousel — same crop concerns, tuned
-   separately since this card's 16:9 box has a different aspect ratio. */
-.search-cat-photo-water { object-position: center 75%; }
-.search-cat-photo-leash { object-position: center 42%; }
-.search-cat-photo-safety { object-position: center 62%; }
+   separately since this card's 16:9 box has a different aspect ratio.
+   WATER now points at the real category photo (task 82/85), whose 3:2 frame
+   barely crops in a 16:9 box; 60% keeps the dog's head and the bottle both
+   whole with the grass trimmed rather than the ears. The old 75% was tuned
+   for the Shopify bowl photo this replaced. */
+/* SPECIFICITY, and it matters: `.search-cat-img img` above sets
+   object-position: center center at (0,2,1), so a bare `.search-cat-photo-*`
+   class (0,1,0) never won and all three of these were silently inert — the
+   tiles have always rendered centre-cropped. Only the water rule is being
+   corrected here (task 82/85 is scoped to Water & Food and explicitly says
+   not to touch the other categories' images); leash and safety are LEFT
+   INERT on purpose, so fixing them is a deliberate decision someone still
+   has to make, not an accident of a specificity change. */
+.search-cat-img img.search-cat-photo-water { object-position: center 60%; }
+.search-cat-photo-leash { object-position: center 42%; }   /* inert — see above */
+.search-cat-photo-safety { object-position: center 62%; }  /* inert — see above */
 .search-cat-name {
   font-family: 'Nunito', sans-serif;
   font-weight: 800;
@@ -3161,8 +3194,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .btn-primary:hover { transform: none; }
   .btn-secondary:hover { transform: none; }
   .btn-black:hover { transform: none; }
-  /* Keep color changes, just remove transforms */
-  .product-card:active { transform: scale(0.97); border-color: var(--orange); }
+  /* Keep color changes, just remove transforms.
+     The product card's orange border-color is gone (task 83) — the card has
+     `border: none`, so it never painted anything anyway, but leaving an
+     orange value on a press state the user was already suspicious of was not
+     worth keeping. .collection-card is deliberately untouched: it is a
+     different component and outside what task 83 named. */
+  .product-card:active { transform: scale(0.97); }
   .collection-card:active { transform: scale(0.97); border-color: var(--orange); }
 }
 

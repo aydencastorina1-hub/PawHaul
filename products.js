@@ -2247,8 +2247,12 @@ var SHOP_HERO = {
     description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
   },
   water: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
-    alt: 'A dog drinking on a walk',
+    // Real photo (task 82) — the first of the four to be swapped off the
+    // shared Unsplash placeholder, which is why applyShopHero's crossfade
+    // path now actually runs for this pill instead of short-circuiting on
+    // "same src as the one already up".
+    image: '/images/products/category-water-food-hero.jpg',
+    alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
     heading: 'Water & Food',
     description: 'Never run out mid-walk. Everything your dog needs to stay hydrated and fed on the go.'
   },
