@@ -539,26 +539,34 @@ var products = [
     colors: ["Purple", "Green", "Orange"],
     tags: ["led leash", "light up leash", "flashlight leash", "night walk leash", "glow leash", "retractable led"],
 
-    // Shopify carries FOUR variant-assigned shots (one per combo). Only three
-    // are used, because productImageFor() keys on colour alone: Purple takes
-    // the 3M shot, which is the length Purple is cheapest in and the one the
-    // card price shows. The unused 5M Purple shot is the same photo with a
-    // different corner badge.
+    // Real product photos, hosted in this repo (see images/products/) rather
+    // than pulled from Shopify's CDN — one per colour, so the card image, the
+    // detail hero and gallery slide 1 always match the selected colour.
+    // productImageFor() keys on colour ALONE, which is exactly what this
+    // product needs: Purple is the only colour sold in both lengths, and 3M
+    // Purple and 5M Purple are the same physical colourway, so both show this
+    // one purple photo and changing length never swaps the image.
     images: {
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1fc509f25675421892595e607faa06dch.webp?width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sf06f940e379d451590a75f97afe0063cU.webp?width=900",
-      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S46783238ae1444fc92edaa7ab931d011v.webp?width=900"
+      "Purple": "/images/products/led-leash-purple-main.jpg",
+      "Green": "/images/products/led-leash-green-main.jpg",
+      "Orange": "/images/products/led-leash-orange-main.jpg"
     },
 
-    // Only one of the six non-variant images passed the audit: a clean
-    // hand-held shot with the flashlight beam lit. Rejected a marketing
-    // collage, a "Don't be afraid of the dark" text overlay, a "Touch
-    // Lighting" instruction panel (which also misspells "2st/3st/4st Touch"),
-    // a "U-shaped rope outlet" spec-callout overlay and a labelled parts
-    // diagram. The variant shots each carry a small, accurate size badge
-    // (3M/5M) and were kept.
+    // Shared, non-colour-specific gallery slides, shown after slide 1 for
+    // every colour in this order: the labelled feature callouts, the
+    // "U-shaped rope outlet" panel, the touch-lighting instructions, the
+    // in-hand night shot with the beam lit, and the three-colour lineup in
+    // the dark. Slides 1, 2 and 4 are shot in the purple colourway (that is
+    // the only set that exists), which is why they live in the shared pool
+    // and never in the per-colour map above — slide 1 is the only slide the
+    // page presents as "the" selected colour, and renderDetailGallery()
+    // deliberately gives these slides alt text with no colour name.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Safa5a04096834eaabb20f35ecf452b60n.webp?width=900"
+      "/images/products/led-leash-lifestyle-1.jpg",
+      "/images/products/led-leash-lifestyle-2.jpg",
+      "/images/products/led-leash-lifestyle-3.jpg",
+      "/images/products/led-leash-lifestyle-4.jpg",
+      "/images/products/led-leash-lifestyle-5.jpg"
     ],
 
     sizePrices: {
