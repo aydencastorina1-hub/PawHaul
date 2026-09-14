@@ -5618,3 +5618,74 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   .offline-screen { transition: none; }
   .offline-retry:active, .offline-retry:hover { transform: none; }
 }
+
+/* ============================================================
+   CAROUSEL MOTION — one shared scroll/snap contract (task 88)
+   Appended LAST so it wins over the per-breakpoint track rules
+   above (media queries add no specificity, so a later #id rule
+   beats an earlier one at every width).
+
+   Every carousel on this site is now a REAL scroll container
+   instead of an overflow:hidden box driven by a JS drag handler.
+   That single change is what buys the momentum: the platform's
+   own inertia, rubber-band and fling physics apply, so a hard
+   flick travels further than a slow drag. Measured before this
+   change, a 600px/s drag and a 12000px/s flick both moved the
+   collections track exactly 327px — identical, because the old
+   handler advanced precisely one card on release regardless of
+   how fast the finger was going.
+
+   Native scrolling is also compositor-driven, so the animation
+   no longer runs as per-frame scrollLeft writes on the main
+   thread, and CSS snapping lands slides flush (the reviews
+   track used to come to rest 66.5px inside a card).
+
+   scroll-snap-stop is deliberately left at `normal`: `always`
+   would clamp every flick to a single slide and throw away the
+   momentum this block exists to enable.
+
+   NOT added here: -webkit-overflow-scrolling. It is the default
+   since iOS 13, it is deprecated, and this file already documents
+   it as the cause of the task-54 dead-tap bug. Do not reintroduce.
+   ============================================================ */
+#collectionsCarousel,
+#problemCarousel,
+#homeProducts,
+#revCarousel,
+.det-track {
+  overflow-x: auto;
+  /* x:auto forces a `visible` y to compute to auto anyway (CSS overflow
+     spec), which these tracks were already getting from their old
+     overflow-x:hidden. Pinning it to hidden just stops a stray vertical
+     scrollbar appearing inside the track. */
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  /* Keep a horizontal fling inside the carousel — without this, running out
+     of track hands the gesture to the page and can trigger the browser's
+     swipe-back. */
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#collectionsCarousel::-webkit-scrollbar,
+#problemCarousel::-webkit-scrollbar,
+#homeProducts::-webkit-scrollbar,
+#revCarousel::-webkit-scrollbar,
+.det-track::-webkit-scrollbar { display: none; }
+
+/* Direct children are the slides in every one of these tracks. */
+#collectionsCarousel > *,
+#problemCarousel > *,
+#homeProducts > *,
+#revCarousel > *,
+.det-track > * {
+  scroll-snap-align: start;
+}
+
+/* The gallery wrapper used to declare `touch-action: pan-y` so that a
+   horizontal drag was left entirely to the JS handler. There is no JS
+   handler any more, and pan-y actively BLOCKS the native horizontal
+   scroll that replaced it — the gallery would not move at all on touch.
+   Allow both axes and let the browser disambiguate, which it does better
+   than the axis-locking code this replaces. */
+.det-carousel { touch-action: pan-x pan-y pinch-zoom; }

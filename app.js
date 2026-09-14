@@ -934,107 +934,157 @@ function doSearch(val) {
 })();
 
 // ==================== CAROUSEL ====================
+// Scrolling is NATIVE. Every track is a real overflow-x:auto scroller with
+// CSS scroll-snap (see the "CAROUSEL MOTION" block at the end of styles.css),
+// and nothing here listens to touch at all. That is the whole point:
+//
+//   - Touch gets the platform's own momentum, so a hard flick travels
+//     further than a slow drag. The handler this replaces wrote scrollLeft
+//     1:1 during the drag and then advanced exactly ONE card on release, so
+//     a flick and a crawl landed in the identical spot (measured: both
+//     327px on the collections track, on every carousel, at every width).
+//   - The scroll runs on the compositor instead of a requestAnimationFrame
+//     loop writing scrollLeft on the main thread every frame.
+//   - The browser does the snapping, so slides land flush. The reviews
+//     track used to come to rest 66.5px inside a card.
+//   - Rapid arrow clicks retarget one native smooth scroll instead of
+//     starting a second rAF loop that fights the first — that overlap was a
+//     measurable backwards jump mid-animation.
+//   - With no touch handlers, a tap can never be swallowed or mistaken for
+//     a drag, and a vertical scroll starting on a card is never hijacked.
+//
+// What is left is arrow/dot wiring and keeping their state in sync with
+// wherever the user actually left the track.
+
+// Shared engine for every carousel on the site. `dots` is optional (only the
+// product gallery has them); pass null for the rest.
+function bindCarousel(track, prev, next, dots, signal) {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
+
+  // The scrollLeft that puts each slide flush against the track's left edge,
+  // measured from the live boxes rather than computed from card width + gap.
+  // The old arithmetic drifted whenever a card width was a fractional
+  // percentage, which is what left the arrows resting mid-card. Cached so
+  // that syncing during a scroll reads no geometry and forces no layout;
+  // re-measured on resize and whenever the carousel is re-bound after a
+  // re-render. Stored UNCLAMPED so slides near the end stay distinguishable.
+  var targets = [];
+  function measure() {
+    var rect = track.getBoundingClientRect();
+    var sl = track.scrollLeft;
+    // getBoundingClientRect reports VISUAL pixels, scrollLeft reports LAYOUT
+    // pixels. Those differ whenever an ancestor is scaled — and one is: the
+    // product gallery's wrapper carries `.main-img:hover { scale(1.02) }`, so
+    // re-measuring while the pointer rests on the gallery would bake a 2%
+    // error into every target. Normalise by the live scale factor.
+    var scale = track.clientWidth ? (rect.width / track.clientWidth) : 1;
+    if (!scale || !isFinite(scale)) scale = 1;
+    targets = [];
+    for (var i = 0; i < track.children.length; i++) {
+      targets.push(sl + (track.children[i].getBoundingClientRect().left - rect.left) / scale);
+    }
+  }
+
+  function current() {
+    if (!targets.length) return 0;
+    // Resting at the scroll limit always means the last slide, even when its
+    // own left edge sits past that limit (several cards per view).
+    if (track.scrollLeft >= maxScroll() - 1) return targets.length - 1;
+    var best = 0, bestD = Infinity;
+    for (var i = 0; i < targets.length; i++) {
+      var d = Math.abs(targets[i] - track.scrollLeft);
+      if (d < bestD) { bestD = d; best = i; }
+    }
+    return best;
+  }
+
+  function goTo(i, instant) {
+    if (!targets.length) return;
+    i = Math.max(0, Math.min(i, targets.length - 1));
+    var left = Math.max(0, Math.min(targets[i], maxScroll()));
+    track.scrollTo({ left: left, behavior: (instant || reduce) ? 'auto' : 'smooth' });
+  }
+
+  // Arrow disabled state is driven by the SCROLL POSITION, not by a counted
+  // index — that is what stops the next arrow staying enabled with nothing
+  // left to reveal once several cards share a view.
+  function sync() {
+    var atStart = track.scrollLeft <= 1;
+    var atEnd = track.scrollLeft >= maxScroll() - 1;
+    if (prev) prev.classList.toggle('disabled', atStart);
+    if (next) next.classList.toggle('disabled', atEnd);
+    if (dots && dots.length) {
+      var c = current();
+      for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === c);
+    }
+  }
+
+  var opts = { passive: true, signal: signal };
+  var ticking = false;
+  track.addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { ticking = false; sync(); });
+  }, opts);
+
+  // Step to the next/previous SNAP POINT rather than to current()+-1. Once
+  // several cards share a view the last few slide positions all sit past the
+  // scroll limit, so index arithmetic would clamp to the same place and the
+  // arrow would appear dead — that is exactly what left the desktop Best
+  // Sellers track stuck at its end, unable to walk back.
+  function nextIndex() {
+    for (var i = 0; i < targets.length; i++) if (targets[i] > track.scrollLeft + 1) return i;
+    return targets.length - 1;
+  }
+  function prevIndex() {
+    for (var i = targets.length - 1; i >= 0; i--) if (targets[i] < track.scrollLeft - 1) return i;
+    return 0;
+  }
+
+  if (prev) prev.addEventListener('click', function () { goTo(prevIndex()); }, { signal: signal });
+  if (next) next.addEventListener('click', function () { goTo(nextIndex()); }, { signal: signal });
+
+  if (dots && dots.length) {
+    for (var d = 0; d < dots.length; d++) {
+      (function (i) {
+        dots[i].addEventListener('click', function () { goTo(i); }, { signal: signal });
+      })(d);
+    }
+  }
+
+  window.addEventListener('resize', function () { measure(); sync(); }, opts);
+  // Slide widths here are percentage-based and do not wait on images, but a
+  // late web font or a scrollbar appearing can still shift them.
+  window.addEventListener('load', function () { measure(); sync(); }, opts);
+
+  measure();
+  sync();
+  return { goTo: goTo, measure: measure, sync: sync };
+}
+
 function initCarousel(trackId, prevId, nextId) {
   var track = document.getElementById(trackId);
   var prev = document.getElementById(prevId);
   var next = document.getElementById(nextId);
   if (!track || !prev || !next) return;
 
-  var idx = 0;
-  var touchStartX = 0;
-  var touchStartLeft = 0;
-
-  function step() {
-    var card = track.children[0];
-    if (!card) return 220;
-    return card.offsetWidth + (parseFloat(getComputedStyle(track).gap) || 12);
-  }
-  function count() { return track.children.length; }
-  // True scroll limit (content minus viewport) — with several cards per view
-  // the last reachable index is well before count()-1, so clamp to it or the
-  // next arrow keeps "working" with nothing left to reveal.
-  function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
-  function maxIdx() { return Math.min(count() - 1, Math.ceil(maxScroll() / step())); }
-
-  function smoothTo(target) {
-    var start = track.scrollLeft;
-    var dest = Math.max(0, Math.min(target, maxScroll()));
-    var diff = dest - start;
-    if (!diff) return;
-    var t0 = null;
-    (function tick(ts) {
-      if (!t0) t0 = ts;
-      var p = Math.min((ts - t0) / 300, 1);
-      track.scrollLeft = start + diff * (1 - Math.pow(1 - p, 3));
-      if (p < 1) requestAnimationFrame(tick);
-    })(performance.now());
-  }
-
-  function goTo(n, instant) {
-    idx = Math.max(0, Math.min(n, maxIdx()));
-    var target = Math.min(idx * step(), maxScroll());
-    if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
-    prev.classList.toggle('disabled', idx === 0);
-    next.classList.toggle('disabled', idx >= maxIdx());
-  }
-
-  // Re-render pages re-run initCarousel on the SAME track element — abort
-  // the previous instance's listeners so they never stack up and fight.
+  // Re-render pages re-run initCarousel on the SAME track element — abort the
+  // previous instance's listeners so they never stack up and fight.
   if (track._carouselAbort) track._carouselAbort.abort();
   var ac = new AbortController();
   track._carouselAbort = ac;
-  var opts = { passive: true, signal: ac.signal };
 
-  // Sync internal state to wherever the track actually rests. Native
-  // momentum scrolling settles between indexes, so idx must be derived
-  // from scrollLeft — a stale idx made the next tap/arrow visibly "jump".
-  function resync() {
-    idx = Math.max(0, Math.min(Math.round(track.scrollLeft / step()), maxIdx()));
-    prev.classList.toggle('disabled', idx === 0);
-    next.classList.toggle('disabled', idx >= maxIdx());
-  }
-  var scrollT;
-  track.addEventListener('scroll', function() {
-    clearTimeout(scrollT);
-    scrollT = setTimeout(resync, 120);
-  }, opts);
-
-  prev.addEventListener('click', function() { goTo(idx - 1); }, { signal: ac.signal });
-  next.addEventListener('click', function() { goTo(idx + 1); }, { signal: ac.signal });
-
-  track.addEventListener('touchstart', function(e) {
-    touchStartX = e.touches[0].clientX;
-    touchStartLeft = track.scrollLeft;
-  }, opts);
-
-  track.addEventListener('touchmove', function(e) {
-    var raw = touchStartLeft + (touchStartX - e.touches[0].clientX);
-    track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
-  }, opts);
-
-  track.addEventListener('touchend', function(e) {
-    var delta = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 30) {
-      // Real swipe: advance from where the gesture STARTED.
-      goTo(Math.round(touchStartLeft / step()) + (delta > 0 ? 1 : -1));
-    } else if (Math.abs(delta) > 8) {
-      // Micro-drag: settle on the nearest card.
-      goTo(Math.round(track.scrollLeft / step()));
-    }
-    // Pure tap (≤8px): never move the track — picking a color/size or
-    // opening a product must not slide the carousel. resync() via the
-    // scroll listener keeps idx honest.
-  }, opts);
-
-  goTo(0, true);
+  bindCarousel(track, prev, next, null, ac.signal);
 }
 
 // ==================== DETAIL IMAGE CAROUSEL ====================
 // Only rendered when a product has more than one gallery slide for the
 // selected color (see renderDetailGallery in products.js) — a single-photo
-// product never calls this. Track-scroll based, same touch-axis
-// disambiguation as the other carousels on this site: a vertical scroll
-// attempt starting on the image must never get swallowed by the swipe.
+// product never calls this. renderDetailGallery rebuilds this whole subtree
+// on every colour tap, so the track is a fresh element each time and the
+// listeners bound here go with the old one.
 function initDetailCarousel() {
   var track = document.getElementById('detTrack');
   var prev = document.getElementById('detPrev');
@@ -1042,89 +1092,24 @@ function initDetailCarousel() {
   var dotsWrap = document.getElementById('detDots');
   if (!track || !prev || !next) return;
 
-  var idx = 0;
   var total = track.children.length;
-  var touchStartX = 0;
-  var touchStartY = 0;
-  var touchStartLeft = 0;
-  var touchAxis = null; // 'x' once a swipe is confirmed horizontal, 'y' once confirmed vertical
   // renderDetailGallery() already ships the dots in the markup so the row is
   // never empty for a paint (that emptiness was the colour-tap layout shake).
   // Only build them here if this ran against markup that lacks them, and
   // never rebuild a row that already has the right number — replacing them
   // for nothing would reintroduce the same shrink/re-grow.
   if (dotsWrap && dotsWrap.children.length !== total) {
-    dotsWrap.innerHTML = Array.from({ length: total }, function() { return '<span class="det-dot"></span>'; }).join('');
+    dotsWrap.innerHTML = Array.from({ length: total }, function () { return '<span class="det-dot"></span>'; }).join('');
   }
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
 
-  function step() { return track.offsetWidth || 300; }
-  function maxScroll() { return Math.max(0, (total - 1) * step()); }
+  if (track._carouselAbort) track._carouselAbort.abort();
+  var ac = new AbortController();
+  track._carouselAbort = ac;
 
-  function smoothTo(target) {
-    var start = track.scrollLeft;
-    var dest = Math.max(0, Math.min(target, maxScroll()));
-    var diff = dest - start;
-    if (!diff) return;
-    var t0 = null;
-    (function tick(ts) {
-      if (!t0) t0 = ts;
-      var p = Math.min((ts - t0) / 300, 1);
-      track.scrollLeft = start + diff * (1 - Math.pow(1 - p, 3));
-      if (p < 1) requestAnimationFrame(tick);
-    })(performance.now());
-  }
-
-  function goTo(n, instant) {
-    idx = Math.max(0, Math.min(n, total - 1));
-    var target = idx * step();
-    if (instant) { track.scrollLeft = target; } else { smoothTo(target); }
-    prev.classList.toggle('disabled', idx === 0);
-    next.classList.toggle('disabled', idx >= total - 1);
-    dots.forEach(function(d, i) { d.classList.toggle('active', i === idx); });
-  }
-
-  prev.addEventListener('click', function() { goTo(idx - 1); });
-  next.addEventListener('click', function() { goTo(idx + 1); });
-
-  track.addEventListener('touchstart', function(e) {
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-    touchStartLeft = track.scrollLeft;
-    touchAxis = null;
-  }, { passive: true });
-
-  track.addEventListener('touchmove', function(e) {
-    var dx = e.touches[0].clientX - touchStartX;
-    var dy = e.touches[0].clientY - touchStartY;
-
-    // Decide the gesture's axis once there's enough movement to be sure —
-    // whichever direction has moved further wins, and that decision sticks
-    // for the rest of this touch. Until then, do nothing: no preventDefault
-    // (so a vertical scroll can still start natively) and no scrollLeft
-    // change (so a few pixels of jitter don't nudge the image early).
-    if (!touchAxis && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
-      touchAxis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-    }
-    if (touchAxis === 'x') {
-      e.preventDefault();
-      var raw = touchStartLeft - dx;
-      track.scrollLeft = Math.max(0, Math.min(raw, maxScroll()));
-    }
-    // touchAxis === 'y' (or not yet decided): let the page scroll normally.
-  }, { passive: false });
-
-  track.addEventListener('touchend', function(e) {
-    if (touchAxis !== 'x') return; // vertical scroll or a tap — never treat as a swipe
-    var delta = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 30) {
-      goTo(idx + (delta > 0 ? 1 : -1));
-    } else {
-      goTo(idx);
-    }
-  }, { passive: true });
-
-  goTo(0, true);
+  var api = bindCarousel(track, prev, next, dots, ac.signal);
+  // A rebuilt gallery always opens on slide 1 (the selected colour's photo).
+  api.goTo(0, true);
 }
 
 // ==================== SECTION REVEAL (subtle fade-up on scroll) ====================
