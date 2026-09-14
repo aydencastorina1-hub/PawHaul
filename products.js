@@ -392,21 +392,36 @@ var products = [
     sizes: ["Universal — fits all leashes"],
     colors: ["Green", "Blue", "Black"],
 
+    // Real product photos, hosted in this repo (see images/products/) rather
+    // than pulled from Shopify's CDN — one per colour, so the card image, the
+    // detail hero and gallery slide 1 always match the selected colour. All
+    // three are the same pouch at the same angle on white, so the swatch row
+    // reads as one set rather than three different photo shoots.
     images: {
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S8eef5a0cca254e189de3a866ef6265c8f.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0713da2667494a60a03cd40e7fc7c805B.webp?width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S56ca0b52b7874b6b8b4b98ac4f252cd2E.webp?width=900"
+      "Green": "/images/products/poop-bag-holder-green-main.jpg",
+      "Blue": "/images/products/poop-bag-holder-blue-main.jpg",
+      "Black": "/images/products/poop-bag-holder-black-main.jpg"
     },
 
-    // Extra detail-page gallery slides — a pouch shown with a bag, and a
-    // hanging-on-leash lifestyle shot. Picked after auditing all 12 other
-    // pool images: excluded a batch of spec/instruction-panel graphics, one
-    // with faint Chinese-looking filler text in a product-parameters
-    // diagram, and a styled multi-pouch group shot that showed pink and
-    // grey pouches — neither an actual sold color (Green/Blue/Black only).
+    // Shared, non-colour-specific gallery slides, shown after slide 1 for
+    // every colour in this order: the green pouch with a bag pulled through,
+    // the buckle/fabric panel, the product-parameters panel, the on-the-walk
+    // shot, and the main-functions panel. These replace the old Shopify pool
+    // and clear what that audit had rejected: the text is all real English
+    // (no filler glyphs), and the only pouches shown are Green, Blue and
+    // Black — the three colours actually sold. The parameters panel's own
+    // colour chart lists exactly those three, so it agrees with the swatches
+    // instead of advertising a pink or grey that cannot be bought. Slides are
+    // a mix of colourways by nature, which is why they live in the shared
+    // pool and never in the per-colour map above — slide 1 is the only slide
+    // the page presents as "the" selected colour, and renderDetailGallery()
+    // deliberately gives these slides alt text with no colour name.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S1fad867101bf459eb368629dc96f3b11W.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S61093ab6323a4f95bc544447f2d9f92fQ.webp?width=900"
+      "/images/products/poop-bag-holder-lifestyle-1.jpg",
+      "/images/products/poop-bag-holder-lifestyle-2.jpg",
+      "/images/products/poop-bag-holder-lifestyle-3.jpg",
+      "/images/products/poop-bag-holder-lifestyle-4.jpg",
+      "/images/products/poop-bag-holder-lifestyle-5.jpg"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Shopify's own
