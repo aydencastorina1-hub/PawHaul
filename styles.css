@@ -1265,6 +1265,15 @@ img.reviewer-av {
    applyShopHero), so it only applies to this one category's photo. */
 #shopHero[data-cat="water"] .shop-hero-img { object-position: center 35%; }
 
+/* Safety & Visibility is 2:1, so it is the WIDTH that runs out first here,
+   not the height. Above ~560px the band is wider than 2:1 and `cover` only
+   crops vertically — centred is right there, and this X offset does nothing.
+   Below it (every phone) the band goes taller than 2:1 and the crop turns
+   horizontal: centred lopped the dog's face off the right edge. 78% holds the
+   dog whole with room to spare and still keeps the lit handle and its beam in
+   frame on the left, which is the half of the photo that sells the category. */
+#shopHero[data-cat="safety"] .shop-hero-img { object-position: 78% center; }
+
 .shop-hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(26,26,46,0.55), rgba(26,26,46,0.35)); }
 
 .shop-hero-copy {

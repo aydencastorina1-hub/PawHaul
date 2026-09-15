@@ -2271,10 +2271,11 @@ var SHOP_HERO = {
     description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
   },
   water: {
-    // Real photo (task 82) — the first of the four to be swapped off the
-    // shared Unsplash placeholder, which is why applyShopHero's crossfade
-    // path now actually runs for this pill instead of short-circuiting on
-    // "same src as the one already up".
+    // Real photo (task 82). Water & Food and Safety & Visibility are the two
+    // real photos so far; `all` and `leash` still share one Unsplash
+    // placeholder, which is why applyShopHero's crossfade path runs for real
+    // between those two pills instead of short-circuiting on "same src as the
+    // one already up".
     image: '/images/products/category-water-food-hero.jpg',
     alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
     heading: 'Water & Food',
@@ -2287,8 +2288,12 @@ var SHOP_HERO = {
     description: 'Freedom for them, control for you. Built for calm, confident walks every time.'
   },
   safety: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
-    alt: 'A dog wearing a light up collar after dark',
+    // Real photo (task 93) — shot after sunset, which is the whole point of
+    // this category: the leash light and the glowing lead ARE the product
+    // demo. See the object-position note in styles.css for why this one is
+    // not cropped dead centre.
+    image: '/images/products/category-safety-visibility-hero.jpg',
+    alt: 'A dog walking at dusk on a lakeside path, lit by a glowing purple LED flashlight leash',
     heading: 'Safety & Visibility',
     description: 'Seen and safe, day or night. Keep your dog visible and secure on every walk.'
   }
