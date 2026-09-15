@@ -2846,6 +2846,38 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      nav background, this canvas, and the mobile footer gradient end. */
   html, body { background-color: var(--navy); }
 
+  /* ── PAGE SCROLLBAR (visual only) ─────────────────────── */
+  /* Hide the thin indicator that rides down the right edge while the page
+     scrolls. Same three-property idiom the carousels in this file already
+     use, just pointed at the document scroller: scrollbar-width for Firefox
+     and Safari 18.2+, -ms-overflow-style for old Edge, ::-webkit-scrollbar
+     for the rest of WebKit/Blink.
+
+     Both html AND body are listed because either one can end up being the
+     element that scrolls the page, and the rule has to land on whichever it
+     is. This is cosmetic only — nothing here touches overflow, so every
+     scroll gesture, momentum fling and scrollTo still behaves exactly as
+     before; the bar is drawn, or not drawn, over the same scroller.
+
+     MOBILE ONLY, deliberately. On mobile the indicator is a transient
+     overlay that costs no layout width, so hiding it is purely visual. On
+     desktop the scrollbar is a real control people grab and read position
+     from, and on a classic (non-overlay) scrollbar hiding it would also give
+     the page back ~15px of width, reflowing every desktop breakpoint. Do not
+     promote this out of the mobile block.
+
+     One caveat this cannot cover: on iOS the MAIN-FRAME indicator is drawn
+     by the system rather than by the page, so older WebKit may keep showing
+     it. Hiding it there would mean moving the whole page into an inner
+     overflow container, which is not worth what it would cost the fixed nav
+     and the overscroll work above. */
+  html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar { display: none; }
+
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
