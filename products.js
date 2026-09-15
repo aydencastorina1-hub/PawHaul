@@ -1004,9 +1004,10 @@ function showPage(page, filter, opts) {
 // to match — otherwise the page starts jumping on load again.
 function renderHomeProducts() {
   var container = document.getElementById('homeProducts');
-  // Home carousel = these 5 specific products (best sellers), in this exact
-  // order. (Shop page still shows all products.)
-  var featuredIds = [2, 3, 8, 1, 6]; // Retractable Leash, Dog Bowl, Poop Bag Holder, Water Bottle, Light Up Collar
+  // Home carousel = these 4 specific products (best sellers), in this exact
+  // order. (Shop page still shows all products — dropping one from here only
+  // takes it out of this carousel.)
+  var featuredIds = [1, 6, 3, 10]; // Water Bottle, Light Up Collar, Dog Bowl, LED Flashlight Leash
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);

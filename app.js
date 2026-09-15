@@ -1013,6 +1013,14 @@ function bindCarousel(track, prev, next, dots, signal) {
   function sync() {
     var atStart = track.scrollLeft <= 1;
     var atEnd = track.scrollLeft >= maxScroll() - 1;
+    // A track that cannot scroll at all (every slide already fits the view —
+    // e.g. the 4-product Best Sellers row at 901px+, which is exactly four
+    // cards per view) would otherwise sit under two permanently dimmed
+    // arrows. Take them out of the layout and the tab order entirely instead;
+    // they come back the moment a resize makes the track overflow again.
+    var idle = maxScroll() <= 1;
+    if (prev) prev.hidden = idle;
+    if (next) next.hidden = idle;
     if (prev) prev.classList.toggle('disabled', atStart);
     if (next) next.classList.toggle('disabled', atEnd);
     if (dots && dots.length) {

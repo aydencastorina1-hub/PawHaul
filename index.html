@@ -521,11 +521,22 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
            Cards no longer carry colour swatches or size pills, so every card
            is the same height and the skeletons are identical apart from
            their data-cat. Keep ONE per real product, in the same order the
-           grid renders them (2, 3, 8, 1, 6) — add or remove one whenever the
-           catalogue changes, or the grid will jump as the cards render. -->
+           grid renders them (1, 6, 3, 10 — see featuredIds in products.js) —
+           add or remove one whenever that list or the catalogue changes, or
+           the grid will jump as the cards render. -->
       <div class="products-grid" id="homeProducts">
-        <!-- Retractable Dog Leash -->
-        <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
+        <!-- 2-in-1 Dog Water Bottle -->
+        <div class="product-card skel-card" data-cat="water" aria-hidden="true">
+          <div class="product-img-wrap"><div class="product-img"></div></div>
+          <div class="product-info">
+            <div class="product-name">&nbsp;</div>
+            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
+            <div class="product-price"><span class="price-now">&nbsp;</span></div>
+            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
+          </div>
+        </div>
+        <!-- Light Up Dog Collar -->
+        <div class="product-card skel-card" data-cat="safety" aria-hidden="true">
           <div class="product-img-wrap"><div class="product-img"></div></div>
           <div class="product-info">
             <div class="product-name">&nbsp;</div>
@@ -544,28 +555,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
             <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
           </div>
         </div>
-        <!-- Poop Bag Holder -->
+        <!-- LED Flashlight Retractable Dog Leash -->
         <div class="product-card skel-card" data-cat="leash" aria-hidden="true">
-          <div class="product-img-wrap"><div class="product-img"></div></div>
-          <div class="product-info">
-            <div class="product-name">&nbsp;</div>
-            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
-            <div class="product-price"><span class="price-now">&nbsp;</span></div>
-            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
-          </div>
-        </div>
-        <!-- 2-in-1 Dog Water Bottle -->
-        <div class="product-card skel-card" data-cat="water" aria-hidden="true">
-          <div class="product-img-wrap"><div class="product-img"></div></div>
-          <div class="product-info">
-            <div class="product-name">&nbsp;</div>
-            <div class="product-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span>(0)</span></div>
-            <div class="product-price"><span class="price-now">&nbsp;</span></div>
-            <button class="btn-black" type="button" tabindex="-1" disabled>&nbsp;</button>
-          </div>
-        </div>
-        <!-- Light Up Dog Collar -->
-        <div class="product-card skel-card" data-cat="safety" aria-hidden="true">
           <div class="product-img-wrap"><div class="product-img"></div></div>
           <div class="product-info">
             <div class="product-name">&nbsp;</div>

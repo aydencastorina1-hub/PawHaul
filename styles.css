@@ -2776,6 +2776,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .mob-menu-overlay.open { display: block; }
 .carousel-btn { display: none; }
+/* bindCarousel() sets `hidden` on an arrow whose track has nothing left to
+   scroll (see sync() in app.js). Every per-carousel block below re-declares
+   `display: flex`, so this needs !important to actually win. */
+.carousel-btn[hidden] { display: none !important; }
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
