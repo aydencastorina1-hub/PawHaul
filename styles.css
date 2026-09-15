@@ -2829,9 +2829,22 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   html, body { overflow-x: hidden; max-width: 100%; }
 
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
-  /* iOS Safari shows the html/body background when you pull past the top or bottom.
-     Deep navy (#0d0d1a) matches the footer so there is no white gap below it on overscroll. */
-  html, body { background-color: #0d0d1a; }
+  /* iOS Safari paints the html/body background — the canvas — in the strip the
+     rubber band opens up when you pull past the top or the bottom. It is ONE
+     colour for both ends, so it has to be a colour that works against the fixed
+     nav above the strip at the top AND against the footer below it at the bottom.
+
+     This used to be --navy-deep (#0d0d1a), chosen to match the footer's gradient
+     end so a bottom pull showed no white gap. That left the TOP pull opening a
+     #0d0d1a strip directly under a #1a1a2e nav — against the nav and the hero it
+     read as a black band flashing in and out (task 91).
+
+     It is now --navy, the EXACT nav background, so the top pull just looks like
+     the header stretching. The footer's gradient end is brought to the same navy
+     on mobile (see the footer rule further down) so the bottom pull stays seamless
+     too — both ends now agree with the one canvas colour. Keep the three in step:
+     nav background, this canvas, and the mobile footer gradient end. */
+  html, body { background-color: var(--navy); }
 
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
@@ -2876,8 +2889,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
   /* padding-top clears the 60px fixed nav. padding-bottom:0 so a white page never
-     shows a strip below its footer — the footer sits flush and the deep-navy body
-     (#0d0d1a, same as the footer) extends below it on overscroll with no white gap. */
+     shows a strip below its footer — the footer sits flush and the navy body
+     (var(--navy), which the mobile footer now ends on) extends below it on
+     overscroll with no gap. */
   .page { padding-top: 60px; padding-bottom: 0; }
   /* Home: push the hero below the 60px fixed nav so the top is never cut off */
   #page-home { padding-top: 60px; }
@@ -3077,7 +3091,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .form-row { grid-template-columns: 1fr; }
 
   /* ── FOOTER ───────────────────────────────────────────── */
-  footer { padding: 54px 5% 30px; }
+  /* Flat --navy rather than the desktop navy->navy-deep fade: the overscroll
+     canvas can only be one colour, and it has to be the nav's navy for the top
+     pull (see OVERSCROLL / RUBBER-BAND above), so the footer has to end on that
+     same navy or a bottom pull opens a lighter seam under it. */
+  footer { padding: 54px 5% 30px; background: var(--navy); }
   .footer-grid { grid-template-columns: 1fr 1fr; gap: 20px; padding-bottom: 24px; }
   .footer-bottom { flex-direction: column; text-align: center; gap: 6px; }
 
