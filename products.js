@@ -1,4 +1,162 @@
-﻿// ==================== DATA ====================
+﻿// ==================== SEASONAL SALE ====================
+// ONE place to configure a date-gated sale. Everything the sale touches — the
+// announce bar, the popup, the crossed-out prices, the leaf accents — reads
+// from this object and from saleIsActive() below. Nothing about the dates or
+// the product list is repeated anywhere else, so a future seasonal sale is an
+// edit here rather than a hunt through four files.
+//
+// ---- HOW THE DATES WORK -------------------------------------------------
+// start/end are ISO strings WITH an explicit UTC offset, and the two offsets
+// deliberately differ:
+//
+//     -04:00 is EDT, in effect on 22 Sep 2026
+//     -05:00 is EST, in effect on 21 Dec 2026
+//
+// US daylight saving ends on 1 Nov 2026 — between these two moments — so one
+// shared offset would be wrong at one end of the window. And a bare local time
+// like '2026-09-22T20:04:00' would be parsed in the VISITOR's timezone, which
+// would start the sale at 8:04pm local everywhere on earth instead of at a
+// single real instant. Writing the offset pins each string to one moment and
+// Date.parse does the rest, so Tokyo and New York flip over at the same second.
+//
+// Keep writing future dates this way: local wall-clock time, then the offset
+// actually in force on that date (-04:00 Mar–Nov, -05:00 Nov–Mar).
+//
+// ---- WHAT IS AUTOMATIC AND WHAT IS NOT ----------------------------------
+// AUTOMATIC: every display this config drives turns itself on at `start` and
+// off at `end`. Merging to production before the start date is safe — it stays
+// dormant and the site looks exactly as it does today.
+//
+// MANUAL: the selling prices themselves. They live in `price` / `sizePrices`
+// in the products array below and are what the site renders; they are NOT read
+// live from Shopify (the only Storefront call this site makes is api/shop.js,
+// for payment badges). Discounting in the Shopify admin alone therefore changes
+// what the customer is CHARGED without changing what the site SHOWS. At sale
+// time the prices in this file have to be edited down too, and put back after.
+//
+// `compareAt` below is the other half of that: the pre-sale price to draw a
+// line through. It is pre-filled with today's real prices, so the order of
+// operations is simply — discount in Shopify, then lower the matching `price`
+// / `sizePrices` values here. compareAt already holds what they used to be.
+//
+// ---- WHY THIS SHOWS A COMPARE-AT AT ALL ---------------------------------
+// Tasks 74 and 94 removed compare-at pricing from this site completely, on the
+// grounds that a crossed-out price is only honest if the product was genuinely
+// sold at that price first. This is the case where it was: these two products
+// really are sold at the compareAt price right up to the moment the sale
+// starts, and really do go back to it afterwards. So the exception is drawn as
+// narrowly as the justification — two product ids, one date window, and
+// nothing outside either renders a compare-at. See variantPriceHtml().
+var SEASONAL_SALE = {
+  id: 'fall-2026-led',
+  start: '2026-09-22T20:04:00-04:00',   // Tue 22 Sep 2026, 8:04pm EDT
+  end:   '2026-12-21T15:50:00-05:00',   // Mon 21 Dec 2026, 3:50pm EST
+
+  bannerText: 'Fall Safety Sale: 20% Off LED Gear',
+
+  popup: {
+    headline: "It's Getting Dark Out Sooner",
+    subhead: '20% Off LED Safety Gear',
+    body: 'The walk home is dark now. Both of these put light on your dog — 20% off until winter.',
+    // PLACEHOLDER IMAGE. Swap it by overwriting this exact file with the real
+    // fall-sale-popup.jpg — the path, the CSS and the alt text all stay as they
+    // are, so nothing else needs touching.
+    image: '/images/fall-sale-popup.jpg',
+    imageAlt: 'A dog wearing a glowing LED collar on an autumn evening walk'
+  },
+
+  // The products on sale, by id, each with the price to draw a line through.
+  // `sizes` mirrors that product's own sizePrices keys; `base` covers a product
+  // with no size-based pricing. A product not listed here never shows a
+  // compare-at, sale window or not.
+  products: {
+    6: {                                  // LED Dog Collar
+      base: 14.99,
+      sizes: { 'S (13-16 in)': 14.99, 'M (14-18 in)': 16.99, 'L (16-20 in)': 18.99, 'XL (16-22 in)': 20.99 }
+    },
+    10: {                                 // LED Flashlight Retractable Dog Leash
+      base: 22.99,
+      sizes: { '3M': 22.99, '5M': 25.99 }
+    }
+  }
+};
+
+// ---- PREVIEW MODE -------------------------------------------------------
+// Add ?fallsale=preview to any URL to see the sale exactly as it will look,
+// at any time, without waiting for the start date and without discounting
+// anything. It is remembered for the tab so clicking around the site keeps it
+// on (SPA navigation rewrites the path and would otherwise drop the query).
+//
+// It does two things, both display-only:
+//   - forces saleIsActive() true
+//   - renders prices with previewDiscount applied, because the crossed-out
+//     price is suppressed while the "was" is not actually above the current
+//     price (see saleCompareAtFor) and the real prices have not been lowered
+//     yet. Cart totals and checkout still use the REAL price — this simulates
+//     the look, it does not put anything on sale.
+//
+// Nothing enters this state without the explicit query string, so no ordinary
+// visitor can ever land in it.
+var SALE_PREVIEW_DISCOUNT = 0.20;
+var SALE_PREVIEW = (function () {
+  try {
+    if (/[?&]fallsale=preview(&|$)/.test(window.location.search)) {
+      sessionStorage.setItem('pawhaul_fallsale_preview', '1');
+      return true;
+    }
+    return sessionStorage.getItem('pawhaul_fallsale_preview') === '1';
+  } catch (e) { return false; }
+})();
+
+// The price to DISPLAY. Identical to the real price everywhere except preview.
+function salePreviewPrice(price) {
+  return SALE_PREVIEW ? Math.round(price * (1 - SALE_PREVIEW_DISCOUNT) * 100) / 100 : price;
+}
+
+// Parsed once. An unparseable date yields NaN, and every comparison against
+// NaN is false — so a typo here fails CLOSED (the sale never shows) rather
+// than leaving it stuck on.
+var SALE_START_MS = Date.parse(SEASONAL_SALE.start);
+var SALE_END_MS = Date.parse(SEASONAL_SALE.end);
+
+// The single source of truth for "is the sale on right now".
+//
+// This reads the VISITOR's clock, the same tradeoff every sale banner on the
+// web makes: a device with a badly wrong clock sees the wrong state. The
+// alternative — asking the server on every page view — costs a round trip
+// before first paint, forever, to defend against a case that only mis-serves
+// the person whose own clock is wrong. Not worth it for a sale banner. Worth
+// knowing if this config is ever reused for something where the gate has to be
+// authoritative (a price the customer is actually charged, say).
+function saleIsActive(now) {
+  if (SALE_PREVIEW && now === undefined) return true;
+  var t = (now === undefined) ? Date.now() : now;
+  return t >= SALE_START_MS && t < SALE_END_MS;
+}
+
+// True only for a product the sale covers, and only while it is running.
+function saleCoversProduct(p) {
+  return !!(p && saleIsActive() && SEASONAL_SALE.products[p.id]);
+}
+
+// The crossed-out price for one product/size, or null when nothing should be
+// crossed out. `size` null means "this product's base price".
+//
+// Returns null whenever the compare-at is missing, or is not actually ABOVE
+// the selling price: a "was" equal to or below what you pay is not a saving,
+// and rendering one would be exactly the dishonest display tasks 74/94
+// removed. That also makes the sale self-defusing if someone forgets to lower
+// the prices — no fake discount appears, the price just renders normally.
+function saleCompareAtFor(p, size, price) {
+  if (!saleCoversProduct(p)) return null;
+  var cfg = SEASONAL_SALE.products[p.id];
+  var was = (size && cfg.sizes && cfg.sizes[size] !== undefined) ? cfg.sizes[size] : cfg.base;
+  if (typeof was !== 'number') return null;
+  if (SALE_PREVIEW) return was;
+  return (price !== undefined && was <= price) ? null : was;
+}
+
+// ==================== DATA ====================
 var products = [
   {
     id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "", category: "water",
@@ -1241,15 +1399,20 @@ function lowestVariant(p) {
 // Builds the price markup for one exact variant (no "From" prefix — used
 // once a specific size has actually been selected).
 //
-// NO COMPARE-AT. Products carry a `was` (and sizePrices[].was) and that data
-// stays put — Shopify holds the same compare-at and the feed logic reads it —
-// but it is NEVER rendered, in any form: no struck-through "was", no "Save
-// N%", nowhere on the site. A compare-at is only honest if the product was
-// genuinely sold at that price first, and these were not. api/feed.js refuses
-// to emit g:sale_price for exactly this reason; the storefront matches it.
-// Do not re-add a `was` argument here.
-function variantPriceHtml(price) {
-  return '<span class="price-now">$' + Number(price).toFixed(2) + '</span>';
+// THE COMPARE-AT RULE. The products array still carries a `was` on every
+// product, and it is still never rendered: it is the supplier's notional list
+// price, nothing was ever sold at it, and tasks 74/94 took it off the site for
+// that reason. api/feed.js refuses to emit g:sale_price on the same grounds.
+//
+// `compareAt` here is a DIFFERENT number with a different justification, and
+// the only thing allowed to supply it is saleCompareAtFor() — a real, dated,
+// temporary markdown on a named product that genuinely sold at the higher
+// price the day before. Never pass p.was to this. If you find yourself wanting
+// a crossed-out price outside a SEASONAL_SALE window, the answer is no.
+function variantPriceHtml(price, compareAt) {
+  price = salePreviewPrice(price);
+  return '<span class="price-now">$' + Number(price).toFixed(2) + '</span>' +
+    (compareAt ? '<span class="price-sale-was">$' + Number(compareAt).toFixed(2) + '</span>' : '');
 }
 
 // True when a product's sizes are priced differently from each other (so the
@@ -1266,7 +1429,10 @@ function hasPriceRange(p) {
 function priceDisplayHtml(p) {
   var v = lowestVariant(p);
   var prefix = hasPriceRange(p) ? '<span class="price-from">From </span>' : '';
-  return prefix + variantPriceHtml(v.price);
+  // The card shows the LOWEST variant, so it must cross out that same
+  // variant's pre-sale price — not the product's base — or a size-priced
+  // product would advertise a discount off the wrong number.
+  return prefix + variantPriceHtml(v.price, saleCompareAtFor(p, v.size, v.price));
 }
 
 // True when this exact size+color combo has been marked unavailable on the
@@ -1557,8 +1723,11 @@ function productCard(p, opts) {
   var imgContent = imgUrl
     ? `<img ${photoAttrs(imgUrl, 'card', opts)} alt="${p.name}">`
     : p.emoji;
+  // `is-sale` is only ever added inside the sale window (saleCoversProduct
+  // checks the clock), so the leaf accents in styles.css cannot outlive it.
+  var saleClass = saleCoversProduct(p) ? ' is-sale' : '';
   return `
-    <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
+    <div class="product-card${saleClass}" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
       <div class="product-img-wrap">
         <div class="product-img">${imgContent}</div>
         <button class="wishlist-btn" data-wid="${p.id}" onclick="event.stopPropagation(); wishlist(${p.id})">${wishlistItems.some(function(w){return w.id===p.id}) ? '♥' : '♡'}</button>
@@ -1680,7 +1849,7 @@ function showProduct(id, opts) {
   }
   currentColor = currentProduct.colors && currentProduct.colors.length ? currentProduct.colors[0] : null;
   currentVariantPrice = cheapest.price;
-  setDetailPrice(cheapest.price);
+  setDetailPrice(cheapest.price, saleCompareAtFor(currentProduct, cheapest.size, cheapest.price));
   // Generic disclaimer pill under the tagline — "requires 2 AAA batteries
   // (not included)" today, previously the AirTag "case only" note. The DOM
   // id/class still carry the older "case note" name.
@@ -1788,7 +1957,7 @@ function updateVariantAvailability() {
   currentSize = pick;
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[pick] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
-  setDetailPrice(currentVariantPrice);
+  setDetailPrice(currentVariantPrice, saleCompareAtFor(currentProduct, pick, currentVariantPrice));
 }
 
 // Writes the selling price on the detail page (main price block AND the sticky
@@ -1802,11 +1971,20 @@ function updateVariantAvailability() {
 // data stays but never reaches the page. `was` is no longer a parameter, so
 // re-introducing this needs a deliberate change rather than a passed argument
 // quietly finding a still-present element.
-function setDetailPrice(price) {
+function setDetailPrice(price, compareAt) {
+  price = salePreviewPrice(price);
   var priceEl = document.getElementById('detailPrice');
+  var wasEl = document.getElementById('detailSaleWas');
   var stickyPriceEl = document.getElementById('stickyPrice');
   if (priceEl) priceEl.textContent = '$' + Number(price).toFixed(2);
   if (stickyPriceEl) stickyPriceEl.textContent = '$' + Number(price).toFixed(2);
+  // Emptied, not just hidden: an element holding a stale price that CSS
+  // happens to be hiding is one rule away from being visible again, and this
+  // one is re-run on every size tap.
+  if (wasEl) {
+    wasEl.textContent = compareAt ? '$' + Number(compareAt).toFixed(2) : '';
+    wasEl.hidden = !compareAt;
+  }
 }
 
 // Size buttons use this instead of selectOption: it toggles the active state
@@ -1821,7 +1999,7 @@ function selectSize(btn) {
   currentSize = btn.textContent.trim();
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
-  setDetailPrice(currentVariantPrice);
+  setDetailPrice(currentVariantPrice, saleCompareAtFor(currentProduct, currentSize, currentVariantPrice));
   renderDetailShopPay();
 }
 

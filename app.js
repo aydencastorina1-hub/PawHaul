@@ -771,7 +771,8 @@ function searchIsOpen() {
 // Hide the floating chat paw while the search overlay or offer popup is up
 // (it sits at z-index 9999 and would float on top of them).
 function syncOverlayChrome() {
-  document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen() || offlineIsUp());
+  document.body.classList.toggle('overlay-up',
+    searchIsOpen() || offerIsOpen() || fallPopupIsOpen() || offlineIsUp());
 }
 
 // Declared here (not only inside the offline IIFE further down) so
@@ -1488,17 +1489,107 @@ function markOfferClaimed() {
 
   // Armed exactly once, here, for the whole visit. Nothing re-arms it — that's
   // what keeps SPA navigation from starting a fresh countdown on every page.
-  if (!offerAlreadyClaimed()) {
+  //
+  // During a seasonal sale the fall popup owns the visit and this one does not
+  // arm at all (see fallPopupOwnsVisit below) — deliberately not "queue behind
+  // it", because two full-screen modals in one visit is the stacking the brief
+  // ruled out, and the timely message should win. Email capture is not lost:
+  // the 10% off box on the home page is a permanent second entry point, and a
+  // visitor who never claims sees this popup again on their next visit once
+  // the sale is over.
+  if (!offerAlreadyClaimed() && !fallPopupOwnsVisit()) {
     timer = setTimeout(reveal, TRIGGER_MS);
     document.addEventListener('mouseleave', exitIntent);
     listening = true;
   }
 })();
 
-// Escape closes whichever overlay is up (search first, then the offer).
+
+// ==================== FALL SALE POPUP ====================
+// Announcement popup for a SEASONAL_SALE window. Same shape as the 10% off
+// popup above — armed once per visit, in-memory flag so a reload is a new
+// visit, no permanent storage — with three differences:
+//
+//   1. It only arms while saleIsActive(). Outside the window nothing runs and
+//      the markup in index.html is never revealed.
+//   2. It asks for nothing. No form, no email, no code; two buttons straight
+//      to the discounted products.
+//   3. It takes priority over the 10% off popup for the visit rather than
+//      sharing it. fallPopupOwnsVisit() is what the other popup checks.
+//
+// It fires SOONER than the 10% popup (3s vs 5s) so the ordering can never come
+// down to a race: by the time the other one would have armed, it has already
+// been told not to.
+var FALL_POPUP_TRIGGER_MS = 3000;
+
+// True when the fall popup is the one that should run this visit. Read by the
+// 10% off popup to stand down. Safe before products.js loads only because both
+// scripts run after it — but guard anyway, since a missing saleIsActive must
+// mean "no sale", never a crash that takes the rest of app.js with it.
+function fallPopupOwnsVisit() {
+  return typeof saleIsActive === 'function' && saleIsActive();
+}
+
+function fallPopupIsOpen() {
+  var popup = document.getElementById('fallPopup');
+  return !!(popup && popup.classList.contains('active'));
+}
+
+function dismissFallPopup() {
+  var overlay = document.getElementById('fallOverlay');
+  var popup = document.getElementById('fallPopup');
+  if (overlay) overlay.classList.remove('active');
+  if (popup) popup.classList.remove('active');
+  if (typeof syncOverlayChrome === 'function') syncOverlayChrome();
+}
+
+// Popup -> product page. Closes first so the visitor does not land on the
+// product with a modal still over it.
+function goToSaleProduct(id) {
+  dismissFallPopup();
+  if (typeof showProduct === 'function') showProduct(id);
+}
+
+(function () {
+  var shownThisVisit = false;
+  var timer = null;
+
+  function reveal() {
+    if (shownThisVisit || !fallPopupOwnsVisit()) return;
+    var overlay = document.getElementById('fallOverlay');
+    var popup = document.getElementById('fallPopup');
+    if (!overlay || !popup) return;
+
+    shownThisVisit = true;
+    clearTimeout(timer);
+
+    // Bound here rather than at script-execution time: this markup sits below
+    // app.js's own <script> tag, so an early getElementById returns null and
+    // the close button silently never gets a listener. Same lesson as the 10%
+    // popup right above.
+    overlay.addEventListener('click', dismissFallPopup);
+    var closeBtn = document.getElementById('fallClose');
+    if (closeBtn) closeBtn.addEventListener('click', dismissFallPopup);
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        overlay.classList.add('active');
+        popup.classList.add('active');
+        if (typeof syncOverlayChrome === 'function') syncOverlayChrome();
+      });
+    });
+  }
+
+  if (fallPopupOwnsVisit()) timer = setTimeout(reveal, FALL_POPUP_TRIGGER_MS);
+})();
+
+// Escape closes whichever overlay is up (search first, then whichever popup).
+// The two popups never co-exist — the fall one suppresses the other for the
+// visit — so the order between them is belt-and-braces, not a real contest.
 document.addEventListener('keydown', function(e) {
   if (e.key !== 'Escape') return;
   if (searchIsOpen()) { closeSearch(); }
+  else if (fallPopupIsOpen()) { dismissFallPopup(); }
   else if (offerIsOpen()) { dismissOffer(); }
 });
 

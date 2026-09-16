@@ -183,7 +183,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=100" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=101" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -192,8 +192,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=2">
-  <link rel="preload" as="script" href="/products.js?v=65">
-  <link rel="preload" as="script" href="/app.js?v=54">
+  <link rel="preload" as="script" href="/products.js?v=66">
+  <link rel="preload" as="script" href="/app.js?v=55">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -206,6 +206,17 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        markOfferClaimed() (app.js) adds the same class live, so claiming through
        the popup swaps the section immediately without waiting for a reload. -->
   <script>try{if(localStorage.getItem('pawhaul_offer_claimed'))document.documentElement.classList.add('offer-claimed');}catch(e){}</script>
+  <!-- SEASONAL SALE GATE. Both announce-bar variants ship in the markup and
+       CSS picks between them on this class, so the bar never flashes the wrong
+       text — the same pre-paint trick the offer-claimed line above uses.
+       products.js has not loaded this early, so the two dates are repeated
+       here and ONLY here; they must stay in step with SEASONAL_SALE in
+       products.js, which is why both carry the same comment. Everything after
+       first paint (prices, popup, accents) reads the config directly. -->
+  <script>try{var s=Date.parse('2026-09-22T20:04:00-04:00'),e=Date.parse('2026-12-21T15:50:00-05:00'),n=Date.now(),
+    pv=/[?&]fallsale=preview(&|$)/.test(location.search)||sessionStorage.getItem('pawhaul_fallsale_preview')==='1';
+    if(pv)sessionStorage.setItem('pawhaul_fallsale_preview','1');
+    if(pv||(n>=s&&n<e))document.documentElement.classList.add('fall-sale');}catch(err){}</script>
   <style>.email-section .email-claimed{display:none}html.offer-claimed .email-section .email-signup{display:none}html.offer-claimed .email-section .email-claimed{display:block}</style>
 </head>
 <body>
@@ -213,9 +224,18 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 <div class="cursor" id="cursor"></div>
 <div class="toast" id="toast">Added to cart!</div>
 
-<!-- ANNOUNCE BAR -->
-<div class="announce-bar">
+<!-- ANNOUNCE BAR. Two variants, both always in the markup; html.fall-sale
+     (set before first paint in the head) decides which one is displayed. Built
+     this way rather than by rewriting textContent in JS so the bar is correct
+     in the very first frame and in the SSR HTML a crawler sees. -->
+<div class="announce-bar announce-bar--normal">
   Free Shipping On All Orders <span>•</span> 30-Day Returns <span>•</span> New Walk Gear Added Regularly
+</div>
+<div class="announce-bar announce-bar--sale" hidden>
+  <span class="announce-leaf" aria-hidden="true">🍂</span>
+  Fall Safety Sale: 20% Off LED Gear
+  <span class="announce-leaf" aria-hidden="true">🍂</span>
+  <span>•</span> Free Shipping On All Orders <span>•</span> 30-Day Returns
 </div>
 
 <!-- NAVBAR -->
@@ -954,6 +974,11 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
              The `was` data stays in products.js; it must not come back here. -->
         <div class="detail-price">
           <span class="now" id="detailPrice">$16.99</span>
+          <!-- Filled ONLY by setDetailPrice() from saleCompareAtFor(), i.e.
+               only for a product in SEASONAL_SALE.products during the window.
+               Ships empty and hidden; see products.js for why this is the one
+               place a crossed-out price is allowed back on the site. -->
+          <span class="sale-was" id="detailSaleWas" hidden></span>
         </div>
         <p class="detail-tagline" id="detailTagline">Water and food in one leak-proof bottle — never cut a walk short again.</p>
         <p class="detail-case-note" id="detailCaseNote" style="display:none;"></p>
@@ -1395,8 +1420,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=2"></script>
-  <script src="/products.js?v=65"></script>
-  <script src="/app.js?v=54"></script>
+  <script src="/products.js?v=66"></script>
+  <script src="/app.js?v=55"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
@@ -1466,6 +1491,36 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
   // paint or routing; just fills in cart contents/badge once it resolves.
   initCartFromStorage();
   </script>
+
+  <!-- FALL SALE POPUP (task 97). An ANNOUNCEMENT, not an email gate: it has no
+       form and asks for nothing, it just points at the two discounted products.
+       Shown only inside the SEASONAL_SALE window — app.js checks saleIsActive()
+       before arming it, so outside the window this markup is inert and never
+       revealed. It also suppresses the 10% off popup for the visit rather than
+       queueing behind it; see the fall-popup block in app.js for why. -->
+  <div id="fallOverlay" class="offer-overlay"></div>
+  <div id="fallPopup" class="offer-popup fall-popup" role="dialog" aria-modal="true" aria-label="Fall Safety Sale: 20% off LED gear">
+    <button id="fallClose" class="offer-close" aria-label="Close">&#x2715;</button>
+    <div class="offer-photo">
+      <!-- PLACEHOLDER. Swap by overwriting /images/fall-sale-popup.jpg with the
+           real photo — same path, same dimensions, nothing else to change. The
+           onerror hides the frame rather than showing a broken-image icon if
+           the file is ever missing. -->
+      <img class="lifestyle-img" src="/images/fall-sale-popup.jpg" width="1200" height="1200"
+           alt="A dog wearing a glowing LED collar on an autumn evening walk" loading="lazy"
+           onerror="this.closest('.offer-photo').hidden = true">
+    </div>
+    <div class="offer-body">
+      <div class="offer-kicker"><span class="fall-kicker-leaf" aria-hidden="true">🍂</span> Fall Safety Sale</div>
+      <h2 class="offer-headline">It’s Getting Dark Out Sooner <span>20% Off LED Safety Gear</span></h2>
+      <p class="offer-sub">The walk home is dark now. Both of these put light on your dog — 20% off until winter.</p>
+      <div class="fall-popup-links">
+        <button type="button" class="offer-btn" onclick="goToSaleProduct(6)">Shop the LED Dog Collar →</button>
+        <button type="button" class="offer-btn offer-btn--alt" onclick="goToSaleProduct(10)">Shop the LED Flashlight Leash →</button>
+      </div>
+      <button type="button" class="offer-dismiss" onclick="dismissFallPopup()">No thanks, maybe later</button>
+    </div>
+  </div>
 
   <!-- 10% OFF POPUP — near full-screen photo modal. The image is hero slide 1
        (already preloaded for the slideshow), so showing it costs zero extra bytes. -->

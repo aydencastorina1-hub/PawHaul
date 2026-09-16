@@ -5852,3 +5852,119 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
    Allow both axes and let the browser disambiguate, which it does better
    than the axis-locking code this replaces. */
 .det-carousel { touch-action: pan-x pan-y pinch-zoom; }
+
+/* ======================= SEASONAL SALE (task 97) =======================
+   Everything here is inert unless html.fall-sale is present, which the
+   pre-paint script in index.html only adds inside the SEASONAL_SALE window.
+   So this whole block costs nothing and shows nothing outside the sale — no
+   JS has to remember to undo it when the window closes.
+   Dates live in products.js; nothing here knows or cares what they are. */
+
+/* ---- ANNOUNCE BAR ----
+   Both variants are in the markup and one is always [hidden]. Swapped with
+   the class rather than by rewriting text in JS so the correct bar is in the
+   first painted frame and in the SSR HTML. */
+.announce-bar--sale { display: none; }
+html.fall-sale .announce-bar--normal { display: none; }
+html.fall-sale .announce-bar--sale { display: block; }
+/* [hidden] loses to .announce-bar's own `display`, so state it again. */
+.announce-bar--sale[hidden] { display: none; }
+html.fall-sale .announce-bar--sale[hidden] { display: block; }
+
+.announce-leaf {
+  display: inline-block;
+  /* The leaf is the only thing on the bar that moves. Very small, very slow:
+     enough to catch the eye on a bar people have learned to ignore, not
+     enough to read as a distraction next to the nav. */
+  animation: leafSway 3.2s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+.announce-leaf:last-of-type { animation-delay: 1.6s; }
+@keyframes leafSway {
+  0%, 100% { transform: rotate(-8deg); }
+  50%      { transform: rotate(8deg); }
+}
+
+/* ---- SALE COMPARE-AT ----
+   The one crossed-out price allowed on this site, and only for the products
+   and window SEASONAL_SALE names — see variantPriceHtml() in products.js for
+   why this is not a reversal of tasks 74/94. Named `price-sale-was`, not the
+   old generic `price-was`, so it cannot be reached by accident from anywhere
+   that is not the sale path. */
+.price-sale-was,
+.detail-price .sale-was {
+  color: var(--gray);
+  text-decoration: line-through;
+  font-weight: 600;
+}
+.price-sale-was { font-size: 12px; }
+.detail-price .sale-was { font-size: 18px; }
+
+/* ---- PRODUCT CARDS ON SALE ----
+   A warm autumn edge and a corner leaf, only on the two discounted cards.
+   Restrained on purpose: the card's job is still the photo and the price. */
+html.fall-sale .product-card.is-sale {
+  border: 2px solid rgba(232, 99, 10, 0.35);
+}
+html.fall-sale .product-card.is-sale .product-img-wrap::after {
+  content: "\01F342";
+  position: absolute;
+  top: 10px; left: 10px;
+  font-size: 17px;
+  line-height: 1;
+  z-index: 2;
+  filter: drop-shadow(0 1px 2px rgba(26, 26, 46, 0.25));
+  pointer-events: none;
+}
+
+/* ---- PRODUCT PAGE ---- */
+html.fall-sale .detail-price .sale-was + .fall-tag,
+html.fall-sale .fall-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232, 99, 10, 0.10);
+  color: var(--orange);
+  border-radius: 50px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.fall-tag { display: none; }
+
+/* ---- FALL POPUP ----
+   Reuses .offer-popup's box, photo frame and animation wholesale; only the
+   things that should differ are restated. */
+.fall-popup .offer-kicker { color: var(--orange); }
+.fall-kicker-leaf { font-size: 1.05em; }
+.fall-popup .offer-headline span {
+  display: block;
+  color: var(--orange);
+  margin-top: 4px;
+}
+.fall-popup-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 6px;
+}
+/* Second product reads as the alternative, not a second primary action.
+   The popup body is navy (#1a1a2e), so this is white-on-transparent — an
+   earlier pass used var(--black) here, which is that same navy, and the
+   button rendered as an empty outlined box with invisible text. */
+.offer-btn--alt {
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+@media (hover: hover) {
+  .offer-btn--alt:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #fff;
+    color: #fff;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announce-leaf { animation: none; }
+}
