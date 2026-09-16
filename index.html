@@ -182,8 +182,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=1">
-  <link rel="preload" as="script" href="/products.js?v=62">
-  <link rel="preload" as="script" href="/app.js?v=51">
+  <link rel="preload" as="script" href="/products.js?v=63">
+  <link rel="preload" as="script" href="/app.js?v=52">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -280,11 +280,11 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
     <div class="search-browse-title">Browse by category</div>
     <div class="search-browse-grid">
       <div class="search-cat-card" onclick="searchGoCategory('all')" role="button" tabindex="0">
-        <div class="search-cat-img"><img loading="lazy" class="lifestyle-img search-cat-photo-all" src="/images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul walk gear"></div>
+        <div class="search-cat-img"><img loading="lazy" decoding="async" class="lifestyle-img search-cat-photo-all" src="/images/products/all-gear-flatlay-1200.webp" srcset="/images/products/all-gear-flatlay-400.webp 400w, /images/products/all-gear-flatlay-800.webp 800w, /images/products/all-gear-flatlay-1200.webp 1200w" sizes="(max-width: 767px) 45vw, 240px" alt="A flat-lay of PawHaul walk gear"></div>
         <div class="search-cat-name">All Walk Gear</div>
       </div>
       <div class="search-cat-card" onclick="searchGoCategory('water')" role="button" tabindex="0">
-        <div class="search-cat-img"><img loading="lazy" class="lifestyle-img search-cat-photo-water" src="/images/products/category-water-food-hero.jpg" alt="A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake"></div>
+        <div class="search-cat-img"><img loading="lazy" decoding="async" class="lifestyle-img search-cat-photo-water" src="/images/products/category-water-food-hero-1536.webp" srcset="/images/products/category-water-food-hero-400.webp 400w, /images/products/category-water-food-hero-800.webp 800w, /images/products/category-water-food-hero-1200.webp 1200w, /images/products/category-water-food-hero-1536.webp 1536w" sizes="(max-width: 767px) 45vw, 240px" alt="A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake"></div>
         <div class="search-cat-name">Water &amp; Food</div>
       </div>
       <div class="search-cat-card" onclick="searchGoCategory('leash')" role="button" tabindex="0">
@@ -438,7 +438,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
       <div id="collectionsCarousel">
 
         <div class="col-slide">
-          <div class="col-slide-img"><img loading="lazy" class="lifestyle-img" src="/images/products/category-water-food-hero.jpg" alt="A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake"></div>
+          <div class="col-slide-img"><img loading="lazy" decoding="async" class="lifestyle-img" src="/images/products/category-water-food-hero-1536.webp" srcset="/images/products/category-water-food-hero-400.webp 400w, /images/products/category-water-food-hero-800.webp 800w, /images/products/category-water-food-hero-1200.webp 1200w, /images/products/category-water-food-hero-1536.webp 1536w" sizes="(max-width: 767px) 92vw, 730px" alt="A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake"></div>
           <div class="col-slide-body">
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg> Water &amp; Food</div>
             <h3 class="col-slide-head">Never Run Out Of Water Mid-Walk</h3>
@@ -468,7 +468,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
         </div>
 
         <div class="col-slide">
-          <div class="col-slide-img"><img loading="lazy" class="lifestyle-img" src="/images/products/all-gear-flatlay.jpg" alt="A flat-lay of PawHaul products: the 2-in-1 Dog Water Bottle, Retractable Dog Leash, and Light Up Dog Collar"></div>
+          <div class="col-slide-img"><img loading="lazy" decoding="async" class="lifestyle-img" src="/images/products/all-gear-flatlay-1200.webp" srcset="/images/products/all-gear-flatlay-400.webp 400w, /images/products/all-gear-flatlay-800.webp 800w, /images/products/all-gear-flatlay-1200.webp 1200w" sizes="(max-width: 767px) 92vw, 730px" alt="A flat-lay of PawHaul products: the 2-in-1 Dog Water Bottle, Retractable Dog Leash, and Light Up Dog Collar"></div>
           <div class="col-slide-body">
             <div class="col-slide-tag"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.05em;height:1.05em;vertical-align:-0.15em;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> All Walk Gear</div>
             <h3 class="col-slide-head">Every Walk, Fully Covered</h3>
@@ -1381,8 +1381,8 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=1"></script>
-  <script src="/products.js?v=62"></script>
-  <script src="/app.js?v=51"></script>
+  <script src="/products.js?v=63"></script>
+  <script src="/app.js?v=52"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

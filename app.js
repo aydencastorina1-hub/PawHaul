@@ -384,7 +384,7 @@ function showBundle(productId) {
     total += lowestVariant(p).price;
     var isMain = bid === productId;
     var bundleImgUrl = productImageFor(p, p.colors && p.colors[0]);
-    var imgContent = bundleImgUrl ? ('<img src="' + bundleImgUrl + '" alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
+    var imgContent = bundleImgUrl ? ('<img ' + photoAttrs(bundleImgUrl, 'thumb') + ' alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
     html += '<div style="display:flex;align-items:center;gap:12px;background:white;padding:10px 14px;border-radius:10px;">' +
       imgContent +
       '<div style="flex:1;">' +
@@ -885,7 +885,7 @@ function doSearch(val) {
   res.innerHTML = matches.map(function(p) {
     var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
     var thumb = thumbUrl
-      ? '<img src="' + thumbUrl + '" alt="" loading="lazy">'
+      ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt="">'
       : p.emoji;
     return '<div class="search-result-item" onclick="goToProduct(' + p.id + ')">' +
       '<span class="search-result-thumb">' + thumb + '</span>' +
