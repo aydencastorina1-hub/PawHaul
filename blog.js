@@ -127,7 +127,7 @@ var blogPosts = [
 <p>This is the one that does the heavy lifting. A lit collar puts a light source at the dog's neck, which is the highest point of the dog and the part most likely to enter the road first.</p>
 <p>Look for three things when choosing one: <strong>USB rechargeable</strong> (coin-cell versions die without warning and get abandoned), <strong>multiple modes</strong>, and a <strong>proper fit for your dog's neck size</strong>. On mode: a steady glow is easier for a driver to track and judge distance against, while a blink is more attention-grabbing in busy traffic. Fast blink on roads, steady glow on paths is a reasonable default.</p>
 <div class="blog-cta">
-  <p><strong>Gear that helps:</strong> the <a href="/product/light-up-dog-collar">Light Up Dog Collar</a> is USB rechargeable with three modes — fast blink, slow blink and steady glow — and comes in four neck sizes from 13 to 22 inches. It's detachable, so it goes over the collar your dog already wears rather than replacing it.</p>
+  <p><strong>Gear that helps:</strong> the <a href="/product/led-dog-collar">LED Dog Collar</a> is USB rechargeable with three modes — fast blink, slow blink and steady glow — and comes in four neck sizes from 13 to 22 inches. It's detachable, so it goes over the collar your dog already wears rather than replacing it.</p>
 </div>
 
 <h3>Layer two: light on you</h3>
@@ -200,7 +200,7 @@ var blogPosts = [
 
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
-<p>A <a href="/product/light-up-dog-collar">rechargeable LED collar</a> puts a light source on the dog that works from any angle and does not depend on anyone else's headlights. Charge it weekly on a fixed day; the usual failure mode is a flat light nobody noticed.</p>
+<p>A <a href="/product/led-dog-collar">rechargeable LED collar</a> puts a light source on the dog that works from any angle and does not depend on anyone else's headlights. Charge it weekly on a fixed day; the usual failure mode is a flat light nobody noticed.</p>
 
 <h2>Off-leash areas: add a tracker</h2>
 <p>If your dog goes off leash anywhere, a Bluetooth tracker is the highest-value thing you can add. The attachment is the part that matters — a tag on a split ring works loose over months, and a soaked tracker is a dead tracker. A waterproof holder with a twist-lock handles both.</p>

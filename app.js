@@ -345,16 +345,16 @@ var bundleMap = {
   2: [9, 5, 8], // Retractable Leash → suggest Wrist Strap + Poop Bag Clip + Poop Bag Holder
   3: [1, 2],    // Bowl → suggest Water Bottle + Retractable Leash
   5: [8, 2],    // Poop Bag Clip → suggest Poop Bag Holder + Retractable Leash
-  // Light Up Collar used to also suggest the Dog AirTag Holder; that product
+  // LED Collar used to also suggest the Dog AirTag Holder; that product
   // was removed from the catalogue, so this is now a two-item pairing (which
   // showBundle already handles — it switches to "Combined Price" / "Add Both
   // To Cart"). No replacement was invented for it.
-  6: [2],       // Light Up Collar → suggest Retractable Leash
+  6: [2],       // LED Collar → suggest Retractable Leash
   8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
   9: [2, 5],    // Wrist Strap → suggest Retractable Leash + Poop Bag Clip
   // The LED leash is the night-visibility option, so it pairs with the
   // other two things that make a dark walk safer.
-  10: [6, 9],   // LED Leash → suggest Light Up Collar + Wrist Strap
+  10: [6, 9],   // LED Leash → suggest LED Collar + Wrist Strap
 };
 
 var originalShowProduct = showProduct;

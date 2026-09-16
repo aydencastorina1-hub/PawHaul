@@ -279,7 +279,7 @@ var products = [
     whatsInBox: "1× Poop Bag Clip"
   },
   {
-    id: 6, name: "Light Up Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "", category: "safety",
+    id: 6, name: "LED Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "", category: "safety",
     badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
@@ -292,6 +292,14 @@ var products = [
     contrast: { without: "A shadow on a dark street", "with": "Lit up the whole walk" },
     sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
+
+    // Renamed from "Light Up Dog Collar" (task 95). Search matches on
+    // name/category/desc, and none of them carry the old name any more, so a
+    // customer who remembers it — or who just types how they think about the
+    // thing — would get "No products found". Same reason the wrist strap
+    // carries tags.
+    tags: ["light up collar", "light up dog collar", "glow collar", "glowing collar",
+           "night collar", "safety collar", "rechargeable collar", "flashing collar"],
 
     // The user's own photo set, hosted in this repo (see images/products/),
     // one "-main-v2" per colour: a clean lit studio shot of the collar on
@@ -375,7 +383,7 @@ var products = [
       "4 sizes from S (13-16 in) to XL (16-22 in)"
     ],
     material: "Flexible LED light strip · USB rechargeable battery · Durable webbing band",
-    whatsInBox: "1× LED light-up dog collar · 1× USB charging cable"
+    whatsInBox: "1× LED dog collar · 1× USB charging cable"
   },
   {
     id: 8, name: "Poop Bag Holder", price: 7.99, was: 11.99, emoji: "🧺", image: "", category: "leash",
@@ -810,6 +818,17 @@ function slugify(name) {
   return String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+// Slugs a product used to live at, mapped to its id. Renaming a product moves
+// its URL (see above), and this store is indexed and linked to from its own
+// blog posts, so the old address has to keep working instead of dumping the
+// visitor on Home. Add a line here whenever a live product is renamed; never
+// remove one, since the old link can outlive us on someone else's page.
+// MIRRORED in api/_seo.js — the server needs the same map to serve the right
+// meta (and a canonical pointing at the new URL) for a crawler on an old link.
+var RENAMED_SLUGS = {
+  'light-up-dog-collar': 6   // -> "LED Dog Collar" (task 95)
+};
+
 function pageToPath(page, filter) {
   if (page === 'home') return '/';
   if (page === 'shop') return (filter && filter !== 'all') ? '/shop/' + filter : '/shop';
@@ -890,6 +909,9 @@ function dispatchRoute(route, opts) {
   }
   if (route.type === 'product') {
     var p = products.find(function (pr) { return slugify(pr.name) === route.slug; });
+    if (!p && RENAMED_SLUGS[route.slug]) p = products.find(function (pr) { return pr.id === RENAMED_SLUGS[route.slug]; });
+    // showProduct() rewrites the address bar to the CURRENT slug, so arriving
+    // on an old one quietly lands on the right page at the right URL.
     if (p) { showProduct(p.id, opts); return; }
     // Unknown/stale product slug (e.g. a since-renamed or removed product) —
     // fall back to Home rather than show a broken/empty product page, and
@@ -1007,7 +1029,7 @@ function renderHomeProducts() {
   // Home carousel = these 4 specific products (best sellers), in this exact
   // order. (Shop page still shows all products — dropping one from here only
   // takes it out of this carousel.)
-  var featuredIds = [1, 6, 3, 10]; // Water Bottle, Light Up Collar, Dog Bowl, LED Flashlight Leash
+  var featuredIds = [1, 6, 3, 10]; // Water Bottle, LED Collar, Dog Bowl, LED Flashlight Leash
   var featured = featuredIds
     .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
     .filter(Boolean);
@@ -1597,7 +1619,7 @@ function renderDetailGallery(color) {
   }
 
   // Slide 1 loads eagerly (it is the one on screen, and the page's largest
-  // image); everything after it is lazy. With the light-up collar the gallery
+  // image); everything after it is lazy. With the LED collar the gallery
   // is 13 slides / ~2.5MB of photos, and eagerly fetching all of them on
   // every product view was pointless — most visitors never page past the
   // first shot. The browser still starts the neighbouring slides early

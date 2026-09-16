@@ -74,7 +74,7 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 > Water and dry food in one leak-proof bottle with a flip-out drinking spout.
 > 350ml for neighbourhood loops, 550ml for real distance.
 >
-> **Light Up Dog Collar — from $19.99**
+> **LED Dog Collar — from $19.99**
 > USB rechargeable, three light modes, four neck sizes. If you walk after dark
 > at all, this is the one that actually changes something.
 >

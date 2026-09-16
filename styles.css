@@ -1543,7 +1543,7 @@ img.reviewer-av {
 .options-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
 /* Size selector only (not colors, which still flow naturally) — a fixed 2x2
-   grid so 4-option sizes (like the Light Up Dog Collar's S/M/L/XL) always
+   grid so 4-option sizes (like the LED Dog Collar's S/M/L/XL) always
    read as two even rows instead of wrapping 3-then-1. */
 #detailSizes.options-row {
   display: grid;

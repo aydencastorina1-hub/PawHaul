@@ -255,6 +255,12 @@ function parseRoute(pathname) {
 
 // MIRROR of slugify() in products.js. Product URLs are derived from names, so
 // this must not drift or every product URL breaks at once.
+// MIRRORS products.js. See the note there: old product URLs have to keep
+// resolving after a rename.
+const RENAMED_SLUGS = {
+  'light-up-dog-collar': 6   // -> "LED Dog Collar" (task 95)
+};
+
 function slugify(name) {
   return String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
@@ -334,7 +340,7 @@ const PRODUCT_COPY = {
     description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $6.99, free shipping.'
   },
   6: {
-    title: 'Light Up Dog Collar — USB Rechargeable LED Night Collar',
+    title: 'LED Dog Collar — USB Rechargeable Night Collar',
     description: 'USB rechargeable LED dog collar with three light modes for night walks. Four neck sizes from 13 to 22 inches, detachable. From $14.99 with free shipping.'
   },
   8: {
@@ -365,8 +371,8 @@ const PAGE_COPY = {
     path: '/shop/leash'
   },
   'shop:safety': {
-    title: 'Dog Safety Gear — Light Up Collars & LED Leashes',
-    description: 'Be seen after dark: USB rechargeable light up dog collars with three light modes, an LED flashlight retractable leash that lights the path ahead, and anti-drop leash wrist straps. Free shipping.',
+    title: 'Dog Safety Gear — LED Collars & Flashlight Leashes',
+    description: 'Be seen after dark: USB rechargeable LED dog collars with three light modes, an LED flashlight retractable leash that lights the path ahead, and anti-drop leash wrist straps. Free shipping.',
     path: '/shop/safety'
   },
   about: {
@@ -554,8 +560,13 @@ async function metaFor(route, products, posts) {
   };
 
   if (route.type === 'product') {
-    const p = products.find(function (pr) { return slugify(pr.name) === route.slug; });
-    if (!p) { meta.noindex = true; return meta; } // stale slug — client falls back to Home
+    let p = products.find(function (pr) { return slugify(pr.name) === route.slug; });
+    // An old slug for a product that still exists serves that product's real
+    // meta, with meta.path (the canonical, set below) pointing at its CURRENT
+    // URL — so a crawler on an old link is sent to the new one rather than
+    // finding a noindex dead end. MIRRORS RENAMED_SLUGS in products.js.
+    if (!p) p = products.find(function (pr) { return pr.id === RENAMED_SLUGS[route.slug]; });
+    if (!p) { meta.noindex = true; return meta; } // genuinely stale slug — client falls back to Home
     const copy = PRODUCT_COPY[p.id] || {
       title: p.name,
       description: (p.tagline || p.desc || '').slice(0, 155)
