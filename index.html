@@ -164,16 +164,26 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 })();
 </script>
 <noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" fetchpriority="high"></noscript>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<!-- BRAND FONTS. These used to come from fonts.googleapis.com, which meant
+     the browser could not start fetching a font until a stylesheet from a
+     third party had arrived — so the fonts were always late and the page
+     painted in the fallback first. They are self-hosted now (see the
+     @font-face block at the top of styles.css) and preloaded here, so both
+     files start downloading immediately, in parallel with the HTML, instead
+     of waiting on a round trip that has to finish before they are discovered.
+     crossorigin is REQUIRED on a font preload even for a same-origin file:
+     fonts are fetched in CORS mode, and without it the browser downloads the
+     file twice and the preload buys nothing.
+     Body font first — it is on far more of the page than the display face. -->
+<link rel="preload" as="font" type="font/woff2" href="/fonts/nunito-latin-var.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/fonts/fredoka-one-latin.woff2" crossorigin>
   <!-- All asset paths on this page are now root-relative (leading "/") — routing
        (real /shop, /product/<name>, etc. URLs) means a page can load from a
        nested path, and a bare relative path like "styles.css" would then
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=99" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=100" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -183,7 +193,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=2">
   <link rel="preload" as="script" href="/products.js?v=65">
-  <link rel="preload" as="script" href="/app.js?v=53">
+  <link rel="preload" as="script" href="/app.js?v=54">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -403,7 +413,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
     <!-- Text overlay -->
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6%;text-align:right;">
       <div style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:800;margin-bottom:18px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.1em;height:1.1em;vertical-align:-0.18em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Dog Walk Essentials</div>
-      <h1 style="font-family:Fredoka One,cursive;font-size:clamp(32px,7vw,56px);color:white;line-height:1.1;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,0.3);">Every Walk.<br><span style="color:var(--orange);">Every Dog.</span><br>Every Time.</h1>
+      <h1 style="font-family:var(--font-display);font-size:clamp(32px,7vw,56px);color:white;line-height:1.1;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,0.3);">Every Walk.<br><span style="color:var(--orange);">Every Dog.</span><br>Every Time.</h1>
       <p style="font-size:15px;color:rgba(255,255,255,0.88);font-weight:600;line-height:1.8;margin-bottom:26px;max-width:180px;margin-left:auto;text-align:right;">The gear your dog deserves — water, food, safety and more. Built for every walk.</p>
       <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:16px;">
         <span style="font-size:16px;display:inline-flex;gap:2px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></span>
@@ -411,7 +421,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
       </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
         <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</a>
-        <button onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:white;border:2px solid rgba(255,255,255,0.5);padding:13px 28px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;">Best Sellers</button>
+        <button onclick="document.getElementById('bestsellers').scrollIntoView({behavior:'smooth'})" style="background:rgba(255,255,255,0.15);backdrop-filter:blur(8px);color:white;border:2px solid rgba(255,255,255,0.5);padding:13px 28px;border-radius:50px;font-family:var(--font-body);font-weight:800;font-size:14px;cursor:pointer;">Best Sellers</button>
       </div>
     </div>
   </section>
@@ -979,9 +989,9 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 
       <!-- BUNDLE SUGGESTION -->
       <div id="bundleSuggestion" style="display:none;margin-top:24px;background:var(--orange-pale);border-radius:var(--radius);padding:20px;border:2px solid var(--orange);">
-        <div style="font-family:Fredoka One,cursive;font-size:18px;margin-bottom:14px;color:var(--black);">Frequently Bought Together</div>
+        <div style="font-family:var(--font-display);font-size:18px;margin-bottom:14px;color:var(--black);">Frequently Bought Together</div>
         <div id="bundleItems" style="display:flex;flex-direction:column;gap:10px;"></div>
-        <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:Nunito,sans-serif;font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart</button>
+        <button id="bundleAddBtn" onclick="addBundleToCart()" style="margin-top:14px;width:100%;background:var(--orange);color:white;border:none;padding:13px;border-radius:var(--radius-sm);font-family:var(--font-body);font-weight:800;font-size:14px;cursor:pointer;transition:all 0.2s;">Add Bundle To Cart</button>
       </div>
 
       <!-- THE PROBLEM IT SOLVES — single-product version of the home
@@ -1322,7 +1332,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 </div>
 
 <!-- CHATBOT -->
-<div id="chatWidget" style="position:fixed;bottom:24px;right:16px;z-index:9999;font-family:Nunito,sans-serif;display:flex;flex-direction:column;align-items:flex-end;max-width:320px;width:calc(100vw - 32px);">
+<div id="chatWidget" style="position:fixed;bottom:24px;right:16px;z-index:9999;font-family:var(--font-body);display:flex;flex-direction:column;align-items:flex-end;max-width:320px;width:calc(100vw - 32px);">
 
   <div id="chatWindow" style="display:none;width:100%;max-width:320px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:12px;overflow:hidden;max-height:70vh;">
 
@@ -1344,16 +1354,16 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
         </div>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:5px;padding-left:38px;">
-        <button onclick="askQuick('What products do you sell?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:Nunito,sans-serif;">What do you sell?</button>
-        <button onclick="askQuick('How long does shipping take?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:Nunito,sans-serif;">Shipping?</button>
-        <button onclick="askQuick('What is your best product?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:Nunito,sans-serif;">Best product?</button>
-        <button onclick="askQuick('What is your return policy?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:Nunito,sans-serif;">Returns?</button>
+        <button onclick="askQuick('What products do you sell?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">What do you sell?</button>
+        <button onclick="askQuick('How long does shipping take?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Shipping?</button>
+        <button onclick="askQuick('What is your best product?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Best product?</button>
+        <button onclick="askQuick('What is your return policy?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Returns?</button>
       </div>
     </div>
 
     <div style="padding:10px 12px;border-top:1px solid #F0F0F0;display:flex;gap:8px;background:white;">
       <input id="chatInput" type="text" placeholder="Ask about our walk gear..." class="chat-input"
-        style="flex:1;padding:9px 13px;border-radius:50px;font-family:Nunito,sans-serif;font-size:16px;font-weight:600;outline:none;transform:scale(1);"
+        style="flex:1;padding:9px 13px;border-radius:50px;font-family:var(--font-body);font-size:16px;font-weight:600;outline:none;transform:scale(1);"
         onkeydown="if(event.key==='Enter'){sendChat();}"
         >
       <button onclick="sendChat()" style="width:36px;height:36px;border-radius:50%;background:#E8630A;border:none;cursor:pointer;font-size:15px;color:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;">&#8594;</button>
@@ -1369,7 +1379,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 <div id="policyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9998;padding:20px;overflow-y:auto;" onclick="if(event.target===this)closePolicyModal()">
   <div style="background:white;border-radius:20px;max-width:600px;margin:40px auto;padding:32px;position:relative;">
     <button onclick="closePolicyModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;cursor:pointer;color:#6B6B6B;">&#10005;</button>
-    <h2 id="policyTitle" style="font-family:Fredoka One,cursive;font-size:28px;margin-bottom:20px;color:#1a1a2e;"></h2>
+    <h2 id="policyTitle" style="font-family:var(--font-display);font-size:28px;margin-bottom:20px;color:#1a1a2e;"></h2>
     <div id="policyBody" style="font-size:14px;color:#6B6B6B;font-weight:600;line-height:1.8;"></div>
   </div>
 </div>
@@ -1386,7 +1396,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=2"></script>
   <script src="/products.js?v=65"></script>
-  <script src="/app.js?v=53"></script>
+  <script src="/app.js?v=54"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

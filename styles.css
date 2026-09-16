@@ -1,4 +1,102 @@
-﻿:root {
+﻿/* ============================ BRAND FONTS ============================
+   Self-hosted, not Google-hosted. Two reasons that matter here:
+
+   1. A <link> to fonts.googleapis.com is a render-blocking round trip to a
+      THIRD party before the browser has even seen a font URL to fetch — that
+      stylesheet has to arrive before the font request can start. Serving the
+      files ourselves lets index.html preload them alongside the HTML.
+   2. Only the `latin` subset ships, and Nunito is a variable font, so the
+      whole brand is two files (15KB + 39KB) instead of a stylesheet plus six
+      weight-specific downloads.
+
+   IMPORTANT: /fonts/ is carved out of the site-wide no-store rule in
+   vercel.json alongside /images/. Without that, these would be re-downloaded
+   on every single page view and the flash would come back every load — worse
+   than what Google Fonts was doing, since its CDN at least allowed caching.
+
+   unicode-range is Google's own latin block, kept so a character outside it
+   makes the browser skip the file rather than render tofu. */
+@font-face {
+  font-family: 'Fredoka One';
+  src: url('/fonts/fredoka-one-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+                 U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+                 U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/nunito-latin-var.woff2') format('woff2');
+  /* Variable (wght 200-1000). The whole declared range comes out of one file,
+     so 600/700/800/900 cost no extra request and never get a fake-bold. */
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+                 U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+                 U+2215, U+FEFF, U+FFFD;
+}
+
+/* ---- Metric-matched fallbacks -------------------------------------------
+   THIS is what the "flash of a cursive font" actually was. Every heading and
+   price was declared `font-family: 'Fredoka One', cursive`, and `cursive` is
+   a real generic family: Comic Sans MS on Windows, Apple Chancery on macOS,
+   Dancing Script on Android. With font-display: swap the browser paints that
+   generic for the swap period, so the site really did render in Comic Sans
+   for a moment. The fix is not only to load the font sooner — it is to make
+   whatever shows during the swap a deliberate choice.
+
+   These two faces wrap real system fonts and correct their metrics to the
+   brand fonts', measured off the woff2 files themselves:
+
+     Fredoka One   asc 97.4 / desc 23.6   vs Trebuchet MS Bold
+     Nunito        asc 101.1 / desc 35.3  vs Segoe UI
+
+   The size-adjust values are not the raw glyph-advance ratio — that estimate
+   (104.3 / 99.5) was measured per-lowercase-letter and came out 3.4% wide and
+   6.3% narrow once real mixed-case strings were rendered in a browser. These
+   are the corrected numbers, measured on canvas against the loaded faces.
+
+   ascent/descent-override make the fallback occupy the same vertical box as
+   the real font on every platform, so the swap moves no text. size-adjust is
+   tuned to the first local() that will resolve. Trebuchet Bold is the pick
+   for Fredoka because it is the roundest face present on both Windows and
+   macOS, and Fredoka One is a heavy display face — a regular weight would
+   read as noticeably lighter. */
+@font-face {
+  font-family: 'Fredoka Fallback';
+  src: local('Trebuchet MS Bold'), local('TrebuchetMS-Bold'), local('Trebuchet MS'),
+       local('Arial Bold'), local('Arial-BoldMT'), local('Helvetica Bold');
+  /* Spans the range so a heading asking for 700 maps here without the browser
+     synthesizing bold on top of already-bold Trebuchet. */
+  font-weight: 400 900;
+  font-style: normal;
+  ascent-override: 97.4%;
+  descent-override: 23.6%;
+  line-gap-override: 0%;
+  size-adjust: 100.8%;
+}
+@font-face {
+  font-family: 'Nunito Fallback';
+  src: local('Segoe UI'), local('Helvetica Neue'), local('Arial'), local('Liberation Sans');
+  font-weight: 200 1000;
+  font-style: normal;
+  ascent-override: 101.1%;
+  descent-override: 35.3%;
+  line-gap-override: 0%;
+  size-adjust: 106.2%;
+}
+
+:root {
+  /* Brand type. Never put a bare `cursive`/`fantasy` generic in a stack —
+     those resolve to Comic Sans / Apple Chancery and are exactly what the
+     font flash was. The *-Fallback families above are metric-matched; the
+     plain names after them are the last resort if no local() resolves. */
+  --font-display: 'Fredoka One', 'Fredoka Fallback', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Nunito', 'Nunito Fallback', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
   --orange: #E8630A;
   --orange-light: #FF7A2E;
   --orange-dark: #C95608;
@@ -78,7 +176,7 @@ img {
 .lifestyle-img.img-ready { opacity: 1; }
 
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   background: white;
   color: var(--black);
   cursor: default;
@@ -196,7 +294,7 @@ nav {
 .logo-circle { display: none; }
 
 .logo-text {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 24px;
   color: #fff;
   -webkit-font-smoothing: antialiased;
@@ -243,7 +341,7 @@ nav {
   border: none;
   padding: 10px 22px;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
@@ -277,7 +375,7 @@ nav {
   color: white;
   padding: 15px 34px;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   border: none;
@@ -301,7 +399,7 @@ nav {
   color: var(--black);
   padding: 15px 34px;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   border: 2px solid var(--line);
@@ -325,7 +423,7 @@ nav {
   padding: 11px 20px;
   min-height: 40px;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 13.5px;
   border: none;
@@ -365,7 +463,7 @@ nav {
 }
 
 .section-title {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(27px, 4vw, 46px);
   color: var(--black);
   margin-bottom: 12px;
@@ -427,7 +525,7 @@ nav {
 }
 
 .hero h1 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(36px, 5vw, 60px);
   line-height: 1.1;
   margin-bottom: 18px;
@@ -502,7 +600,7 @@ nav {
   top: 24px; right: -16px;
 }
 
-.tag-price .now { font-size: 22px; color: var(--orange); font-family: 'Fredoka One', cursive; }
+.tag-price .now { font-size: 22px; color: var(--orange); font-family: var(--font-display); }
 
 .tag-stars {
   bottom: 24px; left: -16px;
@@ -576,7 +674,7 @@ nav {
 .collection-card:hover .col-emoji { transform: scale(1.2) rotate(-8deg); }
 
 .col-name {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 18px;
   margin-bottom: 4px;
 }
@@ -728,7 +826,7 @@ nav {
   margin-bottom: 10px;
 }
 
-.price-now { font-family: 'Fredoka One', cursive; font-size: 19px; color: var(--orange); }
+.price-now { font-family: var(--font-display); font-size: 19px; color: var(--orange); }
 /* No .price-was rule, deliberately: compare-at pricing is never displayed on
    this site. See variantPriceHtml in products.js. */
 .price-from { font-size: 11px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
@@ -769,7 +867,7 @@ nav {
 }
 
 .why-icon { font-size: 42px; margin-bottom: 16px; display: block; }
-.why-title { font-family: 'Fredoka One', cursive; font-size: 18px; margin-bottom: 8px; }
+.why-title { font-family: var(--font-display); font-size: 18px; margin-bottom: 8px; }
 .why-desc { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; font-weight: 600; }
 
 /* MISSION */
@@ -783,7 +881,7 @@ nav {
 }
 
 .mission-section h2 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(26px, 4vw, 42px);
   color: white;
   line-height: 1.2;
@@ -805,7 +903,7 @@ nav {
   text-decoration: none;
   padding: 14px 30px;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   border: none;
@@ -832,7 +930,7 @@ nav {
 
 .stat-card:hover { background: rgba(255,255,255,0.25); transform: translateY(-4px); }
 
-.stat-num { font-family: 'Fredoka One', cursive; font-size: 38px; color: white; display: block; }
+.stat-num { font-family: var(--font-display); font-size: 38px; color: white; display: block; }
 .stat-label { color: rgba(255,255,255,0.8); font-size: 13px; font-weight: 700; }
 
 /* REVIEWS (navy section, white cards) */
@@ -920,7 +1018,7 @@ nav {
 }
 .offer-headline {
   color: #fff; font-size: clamp(26px, 3.2vw, 36px); line-height: 1.15;
-  margin: 0 0 12px; font-family: 'Fredoka One', cursive; font-weight: 400;
+  margin: 0 0 12px; font-family: var(--font-display); font-weight: 400;
 }
 .offer-headline span { color: var(--orange); }
 .offer-sub { color: rgba(255,255,255,0.68); font-size: 15px; font-weight: 600; line-height: 1.6; margin: 0 0 24px; }
@@ -976,7 +1074,7 @@ nav {
   border-radius: 12px; padding: 14px 16px; margin-bottom: 18px;
 }
 .offer-code {
-  flex: 1; font-family: 'Fredoka One', cursive; font-size: 20px;
+  flex: 1; font-family: var(--font-display); font-size: 20px;
   letter-spacing: 1.5px; color: var(--orange); text-align: center;
 }
 .offer-copy-btn {
@@ -1075,7 +1173,7 @@ nav {
   font-size: 16px;
   font-weight: 800;
   color: var(--orange);
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
 }
 img.reviewer-av {
   object-fit: cover;
@@ -1170,7 +1268,7 @@ img.reviewer-av {
   transform: rotate(15deg);
 }
 
-.email-section h2 { font-family: 'Fredoka One', cursive; font-size: clamp(24px, 4vw, 40px); margin-bottom: 10px; }
+.email-section h2 { font-family: var(--font-display); font-size: clamp(24px, 4vw, 40px); margin-bottom: 10px; }
 .email-section p { font-size: 16px; color: var(--gray); font-weight: 600; margin-bottom: 28px; }
 
 .email-form {
@@ -1185,7 +1283,7 @@ img.reviewer-av {
   padding: 14px 20px;
   border: 2px solid var(--line);
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px; /* >=16px so iOS never auto-zooms on focus — see form field base */
   font-weight: 600;
   outline: none;
@@ -1219,7 +1317,7 @@ img.reviewer-av {
   border: none;
   padding: 14px 24px;
   border-radius: 50px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
@@ -1292,7 +1390,7 @@ img.reviewer-av {
 .shop-hero-copy.is-fading { opacity: 0; transform: translateY(6px); }
 
 .shop-hero-copy h1 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(30px, 5vw, 48px);
   color: white;
   line-height: 1.15;
@@ -1325,7 +1423,7 @@ img.reviewer-av {
   border-radius: 50px;
   border: 2px solid var(--line);
   background: white;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -1470,7 +1568,7 @@ img.reviewer-av {
   border-radius: inherit;
 }
 
-.product-detail-info h1 { font-family: 'Fredoka One', cursive; font-size: 36px; margin-bottom: 12px; line-height: 1.2; }
+.product-detail-info h1 { font-family: var(--font-display); font-size: 36px; margin-bottom: 12px; line-height: 1.2; }
 
 /* SHARE CONTROL — sits on the title's right, the way Amazon places it.
    flex-start (not center) so a title that wraps to two or three lines keeps
@@ -1517,7 +1615,7 @@ img.reviewer-av {
   margin-bottom: 22px;
 }
 
-.detail-price .now { font-family: 'Fredoka One', cursive; font-size: 36px; color: var(--orange); }
+.detail-price .now { font-family: var(--font-display); font-size: 36px; color: var(--orange); }
 /* .was and .save rules removed with the markup they styled — a struck-through
    compare-at price and a "Save N%" pill derived from it. Same rule as
    .price-was above. (.option-btn-oos further down still uses line-through:
@@ -1557,7 +1655,7 @@ img.reviewer-av {
   border-radius: 50px;
   border: 2px solid var(--line);
   background: white;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -1625,7 +1723,7 @@ img.reviewer-av {
   color: white;
   padding: 16px;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   border: none;
@@ -1641,7 +1739,7 @@ img.reviewer-av {
   color: white;
   padding: 16px;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   border: none;
@@ -1738,7 +1836,7 @@ img.reviewer-av {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   color: var(--black);
@@ -1800,7 +1898,7 @@ img.reviewer-av {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sticky-atc-price { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--orange); }
+.sticky-atc-price { font-family: var(--font-display); font-size: 16px; color: var(--orange); }
 .sticky-atc-btn {
   flex-shrink: 0;
   background: var(--black);
@@ -1808,7 +1906,7 @@ img.reviewer-av {
   border: none;
   padding: 12px 22px;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 14px;
   cursor: pointer;
@@ -1824,7 +1922,7 @@ img.reviewer-av {
 
 /* ==================== CART PAGE ==================== */
 .cart-page { padding: 50px 5%; background: white; }
-.cart-page h1 { font-family: 'Fredoka One', cursive; font-size: 44px; margin-bottom: 32px; }
+.cart-page h1 { font-family: var(--font-display); font-size: 44px; margin-bottom: 32px; }
 
 .cart-layout {
   display: grid;
@@ -1871,7 +1969,7 @@ img.reviewer-av {
 .cart-item-name { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
 .cart-item-variant { font-size: 13px; color: var(--gray); font-weight: 600; margin-bottom: 10px; }
 
-.cart-item-price { font-family: 'Fredoka One', cursive; font-size: 22px; color: var(--orange); }
+.cart-item-price { font-family: var(--font-display); font-size: 22px; color: var(--orange); }
 
 .cart-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
 
@@ -1894,7 +1992,7 @@ img.reviewer-av {
   top: 100px;
 }
 
-.cart-summary h3 { font-family: 'Fredoka One', cursive; font-size: 24px; margin-bottom: 20px; }
+.cart-summary h3 { font-family: var(--font-display); font-size: 24px; margin-bottom: 20px; }
 
 .summary-row {
   display: flex;
@@ -1912,7 +2010,7 @@ img.reviewer-av {
   margin-top: 14px;
 }
 
-.summary-row.total span:last-child { color: var(--orange); font-family: 'Fredoka One', cursive; font-size: 22px; }
+.summary-row.total span:last-child { color: var(--orange); font-family: var(--font-display); font-size: 22px; }
 
 .checkout-btn {
   width: 100%;
@@ -1921,7 +2019,7 @@ img.reviewer-av {
   border: none;
   padding: 18px;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 16px;
   cursor: pointer;
@@ -1944,7 +2042,7 @@ img.reviewer-av {
 
 .empty-cart { text-align: center; padding: 64px 20px; }
 .empty-cart .empty-icon { font-size: 56px; margin-bottom: 16px; display: block; }
-.empty-cart h2 { font-family: 'Fredoka One', cursive; font-size: 24px; margin-bottom: 8px; }
+.empty-cart h2 { font-family: var(--font-display); font-size: 24px; margin-bottom: 8px; }
 .empty-cart p { color: var(--gray); font-weight: 600; font-size: 15px; margin-bottom: 24px; }
 
 /* ==================== ABOUT PAGE ==================== */
@@ -1954,7 +2052,7 @@ img.reviewer-av {
   text-align: center;
 }
 
-.about-hero h1 { font-family: 'Fredoka One', cursive; font-size: clamp(36px, 5vw, 60px); margin-bottom: 18px; }
+.about-hero h1 { font-family: var(--font-display); font-size: clamp(36px, 5vw, 60px); margin-bottom: 18px; }
 .about-hero h1 span { color: var(--orange); }
 .about-hero p { font-size: 18px; color: var(--gray); font-weight: 600; line-height: 1.7; max-width: 600px; margin: 0 auto 32px; }
 
@@ -1966,7 +2064,7 @@ img.reviewer-av {
 .story-sec { margin-bottom: 46px; }
 .story-sec:last-child { margin-bottom: 0; }
 .story-sec h3 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 27px;
   line-height: 1.25;
@@ -2060,7 +2158,7 @@ img.reviewer-av {
 }
 .value-visual svg { width: 42px; height: 42px; display: block; }
 .value-text { flex: 1; min-width: 0; }
-.value-row-title { font-family: 'Fredoka One', cursive; font-weight: 400; font-size: 22px; color: white; margin-bottom: 8px; }
+.value-row-title { font-family: var(--font-display); font-weight: 400; font-size: 22px; color: white; margin-bottom: 8px; }
 .value-row-desc { font-size: 14.5px; color: rgba(255,255,255,0.62); line-height: 1.7; font-weight: 600; }
 
 /* Phones: every value row reads icon-left (alternation is a wide-screen
@@ -2124,7 +2222,7 @@ img.reviewer-av {
 
 /* Quick answers — instant links for the most common questions, no form needed */
 .quick-answers { margin-top: 28px; padding: 24px; background: var(--light-gray); border-radius: var(--radius); }
-.quick-answers-title { font-family: 'Fredoka One', cursive; font-weight: 400; font-size: 16px; margin-bottom: 12px; color: var(--black); }
+.quick-answers-title { font-family: var(--font-display); font-weight: 400; font-size: 16px; margin-bottom: 12px; color: var(--black); }
 .quick-answer-links { display: flex; flex-direction: column; }
 .quick-answer-link {
   display: flex;
@@ -2149,7 +2247,7 @@ img.reviewer-av {
   padding: 36px;
 }
 
-.contact-form-wrap h2 { font-family: 'Fredoka One', cursive; font-size: 28px; margin-bottom: 24px; }
+.contact-form-wrap h2 { font-family: var(--font-display); font-size: 28px; margin-bottom: 24px; }
 
 .form-group { margin-bottom: 20px; }
 
@@ -2160,7 +2258,7 @@ img.reviewer-av {
   padding: 13px 16px;
   border: 2px solid var(--line);
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px; /* >=16px so iOS never auto-zooms on focus — see form field base */
   font-weight: 600;
   outline: none;
@@ -2195,7 +2293,7 @@ footer {
 }
 
 .footer-brand-logo {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 26px;
   color: white;
   margin-bottom: 12px;
@@ -2223,7 +2321,7 @@ footer {
 
 .social-btn:hover { background: var(--orange); transform: translateY(-3px); }
 
-.footer-col h4 { font-family: 'Fredoka One', cursive; font-size: 17px; margin-bottom: 16px; }
+.footer-col h4 { font-family: var(--font-display); font-size: 17px; margin-bottom: 16px; }
 
 .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 
@@ -2292,7 +2390,7 @@ footer {
   transition: color 0.2s;
   background: none;
   border: none;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   /* THE "FLASH ON PRESS" (task 78). This element was the one tappable thing
      in the file that never zeroed the native tap highlight — measured on the
      live site it was rgba(51,181,229,0.4), i.e. the browser painted its own
@@ -2449,7 +2547,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   min-width: 0;
   border: none;
   background: none;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px; /* ≥16px so iOS never auto-zooms (zooming = the page "jumps") */
   font-weight: 600;
   color: var(--black);
@@ -2462,7 +2560,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   inset: 0;
   display: flex;
   align-items: center;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   font-weight: 600;
   color: #aaa;
@@ -2521,12 +2619,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .search-result-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .search-result-info { flex: 1; min-width: 0; }
-.search-result-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px; color: var(--black); }
+.search-result-name { font-family: var(--font-body); font-weight: 800; font-size: 14px; color: var(--black); }
 .search-result-name b { color: var(--orange); font-weight: 900; }
-.search-result-price { font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange); margin-top: 2px; }
+.search-result-price { font-family: var(--font-display); font-size: 14px; color: var(--orange); margin-top: 2px; }
 .search-no-results {
   padding: 30px 8px 24px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px; font-weight: 700; color: var(--gray);
   text-align: center;
 }
@@ -2599,7 +2697,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .search-cat-photo-leash { object-position: center 42%; }   /* inert — see above */
 .search-cat-photo-safety { object-position: center 62%; }  /* inert — see above */
 .search-cat-name {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 13.5px;
   color: var(--black);
@@ -2699,7 +2797,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   border-bottom: 2px solid var(--line-soft);
 }
 .mob-menu-title {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 18px;
   color: var(--black);
 }
@@ -2718,7 +2816,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .mob-menu a {
   display: block;
   padding: 18px 20px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 16px;
   color: var(--black);
@@ -2750,7 +2848,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   border-radius: 50%;
 }
 .mob-menu-brand-text {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 19px;
   color: var(--black);
 }
@@ -2768,7 +2866,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .mob-menu-footer .paw-divider { margin: 0; }
 .mob-menu-tagline {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 11px;
   letter-spacing: 0.3px;
@@ -3573,7 +3671,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   color: var(--orange);
 }
 .col-slide-head {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 23px;
   line-height: 1.18;
@@ -3596,7 +3694,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   background: var(--orange);
   color: white;
   text-decoration: none;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   font-weight: 800;
   cursor: pointer;
@@ -3725,7 +3823,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 19px;
   color: white;
   background: linear-gradient(135deg, #F58138 0%, var(--orange) 55%, var(--orange-dark) 100%);
@@ -3765,7 +3863,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .route-icon svg { width: 20px; height: 20px; display: block; }
 .route-title {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 20px;
   line-height: 1.2;
@@ -3784,7 +3882,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   margin-top: 60px;
 }
 .why-cta-line {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: clamp(20px, 3.2vw, 27px);
   line-height: 1.3;
@@ -4043,7 +4141,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .blog-hero .section-tag { color: var(--orange); }
 .blog-hero h1 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 46px;
   line-height: 1.15;
   margin: 10px 0 14px;
@@ -4094,7 +4192,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   border-radius: 50px;
 }
 .blog-card h2 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 21px;
   line-height: 1.25;
   color: var(--navy);
@@ -4129,7 +4227,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .blog-crumbs a:hover { text-decoration: underline; }
 
 .blog-article-title {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 42px;
   line-height: 1.15;
   color: var(--navy);
@@ -4151,14 +4249,14 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 .blog-body { font-size: 17px; line-height: 1.75; color: #333; }
 .blog-body h2 {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 27px;
   line-height: 1.25;
   color: var(--navy);
   margin: 44px 0 14px;
 }
 .blog-body h3 {
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 900;
   font-size: 20px;
   color: var(--navy);
@@ -4368,7 +4466,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
   .mob-menu-brand-copy { display: flex; flex-direction: column; gap: 1px; }
   .mob-menu-title {
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-body);
     font-weight: 800;
     font-size: 10px;
     letter-spacing: 1.4px;
@@ -4409,7 +4507,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     padding: 14px 12px 6px;
   }
   .mob-menu-group {
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-body);
     font-weight: 800;
     font-size: 10px;
     letter-spacing: 1.3px;
@@ -4437,7 +4535,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     padding: 10px 12px;
     border-bottom: none;
     border-radius: 14px;
-    font-family: 'Nunito', sans-serif;
+    font-family: var(--font-body);
     font-weight: 800;
     font-size: 15.5px;
     color: var(--navy);
@@ -4963,7 +5061,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   border-bottom: 1px solid var(--line);
 }
 .rv-summary-score {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: 40px; line-height: 1; color: var(--black);
 }
 .rv-summary-stars { display: flex; gap: 2px; margin-bottom: 4px; }
@@ -4988,7 +5086,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 /* ---- write a review ---- */
 .rv-write { border-top: 1px solid var(--line); padding-top: 20px; }
-.rv-write-title { font-family: 'Fredoka One', cursive; font-size: 17px; margin: 0 0 14px; color: var(--black); }
+.rv-write-title { font-family: var(--font-display); font-size: 17px; margin: 0 0 14px; color: var(--black); }
 .rv-form { display: flex; flex-direction: column; gap: 14px; }
 .rv-field { display: flex; flex-direction: column; gap: 6px; }
 .rv-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); }
@@ -5008,7 +5106,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .rv-form input[type="text"], .rv-form textarea {
   width: 100%; padding: 11px 13px;
   border: 1.5px solid var(--line); border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif; font-size: 16px;   /* 16px: iOS focus-zoom floor */
+  font-family: var(--font-body); font-size: 16px;   /* 16px: iOS focus-zoom floor */
   font-weight: 600; color: var(--black); background: #fff;
   transition: border-color 0.2s var(--ease);
 }
@@ -5020,7 +5118,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   align-self: flex-start;
   background: var(--orange); color: #fff; border: none;
   padding: 12px 26px; border-radius: 50px;
-  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 14px;
+  font-family: var(--font-body); font-weight: 800; font-size: 14px;
   cursor: pointer; transition: background 0.2s var(--ease), transform 0.2s var(--ease);
 }
 .rv-submit:hover { background: var(--orange-light); }
@@ -5235,7 +5333,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* The weight contrast IS the design here — a heavy display headline against
    light grey body copy, with no decoration doing the work. */
 .prob-head {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 22px;
   line-height: 1.25;
@@ -5335,7 +5433,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   min-height: 44px;
   border: none;
   border-radius: var(--radius-sm);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 13.5px;
   line-height: 1.25;
@@ -5412,7 +5510,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    it sits in normal flow on the kicker row. */
 .prob-detail .prob-proof { position: static; max-width: 100%; background: #fff; }
 .prob-detail-head {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-weight: 400;
   font-size: 20px;
   line-height: 1.3;
@@ -5511,7 +5609,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   justify-content: center;
   gap: 12px;
   color: var(--black);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
 }
 
 .paw-loader-paws { display: inline-flex; align-items: flex-end; gap: 5px; flex-shrink: 0; }
@@ -5613,7 +5711,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .offline-paw svg { width: 38px; height: 38px; fill: #fff; display: block; }
 
 .offline-title {
-  font-family: 'Fredoka One', cursive;
+  font-family: var(--font-display);
   font-size: clamp(24px, 6vw, 30px);
   line-height: 1.2;
   margin-bottom: 12px;
@@ -5639,7 +5737,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   border: none;
   border-radius: 50px;
   padding: 14px 34px;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: 15px;
   cursor: pointer;
@@ -5655,7 +5753,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   background: none;
   border: none;
   color: rgba(255,255,255,0.55);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 13px;
   text-decoration: underline;

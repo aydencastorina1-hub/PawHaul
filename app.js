@@ -400,7 +400,7 @@ function showBundle(productId) {
   var isPair = allIds.length === 2;
   html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:2px dashed #F0F0F0;margin-top:4px;">' +
     '<span style="font-weight:800;font-size:14px;">' + (isPair ? 'Combined Price' : 'Bundle Total') + '</span>' +
-    '<span style="font-family:Fredoka One,cursive;font-size:20px;color:var(--orange);">$' + total.toFixed(2) + '</span>' +
+    '<span style="font-family:var(--font-display);font-size:20px;color:var(--orange);">$' + total.toFixed(2) + '</span>' +
   '</div>';
 
   bundleItems.innerHTML = html;
