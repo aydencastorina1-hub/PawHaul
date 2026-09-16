@@ -1033,9 +1033,12 @@ var PROB_SHORT_NAME = {
 function probCtaName(p) { return PROB_SHORT_NAME[p.id] || p.name; }
 
 // SUPPORTING DETAIL BESIDE THE IMAGE. Nothing here is invented: it is either a
-// REAL customer rating from /api/reviews, or facts already shown elsewhere on
-// this site for this exact product (the Save % the detail page computes from the
-// Shopify compare-at price, and the site-wide free shipping promise).
+// REAL customer rating from /api/reviews, or the site-wide shipping and
+// returns promise. There used to be a middle branch here -- "Save N%, free
+// shipping", computed from the compare-at price. That is the same unearned
+// claim as a struck-through price, only phrased as a percentage, so it went
+// with it; a product with no reviews yet now falls straight through to the
+// shipping line. See variantPriceHtml for the rule.
 // Deliberately NOT the supplier listing's "4.9 stars / 5,000+ sold" — those are
 // the supplier's numbers, not PawHaul's, which is why they live in a sourcing
 // comment and have never been surfaced. A star on this site means a real review.
@@ -1045,11 +1048,6 @@ function probProofHtml(p) {
     return '<span class="prob-proof">' + starSvg('#FFB800') +
       '<strong>' + r.average.toFixed(1) + '</strong> \u00b7 ' + r.count +
       ' review' + (r.count === 1 ? '' : 's') + '</span>';
-  }
-  var v = lowestVariant(p);
-  if (v.was && v.was > v.price) {
-    return '<span class="prob-proof"><strong>Save ' +
-      Math.round((1 - v.price / v.was) * 100) + '%</strong> \u00b7 Free shipping</span>';
   }
   return '<span class="prob-proof">Free shipping \u00b7 30-day returns</span>';
 }
@@ -1218,11 +1216,18 @@ function lowestVariant(p) {
   return { size: null, price: p.price, was: p.was };
 }
 
-// Builds the price/was markup for one exact variant (no "From" prefix —
-// used once a specific size has actually been selected).
-function variantPriceHtml(price, was) {
-  return '<span class="price-now">$' + Number(price).toFixed(2) + '</span>' +
-    (was ? '<span class="price-was">$' + Number(was).toFixed(2) + '</span>' : '');
+// Builds the price markup for one exact variant (no "From" prefix — used
+// once a specific size has actually been selected).
+//
+// NO COMPARE-AT. Products carry a `was` (and sizePrices[].was) and that data
+// stays put — Shopify holds the same compare-at and the feed logic reads it —
+// but it is NEVER rendered, in any form: no struck-through "was", no "Save
+// N%", nowhere on the site. A compare-at is only honest if the product was
+// genuinely sold at that price first, and these were not. api/feed.js refuses
+// to emit g:sale_price for exactly this reason; the storefront matches it.
+// Do not re-add a `was` argument here.
+function variantPriceHtml(price) {
+  return '<span class="price-now">$' + Number(price).toFixed(2) + '</span>';
 }
 
 // True when a product's sizes are priced differently from each other (so the
@@ -1233,14 +1238,13 @@ function hasPriceRange(p) {
   return Math.max.apply(null, prices) !== Math.min.apply(null, prices);
 }
 
-// Builds the inner HTML of a .product-price block: the lowest price plus its
-// struck-through "was" (prefixed "From" when sizes actually vary in price).
-// Shared by the shop grid, the home carousel and the wishlist so they always
-// stay consistent.
+// Builds the inner HTML of a .product-price block: the lowest real selling
+// price, prefixed "From" when sizes actually vary in price. Shared by the shop
+// grid, the home carousel and the wishlist so they always stay consistent.
 function priceDisplayHtml(p) {
   var v = lowestVariant(p);
   var prefix = hasPriceRange(p) ? '<span class="price-from">From </span>' : '';
-  return prefix + variantPriceHtml(v.price, v.was);
+  return prefix + variantPriceHtml(v.price);
 }
 
 // True when this exact size+color combo has been marked unavailable on the
@@ -1654,7 +1658,7 @@ function showProduct(id, opts) {
   }
   currentColor = currentProduct.colors && currentProduct.colors.length ? currentProduct.colors[0] : null;
   currentVariantPrice = cheapest.price;
-  setDetailPrice(cheapest.price, cheapest.was);
+  setDetailPrice(cheapest.price);
   // Generic disclaimer pill under the tagline — "requires 2 AAA batteries
   // (not included)" today, previously the AirTag "case only" note. The DOM
   // id/class still carry the older "case note" name.
@@ -1762,28 +1766,25 @@ function updateVariantAvailability() {
   currentSize = pick;
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[pick] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
-  setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
+  setDetailPrice(currentVariantPrice);
 }
 
-// Writes the price, struck-through "was", and Save % badge on the detail page
-// (main price block AND the sticky Add To Cart bar, which mirrors it).
-// Shared by showProduct (initial render) and selectSize (when the size toggles).
-function setDetailPrice(price, was) {
+// Writes the selling price on the detail page (main price block AND the sticky
+// Add To Cart bar, which mirrors it). Shared by showProduct (initial render)
+// and selectSize (when the size toggles).
+//
+// One price, nothing beside it. This used to also write a struck-through
+// "was" into #detailWas and a "Save N%" pill into .save — both computed from
+// the compare-at price, both removed along with their markup in index.html
+// and their rules in styles.css. See variantPriceHtml for why the compare-at
+// data stays but never reaches the page. `was` is no longer a parameter, so
+// re-introducing this needs a deliberate change rather than a passed argument
+// quietly finding a still-present element.
+function setDetailPrice(price) {
   var priceEl = document.getElementById('detailPrice');
-  var wasEl = document.getElementById('detailWas');
-  var saveEl = document.querySelector('.save');
   var stickyPriceEl = document.getElementById('stickyPrice');
   if (priceEl) priceEl.textContent = '$' + Number(price).toFixed(2);
-  if (wasEl) wasEl.textContent = was ? '$' + Number(was).toFixed(2) : '';
   if (stickyPriceEl) stickyPriceEl.textContent = '$' + Number(price).toFixed(2);
-  if (saveEl) {
-    if (was && was > price) {
-      saveEl.textContent = 'Save ' + Math.round((1 - price / was) * 100) + '%';
-      saveEl.style.display = '';
-    } else {
-      saveEl.style.display = 'none';
-    }
-  }
 }
 
 // Size buttons use this instead of selectOption: it toggles the active state
@@ -1798,7 +1799,7 @@ function selectSize(btn) {
   currentSize = btn.textContent.trim();
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
-  setDetailPrice(currentVariantPrice, variant ? variant.was : currentProduct.was);
+  setDetailPrice(currentVariantPrice);
   renderDetailShopPay();
 }
 
