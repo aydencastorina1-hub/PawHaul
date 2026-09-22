@@ -846,7 +846,18 @@ nav {
      (invisible) instead of visibly overflowing. Keep it un-shrinkable. */
   flex-shrink: 0;
 }
-.product-stars { color: #FFB800; font-size: 11px; margin-bottom: 8px; flex-shrink: 0; }
+/* Star row + "4.8 · 322 ratings", on one line. gap (not a margin on the text)
+   so the row stays centred as a unit in the carousel's centred card layout. */
+.product-stars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #FFB800;
+  font-size: 11px;
+  margin-bottom: 8px;
+  flex-shrink: 0;
+  min-height: 15px;
+}
 .product-stars span { color: var(--gray); font-size: 11px; font-weight: 600; }
 
 .product-price {
@@ -1664,8 +1675,21 @@ img.reviewer-av {
 .detail-share-btn:active { transform: scale(0.95); }
 .detail-share-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 
-.detail-stars { color: #FFB800; font-size: 16px; margin-bottom: 16px; }
+/* Product-page rating line beside the price. min-height reserves the row so
+   the price and Add To Cart below it do not jolt when renderDetailRating()
+   fills it on product open. */
+.detail-stars {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #FFB800;
+  font-size: 16px;
+  margin-bottom: 16px;
+  min-height: 18px;
+}
+.detail-stars .rv-star { width: 17px; height: 17px; }
 .detail-stars span { color: var(--gray); font-size: 13px; font-weight: 600; }
+.detail-stars:empty { display: none; }
 
 .detail-price {
   display: flex;
@@ -5140,115 +5164,80 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .social-btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 
 /* ============================================================
-   USER-SUBMITTED REVIEWS (task 56)
+   SUPPLIER RATINGS (task 103)
 
-   Lives inside the product page's Reviews accordion. Everything
-   here is rendered from /api/reviews — there is no static or
-   seeded state, which is why the empty case gets real design
-   attention rather than being an afterthought.
+   Replaces the user-submitted review CSS. The star row is two
+   stacked copies of the same five stars — a grey base and a gold
+   overlay clipped to the exact fraction — because every rating in
+   the catalogue is x.5-x.9 and rounding 4.5 up to five whole gold
+   stars would overstate it.
    ============================================================ */
 
 .rv-star { width: 15px; height: 15px; display: inline-block; vertical-align: -0.15em; }
 
-.rv-loading, .rv-offline {
-  font-size: 13px; color: var(--gray); font-weight: 600; margin: 0;
+.rv-stars { position: relative; display: inline-block; line-height: 0; white-space: nowrap; }
+.rv-stars-base { display: block; }
+/* The overlay is clipped by WIDTH, so it must not wrap or re-flow: it is the
+   same five glyphs at the same size, laid exactly over the base row. */
+.rv-stars-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  display: block;
+  white-space: nowrap;
 }
 
-/* The zero-review state is the DEFAULT state of a new shop, so it is styled
-   as an invitation rather than as an error. */
-.rv-empty {
-  margin: 0 0 18px;
-  padding: 16px 18px;
-  background: var(--light-gray);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 600;
+/* ---- product cards (shop grid, home carousel, wishlist) ---- */
+.product-stars-txt { color: var(--gray); font-size: 11px; font-weight: 600; }
+.product-stars-txt strong { color: var(--black); font-weight: 800; }
+.product-stars-dot { margin: 0 4px; }
+
+/* ---- compact rows (search results, frequently-bought-together) ---- */
+.rating-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--gray);
-  line-height: 1.6;
+  white-space: nowrap;
 }
-.rv-empty strong { color: var(--black); font-weight: 800; }
+.rating-compact .rv-star { width: 12px; height: 12px; }
+.rating-compact strong { color: var(--black); font-weight: 800; }
+.rating-compact-count { font-weight: 600; }
 
-.rv-summary {
-  display: flex; align-items: center; gap: 16px;
-  margin-bottom: 18px; padding-bottom: 18px;
-  border-bottom: 1px solid var(--line);
-}
-.rv-summary-score {
+.search-result-meta { display: flex; align-items: center; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+.fbt-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ---- product page: the panel that replaced the reviews accordion ---- */
+.sr-panel { display: flex; flex-direction: column; gap: 14px; }
+
+.sr-score { display: flex; align-items: center; gap: 16px; }
+.sr-score-num {
   font-family: var(--font-display);
-  font-size: 40px; line-height: 1; color: var(--black);
+  font-size: 40px;
+  line-height: 1;
+  color: var(--black);
 }
-.rv-summary-stars { display: flex; gap: 2px; margin-bottom: 4px; }
-.rv-summary-count { font-size: 13px; font-weight: 700; color: var(--gray); }
+.sr-score-meta { display: flex; flex-direction: column; gap: 5px; }
+.sr-score-meta .rv-star { width: 18px; height: 18px; }
+.sr-score-count { font-size: 13px; font-weight: 700; color: var(--gray); }
 
-.rv-list { list-style: none; margin: 0 0 22px; padding: 0; display: flex; flex-direction: column; gap: 16px; }
-.rv-item { border-bottom: 1px solid var(--line-soft); padding-bottom: 16px; }
-.rv-item:last-child { border-bottom: none; padding-bottom: 0; }
-.rv-item-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
-.rv-item-stars { display: inline-flex; gap: 1px; }
-.rv-item-name { font-weight: 800; font-size: 14px; color: var(--black); }
-.rv-item-date { font-size: 12px; font-weight: 600; color: var(--gray); margin-left: auto; }
-.rv-item-text { margin: 0; font-size: 14px; line-height: 1.65; color: var(--gray); overflow-wrap: anywhere; }
-
-.rv-photo { display: inline-block; margin-top: 10px; border-radius: var(--radius-sm); overflow: hidden; }
-.rv-photo img {
-  display: block; width: 92px; height: 92px; object-fit: cover;
-  border-radius: var(--radius-sm); background: var(--img-placeholder);
-  transition: transform 0.2s var(--ease);
+.sr-note { margin: 0; font-size: 14px; line-height: 1.65; color: var(--gray); }
+.sr-note strong { color: var(--black); font-weight: 800; }
+/* The disclaimer is deliberately the same size as the copy above it, only
+   quieter — shrinking it to fine print is how a disclaimer stops being read. */
+.sr-note--muted {
+  padding-top: 12px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--gray);
+  opacity: 0.9;
 }
-.rv-photo:hover img { transform: scale(1.04); }
-
-/* ---- write a review ---- */
-.rv-write { border-top: 1px solid var(--line); padding-top: 20px; }
-.rv-write-title { font-family: var(--font-display); font-size: 17px; margin: 0 0 14px; color: var(--black); }
-.rv-form { display: flex; flex-direction: column; gap: 14px; }
-.rv-field { display: flex; flex-direction: column; gap: 6px; }
-.rv-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); }
-.rv-label em { font-style: normal; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--gray); }
-
-/* Star picker: real buttons in a radiogroup so it is keyboard- and
-   screen-reader-operable, not a row of decorative glyphs. */
-.rv-starpick { display: flex; gap: 4px; }
-.rv-starbtn {
-  background: none; border: none; padding: 2px; cursor: pointer; line-height: 0;
-  border-radius: 6px; transition: transform 0.15s var(--ease);
-}
-.rv-starbtn .rv-star { width: 28px; height: 28px; }
-.rv-starbtn:hover { transform: scale(1.12); }
-.rv-starbtn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
-
-.rv-form input[type="text"], .rv-form textarea {
-  width: 100%; padding: 11px 13px;
-  border: 1.5px solid var(--line); border-radius: var(--radius-sm);
-  font-family: var(--font-body); font-size: 16px;   /* 16px: iOS focus-zoom floor */
-  font-weight: 600; color: var(--black); background: #fff;
-  transition: border-color 0.2s var(--ease);
-}
-.rv-form textarea { resize: vertical; min-height: 92px; line-height: 1.6; }
-.rv-form input[type="text"]:focus, .rv-form textarea:focus { outline: none; border-color: var(--orange); }
-.rv-form input[type="file"] { font-size: 13px; font-weight: 600; color: var(--gray); }
-
-.rv-submit {
-  align-self: flex-start;
-  background: var(--orange); color: #fff; border: none;
-  padding: 12px 26px; border-radius: 50px;
-  font-family: var(--font-body); font-weight: 800; font-size: 14px;
-  cursor: pointer; transition: background 0.2s var(--ease), transform 0.2s var(--ease);
-}
-.rv-submit:hover { background: var(--orange-light); }
-.rv-submit:active { background: var(--orange-dark); transform: translateY(0); }
-.rv-submit:disabled { opacity: 0.6; cursor: default; }
-
-.rv-form-note { margin: 0; font-size: 13px; font-weight: 700; color: var(--gray); min-height: 1em; }
-.rv-form-note--err { color: #C0392B; }
-
-/* Card rating row when a product has no reviews yet — deliberately quiet,
-   since it is the honest default for a new shop rather than a warning. */
-.product-stars--empty { color: var(--gray); font-weight: 600; font-style: normal; }
+.sr-none { margin: 0; font-size: 14px; font-weight: 600; color: var(--gray); }
 
 @media (max-width: 600px) {
-  .rv-summary-score { font-size: 34px; }
-  .rv-item-date { margin-left: 0; width: 100%; }
-  .rv-submit { align-self: stretch; text-align: center; }
+  .sr-score-num { font-size: 34px; }
+  .search-result-meta { gap: 8px; }
 }
 
 /* ---- SHOP PAY ON THE PRODUCT PAGE (task 58) ----

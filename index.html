@@ -952,7 +952,11 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
             <span id="detailShareLabel">Share</span>
           </button>
         </div>
-        <div class="detail-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg> <span id="detailReviews">(127 reviews)</span></div>
+        <!-- Filled by renderDetailRating() from this product's own `supplier`
+             stats. Deliberately empty in the markup: the old version shipped
+             five hardcoded gold stars and "(127 reviews)" -- a score nobody
+             had given, visible for the instant before JS replaced it. -->
+        <div class="detail-stars" id="detailRating"></div>
         <!-- ONE PRICE ONLY. A struck-through #detailWas and a "Save N%" pill
              used to sit beside this, both computed from the compare-at price.
              They are gone for good: the compare-at was never a price PawHaul
@@ -1024,14 +1028,15 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
           </div>
         </div>
         <div class="pd-acc-item">
-          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Reviews<span class="pd-acc-icon">+</span></button>
+          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Ratings<span class="pd-acc-icon">+</span></button>
           <div class="pd-acc-body">
-            <!-- Filled by renderReviews() in products.js from /api/reviews.
-                 Deliberately empty in the markup: there is no such thing as a
-                 default review, and the old hardcoded "127 reviews / Based on
-                 verified PawHaul purchases" was a claim about data that did
-                 not exist. -->
-            <div id="reviewsRoot" class="reviews-root"></div>
+            <!-- Filled by renderDetailRating() from this product's `supplier`
+                 stats. Task 103 removed the user-submitted review system that
+                 used to live here (form, stored reviews, /api/reviews). What
+                 replaces it is the real AliExpress supplier rating, attributed
+                 in full -- it is the one surface with room to say outright
+                 whose ratings these are and that PawHaul has none of its own. -->
+            <div id="ratingRoot" class="rating-root"></div>
           </div>
         </div>
         <div class="pd-acc-item">

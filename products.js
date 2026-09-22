@@ -2,7 +2,12 @@
 var products = [
   {
     id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "", category: "water",
-    badge: "Best Seller", badgeClass: "", reviews: 127,
+    badge: "Best Seller", badgeClass: "",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.8, ratings: 322 },
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -81,7 +86,12 @@ var products = [
   },
   {
     id: 2, name: "Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new", reviews: 84,
+    badge: "New", badgeClass: "badge-new",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.9, ratings: 638 },
     desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
     tagline: "Smooth, jam-free control that adapts to every walk.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -174,7 +184,12 @@ var products = [
   },
   {
     id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "", category: "water",
-    badge: "Popular", badgeClass: "badge-popular", reviews: 91,
+    badge: "Popular", badgeClass: "badge-popular",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.8, ratings: 1749 },
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -252,7 +267,12 @@ var products = [
   },
   {
     id: 5, name: "Poop Bag Clip", price: 6.99, was: 10.99, emoji: "🧷", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new", reviews: 67,
+    badge: "New", badgeClass: "badge-new",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.9, ratings: 95 },
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
     tagline: "Hands-free carrying for used bags, every walk.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -318,7 +338,12 @@ var products = [
   },
   {
     id: 6, name: "LED Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "", category: "safety",
-    badge: "Night Safety", badgeClass: "badge-night", reviews: 62,
+    badge: "Night Safety", badgeClass: "badge-night",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.5, ratings: 638 },
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -437,7 +462,12 @@ var products = [
   },
   {
     id: 8, name: "Poop Bag Holder", price: 7.99, was: 11.99, emoji: "🧺", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new", reviews: 24,
+    badge: "New", badgeClass: "badge-new",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.9, ratings: 196 },
     desc: "Always be ready for cleanup with a full roll of bags on hand. This durable canvas holder attaches to your leash with a sturdy carabiner clip, keeping unused waste bags organized and within reach on every walk — just pull a bag out whenever you need one. Simple, reliable, and built to last.",
     tagline: "A full roll of bags, always within reach.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -511,10 +541,10 @@ var products = [
     whatsInBox: "1× Poop Bag Holder pouch (bag roll not included)"
   },
   {
-    // Sourcing note (NOT surfaced in the UI): the supplier listing shows 4.9
-    // stars and 3,000+ sold. The site deliberately has no per-product supplier
-    // rating field — star ratings come only from real customer reviews via
-    // /api/reviews — so this stays a comment, same as the id 7 listing did.
+    // Sourcing note: the supplier listing shows 4.9 stars and 3,000+ sold.
+    // As of task 103 the star figure IS surfaced, via the `supplier` field
+    // below and always attributed — the 546 there is the listing's RATINGS
+    // count, which is a different number from the 3,000+ SOLD recorded here.
     id: 9, name: "Anti-Drop Leash Wrist Strap", price: 8.99, was: 13.99, emoji: "🔗", image: "", category: "leash",
     // Genuinely belongs in two aisles: it is a leash accessory AND a
     // loss-prevention/safety item. `category` stays the PRIMARY one (it drives
@@ -523,6 +553,11 @@ var products = [
     // and search read. Any product without this field just uses `category`.
     categories: ["leash", "safety"],
     badge: "New", badgeClass: "badge-new",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.9, ratings: 546 },
     desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
     tagline: "If the leash slips, it stays on your wrist.",
     // "The problem it solves" copy — shown on the home carousel and on
@@ -596,9 +631,10 @@ var products = [
     whatsInBox: "1× Anti-Drop Leash Wrist Strap"
   },
   {
-    // Sourcing note (NOT surfaced in the UI): the supplier listing shows 4.8
-    // stars and 1,000+ sold. Star ratings on this site come only from real
-    // customer reviews via /api/reviews, so this stays a comment.
+    // Sourcing note: the supplier listing shows 4.8 stars and 1,000+ sold.
+    // As of task 103 the star figure IS surfaced, via the `supplier` field
+    // below and always attributed — the 174 there is the listing's RATINGS
+    // count, which is a different number from the 1,000+ SOLD recorded here.
     //
     // MODELLING NOTE: Shopify sells this as ONE "Color" option with four flat
     // combo values (3M Purple, 5M Green, 5M Orange, 5M Purple). It is modelled
@@ -612,6 +648,11 @@ var products = [
     id: 10, name: "LED Flashlight Retractable Dog Leash", emoji: "🔦", image: "", category: "leash",
     categories: ["leash", "safety"],
     badge: "New", badgeClass: "badge-new",
+    // Real, verified stats from the AliExpress listing this product is
+    // sourced from — read off the live listing, not estimated. They are
+    // the SUPPLIER's numbers, never PawHaul's, and every surface that
+    // renders them says so. See supplierRatingHtml().
+    supplier: { rating: 4.8, ratings: 174 },
     desc: "See and be seen on every walk. This retractable leash features a built-in LED light for visibility on nighttime walks, plus a built-in flashlight to help you spot what's ahead in the dark. Quick-release design and durable build fit dogs and cats of all sizes. Note: requires 2 AAA batteries, not included.",
     tagline: "A leash that lights the dog and the path.",
     problem: "Can't see your dog — or the path — after dark?",
@@ -1124,24 +1165,24 @@ var PROB_SHORT_NAME = {
 };
 function probCtaName(p) { return PROB_SHORT_NAME[p.id] || p.name; }
 
-// SUPPORTING DETAIL BESIDE THE IMAGE. Nothing here is invented: it is either a
-// REAL customer rating from /api/reviews, or the site-wide shipping and
+// SUPPORTING DETAIL BESIDE THE IMAGE. Nothing here is invented: it is either
+// the real supplier rating for this product or the site-wide shipping and
 // returns promise. There used to be a middle branch here -- "Save N%, free
 // shipping", computed from the compare-at price. That is the same unearned
 // claim as a struck-through price, only phrased as a percentage, so it went
-// with it; a product with no reviews yet now falls straight through to the
-// shipping line. See variantPriceHtml for the rule.
-// Deliberately NOT the supplier listing's "4.9 stars / 5,000+ sold" — those are
-// the supplier's numbers, not PawHaul's, which is why they live in a sourcing
-// comment and have never been surfaced. A star on this site means a real review.
+// with it. See variantPriceHtml for the rule.
+//
+// The chip always carries the COUNT, never a bare star: "4.8 * 322 ratings"
+// states a fact about a rating that exists, where a lone star would read as
+// PawHaul's own score. The product page spells out the AliExpress source.
 function probProofHtml(p) {
-  var r = ratingFor(p.id);
-  if (r) {
-    return '<span class="prob-proof">' + starSvg('#FFB800') +
-      '<strong>' + r.average.toFixed(1) + '</strong> \u00b7 ' + r.count +
-      ' review' + (r.count === 1 ? '' : 's') + '</span>';
+  var s = supplierOf(p);
+  if (s) {
+    return '<span class="prob-proof" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
+      starSvg(STAR_GOLD) + '<strong>' + s.rating.toFixed(1) + '</strong> · ' +
+      fmtRatings(s.ratings) + ' ratings</span>';
   }
-  return '<span class="prob-proof">Free shipping \u00b7 30-day returns</span>';
+  return '<span class="prob-proof">Free shipping · 30-day returns</span>';
 }
 
 // WITHOUT / WITH strip. Cross-and-tick SVGs rather than emoji: every other icon
@@ -1157,11 +1198,11 @@ function probContrastHtml(p) {
   return '<div class="prob-contrast">' +
       '<div class="prob-vs prob-vs--without">' +
         '<span class="prob-vs-ico">' + PROB_ICON_X + '</span>' +
-        '<span class="prob-vs-txt"><em>Without</em>' + reviewsEscape(c.without) + '</span>' +
+        '<span class="prob-vs-txt"><em>Without</em>' + esc(c.without) + '</span>' +
       '</div>' +
       '<div class="prob-vs prob-vs--with">' +
         '<span class="prob-vs-ico">' + PROB_ICON_TICK + '</span>' +
-        '<span class="prob-vs-txt"><em>With</em>' + reviewsEscape(c["with"]) + '</span>' +
+        '<span class="prob-vs-txt"><em>With</em>' + esc(c["with"]) + '</span>' +
       '</div>' +
     '</div>';
 }
@@ -1184,7 +1225,7 @@ function renderProblemCarousel() {
   track.innerHTML = slides.map(function (p, i) {
     var img = productImageFor(p, p.colors && p.colors[0]);
     var media = img
-      ? '<img ' + photoAttrs(img, 'card') + ' alt="' + reviewsEscape(p.name) + '">'
+      ? '<img ' + photoAttrs(img, 'card') + ' alt="' + esc(p.name) + '">'
       : '<span class="prob-emoji">' + p.emoji + '</span>';
     // Staggered by COLUMN, not by absolute index: a slide dragged in from the
     // right is the first of its own group and must not inherit a 560ms delay
@@ -1199,13 +1240,13 @@ function renderProblemCarousel() {
     return '<article class="prob-slide' + reveal + '" onclick="showProduct(' + p.id + ')">' +
         '<div class="prob-slide-img">' + media + probProofHtml(p) + '</div>' +
         '<div class="prob-slide-body">' +
-          '<p class="prob-kicker">' + reviewsEscape(p.name) + '</p>' +
-          '<h3 class="prob-head">' + reviewsEscape(p.problem) + '</h3>' +
-          '<p class="prob-agitate">' + reviewsEscape(p.agitate || '') + '</p>' +
-          '<p class="prob-copy">' + reviewsEscape(p.solution) + '</p>' +
+          '<p class="prob-kicker">' + esc(p.name) + '</p>' +
+          '<h3 class="prob-head">' + esc(p.problem) + '</h3>' +
+          '<p class="prob-agitate">' + esc(p.agitate || '') + '</p>' +
+          '<p class="prob-copy">' + esc(p.solution) + '</p>' +
           probContrastHtml(p) +
           '<button class="prob-cta" type="button" onclick="event.stopPropagation(); showProduct(' + p.id + ')">' +
-            'Shop the ' + reviewsEscape(probCtaName(p)) +
+            'Shop the ' + esc(probCtaName(p)) +
             '<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
           '</button>' +
         '</div>' +
@@ -1254,9 +1295,9 @@ function renderDetailProblem() {
       '<p class="prob-detail-kicker">The problem it solves</p>' +
       probProofHtml(p) +
     '</div>' +
-    '<h3 class="prob-detail-head">' + reviewsEscape(p.problem) + '</h3>' +
-    '<p class="prob-detail-agitate">' + reviewsEscape(p.agitate || '') + '</p>' +
-    '<p class="prob-detail-copy">' + reviewsEscape(p.solution) + '</p>' +
+    '<h3 class="prob-detail-head">' + esc(p.problem) + '</h3>' +
+    '<p class="prob-detail-agitate">' + esc(p.agitate || '') + '</p>' +
+    '<p class="prob-detail-copy">' + esc(p.solution) + '</p>' +
     probContrastHtml(p) +
     '<button class="prob-cta prob-cta--detail" type="button" onclick="addToCartDetail()">' +
       'Add To Cart<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
@@ -1687,7 +1728,7 @@ function productCard(p, opts) {
       </div>
       <div class="product-info">
         <div class="product-name">${p.name}</div>
-        ${cardRatingHtml(p)}
+        ${supplierRatingHtml(p)}
         <div class="product-price">${priceDisplayHtml(p)}</div>
         <button class="btn-black" onclick="cardAdd(event, ${p.id})">Add To Cart</button>
       </div>
@@ -1823,10 +1864,11 @@ function showProduct(id, opts) {
   }
   document.getElementById('detailDesc').textContent = currentProduct.desc;
   document.getElementById('detailTagline').textContent = currentProduct.tagline || '';
-  // Rating text/stars are set from REAL data by syncDetailRating(); renderReviews()
-  // fills the section and calls it once the fetch lands.
-  syncDetailRating(currentProduct.id);
-  renderReviews(currentProduct.id);
+  // The price-block rating line and the panel that replaced the old reviews
+  // accordion are both rendered straight from this product's own `supplier`
+  // stats -- no fetch, so they are correct on first paint instead of popping
+  // in a moment later the way the /api/reviews round-trip used to.
+  renderDetailRating();
   renderDetailProblem();
   document.getElementById('qtyNum').textContent = '1';
   renderDetailShopPay();
@@ -2156,7 +2198,7 @@ function renderWishlist() {
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
       '<button class="wishlist-btn" data-wid="' + p.id + '" style="opacity:1;" onclick="event.stopPropagation();wishlist(' + p.id + ')">♥</button></div>' +
       '<div class="product-info"><div class="product-name">' + p.name + '</div>' +
-      cardRatingHtml(p) +
+      supplierRatingHtml(p) +
       '<div class="product-price">' + priceDisplayHtml(p) + '</div>' +
       '<button class="btn-black" onclick="event.stopPropagation();quickAdd(' + p.id + ')">Add To Cart</button></div></div>';
   }).join('') + '</div>';
@@ -3038,259 +3080,152 @@ function submitContact() {
   });
 }
 
-// ==================== REAL PRODUCT REVIEWS (task 56) ====================
-// Backed by /api/reviews (Upstash Redis + optional Vercel Blob). Nothing here
-// is seeded: a product with no reviews says so, and no star average is shown
-// for it anywhere on the site until a real one exists.
+// ==================== SUPPLIER RATINGS (task 103) ====================
+// Task 56's user-submitted review system is GONE — the form, the stored
+// reviews, the /api/reviews calls and the aggregateRating JSON-LD with it.
+// What is left is a plain, honest reference to the real rating on the
+// AliExpress listing each product is sourced from (see `supplier` in the
+// product data, read off the live listings).
 //
-// reviewStats is fetched ONCE per page load for every product at boot, so the
-// shop grid and carousel can show real ratings without a request per card.
-var reviewStats = {};          // { <productId>: { count, average } }
-var reviewsConfigured = null;  // null = unknown yet, false = backend not set up
-var reviewPhotosEnabled = false;
+// These are the SUPPLIER's numbers, not PawHaul's. Nothing here invents a
+// reviewer, a quote or a date, and nothing claims a PawHaul customer said
+// anything. Cards stay neutral — "4.8 · 322 ratings" asserts only that the
+// rating exists — and the product page carries the full attribution naming
+// AliExpress and stating plainly that PawHaul does not collect its own
+// reviews yet.
+//
+// Deliberately NOT fed into JSON-LD: Google prohibits marking up a rating
+// you did not collect yourself as your product's aggregateRating, and the
+// penalty is a structured-data manual action against the WHOLE site. The
+// old comment in api/_seo.js explaining that risk is still the rule; the
+// only change is that there is no longer a real review system to exempt.
 
 function starSvg(fill) {
   return '<svg viewBox="0 0 24 24" fill="' + fill + '" class="rv-star" aria-hidden="true">' +
     '<path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg>';
 }
 
-// Rounded to the nearest whole star — half-star clipping is not worth the
-// markup here, and the numeric average is always shown beside it.
+// Every rating in the catalogue is x.5-x.9, so rounding to whole stars would
+// round 4.5 up to a clean five and overstate it. The partial star is drawn by
+// laying a gold row over a grey one and clipping it to the exact fraction —
+// which is also what the reference design shows.
+var STAR_GOLD = '#FFB800';
+var STAR_GREY = '#D8D4CC';
+
 function starsHtml(avg) {
-  var full = Math.round(Number(avg) || 0);
-  var out = '';
-  for (var i = 1; i <= 5; i++) out += starSvg(i <= full ? '#FFB800' : '#D8D4CC');
-  return out;
+  var v = Math.max(0, Math.min(5, Number(avg) || 0));
+  var pct = (v / 5) * 100;
+  var row = function (fill) {
+    var out = '';
+    for (var i = 0; i < 5; i++) out += starSvg(fill);
+    return out;
+  };
+  return '<span class="rv-stars" aria-hidden="true">' +
+    '<span class="rv-stars-base">' + row(STAR_GREY) + '</span>' +
+    '<span class="rv-stars-fill" style="width:' + pct.toFixed(1) + '%">' + row(STAR_GOLD) + '</span>' +
+  '</span>';
 }
 
-function ratingFor(id) { return reviewStats[id] || null; }
-
-// Used by product cards. No reviews yet => no rating row at all, rather than
-// five decorative stars implying a score nobody gave.
-function cardRatingHtml(p) {
-  var r = ratingFor(p.id);
-  if (!r) return '<div class="product-stars product-stars--empty">No reviews yet</div>';
-  return '<div class="product-stars">' + starsHtml(r.average) +
-    ' <span>' + r.average.toFixed(1) + ' (' + r.count + ')</span></div>';
+function supplierOf(p) {
+  var s = p && p.supplier;
+  return (s && typeof s.rating === 'number' && typeof s.ratings === 'number') ? s : null;
 }
 
-async function loadReviewStats() {
-  try {
-    var ids = products.map(function (p) { return p.id; }).join(',');
-    var res = await fetch('/api/reviews?stats=' + encodeURIComponent(ids), { cache: 'no-store' });
-    var data = await res.json();
-    if (data && data.ok) {
-      reviewStats = data.stats || {};
-      reviewsConfigured = !!data.configured;
-    }
-  } catch (e) {
-    reviewsConfigured = false;   // leave stats empty; cards fall back to "No reviews yet"
+// Screen readers get the source spelled out even on the compact card row,
+// where there is no width to print it.
+function supplierAriaLabel(s) {
+  return s.rating.toFixed(1) + ' out of 5 from ' + fmtRatings(s.ratings) +
+    ' supplier ratings on AliExpress';
+}
+
+function fmtRatings(n) {
+  return Number(n).toLocaleString('en-US');
+}
+
+// PRODUCT CARDS — shop grid, home carousel and wishlist. Neutral by design:
+// it states the rating and how many ratings there are, and claims nothing
+// about who gave them. A product with no supplier stats renders no row at
+// all rather than five decorative stars implying a score nobody gave.
+function supplierRatingHtml(p) {
+  var s = supplierOf(p);
+  if (!s) return '';
+  return '<div class="product-stars" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
+    starsHtml(s.rating) +
+    '<span class="product-stars-txt"><strong>' + s.rating.toFixed(1) + '</strong>' +
+      '<span class="product-stars-dot">·</span>' + fmtRatings(s.ratings) + ' ratings</span>' +
+  '</div>';
+}
+
+// COMPACT ROWS — search results and the frequently-bought-together list,
+// which are one short line each and cannot carry the word "ratings" without
+// wrapping. Same aria-label, so the source is never lost to a screen reader.
+function supplierRatingCompactHtml(p) {
+  var s = supplierOf(p);
+  if (!s) return '';
+  return '<span class="rating-compact" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
+    starSvg(STAR_GOLD) + '<strong>' + s.rating.toFixed(1) + '</strong>' +
+    '<span class="rating-compact-count">(' + fmtRatings(s.ratings) + ')</span>' +
+  '</span>';
+}
+
+// PRODUCT PAGE — the block that replaces the old reviews accordion panel.
+// This is the one surface with room for the full attribution, so it names
+// AliExpress outright and says in as many words that PawHaul has no reviews
+// of its own yet. Anything less would let the stars read as PawHaul's.
+function supplierRatingPanelHtml(p) {
+  var s = supplierOf(p);
+  if (!s) {
+    return '<p class="sr-none">No rating data for this product yet.</p>';
   }
-  // Re-render whatever is on screen so ratings appear as soon as they arrive.
-  try {
-    if (document.getElementById('shopProducts')) renderShopProducts(currentShopFilter);
-    if (document.getElementById('homeProducts')) renderHomeProducts();
-    // The problem slides carry a proof chip that upgrades to a REAL star
-    // rating the moment one exists, so they need the same refresh. Guarded on
-    // stats actually having arrived: with none (the case today) a re-render
-    // would change nothing while resetting the carousel's scroll position and
-    // replaying the slide reveal.
-    if (Object.keys(reviewStats).length && document.getElementById('problemCarousel')) renderProblemCarousel();
-  } catch (e) { /* pages not built yet — boot renders with stats already present */ }
+  return '<div class="sr-panel">' +
+    '<div class="sr-score" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
+      '<div class="sr-score-num">' + s.rating.toFixed(1) + '</div>' +
+      '<div class="sr-score-meta">' +
+        starsHtml(s.rating) +
+        '<div class="sr-score-count">' + fmtRatings(s.ratings) + ' ratings</div>' +
+      '</div>' +
+    '</div>' +
+    '<p class="sr-note">This is the rating on the <strong>AliExpress listing PawHaul ' +
+      'sources this product from</strong> — ' + s.rating.toFixed(1) + ' out of 5 across ' +
+      fmtRatings(s.ratings) + ' ratings, shown here as-is.</p>' +
+    '<p class="sr-note sr-note--muted">These are the supplier&#39;s ratings, not PawHaul&#39;s. ' +
+      'PawHaul does not collect its own customer reviews yet, so nothing on this page is ' +
+      'a review of PawHaul&#39;s service, shipping or packaging.</p>' +
+  '</div>';
 }
 
-function reviewsEscape(s) {
+// Fills both product-page surfaces: the one-line rating beside the price and
+// the full attributed panel in the Ratings accordion. Called by showProduct()
+// on every product open — synchronous, off local data, so there is no moment
+// where the page shows a rating for the previous product.
+function renderDetailRating() {
+  var p = currentProduct;
+  if (!p) return;
+  var s = supplierOf(p);
+
+  var line = document.getElementById('detailRating');
+  if (line) {
+    line.innerHTML = s
+      ? starsHtml(s.rating) +
+        '<span id="detailRatingTxt">' + s.rating.toFixed(1) + ' · ' +
+        fmtRatings(s.ratings) + ' ratings</span>'
+      : '';
+    line.style.display = s ? '' : 'none';
+    if (s) line.setAttribute('aria-label', supplierAriaLabel(s));
+    else line.removeAttribute('aria-label');
+  }
+
+  var root = document.getElementById('ratingRoot');
+  if (root) root.innerHTML = supplierRatingPanelHtml(p);
+}
+
+// Kept from the review system because a dozen callers outside it use this as
+// the general-purpose HTML escape (the problem carousel, product cards). It
+// was named esc() only because that is where it was first needed.
+function esc(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
-}
-
-function reviewDateLabel(iso) {
-  var d = new Date(iso);
-  if (isNaN(d.getTime())) return '';
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
-function reviewCardHtml(r) {
-  var alt = 'Photo from a review by ' + reviewsEscape(r.name);
-  var photo = r.photo
-    ? '<a class="rv-photo" href="' + reviewsEscape(r.photo) + '" target="_blank" rel="noopener noreferrer">' +
-      '<img src="' + reviewsEscape(r.photo) + '" alt="' + alt + '" loading="lazy"></a>'
-    : '';
-  return '<li class="rv-item" data-review-id="' + reviewsEscape(r.id) + '">' +
-    '<div class="rv-item-head">' +
-      '<span class="rv-item-stars" aria-label="' + r.rating + ' out of 5 stars">' + starsHtml(r.rating) + '</span>' +
-      '<span class="rv-item-name">' + reviewsEscape(r.name) + '</span>' +
-      '<span class="rv-item-date">' + reviewsEscape(reviewDateLabel(r.createdAt)) + '</span>' +
-    '</div>' +
-    (r.text ? '<p class="rv-item-text">' + reviewsEscape(r.text) + '</p>' : '') +
-    photo +
-  '</li>';
-}
-
-function reviewFormHtml(productId) {
-  var photoField = reviewPhotosEnabled
-    ? '<label class="rv-field"><span class="rv-label">Photo <em>(optional)</em></span>' +
-      '<input type="file" id="rvPhoto" accept="image/jpeg,image/png,image/webp"></label>'
-    : '';
-  var starButtons = [1, 2, 3, 4, 5].map(function (n) {
-    return '<button type="button" class="rv-starbtn" role="radio" aria-checked="false" ' +
-      'aria-label="' + n + ' star' + (n > 1 ? 's' : '') + '" data-star="' + n + '" ' +
-      'onclick="pickReviewStar(' + n + ')">' + starSvg('#D8D4CC') + '</button>';
-  }).join('');
-  return '<form class="rv-form" id="rvForm" onsubmit="return submitReview(event,' + productId + ')">' +
-    '<div class="rv-field">' +
-      '<span class="rv-label">Your rating <em>(required)</em></span>' +
-      '<div class="rv-starpick" id="rvStars" role="radiogroup" aria-label="Rating out of 5">' + starButtons + '</div>' +
-    '</div>' +
-    '<label class="rv-field"><span class="rv-label">Your name</span>' +
-      '<input type="text" id="rvName" maxlength="40" placeholder="e.g. Sam" autocomplete="name"></label>' +
-    '<label class="rv-field"><span class="rv-label">Your review</span>' +
-      '<textarea id="rvText" maxlength="1500" rows="4" placeholder="How did it work out on your walks?"></textarea></label>' +
-    photoField +
-    '<button type="submit" class="rv-submit" id="rvSubmit">Post Review</button>' +
-    '<p class="rv-form-note" id="rvNote" role="status" aria-live="polite"></p>' +
-  '</form>';
-}
-
-var rvSelectedStars = 0;
-
-function pickReviewStar(n) {
-  rvSelectedStars = n;
-  var wrap = document.getElementById('rvStars');
-  if (!wrap) return;
-  wrap.querySelectorAll('.rv-starbtn').forEach(function (b) {
-    var v = parseInt(b.dataset.star, 10);
-    b.setAttribute('aria-checked', v === n ? 'true' : 'false');
-    b.innerHTML = starSvg(v <= n ? '#FFB800' : '#D8D4CC');
-  });
-  var note = document.getElementById('rvNote');
-  if (note && note.dataset.err === '1') { note.textContent = ''; note.dataset.err = ''; }
-}
-
-async function renderReviews(productId) {
-  var root = document.getElementById('reviewsRoot');
-  if (!root) return;
-  rvSelectedStars = 0;
-  root.innerHTML = pawLoaderHtml('Sniffing out the reviews…');
-
-  var data = null;
-  try {
-    var res = await fetch('/api/reviews?product=' + productId, { cache: 'no-store' });
-    data = await res.json();
-  } catch (e) { data = null; }
-
-  // Ignore a response that arrived after the shopper moved to another product.
-  if (!currentProduct || currentProduct.id !== productId) return;
-
-  if (!data || !data.ok) {
-    root.innerHTML = '<p class="rv-loading">Reviews are unavailable right now.</p>';
-    return;
-  }
-  reviewsConfigured = !!data.configured;
-  reviewPhotosEnabled = !!data.photos;
-  if (data.count > 0) reviewStats[productId] = { count: data.count, average: data.average };
-  else delete reviewStats[productId];
-
-  var summary = data.count > 0
-    ? '<div class="rv-summary">' +
-        '<div class="rv-summary-score">' + Number(data.average).toFixed(1) + '</div>' +
-        '<div><div class="rv-summary-stars">' + starsHtml(data.average) + '</div>' +
-        '<div class="rv-summary-count">' + data.count + ' review' + (data.count === 1 ? '' : 's') + '</div></div>' +
-      '</div>'
-    : '<p class="rv-empty">No reviews yet &mdash; <strong>be the first to review this product.</strong></p>';
-
-  var list = data.reviews && data.reviews.length
-    ? '<ul class="rv-list">' + data.reviews.map(reviewCardHtml).join('') + '</ul>'
-    : '';
-
-  var form = reviewsConfigured
-    ? reviewFormHtml(productId)
-    : '<p class="rv-offline">Reviews cannot be submitted yet &mdash; the store owner still needs to finish setting this up.</p>';
-
-  root.innerHTML = summary + list +
-    '<div class="rv-write"><h4 class="rv-write-title">Write a review</h4>' + form + '</div>';
-
-  syncDetailRating(productId);
-}
-
-// Keeps the price-block rating line honest and in step with the section below.
-function syncDetailRating(productId) {
-  var r = ratingFor(productId);
-  var starWrap = document.querySelector('#page-product .detail-stars');
-  var countEl = document.getElementById('detailReviews');
-  if (starWrap) {
-    starWrap.querySelectorAll('svg').forEach(function (s) { s.remove(); });
-    if (r) starWrap.insertAdjacentHTML('afterbegin', starsHtml(r.average));
-  }
-  if (countEl) {
-    countEl.textContent = r
-      ? '(' + r.average.toFixed(1) + ' · ' + r.count + ' review' + (r.count === 1 ? '' : 's') + ')'
-      : '(No reviews yet)';
-  }
-}
-
-async function submitReview(ev, productId) {
-  ev.preventDefault();
-  var note = document.getElementById('rvNote');
-  var btn = document.getElementById('rvSubmit');
-  var setNote = function (msg, isErr) {
-    if (!note) return;
-    note.textContent = msg;
-    note.dataset.err = isErr ? '1' : '';
-    note.className = 'rv-form-note' + (isErr ? ' rv-form-note--err' : '');
-  };
-
-  if (!rvSelectedStars) { setNote('Please pick a star rating first.', true); return false; }
-
-  var photoInput = document.getElementById('rvPhoto');
-  var payload = {
-    productId: productId,
-    rating: rvSelectedStars,
-    name: (document.getElementById('rvName') || {}).value || '',
-    text: (document.getElementById('rvText') || {}).value || ''
-  };
-
-  if (photoInput && photoInput.files && photoInput.files[0]) {
-    var f = photoInput.files[0];
-    if (f.size > 2 * 1024 * 1024) { setNote('That photo is over 2MB - please pick a smaller one.', true); return false; }
-    try {
-      payload.photo = await new Promise(function (resolve, reject) {
-        var fr = new FileReader();
-        fr.onload = function () { resolve(fr.result); };
-        fr.onerror = reject;
-        fr.readAsDataURL(f);
-      });
-    } catch (e) { /* post the review without the photo rather than losing it */ }
-  }
-
-  var prevBtnHtml = setBtnBusy(btn, 'Posting your review…');
-  setNote('');
-  try {
-    var res = await fetch('/api/reviews', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    var data = await res.json();
-    if (!data || !data.ok) {
-      setNote((data && data.error) || 'Could not post your review - please try again.', true);
-      clearBtnBusy(btn, prevBtnHtml);
-      return false;
-    }
-    showToast('Thanks for your review!');
-    reviewStats[productId] = { count: data.count, average: data.average };
-    await renderReviews(productId);
-    // The card grids show the average too, so refresh them with the new number.
-    try {
-      if (document.getElementById('shopProducts')) renderShopProducts(currentShopFilter);
-      if (document.getElementById('homeProducts')) renderHomeProducts();
-    } catch (e) { /* not fatal */ }
-  } catch (e) {
-    setNote('Could not post your review - please try again.', true);
-    clearBtnBusy(btn, prevBtnHtml);
-  }
-  return false;
 }
 
 // ==================== INIT ====================
@@ -3298,5 +3233,3 @@ renderHomeProducts();
 // Rendered once at boot: the section lives in the SPA's DOM permanently,
 // so it does not need re-rendering on every return to the home page.
 renderProblemCarousel();
-// Real review aggregates for every product, one request, then a re-render.
-loadReviewStats();

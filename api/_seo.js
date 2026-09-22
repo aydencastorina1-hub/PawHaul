@@ -94,55 +94,28 @@ const RETURN_POLICY = {
   returnMethod: 'https://schema.org/ReturnByMail'
 };
 
-// AGGREGATE RATING IS INTENTIONALLY DISABLED.
-// The star ratings and review counts on this site (products.js `reviews`, the
-// hard-coded 5-star SVGs, the "Verified" review cards with stock-photo
-// avatars) are marketing placeholders, not collected customer reviews. Google
-// Search Essentials prohibits marking up review data that was not genuinely
-// collected from customers, and the penalty for self-serving fake ratings is
-// a structured-data manual action that removes rich results for the WHOLE
-// site — strictly worse than shipping no stars at all.
+// AGGREGATE RATING IS INTENTIONALLY ABSENT (task 103).
 //
-// When a real review system exists (Shopify Product Reviews, Judge.me free
-// tier, etc.), set this to true and point ratingFor() at the real data.
-// AGGREGATE RATING (updated task 56)
+// Google Search Essentials prohibits marking up review data you did not
+// genuinely collect from your own customers, and the penalty for self-serving
+// ratings is a structured-data manual action that strips rich results from the
+// WHOLE site — strictly worse than shipping no stars at all.
 //
-// This used to be a hard `false`, because marking up ratings nobody had
-// actually given risks a site-wide structured-data manual action. There is now
-// a real review system (/api/reviews), so the rule is per-product and
-// data-driven instead of a global switch: a product gets aggregateRating in
-// its JSON-LD if and ONLY if it has at least one genuine submitted review.
+// Task 56 added a real user-submitted review system, which made a per-product
+// exemption legitimate: a product got aggregateRating if and only if it had at
+// least one genuine submitted review. Task 103 REMOVED that system, so the
+// exemption is gone with it and this is a hard rule again.
 //
-// Ratings are fetched by the caller (buildMeta) and passed in, because reading
-// them is async and productSchema() is not.
-async function fetchRatings(ids) {
-  const url = (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || '').replace(/\/$/, '');
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '';
-  if (!url || !token || !ids.length) return {};
-  try {
-    const res = await fetch(url + '/pipeline', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-      body: JSON.stringify(ids.map(id => ['HGETALL', 'pawhaul:agg:' + id]))
-    });
-    if (!res.ok) return {};
-    const rows = await res.json();
-    const out = {};
-    ids.forEach((id, i) => {
-      const raw = rows[i] && rows[i].result;
-      const o = {};
-      if (Array.isArray(raw)) { for (let k = 0; k < raw.length - 1; k += 2) o[raw[k]] = raw[k + 1]; }
-      else if (raw && typeof raw === 'object') Object.assign(o, raw);
-      const n = parseInt(o.n, 10) || 0;
-      const sum = parseInt(o.sum, 10) || 0;
-      if (n > 0) out[id] = { value: Math.round((sum / n) * 10) / 10, count: n };
-    });
-    return out;
-  } catch (e) {
-    // Never let a ratings lookup break page rendering.
-    return {};
-  }
-}
+// The supplier ratings now shown on the site (products.js `supplier`, read off
+// the AliExpress listings PawHaul sources from) must NOT be substituted here.
+// They are a third party's ratings of the manufacturer's listing, not reviews
+// of this store's product, service or fulfilment — marking them up as this
+// product's aggregateRating is exactly the misrepresentation the rule targets.
+// They are surfaced to shoppers in plain sight, attributed, and nowhere else.
+//
+// If a real PawHaul review system ever exists, reinstate the per-product rule
+// from task 56 — not a global switch.
+
 
 // ------------------------------------------------------------ file loading
 
@@ -439,7 +412,7 @@ function breadcrumbSchema(trail) {
   };
 }
 
-function productSchema(p, rating) {
+function productSchema(p) {
   const url = ORIGIN + '/product/' + slugify(p.name);
   const range = priceRange(p);
   const images = [].concat(Object.values(p.images || {}), p.extraImages || [])
@@ -478,16 +451,9 @@ function productSchema(p, rating) {
   if (p.material) schema.material = p.material;
   if (p.colors && p.colors.length) schema.color = p.colors.join(', ');
 
-  // Present only when this product genuinely has reviews — see fetchRatings.
-  if (rating && rating.count > 0) {
-    schema.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: rating.value,
-      reviewCount: rating.count,
-      bestRating: 5,
-      worstRating: 1
-    };
-  }
+  // NO aggregateRating — see the note at the top of this file. The supplier
+  // ratings shown on the site are a third party's, and marking them up as this
+  // product's own is the misrepresentation Google penalises site-wide.
   return schema;
 }
 
@@ -539,9 +505,10 @@ function titleWithBrand(t) {
   return t.indexOf(BRAND) === 0 || t.indexOf('| ' + BRAND) !== -1 ? t : t + ' | ' + BRAND;
 }
 
-// ASYNC as of task 56: product routes look up their real review aggregate
-// before building JSON-LD. renderPage() is the only caller and was already
-// async; the export is now async too.
+// ASYNC. Task 56 made this async so product routes could look up a review
+// aggregate before building JSON-LD; task 103 removed that lookup, but the
+// signature stays async — renderPage(), the only caller, already awaits it,
+// and narrowing it back would be a breaking change for no gain.
 async function metaFor(route, products, posts) {
   const meta = {
     title: PAGE_COPY.home.title,
@@ -576,8 +543,7 @@ async function metaFor(route, products, posts) {
     meta.path = '/product/' + slugify(p.name);
     meta.ogImage = ogImageFor(p);
     meta.ogType = 'product';
-    const ratings = await fetchRatings([p.id]);
-    meta.schemas.push(productSchema(p, ratings[p.id]));
+    meta.schemas.push(productSchema(p));
     meta.schemas.push(breadcrumbSchema([
       { name: 'Home', path: '/' },
       { name: 'Shop', path: '/shop' },

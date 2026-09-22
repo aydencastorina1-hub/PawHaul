@@ -391,7 +391,10 @@ function showBundle(productId) {
         '<div style="font-weight:800;font-size:13px;line-height:1.4;">' + p.name +
           (isMain ? ' <span style="background:var(--orange);color:white;font-size:10px;padding:2px 7px;border-radius:50px;white-space:nowrap;">This Item</span>' : '') +
         '</div>' +
-        '<div style="color:var(--orange);font-weight:800;font-size:13px;">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
+        '<div class="fbt-meta">' +
+          '<span style="color:var(--orange);font-weight:800;font-size:13px;">$' + lowestVariant(p).price.toFixed(2) + '</span>' +
+          supplierRatingCompactHtml(p) +
+        '</div>' +
       '</div>' +
       '<span style="color:var(--green);font-size:14px;font-weight:900;">&#10003;</span>' +
     '</div>';
@@ -891,7 +894,10 @@ function doSearch(val) {
       '<span class="search-result-thumb">' + thumb + '</span>' +
       '<div class="search-result-info">' +
         '<div class="search-result-name">' + p.name.replace(hl, '<b>$1</b>') + '</div>' +
-        '<div class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
+        '<div class="search-result-meta">' +
+          '<span class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</span>' +
+          supplierRatingCompactHtml(p) +
+        '</div>' +
       '</div>' +
     '</div>';
   }).join('');
