@@ -1116,8 +1116,16 @@ function initDetailCarousel() {
   track._carouselAbort = ac;
 
   var api = bindCarousel(track, prev, next, dots, ac.signal);
-  // A rebuilt gallery always opens on slide 1 (the selected colour's photo).
-  api.goTo(0, true);
+  // A rebuilt gallery always opens on slide 1 (the selected colour's photo) —
+  // but only actually scroll if it is not already there. renderDetailGallery
+  // replaces this whole subtree, so the fresh track is at 0 already and this
+  // call was a programmatic scroll on a `scroll-snap-type: mandatory`
+  // container for no reason. That arms a pending snap, and a touch arriving
+  // while one is pending is spent resolving it instead of scrolling — the
+  // shape of the task-101 report. Belt-and-braces next to the real fix (the
+  // gallery hover transform, see .main-img:hover in styles.css); costs a
+  // property read and removes a needless poke at the scroller.
+  if (track.scrollLeft !== 0) api.goTo(0, true);
 }
 
 // ==================== SECTION REVEAL (subtle fade-up on scroll) ====================
