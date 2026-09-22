@@ -20,6 +20,13 @@ var products = [
     // Real product photos, hosted in this repo (see images/products/) rather
     // than pulled from Shopify's CDN — one per color, so the card image, the
     // detail hero and gallery slide 1 always match the selected color.
+    //
+    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
+    // these same 7 files, pixel for pixel, and Shopify's own variant_ids
+    // assign them to the same colours this map does. Shopify was brought in
+    // line with these photos, not the other way round, so they stay local —
+    // same image, but served as webp at the width the slot actually needs
+    // (see LOCAL_PHOTO_WIDTHS) instead of a full-size CDN fetch.
     images: {
       "Pink": "/images/products/water-bottle-pink-main.jpg",
       "White": "/images/products/water-bottle-white-main.jpg",
@@ -89,27 +96,35 @@ var products = [
     sizes: ["3m (10ft)", "5m (16ft)"],
     colors: ["Red", "Green", "Blue", "White", "Pink"],
 
+    // RE-SYNCED from Shopify (task 99): the whole pool was replaced there,
+    // so every URL below is new. One variant-assigned photo per colour,
+    // taken straight from Shopify's own image.variant_ids — not guessed
+    // from the filename or the colour in the shot.
     images: {
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S5294cac17bbb487bac47cce1df064df0J.webp?width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S5a39efa1841e49b1ad7857b34634dad6v.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb032f773be6f4a26ad06ed2d00ca88783.webp?width=900",
-      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sef87ddb83ec648e9bb3240889af6c8a0k.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Saa15954db497432a8865ca3daedfc754j.webp?width=900"
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/678368BF-37CA-4B87-9BB2-1101819ADEF3.png?v=1789930342&width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/051FDB3A-A88E-49F6-831C-97F1619E4AB9.png?v=1789930256&width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/7AC23AF3-C6C0-4CAE-9498-6DDCDE0A8F23.png?v=1789930225&width=900",
+      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/1273A040-5DAA-4B74-A324-50C9B31CE6D8.png?v=1789930427&width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/622BC111-3004-4359-8440-9DEF5D0653A3.png?v=1789930295&width=900"
     },
 
-    // Extra detail-page gallery slides — general/non-color-specific shots
-    // from Shopify's wider image pool: an in-use hand-hold shot, a carabiner
-    // close-up and a handle close-up. RE-AUDITED against the RE-CREATED
-    // product's 17-image pool (the old product's pool is gone, and one former
-    // extra no longer exists at all). Excluded: a multi-color grid collage
-    // with a stock dog photo, a numbered feature-callout overlay that also
-    // carries the line "3m Handle Prefer For Female", and a cm measurement
-    // diagram. The six unused clean shots are colors this product does not
-    // sell (grey, yellow, brown, coral, teal, pink/grey).
+    // Extra detail-page gallery slides — the four pool images with no
+    // variant attached: a non-slip-handle feature panel, a carabiner
+    // close-up, a handle/brake close-up and a numbered feature callout.
+    // The callout panels are the merchant's own clean English artwork, in
+    // the same house style as the water bottle's, and carry no measurement,
+    // no watermark and no foreign text — unlike the pool this replaced,
+    // whose callout read "3m Handle Prefer For Female".
+    // SKIPPED by the task-20/27 bar: pos10, a dimension diagram (6.3 in /
+    // 5 in / 3.9 in over one body, 5.1 in / 3 in / 3.5 in over the other).
+    // The two close-ups show a grey body this shop does not sell; they are
+    // crops of hardware, not of a colourway, and the previous audit kept
+    // their equivalents for the same reason.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sbdc750f0c22f49f19f834493fa8c1e8aJ.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0bac281c54e342e885cd09dd407d2182w.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9a7394d555e045648b5710b0c3fc1f9fQ.webp?width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/31C0883B-F306-4DB4-8CC5-B500CD6E9C37.png?v=1789930462&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/A0B17F59-68B3-4BD3-A1BB-7327678FFF2F.png?v=1789930462&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/12338873-42B1-4663-A045-A52F9AE46D1F.png?v=1789930462&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/664067B2-84E3-4760-B795-2221F4CF86D3.png?v=1789930461&width=900"
     ],
 
     sizePrices: {
@@ -168,29 +183,36 @@ var products = [
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
 
-    // Locally-hosted: Shopify's own variant photos for this product all had
-    // an AliExpress-style measurement-diagram overlay burned in — cropped
-    // out (see images/products/) so the card/detail photos look like a
-    // normal studio product shot instead of a supplier listing screenshot.
+    // RE-SYNCED from Shopify (task 99). These REPLACE the local
+    // images/products/bowl-*.jpg crops, and the reason those existed is
+    // gone: they were cropped by hand because every Shopify variant photo
+    // carried a burned-in measurement diagram. The re-shot pool has none —
+    // six clean studio shots at one consistent angle, each with its own
+    // matching carabiner — so the source of truth goes back to Shopify.
+    // The old local files are now unreferenced (kept on disk, like the
+    // pre-79 collar set, pending the user's word).
     images: {
-      "Red": "/images/products/bowl-red.jpg",
-      "Blue": "/images/products/bowl-blue.jpg",
-      "Orange": "/images/products/bowl-orange.jpg",
-      "Green": "/images/products/bowl-green.jpg",
-      "White": "/images/products/bowl-white.jpg",
-      "Black": "/images/products/bowl-black.jpg"
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/99B5501A-6912-4471-BFDA-E75A4CA2808C.png?v=1789928225&width=900",
+      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/475223E9-2911-41AD-8402-B9DF0D07B188.png?v=1789928246&width=900",
+      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/82088BE3-AB5D-4539-BBEA-94C16C5845BB.png?v=1789928267&width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/B2146D24-A830-44AF-8D2A-8DF25FFA4D90.png?v=1789928296&width=900",
+      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2CE939E3-AD2C-471E-82A8-F1A87A72C42A.png?v=1789928320&width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/0B2E56CB-BCD6-4717-A467-1FA77CF89FA6.png?v=1789928337&width=900"
     },
 
-    // Extra detail-page gallery slides — a lifestyle in-use shot and a solo
-    // top-down detail shot. Picked after auditing all 10 other pool images:
-    // excluded measurement-diagram overlays (same issue as the color photos
-    // above), a rainbow "colors available" fan-out collage showing several
-    // unsold colors (pink, yellow, magenta), a 3-panel backpack/belt-clip
-    // montage that also showed unsold colors (yellow, pink), and other
-    // single-color solo shots that read as another color's own photo.
+    // Extra detail-page gallery slides. Only one of the five shared pool
+    // images clears the task-20/27 bar on its own — pos9, the bowl folded
+    // flat — so the in-use shot is CROPPED rather than skipped: the pool
+    // original stacks five bowls (one of them yellow, a colour this shop
+    // does not sell) beside the one the dog is eating from, which reads as
+    // a multi-pack. images/products/bowl-lifestyle-1.jpg is that photo with
+    // the stack cropped out of frame.
+    // SKIPPED: pos8, a four-panel montage showing yellow and pink bowls
+    // (neither sold); pos10, a five-colour fan-out; pos11, a phone-beside-
+    // bowl dimension diagram (5.1 in / 3.5 in / 1.9 in).
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Se41e912ec0cb4da697da3f6f75a261b82.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa0f8a84f540d477cb9edf31bc9bd202cq.webp?width=900"
+      "/images/products/bowl-lifestyle-1.jpg",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D7F9C6D8-41EA-44A4-BF2F-509EB4820D00.png?v=1789928528&width=900"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
@@ -230,26 +252,30 @@ var products = [
     sizes: ["Universal — fits all leashes"],
     colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
 
+    // RE-SYNCED from Shopify (task 99). The old pool's wrong-product
+    // photos are gone entirely — the round tag with unrelated branding text
+    // that used to stand in for Blue no longer exists, and Blue itself was
+    // retired (task 98). Six colours, six variant-assigned photos.
     images: {
-      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdabcb515185644749aa0640e68078179d.webp?width=900",
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0da950fa93d04a25afebfaa0336a51cbS.webp?width=900",
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Se9fbfd87f59e4b41beee2244e4b329b20.webp?width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdb52b5440928451eb6abb1ed06b3ce6dB.webp?width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S48db40d2b42148dd9cd2af3427535c48X.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S856c79dab79e4350a9cd09e7fb81679b6.webp?width=900"
+      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/05311962-98DD-48BE-9B18-AA26717C4EA5.png?v=1790043744&width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/921F2642-8033-42DC-8934-66A11F537D1E.png?v=1790043784&width=900",
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D950C3DF-9AF0-4416-8427-D1F38304E8FE.png?v=1790043835&width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/9B99CB59-87DD-42C0-998C-737EDDAE99B1.png?v=1790043817&width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E9F331FB-A50C-4DB7-B66A-56CBA5DC191D.png?v=1790043893&width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E3A0D367-24B5-486D-81F4-1AD31FAD9E89.png?v=1790043866&width=900"
     },
 
-    // Extra detail-page gallery slides — a moody hardware close-up on the
-    // clip's Y-notch, a hand-holding-a-used-bag hero shot (directly matches
-    // the corrected "holds used bags" description), and a backpack-attached
-    // usage shot. Picked after auditing all 23 other pool images: excluded
-    // several wrong-product round-tag photos (unrelated branding text), a
-    // multi-color grid collage, solo studio shots of other colors, and a
-    // batch of spec/instruction diagrams.
+    // Extra detail-page gallery slides — a hand holding a knotted bag by
+    // the clip, a close-up of the same, the clip riding on a leash, and one
+    // clipped to a bag. All four show the product doing the job the
+    // description claims (carrying a USED bag), which a studio shot cannot.
+    // SKIPPED by the task-20/27 bar: pos9, four black clips lined up, which
+    // reads as a four-pack of a product sold one at a time.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb3cc74988c5349db92ec75f67e3e98e5R.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S68f4725cdb964fe683c982b0ac097df1C.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sde53da21db1445f4b8edf1b6e8d8a7abf.webp?width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FBB272E1-1FAC-473A-93AF-7BDDF7356226.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/65E99535-F7CD-4A0F-B319-487A9C9DBF01.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FCA197B8-16F8-48B5-9E1E-BF7750AE80F1.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/BE4DE668-334E-4929-A1EE-CCFEDC2631C5.png?v=1790044578&width=900"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
@@ -306,6 +332,18 @@ var products = [
     // Still unreferenced from the pre-79 era: collar-<colour>.jpg, the same
     // composites cropped to their studio panel. Left in place pending the
     // user's word.
+    //
+    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
+    // these same 13 files, pixel for pixel, and Shopify's own variant_ids
+    // assign them to the same colours this map does. Shopify was brought in
+    // line with these photos, not the other way round, so they stay local —
+    // same image, but served as webp at the width the slot actually needs
+    // (see LOCAL_PHOTO_WIDTHS) instead of a full-size CDN fetch.
+    //
+    // The eight shared shots below are part of that same identical set, so
+    // the task-99 re-sync changes nothing here — including the three content
+    // mismatches recorded further down, which the user was shown and chose
+    // to keep. They are NOT re-decided by the task-99 audit.
     images: {
       "Green": "/images/products/collar-green-main-v2.jpg",
       "Blue": "/images/products/collar-blue-main-v2.jpg",
@@ -400,6 +438,13 @@ var products = [
     // detail hero and gallery slide 1 always match the selected colour. All
     // three are the same pouch at the same angle on white, so the swatch row
     // reads as one set rather than three different photo shoots.
+    //
+    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
+    // these same 8 files, pixel for pixel, and Shopify's own variant_ids
+    // assign them to the same colours this map does. Shopify was brought in
+    // line with these photos, not the other way round, so they stay local —
+    // same image, but served as webp at the width the slot actually needs
+    // (see LOCAL_PHOTO_WIDTHS) instead of a full-size CDN fetch.
     images: {
       "Green": "/images/products/poop-bag-holder-green-main.jpg",
       "Blue": "/images/products/poop-bag-holder-blue-main.jpg",
@@ -480,28 +525,26 @@ var products = [
     // people actually type for this thing.
     tags: ["wrist strap", "wristband", "anti drop", "anti-drop", "hands free leash", "leash strap", "dog walking strap"],
 
-    // The six variant-assigned Shopify photos — one clean white-background
-    // studio shot per colour. The wider 28-image pool was audited and four
-    // images were rejected outright: a multi-strap collage, a shot with a
-    // misspelled text overlay ("Porvides"), one with a burned-in
-    // "22cm/8.6inch" measurement diagram, and one stamped "4Pcs" (which would
-    // imply a four-pack). No Chinese text was present anywhere in this pool.
+    // RE-SYNCED from Shopify (task 99): re-shot pool, so every URL is new.
+    // One variant-assigned white-background studio shot per colour.
     images: {
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb2ac92f1728c4d60b6b829cb49350f44o.webp?width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sb0cde838dcae46548021fd92b632f2caN.webp?width=900",
-      "Gray": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S677376f94420460abab02ced06ed2667M.webp?width=900",
-      "Brown": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sa66f58d267df4b3b9cdb14e68d83e891z.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S7dc7107a6f8a466bb78a46f2a05bf3c05_2ec00128-e5e9-41e5-9145-12481b27a139.webp?width=900",
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S9d3b04c34a364c71954fe739a24ee96eN_725b41ce-da4f-4f49-bc90-dbefbc05d203.webp?width=900"
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/4C5BE3B2-5CC6-48DC-88EA-7486F24AA1B7.png?v=1790045465&width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/92AC92E7-F62B-453D-BE87-C760272DB3CC.png?v=1790045199&width=900",
+      "Gray": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E5B644C1-AEEF-40A1-B4E6-43C0F6052DF3.png?v=1790045254&width=900",
+      "Brown": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/22751449-1824-4A50-8179-E05E18CA4247.png?v=1790045514&width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/4373A82C-58AE-4E12-85BE-C89AE43A1BFC.png?v=1790045490&width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/351A932E-77B2-473C-A6B3-3EA0CDEC4A8E.png?v=1790045227&width=900"
     },
 
-    // Extra gallery slides: all three show the strap actually in use on a
-    // wrist with a retractable leash, which is the whole point of the product
-    // and is not obvious from a studio shot of a loop of cord.
+    // Extra gallery slides: both show the strap on a wrist holding a
+    // retractable leash, which is the whole point of the product and is not
+    // obvious from a studio shot of a loop of cord.
+    // SKIPPED by the task-20/27 bar: an in-use shot captioned "Provides a
+    // better control with greater comfort" (burned-in text, and not
+    // English); an "8.6 in" dimension diagram; and a five-strap fan-out.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S6f41f4569a8b4c66812bd7c76ca26683D.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0d26b16360be468a904ee320f7f3f001m.webp?width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S142247eaa0d94974a8e4f61798de608b4.webp?width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/A2B89FF7-D438-4CD8-A03D-610075FC9FA5.png?v=1790046334&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/99AAC5E2-C549-48D9-B3F1-A730804FEE21.png?v=1790046334&width=900"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Every one of
@@ -564,6 +607,12 @@ var products = [
     // product needs: Purple is the only colour sold in both lengths, and 3M
     // Purple and 5M Purple are the same physical colourway, so both show this
     // one purple photo and changing length never swaps the image.
+    //
+    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
+    // these same 8 files, pixel for pixel, and Shopify assigns its own
+    // 3M Purple and 5M Purple variants to the one purple photo — exactly the
+    // colour-alone keying above. Shopify was brought in line with these
+    // photos, not the other way round, so they stay local.
     images: {
       "Purple": "/images/products/led-leash-purple-main.jpg",
       "Green": "/images/products/led-leash-green-main.jpg",
@@ -1433,6 +1482,7 @@ var LOCAL_PHOTO_WIDTHS = {
   'bowl-black': [400, 675],
   'bowl-blue': [400, 675],
   'bowl-green': [400, 675],
+  'bowl-lifestyle-1': [400, 800, 822],
   'bowl-orange': [400, 675],
   'bowl-red': [400, 675],
   'bowl-white': [400, 675],

@@ -3,6 +3,7 @@ var LOCAL_PHOTO_WIDTHS = {
   'bowl-black': [400, 675],
   'bowl-blue': [400, 675],
   'bowl-green': [400, 675],
+  'bowl-lifestyle-1': [400, 800, 822],
   'bowl-orange': [400, 675],
   'bowl-red': [400, 675],
   'bowl-white': [400, 675],
