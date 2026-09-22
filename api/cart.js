@@ -130,9 +130,20 @@ function respondWithMutation(res, r, mutationName) {
     // Most common real-world case: a variant went out of stock, or the
     // cart/line id itself no longer exists (expired cart).
     var msg = userErrors.map(function (e) { return e.message; }).join(" ");
+    console.error("[cart] Shopify userErrors", msg);
+    // A DELETED variant is reported by raw GID — "The merchandise with id
+    // gid://shopify/ProductVariant/48945264787712 does not exist." — which
+    // means nothing to a customer. This is the message a tab left open
+    // across a variant being retired (the Poop Bag Clip's Blue, task 98)
+    // hits at checkout, and it is the ONLY route that still reaches those
+    // stale tabs, since their copy of products.js predates the change. Say
+    // what to do instead; the raw text stays in the log above.
+    var deadVariant = /merchandise with id/i.test(msg);
     res.status(200).json({
       ok: false,
-      error: "Some items in your cart are no longer available (" + msg + ")."
+      error: deadVariant
+        ? "One item in your cart is no longer available in the color or size you picked — please remove it and choose another."
+        : "Some items in your cart are no longer available (" + msg + ")."
     });
     return;
   }

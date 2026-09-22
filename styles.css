@@ -2003,6 +2003,41 @@ img.reviewer-av {
 
 .cart-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
 
+/* ---- A cart line whose colour was discontinued --------------------------
+   Deliberately not styled as an error: nothing has gone wrong for the
+   customer, one choice they made is simply no longer for sale. So the line
+   keeps its normal shape and just loses its price (it is excluded from the
+   subtotal in renderCart, since it cannot be bought) and gains the one
+   action that resolves it. The photo is dimmed rather than hidden — it is
+   still the thing they picked, and removing it would make the line hard to
+   recognise. See retiredColorFor() in products.js. */
+.cart-item-gone { border-color: var(--line); background: var(--light-gray); }
+.cart-item-gone:hover { border-color: var(--line); }
+.cart-item-gone .cart-item-img { opacity: 0.55; }
+
+.cart-item-gone-note {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--orange-dark);
+  line-height: 1.45;
+  margin-bottom: 10px;
+}
+
+.cart-item-gone-btn {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--white);
+  background: var(--orange);
+  border: none;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.cart-item-gone-btn:hover { background: var(--orange-dark); }
+
+
 .remove-btn {
   background: none;
   border: none;

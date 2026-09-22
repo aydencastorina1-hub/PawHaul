@@ -228,19 +228,15 @@ var products = [
     solution: "Knot it through the clip and it rides on the leash — hands free the rest of the way.",
     contrast: { without: "One hand out of action", "with": "Both hands back" },
     sizes: ["Universal — fits all leashes"],
-    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Blue"],
+    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
 
-    // Note: Shopify's own "Blue" variant image was a mismatched product (a
-    // round tag with unrelated branding text) — swapped for a matching
-    // teardrop-clip photo from the product's wider image pool instead.
     images: {
       "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdabcb515185644749aa0640e68078179d.webp?width=900",
       "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S0da950fa93d04a25afebfaa0336a51cbS.webp?width=900",
       "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Se9fbfd87f59e4b41beee2244e4b329b20.webp?width=900",
       "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/Sdb52b5440928451eb6abb1ed06b3ce6dB.webp?width=900",
       "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S48db40d2b42148dd9cd2af3427535c48X.webp?width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S856c79dab79e4350a9cd09e7fb81679b6.webp?width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S96d1aaaf88394f8fa64e7a8ff93bede5O.webp?width=900"
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/S856c79dab79e4350a9cd09e7fb81679b6.webp?width=900"
     },
 
     // Extra detail-page gallery slides — a moody hardware close-up on the
@@ -263,8 +259,7 @@ var products = [
         "Red": "gid://shopify/ProductVariant/48945264361728",
         "Black": "gid://shopify/ProductVariant/48945264394496",
         "Green": "gid://shopify/ProductVariant/48945264656640",
-        "Pink": "gid://shopify/ProductVariant/48945264623872",
-        "Blue": "gid://shopify/ProductVariant/48945264787712"
+        "Pink": "gid://shopify/ProductVariant/48945264623872"
       } },
 
     features: [
@@ -273,7 +268,7 @@ var products = [
       "Keeps both hands free while walking your dog",
       "Lightweight and compact design",
       "Quick, hygienic cleanup every time",
-      "7 colors to choose from"
+      "6 colors to choose from"
     ],
     material: "Durable silicone clip · Secure metal hook attachment",
     whatsInBox: "1× Poop Bag Clip"
@@ -2067,7 +2062,9 @@ function renderCart() {
     return;
   }
 
-  var subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  // A retired-colour line cannot be bought, so it must not be billed for
+  // either — it shows in the cart as something to fix, not as a charge.
+  var subtotal = cart.reduce((sum, item) => sum + (retiredColorFor(item) ? 0 : item.price * item.qty), 0);
   var shipping = 0;
   var total = subtotal + shipping;
 
@@ -2077,6 +2074,27 @@ function renderCart() {
         ${cart.map((item, idx) => {
           var imgUrl = productImageFor(item, item.color);
           var imgContent = imgUrl ? ('<img ' + photoAttrs(imgUrl, 'thumb') + ' alt="' + item.name + '">') : item.emoji;
+          // Discontinued colour: say so on the line, price it at nothing, and
+          // offer the one action that fixes it (open the product and pick
+          // another). Quantity controls are dropped — there is no quantity of
+          // an unbuyable variant worth choosing.
+          var gone = retiredColorFor(item);
+          if (gone) {
+            return `
+          <div class="cart-item cart-item-gone">
+            <div class="cart-item-img">${imgContent}</div>
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-variant">${item.size ? item.size + ' · ' : ''}${gone} · Qty: ${item.qty}</div>
+              <p class="cart-item-gone-note">${gone} is no longer available. Pick a different color to check out.</p>
+              <button class="cart-item-gone-btn" onclick="showProduct(${item.id})">Choose another color →</button>
+            </div>
+            <div class="cart-item-right">
+              <button class="remove-btn" onclick="removeFromCart(${idx})">✕</button>
+            </div>
+          </div>
+        `;
+          }
           return `
           <div class="cart-item">
             <div class="cart-item-img">${imgContent}</div>
@@ -2118,6 +2136,24 @@ function updateCartQty(idx, delta) {
   syncQtyToShopify(item);
   updateCartCount();
   renderCart();
+}
+
+// The colour on a cart line that the catalogue no longer sells, or null when
+// the line is fine. The Poop Bag Clip's Blue is the first of these: the
+// variant was deleted in Shopify (task 98), so it is gone from `colors` and
+// has no variant GID left to check out with.
+//
+// A line like this can only come from a tab left open across the change —
+// the local cart is rebuilt from `products` on every load, and a restored
+// Shopify cart maps its lines back through variantReverseMap(), which only
+// knows current variants. Rare, but the old behaviour was that checkout
+// refused the WHOLE cart with "please remove and try again" and never said
+// which item or why, so it is worth naming.
+function retiredColorFor(item) {
+  if (!item || !item.color) return null;
+  var product = products.find(function (p) { return p.id === item.id; });
+  if (!product || !product.colors) return null;
+  return product.colors.indexOf(item.color) > -1 ? null : item.color;
 }
 
 // Resolves a local cart line to the real Shopify variant GID it corresponds
@@ -2365,6 +2401,16 @@ function cartMatchesLines(shopifyLines, localLines) {
 async function checkout() {
   if (!cart.length) return;
   var btn = document.querySelector('.checkout-btn');
+
+  // A discontinued colour is refused by name before the generic path, so the
+  // customer is told which line to fix rather than that "something" is wrong.
+  var retired = cart.filter(function (item) { return !!retiredColorFor(item); });
+  if (retired.length) {
+    showToast(retired.map(function (item) {
+      return item.name + ' in ' + retiredColorFor(item);
+    }).join(', ') + ' is no longer available — pick a different color or remove it to check out.', 6000);
+    return;
+  }
 
   var lines = [];
   var unresolved = [];
