@@ -794,9 +794,16 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
        inside it, so no swap can move the grid below.
        eager + fetchpriority=low matches the About/Contact heroes: this page's
        own hero never flashes on SPA navigation, but it also doesn't compete
-       with the home hero for bandwidth on a cold first load. -->
+       with the home hero for bandwidth on a cold first load.
+       The src/srcset/sizes here must stay byte-identical to what
+       applyShopHero() would set for the `all` category, or its "same photo as
+       the one already up" check misses and the band re-fetches on arrival.
+       This was w=2400&q=100 — a 1.7MB JPEG, eagerly fetched on EVERY page
+       load including product pages, under a dark scrim that hides the detail
+       it was paying for. Same q=75 + responsive-width treatment the contact
+       hero already got; a phone now takes the 828w (118KB) step. -->
   <section class="shop-hero" id="shopHero" data-cat="all">
-    <img class="shop-hero-img is-active" src="https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100" alt="A dog out on a walk in PawHaul gear" loading="eager" fetchpriority="low">
+    <img class="shop-hero-img is-active" src="https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="A dog out on a walk in PawHaul gear" loading="eager" fetchpriority="low">
     <img class="shop-hero-img" alt="" aria-hidden="true" loading="eager" fetchpriority="low">
     <div class="shop-hero-overlay"></div>
     <div class="shop-hero-copy" id="shopHeroCopy">
@@ -1118,7 +1125,7 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
          never the visible content on FIRST page load (home is) — high priority
          here was found to starve the actually-visible home hero of bandwidth,
          a real contributor to hero flash reports investigated 2026-07-17. -->
-    <img loading="eager" fetchpriority="low" class="about-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1600" alt="A dog on an outdoor trail at golden hour" style="width:100%;height:100%;object-fit:cover;display:block;">
+    <img loading="eager" fetchpriority="low" class="about-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="A dog on an outdoor trail at golden hour" style="width:100%;height:100%;object-fit:cover;display:block;">
     <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
   </div>
   <div class="about-hero">
@@ -1205,13 +1212,16 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
 <!-- ==================== CONTACT PAGE ==================== -->
 <div id="page-contact" class="page" style="background:white;">
   <div class="contact-hero-wrap" style="position:relative;width:100%;overflow:hidden;">
-    <!-- Was q=100 w=2400 (2MB!) + fetchpriority=high, competing for bandwidth
+    <!-- Task 102 finished the job: q=75 had come down but the width had not,
+         so this was still a single 783KB 2400px JPEG with no srcset, fetched
+         eagerly on EVERY page load (it is in the SPA's permanent DOM). Now a
+         responsive srcset like the home hero slides — a phone takes 828w.
+         Was q=100 w=2400 (2MB!) + fetchpriority=high, competing for bandwidth
          against the actually-visible home hero on every first page load (this
          SPA keeps every page's markup in the DOM) — same fix as the About hero
-         above: right-sized (q=75, plain JPEG -> ~500KB at this large w=2400)
-         + fetchpriority LOW (kept eager so this page's own hero still never
-         flashes on nav). -->
-    <img loading="eager" fetchpriority="low" class="contact-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=2400" alt="A leashed dog outdoors in a forest setting" style="width:100%;height:100%;object-fit:cover;display:block;">
+         above: right-sized (q=75) + fetchpriority LOW (kept eager so this
+         page's own hero still never flashes on nav). -->
+    <img loading="eager" fetchpriority="low" class="contact-hero-img lifestyle-img" src="https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1571897888855-e9cceb0486fa?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="A leashed dog outdoors in a forest setting" style="width:100%;height:100%;object-fit:cover;display:block;">
     <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,26,46,0.45),rgba(26,26,46,0.25));"></div>
   </div>
   <div class="about-hero">

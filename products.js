@@ -108,23 +108,27 @@ var products = [
       "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/622BC111-3004-4359-8440-9DEF5D0653A3.png?v=1789930295&width=900"
     },
 
-    // Extra detail-page gallery slides — the four pool images with no
+    // Extra detail-page gallery slides — ALL five pool images with no
     // variant attached: a non-slip-handle feature panel, a carabiner
-    // close-up, a handle/brake close-up and a numbered feature callout.
+    // close-up, a handle/brake close-up, a numbered feature callout and
+    // the dimension diagram.
     // The callout panels are the merchant's own clean English artwork, in
     // the same house style as the water bottle's, and carry no measurement,
     // no watermark and no foreign text — unlike the pool this replaced,
     // whose callout read "3m Handle Prefer For Female".
-    // SKIPPED by the task-20/27 bar: pos10, a dimension diagram (6.3 in /
-    // 5 in / 3.9 in over one body, 5.1 in / 3 in / 3.5 in over the other).
-    // The two close-ups show a grey body this shop does not sell; they are
-    // crops of hardware, not of a colourway, and the previous audit kept
-    // their equivalents for the same reason.
+    // Task 102 retired the task-20/27 skip list for this product: the shop
+    // now mirrors Shopify's pool exactly, so pos10 (the 6.3 in / 5 in /
+    // 3.9 in over one body, 5.1 in / 3 in / 3.5 in over the other diagram)
+    // is back in. It and the two close-ups show a grey body this shop does
+    // not sell; they read as hardware/measurement drawings rather than as a
+    // colourway, which is why they sit in the shared pool and never in the
+    // per-colour map — slide 1 stays the only slide that claims a colour.
     extraImages: [
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/31C0883B-F306-4DB4-8CC5-B500CD6E9C37.png?v=1789930462&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/A0B17F59-68B3-4BD3-A1BB-7327678FFF2F.png?v=1789930462&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/12338873-42B1-4663-A045-A52F9AE46D1F.png?v=1789930462&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/664067B2-84E3-4760-B795-2221F4CF86D3.png?v=1789930461&width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/664067B2-84E3-4760-B795-2221F4CF86D3.png?v=1789930461&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/AA2C9CB0-53BC-40A4-9D31-C3CA405CE860.png?v=1789930461&width=900"
     ],
 
     sizePrices: {
@@ -200,19 +204,28 @@ var products = [
       "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/0B2E56CB-BCD6-4717-A467-1FA77CF89FA6.png?v=1789928337&width=900"
     },
 
-    // Extra detail-page gallery slides. Only one of the five shared pool
-    // images clears the task-20/27 bar on its own — pos9, the bowl folded
-    // flat — so the in-use shot is CROPPED rather than skipped: the pool
-    // original stacks five bowls (one of them yellow, a colour this shop
-    // does not sell) beside the one the dog is eating from, which reads as
-    // a multi-pack. images/products/bowl-lifestyle-1.jpg is that photo with
-    // the stack cropped out of frame.
-    // SKIPPED: pos8, a four-panel montage showing yellow and pink bowls
-    // (neither sold); pos10, a five-colour fan-out; pos11, a phone-beside-
-    // bowl dimension diagram (5.1 in / 3.5 in / 1.9 in).
+    // Extra detail-page gallery slides — all five shared pool images, in
+    // Shopify's own position order (pos7 … pos11).
+    //
+    // Task 102 retired the task-20/27 skip list here: the gallery now
+    // mirrors Shopify's pool one for one. That knowingly puts colours this
+    // shop does not sell on screen — pos8's montage shows a yellow and a
+    // pink bowl, pos11's phone size-reference (5.1 in / 3.5 in / 1.9 in) is
+    // shot in pink — so slide 1 remains the ONLY slide that claims to show
+    // the selected colour, and the colour swatches remain the only place a
+    // buyer picks one.
+    //
+    // pos7 stays the CROPPED local copy: the pool original stacks five
+    // bowls beside the one the dog is eating from, which reads as a
+    // multi-pack of a product sold singly. images/products/bowl-lifestyle-1.jpg
+    // is that same photo with the stack cropped out of frame — the image is
+    // present, just framed on the one bowl in use.
     extraImages: [
       "/images/products/bowl-lifestyle-1.jpg",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D7F9C6D8-41EA-44A4-BF2F-509EB4820D00.png?v=1789928528&width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/649F0CE6-2494-42DF-94BE-A9D3FD787024.png?v=1789928528&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D7F9C6D8-41EA-44A4-BF2F-509EB4820D00.png?v=1789928528&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/86F6DB3D-B47A-490F-9A7B-7B7D0CB3A4BD.png?v=1789928528&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E30A5796-62AB-4CE8-BF4F-158AA947326F.png?v=1789928528&width=900"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout.
@@ -269,11 +282,15 @@ var products = [
     // the clip, a close-up of the same, the clip riding on a leash, and one
     // clipped to a bag. All four show the product doing the job the
     // description claims (carrying a USED bag), which a studio shot cannot.
-    // SKIPPED by the task-20/27 bar: pos9, four black clips lined up, which
-    // reads as a four-pack of a product sold one at a time.
+    // Task 102 retired the task-20/27 skip list here: pos9 (four black clips
+    // lined up) is back in, in its own position order, so the gallery
+    // mirrors Shopify's pool one for one. It can read as a four-pack of a
+    // product sold one at a time — "1× Poop Bag Clip" in whatsInBox and the
+    // single-unit price are what set that straight.
     extraImages: [
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FBB272E1-1FAC-473A-93AF-7BDDF7356226.png?v=1790044578&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/65E99535-F7CD-4A0F-B319-487A9C9DBF01.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FCA197B8-16F8-48B5-9E1E-BF7750AE80F1.png?v=1790044578&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/BE4DE668-334E-4929-A1EE-CCFEDC2631C5.png?v=1790044578&width=900"
     ],
@@ -536,15 +553,24 @@ var products = [
       "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/351A932E-77B2-473C-A6B3-3EA0CDEC4A8E.png?v=1790045227&width=900"
     },
 
-    // Extra gallery slides: both show the strap on a wrist holding a
-    // retractable leash, which is the whole point of the product and is not
-    // obvious from a studio shot of a loop of cord.
-    // SKIPPED by the task-20/27 bar: an in-use shot captioned "Provides a
-    // better control with greater comfort" (burned-in text, and not
-    // English); an "8.6 in" dimension diagram; and a five-strap fan-out.
+    // Extra gallery slides — all five shared pool images, in Shopify's own
+    // position order (pos7 … pos11). The middle two show the strap on a
+    // wrist holding a retractable leash, which is the whole point of the
+    // product and is not obvious from a studio shot of a loop of cord.
+    //
+    // Task 102 retired the task-20/27 skip list here, so three more are
+    // back: pos7, an in-use shot with burned-in supplier copy ("Helps to
+    // loosen grip on your hands / Provides a better control with greater
+    // comfort" — clumsy, but English, contrary to the note this replaces);
+    // pos10, an "8.6 in" dimension diagram on the brown strap; and pos11, a
+    // four-strap fan-out in black, gray, brown and green, all four of which
+    // this shop does sell.
     extraImages: [
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/C3A90130-E059-442F-B9F7-C799D58E5B80.png?v=1790046334&width=900",
       "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/A2B89FF7-D438-4CD8-A03D-610075FC9FA5.png?v=1790046334&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/99AAC5E2-C549-48D9-B3F1-A730804FEE21.png?v=1790046334&width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/99AAC5E2-C549-48D9-B3F1-A730804FEE21.png?v=1790046334&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/439914DE-4282-4A10-9252-1390B8D2D76A.png?v=1790046334&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/CFBB5FE5-B16F-4FFA-8320-919BCDA27FB7.png?v=1790046334&width=900"
     ],
 
     // Real Shopify variant GIDs (Storefront API) for checkout. Every one of
@@ -1551,19 +1577,70 @@ function localPhotoBase(url) {
   return (m && LOCAL_PHOTO_WIDTHS[m[1]]) ? m[1] : null;
 }
 
+// Shopify's CDN resizes on demand from the `width` query param, so one
+// stored URL can serve a whole srcset. Every pool image is 1254px square (a
+// couple are 1536 wide), so these are the useful steps under that; asking
+// for more than the original just gets the original back.
+//
+// It also content-negotiates WebP off the Accept header with no parameter
+// needed — a 900px pool PNG comes back as a 28KB WebP, a 400px one as 12KB —
+// so the bytes were never the problem. The problem was that WITHOUT a
+// srcset a phone rendering a 340px card still downloaded the 900px file.
+var SHOPIFY_CDN_WIDTHS = [400, 600, 900, 1254];
+
+function shopifyPhotoBase(url) {
+  return /^https:\/\/cdn\.shopify\.com\/.*[?&]width=\d+/.test(url || '') ? url : null;
+}
+
+function shopifyPhotoAt(url, w) {
+  return url.replace(/([?&]width=)\d+/, '$1' + w);
+}
+
+// Unsplash resizes off `w` the same way, so a full-bleed band photo gets the
+// same treatment as the home hero slides — which have always hand-written
+// these exact widths into their markup. Only the ones already written in the
+// house form (fm=jpg&fit=crop&q=75&w=N) are touched, so a hand-tuned URL with
+// its own crop or quality is left exactly as it is.
+var UNSPLASH_WIDTHS = [640, 828, 1080, 1440, 1920, 2560];
+
+function unsplashPhotoBase(url) {
+  return /^https:\/\/images\.unsplash\.com\/.*[?&]w=\d+/.test(url || '') &&
+    /[?&]q=\d+/.test(url) ? url : null;
+}
+
+function unsplashPhotoAt(url, w) {
+  return url.replace(/([?&]w=)\d+/, '$1' + w);
+}
+
 function photoSrc(url) {
   var base = localPhotoBase(url);
-  if (!base) return url;
-  var widths = LOCAL_PHOTO_WIDTHS[base];
-  return '/images/products/' + base + '-' + widths[widths.length - 1] + '.webp';
+  if (base) {
+    var widths = LOCAL_PHOTO_WIDTHS[base];
+    return '/images/products/' + base + '-' + widths[widths.length - 1] + '.webp';
+  }
+  // Shopify URLs keep the width they are stored with as the `src` fallback,
+  // so a browser with no srcset support behaves exactly as it did before.
+  return url;
 }
 
 function photoSrcset(url) {
   var base = localPhotoBase(url);
-  if (!base) return '';
-  return LOCAL_PHOTO_WIDTHS[base].map(function (w) {
-    return '/images/products/' + base + '-' + w + '.webp ' + w + 'w';
-  }).join(', ');
+  if (base) {
+    return LOCAL_PHOTO_WIDTHS[base].map(function (w) {
+      return '/images/products/' + base + '-' + w + '.webp ' + w + 'w';
+    }).join(', ');
+  }
+  if (shopifyPhotoBase(url)) {
+    return SHOPIFY_CDN_WIDTHS.map(function (w) {
+      return shopifyPhotoAt(url, w) + ' ' + w + 'w';
+    }).join(', ');
+  }
+  if (unsplashPhotoBase(url)) {
+    return UNSPLASH_WIDTHS.map(function (w) {
+      return unsplashPhotoAt(url, w) + ' ' + w + 'w';
+    }).join(', ');
+  }
+  return '';
 }
 
 // Every attribute an <img> needs except alt/class. `slot` keys PHOTO_SIZES.
@@ -1663,17 +1740,23 @@ function renderDetailGallery(color) {
     return;
   }
 
-  // Slide 1 loads eagerly (it is the one on screen, and the page's largest
-  // image); everything after it is lazy. With the LED collar the gallery
-  // is 13 slides / ~2.5MB of photos, and eagerly fetching all of them on
-  // every product view was pointless — most visitors never page past the
-  // first shot. The browser still starts the neighbouring slides early
-  // (lazy-loading's viewport margin covers the next slide or two), so paging
-  // one step at a time stays instant.
+  // Slide 1 loads at high priority (it is the one on screen, and the page's
+  // largest image). Slide 2 is eager but LOW priority — it is the single
+  // most likely next thing a visitor looks at, and fetching it behind
+  // slide 1 means the first swipe never waits on the network. Slide 3
+  // onward stay lazy; bindCarousel's warm() promotes them a slide ahead of
+  // the scroll, so paging on through the gallery stays instant too.
+  //
+  // Everything past slide 2 must stay lazy on arrival: with the LED collar
+  // and the wrist strap the gallery now runs to 11-13 slides, and eagerly
+  // fetching all of them on every product view is exactly the waste the
+  // lazy-loading was added to avoid — most visitors never page past the
+  // first shot.
   var slidesHtml = slides.map(function (s, i) {
     var alt = currentProduct.name + (s.color ? ' — ' + s.color : '');
+    var opts = i === 0 ? { priority: true } : (i === 1 ? { eager: true } : null);
     return '<div class="det-slide"><img ' +
-      photoAttrs(s.url, 'detail', i === 0 ? { priority: true } : null) +
+      photoAttrs(s.url, 'detail', opts) +
       ' alt="' + alt + '"></div>';
   }).join('');
 
@@ -2528,7 +2611,7 @@ async function checkout() {
 // ---------------------------------------------------------------------------
 var SHOP_HERO = {
   all: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440',
     alt: 'A dog out on a walk in PawHaul gear',
     heading: 'Shop Walk Gear',
     description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
@@ -2545,7 +2628,7 @@ var SHOP_HERO = {
     description: 'Never run out mid-walk. Everything your dog needs to stay hydrated and fed on the go.'
   },
   leash: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?w=2400&q=100',
+    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440',
     alt: 'A dog walking calmly on a leash',
     heading: 'Leashes & Control',
     description: 'Freedom for them, control for you. Built for calm, confident walks every time.'

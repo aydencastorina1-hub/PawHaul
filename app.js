@@ -1023,9 +1023,32 @@ function bindCarousel(track, prev, next, dots, signal) {
     if (next) next.hidden = idle;
     if (prev) prev.classList.toggle('disabled', atStart);
     if (next) next.classList.toggle('disabled', atEnd);
+    var c = current();
     if (dots && dots.length) {
-      var c = current();
       for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === c);
+    }
+    warm(c);
+  }
+
+  // Pull the slides on either side of the current one out of the lazy queue
+  // as soon as it becomes current, so the NEXT swipe shows a decoded photo
+  // instead of an empty box that fills a moment later.
+  //
+  // A lazy image inside a horizontally scrolling track is only fetched once
+  // it is near the scrollport, which on a fast flick is too late — that is
+  // the pop-in. Flipping loading to "eager" starts the fetch immediately
+  // (per spec, an image whose load was deferred begins loading the moment
+  // the attribute stops being "lazy"), and each slide is only ever promoted
+  // once, so this stays a no-op after the first pass over the gallery.
+  //
+  // Deliberately a WINDOW, not the whole track: the LED collar's gallery is
+  // 13 slides, and fetching all of them on every product view is the bytes
+  // this lazy-loading was added to save.
+  function warm(c) {
+    for (var i = c - 1; i <= c + 2; i++) {
+      if (i < 0 || i >= track.children.length) continue;
+      var img = track.children[i].querySelector ? track.children[i].querySelector('img[loading="lazy"]') : null;
+      if (img) img.loading = 'eager';
     }
   }
 
