@@ -1191,6 +1191,39 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(function() { imgs.forEach(ready); }, 2500);
 });
 
+// ==================== PHOTO LOCK (task 97) ====================
+// Backup for the CSS in styles.css (search: PHOTO LOCK). The callout/select
+// properties are the whole answer on iOS and iPadOS, but Android Chrome and
+// desktop browsers raise a real `contextmenu` event on a long-press or a
+// right-click regardless of them, so the event itself has to be refused.
+//
+// Delegated on the document rather than bound per image, because almost
+// every photo on this site is written into the page later — product grids,
+// the detail gallery, blog cards, the shop hero band, the popups — and a
+// listener attached at load time would miss all of them.
+//
+// Capture phase so a component that stops propagation on its own container
+// can't punch a hole in this, and scoped to the photo itself: a right-click
+// on text, a link or a form field still gets its normal menu (copy, paste,
+// open in new tab), which is what "don't break normal interactions" means.
+(function () {
+  function isPhoto(el) {
+    return el && typeof el.closest === 'function' && el.closest('img, picture, svg');
+  }
+
+  document.addEventListener('contextmenu', function (e) {
+    if (isPhoto(e.target)) e.preventDefault();
+  }, true);
+
+  // A mouse drag off an image saves/copies the file just as readily as the
+  // menu does, and it is the one route the touch-callout rule says nothing
+  // about. The carousels swipe on scroll, never on HTML drag-and-drop, so
+  // nothing on the site depends on this event firing.
+  document.addEventListener('dragstart', function (e) {
+    if (isPhoto(e.target)) e.preventDefault();
+  }, true);
+})();
+
 // ==================== 10% OFF POPUP ====================
 function offerIsOpen() {
   var popup = document.getElementById('offerPopup');

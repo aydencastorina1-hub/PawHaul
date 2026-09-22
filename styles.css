@@ -166,6 +166,36 @@ img {
   animation: imgShimmer 1.6s ease-in-out infinite;
 }
 
+/* ---- PHOTO LOCK (long-press / right-click) -------------------------------
+   Long-pressing any photo on a phone or tablet pops the native sheet — Save
+   to Photos, Copy, Share, Look Up — and right-clicking does the same on a
+   desktop. That hands the product photography out one tap at a time, so it
+   is switched off site-wide rather than per page.
+
+   Three separate mechanisms, because they guard three different routes to
+   the same menu:
+     -webkit-touch-callout  the iOS long-press sheet itself;
+     user-select            the iOS 16+ Live Text path, which selects INSIDE
+                            the photo and offers Copy/Share from there;
+     -webkit-user-drag      dragging the file out to the desktop or a tab.
+   app.js blocks contextmenu and dragstart as a backup for the engines that
+   ignore the CSS — Android Chrome's long-press menu is the notable one.
+
+   None of this touches normal interaction: taps still open the gallery and
+   the carousels still swipe, because neither is a selection or a drag. */
+img, picture, svg {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* A long-press on a photo that sits inside a link (blog cards, the review
+   photo lightbox) targets the LINK, so iOS shows its link preview — which
+   carries Save to Photos of its own. Deliberately a rule by itself: an
+   engine without :has() must drop this one only, never the block above. */
+a:has(img) { -webkit-touch-callout: none; }
+
 /* Large lifestyle/background photos (About/Contact hero, home mission
    banner, collections carousel, 10%-off popup — hero slides excluded, they
    already crossfade via their own .active opacity transition above) fade in
