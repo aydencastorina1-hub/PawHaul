@@ -7,6 +7,7 @@ var LOCAL_PHOTO_WIDTHS = {
   'bowl-orange': [400, 675],
   'bowl-red': [400, 675],
   'bowl-white': [400, 675],
+  'category-leashes-control-hero': [400, 800, 1200, 1671],
   'category-safety-visibility-hero': [400, 800, 1200, 1774],
   'category-water-food-hero': [400, 800, 1200, 1536],
   'collar-black': [400, 800],

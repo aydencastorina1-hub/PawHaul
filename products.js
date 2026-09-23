@@ -1553,6 +1553,7 @@ var LOCAL_PHOTO_WIDTHS = {
   'bowl-orange': [400, 675],
   'bowl-red': [400, 675],
   'bowl-white': [400, 675],
+  'category-leashes-control-hero': [400, 800, 1200, 1671],
   'category-safety-visibility-hero': [400, 800, 1200, 1774],
   'category-water-food-hero': [400, 800, 1200, 1536],
   'collar-black': [400, 800],
@@ -2659,19 +2660,23 @@ var SHOP_HERO = {
     description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
   },
   water: {
-    // Real photo (task 82). Water & Food and Safety & Visibility are the two
-    // real photos so far; `all` and `leash` still share one Unsplash
-    // placeholder, which is why applyShopHero's crossfade path runs for real
-    // between those two pills instead of short-circuiting on "same src as the
-    // one already up".
+    // Real photo (task 82). As of task 104 only `all` is still an Unsplash
+    // placeholder — water, leash and safety are all real photos now, so every
+    // pill change runs applyShopHero's real crossfade rather than
+    // short-circuiting on "same src as the one already up".
     image: '/images/products/category-water-food-hero.jpg',
     alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
     heading: 'Water & Food',
     description: 'Never run out mid-walk. Everything your dog needs to stay hydrated and fed on the go.'
   },
   leash: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440',
-    alt: 'A dog walking calmly on a leash',
+    // Real photo (task 104), replacing the Unsplash placeholder this shared
+    // with `all`. It shows one of the shop's OWN products doing its job — the
+    // red retractable leash, the colourway sold as Retractable Dog Leash /
+    // Red — which is the whole argument for this category.
+    // See the object-position note in styles.css for why it is not centred.
+    image: '/images/products/category-leashes-control-hero.jpg',
+    alt: 'A man walking a golden retriever on a red retractable leash along a waterfront path at sunset',
     heading: 'Leashes & Control',
     description: 'Freedom for them, control for you. Built for calm, confident walks every time.'
   },
