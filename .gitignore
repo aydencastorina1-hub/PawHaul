@@ -10,3 +10,6 @@ desktop.ini
 
 # Claude Code scratch worktrees
 .claude/
+
+__pycache__/
+*.pyc
