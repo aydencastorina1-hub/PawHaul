@@ -877,22 +877,33 @@ nav {
   white-space: nowrap;
 }
 .product-stars .rv-star { width: 1.25em; height: 1.25em; }
-/* Drops the star box so the star ink centres on the digits' cap band. The
-   starting point is font-metric derived, not eyeballed: cap height is ~0.705em
-   above the baseline, and the star path fills y=2..21.3 of a 24 viewBox, so
-   its ink centre sits 0.643em above the baseline when the box is
-   baseline-aligned — 0.29em too high. Both scale with em, so one value holds
-   across the whole clamp range.
+/* Drops the star box so the stars' OPTICAL centre lands on the text's cap
+   band. Derived, not eyeballed, and every term is measured rather than
+   assumed (task 106 — the previous pass guessed two of the four and landed
+   0.64px low here, which is what read as the stars sagging):
 
-   TRANSFORM, not vertical-align. Measured against the RENDERED PIXELS at six
-   widths: vertical-align snaps the inline box to whole CSS pixels, so the same
-   offset landed 0.31px out at 1440 and 0.69px out at 1024 — the visible
-   "4.8 sits a bit high". A transform is applied after layout and is not
-   snapped, so the offset holds: translateY(0.14em) measures within 0.25px at
-   every width, and the residual is balanced +/- rather than always high. */
+     cap height   0.71875em  — Nunito's digit height, measured off the shipped
+                               woff2, not the 0.705 that was assumed before
+     star box     1.25em     — set just above
+     optical centre = the box centre, because starSvg() now ships a viewBox
+                               recentred on the star's centroid (see there)
+
+   The number is 1.05em and the count is 1em, so they have cap-band midlines
+   0.37734em and 0.35938em above the shared baseline. The stars sit BETWEEN
+   those two, so they target the mean, 0.36836em — splitting a difference of
+   0.2px rather than picking a side and being 0.2px out against the other.
+   The -0.15em on .rv-star has already dropped the box, so the transform only
+   carries the remainder:
+
+     translateY = 0.5 x 1.25 - 0.36836 - 0.15 = 0.10664em
+
+   A TRANSFORM and not more vertical-align, because a transform is applied
+   after layout: it moves the ink without touching the line box, so tuning it
+   can never resize a card. Being unrounded, one value also holds across the
+   whole clamp() range. */
 .product-stars .rv-stars {
   vertical-align: baseline;
-  transform: translateY(0.14em);
+  transform: translateY(0.10664em);
   margin: 0 0.45em;
 }
 .product-stars span { color: var(--gray); font-weight: 600; }
@@ -1756,13 +1767,19 @@ img.reviewer-av {
   white-space: nowrap;
 }
 .detail-stars .rv-star { width: 1.3em; height: 1.3em; }
-/* 0.09em, not the cards' 0.14em: the number here is 1.25em against the cards'
-   1.05em, so its cap band sits higher above the shared baseline and the stars
-   have to come up to meet it. Swept against rendered pixels — 0.09em lands
-   within 0.06px. */
+/* 0.09570em, not the cards' 0.10664em, and from the same formula — only the
+   two inputs differ. The star box is 1.3em here (set just above) and the
+   number is 1.25em against the cards' 1.05em, so its cap-band midline sits
+   0.44922em above the baseline; the count is still 1em, so its midline is
+   0.35938em. The stars take the mean, 0.40430em:
+
+     translateY = 0.5 x 1.3 - 0.40430 - 0.15 = 0.09570em
+
+   See the .product-stars block for where 0.71875em, the recentred viewBox and
+   the -0.15em come from; if any of them changes, both numbers move together. */
 .detail-stars .rv-stars {
   vertical-align: baseline;
-  transform: translateY(0.09em);
+  transform: translateY(0.09570em);
   margin: 0 0.5em;
 }
 .detail-stars .product-stars-num { color: var(--black); font-weight: 800; font-size: 1.25em; }
@@ -5251,6 +5268,14 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    stars would overstate it.
    ============================================================ */
 
+/* The -0.15em is a LAYOUT constant, not an optical nudge, and the two jobs
+   must not be confused (task 106). Where this box sits in the line box is
+   what sets the ROW's height, and the row's height is what sets the card's:
+   parking it flat on the baseline instead grew every card by 0.75px and the
+   shop grid by 2.25px. So this value stays put and stays the same everywhere,
+   and all the OPTICAL tuning lives in the one transform per surface below.
+   Change this and you resize cards; change the transform and you only move
+   ink, because transforms are applied after layout. */
 .rv-star { width: 15px; height: 15px; display: inline-block; vertical-align: -0.15em; }
 
 .rv-stars { position: relative; display: inline-block; line-height: 0; white-space: nowrap; }
@@ -5292,9 +5317,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* ---- compact rows (search results, frequently-bought-together) ----
    Same order and the same parts as the card row, one step smaller. */
 /* Baseline row on the SAME geometry as the card row — number 1.05em, star
-   box 1.25em, stars nudged 0.14em — so one tuned offset covers both and they
-   cannot drift apart. It was an align-items:center flex row, which put the
-   number 0.62px above the stars for exactly the reason the cards did.
+   box 1.25em, stars dropped 0.10664em — so one derived offset covers both and
+   they cannot drift apart. It was an align-items:center flex row, which put
+   the number 0.62px above the stars for exactly the reason the cards did.
    Only the container font-size differs, which scales the whole thing. */
 .rating-compact {
   display: inline-block;
@@ -5308,7 +5333,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .rating-compact .rv-star { width: 1.25em; height: 1.25em; }
 .rating-compact .rv-stars {
   vertical-align: baseline;
-  transform: translateY(0.14em);
+  transform: translateY(0.10664em);
   margin: 0 0.4em;
 }
 .rating-compact strong { color: var(--black); font-weight: 800; font-size: 1.05em; }

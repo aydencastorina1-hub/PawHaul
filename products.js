@@ -3162,8 +3162,24 @@ function submitContact() {
 // old comment in api/_seo.js explaining that risk is still the rule; the
 // only change is that there is no longer a real review system to exempt.
 
+// viewBox="0 0.484 ..." is NOT a typo and must not be "normalised" back to
+// "0 0 24 24" (task 106).
+//
+// The star's ink spans y=2..21 of the path, so its BOUNDING BOX centre is
+// y=11.5 — but a five-pointed star is not symmetric about that line. It has
+// one thin point on top and two wide legs below, so its area centroid sits at
+// y=12.484 (the circumscribed circle's centre, independently, is y=12.503 —
+// the two agree to 0.02 units). Centring the BOX therefore hangs the star
+// about 1/24 of its own height too low, which is what made "4.8 * * * * *"
+// read as stars sagging under the digits on every card.
+//
+// Shifting the viewBox down by 12.484 - 12 = 0.484 makes the box centre BE
+// the optical centre. That is a property of the icon, so every consumer gets
+// it: the baseline rows below, and .prob-proof, which centres the star with
+// flexbox and could not be fixed by a baseline rule at all. Nothing about the
+// drawn size changes — only where the ink sits inside its box.
 function starSvg(fill) {
-  return '<svg viewBox="0 0 24 24" fill="' + fill + '" class="rv-star" aria-hidden="true">' +
+  return '<svg viewBox="0 0.484 24 24" fill="' + fill + '" class="rv-star" aria-hidden="true">' +
     '<path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg>';
 }
 
