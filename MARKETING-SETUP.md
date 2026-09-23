@@ -109,7 +109,7 @@ the import fails: verify manually via **HTML Meta Tag**, paste the value into
 
 ## 4. Google Merchant Center — free product listings — 45 minutes
 
-**Unlocks:** the seven products appearing in the Google Shopping tab and in
+**Unlocks:** the eight products appearing in the Google Shopping tab and in
 free product results on Search. This is the **free listings** path — no card,
 no budget, no campaign. Shopping *ads* are a separate opt-in that requires a
 linked Google Ads account; nothing here creates one, and you should not create

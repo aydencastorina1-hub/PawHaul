@@ -25,7 +25,7 @@ var blogPosts = [
     metaDescription: 'A step-by-step guide to stopping leash pulling — why dogs pull, the training method that actually works, and the gear that makes it easier.',
     excerpt: 'Pulling is the single most common walk complaint dog owners have. Here is why it happens, and the training approach that fixes it without hurting your dog.',
     date: '2026-07-14',
-    updated: '2026-07-14',
+    updated: '2026-09-23',
     readMins: 7,
     image: 'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog walking calmly on a loose leash beside its owner',
@@ -71,6 +71,13 @@ var blogPosts = [
   <p><strong>Gear that helps:</strong> the <a href="/product/retractable-dog-leash">Retractable Dog Leash</a> has a one-touch lock button and a jam-free mechanism, in 10ft and 16ft lengths. Being able to fix the length in one thumb press is what makes the stop-and-go method practical on a real street.</p>
 </div>
 
+<h2>Make sure a lunge can't cost you the leash</h2>
+<p>Early in training, before the new rule has sunk in, a dog that spots a cat or a squirrel will still hit the end of the line hard. That is the moment the handle leaves most people's hand — and a dog that gets free once has learned that a big enough lunge ends the walk on its terms.</p>
+<p>The fix is a strap that ties the handle to your wrist, so a lunge you were not braced for costs you a step, not the dog. It matters most with a retractable leash, whose chunky handle is exactly the thing that jolts loose.</p>
+<div class="blog-cta">
+  <p><strong>Gear that helps:</strong> the <a href="/product/anti-drop-leash-wrist-strap">Anti-Drop Leash Wrist Strap</a> clips onto any leash, retractable or standard, and tightens around your wrist. If the handle slips, it stays with you instead of skittering down the pavement behind a running dog.</p>
+</div>
+
 <h2>Free your hands</h2>
 <p>The second friction point is more mundane: you cannot train a dog while juggling. Loose-leash work needs one hand on the leash and one hand free for treats and for marking good position. If one hand is permanently occupied by a bag of waste, the training simply does not happen.</p>
 <p>This is worth solving properly. A <a href="/product/poop-bag-clip">hands-free poop bag clip</a> takes the used bag off your hand and onto the leash, and a <a href="/product/poop-bag-holder">bag holder</a> keeps the unused roll where you can reach it without stopping and searching your pockets. Small things — but they are the difference between doing the routine and skipping it.</p>
@@ -95,7 +102,7 @@ var blogPosts = [
     metaDescription: 'Drivers need far more stopping distance than most owners realise. Here is how far away your dog is actually visible at night, and how to fix it.',
     excerpt: 'A driver at 30mph needs about 75 feet to stop. An unlit dog on a dark road is visible from about 55. Here is how to close that gap.',
     date: '2026-07-24',
-    updated: '2026-07-24',
+    updated: '2026-09-23',
     readMins: 6,
     image: 'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog on an evening walk in low light',
@@ -130,12 +137,19 @@ var blogPosts = [
   <p><strong>Gear that helps:</strong> the <a href="/product/led-dog-collar">LED Dog Collar</a> is USB rechargeable with three modes — fast blink, slow blink and steady glow — and comes in four neck sizes from 13 to 22 inches. It's detachable, so it goes over the collar your dog already wears rather than replacing it.</p>
 </div>
 
-<h3>Layer two: light on you</h3>
-<p>A driver who sees a person and then spots movement at ground level will slow down. A driver who sees nothing will not. Clip a light to your jacket or carry one — a phone torch pointed down and slightly ahead is better than nothing, though it ruins your own night vision if you point it too far out.</p>
+<h3>Layer two: light on you and the leash</h3>
+<p>A driver who sees a person and then spots movement at ground level will slow down. A driver who sees nothing will not. You also need to see the ground yourself — broken glass, a kerb edge, and whatever your dog is about to pick up are all invisible in the dark. A phone torch works in a pinch, but it ties up the hand you need for everything else.</p>
+<p>The neat answer is to put the light in the leash handle, which is already in your hand. A lit leash marks the line between you and the dog — the part a cyclist is most likely to ride straight into — and a torch in the handle points wherever your hand does.</p>
+<div class="blog-cta">
+  <p><strong>Gear that helps:</strong> the <a href="/product/led-flashlight-retractable-dog-leash">LED Flashlight Retractable Dog Leash</a> has an LED light ring that keeps your dog visible plus a built-in flashlight for the path ahead, switched with a touch control. It retracts and locks with one button, in 3M and 5M lengths. It runs on 2 AAA batteries (not included).</p>
+</div>
 
-<h3>Layer three: findability if the worst happens</h3>
-<p>Visibility gear stops accidents. It does nothing once a spooked dog has slipped its collar and bolted into the dark — and fireworks, thunder and a car backfiring all cause exactly that. A Bluetooth tracker on the collar means the difference between searching and knowing.</p>
-<p>The weak point of tracker setups is almost always the attachment. A tag that swings on a split ring works loose over months of movement. A waterproof tracker holder with a twist-lock closure keeps the tracker fixed to the collar and sealed against rain and puddles — the two things that actually kill tracker setups.</p>
+<h3>Layer three: keep hold of the leash</h3>
+<p>Visibility gear stops accidents. It does nothing if a spooked dog tears the leash out of your hand and bolts into the dark — and fireworks, thunder and a car backfiring all cause exactly that. It happens more at night because you are carrying more, your hands are cold, and you did not see the fox until your dog did.</p>
+<p>A loose dog in the dark is the situation all the visibility gear is trying to prevent, so the cheapest insurance is making sure the handle physically cannot leave you. A strap from the leash to your wrist does that: one sudden lunge costs you a stumble, not your dog.</p>
+<div class="blog-cta">
+  <p><strong>Gear that helps:</strong> the <a href="/product/anti-drop-leash-wrist-strap">Anti-Drop Leash Wrist Strap</a> clips onto any leash — including both retractable leashes — and adjusts to fit your wrist, so if the handle slips out of a cold hand it stays attached to you.</p>
+</div>
 
 <h2>Route choices matter as much as gear</h2>
 <ul>
@@ -152,12 +166,13 @@ var blogPosts = [
 <p>It takes fifteen seconds and it catches almost everything:</p>
 <ul>
   <li>Is the collar light charged and switched on?</li>
-  <li>Is the tracker attached and seated in its holder?</li>
+  <li>If your leash has a light, are the batteries still good?</li>
+  <li>Is the wrist strap clipped to the leash handle?</li>
   <li>Does the collar fit — two fingers under it, no more?</li>
   <li>Do you have a light on you as well as on the dog?</li>
   <li>Is the leash lock working?</li>
 </ul>
-<p>The most common failure is not missing gear. It is a collar light that ran flat two walks ago and nobody noticed. Charge it on the same day each week and the problem disappears.</p>
+<p>The most common failure is not missing gear. It is a collar light that ran flat two walks ago and nobody noticed. Charge it on the same day each week, and keep a spare pair of AAA batteries by the door for the leash, and the problem disappears.</p>
 `
   },
   {
@@ -167,7 +182,7 @@ var blogPosts = [
     metaDescription: 'Everything worth carrying on a dog walk, sorted by walk length — the five essentials, what to add past 30 minutes, and what you can safely leave home.',
     excerpt: 'Sorted by how long you are actually going out for, from a ten-minute block loop to a half-day hike. Plus the items people carry that they do not need.',
     date: '2026-08-01',
-    updated: '2026-08-01',
+    updated: '2026-09-23',
     readMins: 8,
     image: 'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog and owner setting out on a walk',
@@ -201,9 +216,10 @@ var blogPosts = [
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
 <p>A <a href="/product/led-dog-collar">rechargeable LED collar</a> puts a light source on the dog that works from any angle and does not depend on anyone else's headlights. Charge it weekly on a fixed day; the usual failure mode is a flat light nobody noticed.</p>
+<p>For your side of the leash, an <a href="/product/led-flashlight-retractable-dog-leash">LED flashlight leash</a> puts a light ring on the lead and a torch in the handle, so you can see the path — and what your dog is sniffing — without juggling your phone.</p>
 
-<h2>Off-leash areas: add a tracker</h2>
-<p>If your dog goes off leash anywhere, a Bluetooth tracker is the highest-value thing you can add. The attachment is the part that matters — a tag on a split ring works loose over months, and a soaked tracker is a dead tracker. A waterproof holder with a twist-lock handles both.</p>
+<h2>Strong pullers and busy streets: add a wrist strap</h2>
+<p>If your dog lunges at cats, bikes or other dogs, the weak link on the walk is not the leash — it is your grip on it. Handles get yanked loose at exactly the moment you least want a loose dog: next to a road. An <a href="/product/anti-drop-leash-wrist-strap">anti-drop wrist strap</a> clips the leash handle to your wrist, so a lunge you were not braced for costs you a step instead of your dog. It weighs next to nothing, so it can just live on the leash.</p>
 
 <h2>Long walks and hikes (90+ minutes)</h2>
 <ul>
@@ -220,7 +236,7 @@ var blogPosts = [
 <h3>Cold weather</h3>
 <p>Short-coated and small dogs lose heat fast. Dogs still dehydrate in the cold — they just do not look like it, so water gets skipped. Rinse salt off paws when you get home.</p>
 <h3>Rain</h3>
-<p>Check that whatever electronics you have on the collar are actually waterproof rather than "water resistant". Trackers and lights are the two items that quietly die over a wet winter.</p>
+<p>Check that whatever electronics you have on the collar are actually waterproof rather than "water resistant". Collar lights and leash lights are the items that quietly die over a wet winter, so dry them off when you get in.</p>
 
 <h2>What you can leave at home</h2>
 <p>For an ordinary walk, most of the things sold as walk essentials are not:</p>
