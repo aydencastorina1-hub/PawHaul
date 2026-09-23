@@ -1027,18 +1027,13 @@ html.route-shop-safety #shopProducts .skel-card:not([data-cat~="safety"]) { disp
             </div>
           </div>
         </div>
-        <div class="pd-acc-item">
-          <button class="pd-acc-head" onclick="togglePdAccordion(this)">Ratings<span class="pd-acc-icon">+</span></button>
-          <div class="pd-acc-body">
-            <!-- Filled by renderDetailRating() from this product's `supplier`
-                 stats. Task 103 removed the user-submitted review system that
-                 used to live here (form, stored reviews, /api/reviews). What
-                 replaces it is the real AliExpress supplier rating, attributed
-                 in full -- it is the one surface with room to say outright
-                 whose ratings these are and that PawHaul has none of its own. -->
-            <div id="ratingRoot" class="rating-root"></div>
-          </div>
-        </div>
+        <!-- NO ratings/reviews accordion here, deliberately. The task-56/61
+             user-submitted review system lived in this slot (form, stored
+             reviews, /api/reviews) and task 103 removed it outright; a
+             supplier-ratings panel briefly replaced it and was removed too.
+             The product's rating lives ONLY in the line beside the price at
+             the top of this page. Do not reintroduce a third accordion here
+             without being asked -- the gap is intentional, not an oversight. -->
         <div class="pd-acc-item">
           <button class="pd-acc-head" onclick="togglePdAccordion(this)">Shipping &amp; Returns<span class="pd-acc-icon">+</span></button>
           <div class="pd-acc-body">

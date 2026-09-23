@@ -3089,10 +3089,18 @@ function submitContact() {
 //
 // These are the SUPPLIER's numbers, not PawHaul's. Nothing here invents a
 // reviewer, a quote or a date, and nothing claims a PawHaul customer said
-// anything. Cards stay neutral — "4.8 · 322 ratings" asserts only that the
-// rating exists — and the product page carries the full attribution naming
-// AliExpress and stating plainly that PawHaul does not collect its own
-// reviews yet.
+// anything. Every surface is neutral by construction — "4.8 * * * * * ·
+// 322 ratings" asserts only that the rating exists, and the word "Reviews"
+// appears nowhere, because on a PawHaul card it would read as PawHaul's own
+// customers.
+//
+// ATTRIBUTION NOTE: a product-page panel used to spell out "these are the
+// AliExpress supplier's ratings, PawHaul collects none of its own". The task
+// 103 brief removed that lower section outright, so the ONLY place the
+// AliExpress source is now stated is supplierAriaLabel(), which every
+// surface hangs off its aria-label. Sighted shoppers see the number, the
+// stars and the count with no visible source. That was the user's explicit
+// call; if a visible source line is ever wanted back, this is the seam.
 //
 // Deliberately NOT fed into JSON-LD: Google prohibits marking up a rating
 // you did not collect yourself as your product's aggregateRating, and the
@@ -3142,62 +3150,44 @@ function fmtRatings(n) {
   return Number(n).toLocaleString('en-US');
 }
 
-// PRODUCT CARDS — shop grid, home carousel and wishlist. Neutral by design:
-// it states the rating and how many ratings there are, and claims nothing
-// about who gave them. A product with no supplier stats renders no row at
-// all rather than five decorative stars implying a score nobody gave.
+// PRODUCT CARDS — shop grid, home carousel and wishlist. One horizontal line
+// in a fixed order, per the task-103 reference: NUMBER first, then the stars,
+// then "· N ratings". Neutral by design: it states the rating and how many
+// ratings there are, and claims nothing about who gave them. A product with no
+// supplier stats renders no row at all rather than five decorative stars
+// implying a score nobody gave.
 function supplierRatingHtml(p) {
   var s = supplierOf(p);
   if (!s) return '';
   return '<div class="product-stars" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
+    '<strong class="product-stars-num">' + s.rating.toFixed(1) + '</strong>' +
     starsHtml(s.rating) +
-    '<span class="product-stars-txt"><strong>' + s.rating.toFixed(1) + '</strong>' +
-      '<span class="product-stars-dot">·</span>' + fmtRatings(s.ratings) + ' ratings</span>' +
+    '<span class="product-stars-txt">· ' + fmtRatings(s.ratings) + ' ratings</span>' +
   '</div>';
 }
 
-// COMPACT ROWS — search results and the frequently-bought-together list,
-// which are one short line each and cannot carry the word "ratings" without
-// wrapping. Same aria-label, so the source is never lost to a screen reader.
+// COMPACT ROWS — search results and the frequently-bought-together list.
+// Same number-stars-count order as the cards, just at a smaller size, so the
+// layout reads identically everywhere it appears. Same aria-label too, so the
+// AliExpress source is never lost to a screen reader.
 function supplierRatingCompactHtml(p) {
   var s = supplierOf(p);
   if (!s) return '';
   return '<span class="rating-compact" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
-    starSvg(STAR_GOLD) + '<strong>' + s.rating.toFixed(1) + '</strong>' +
-    '<span class="rating-compact-count">(' + fmtRatings(s.ratings) + ')</span>' +
+    '<strong>' + s.rating.toFixed(1) + '</strong>' +
+    starsHtml(s.rating) +
+    '<span class="rating-compact-count">· ' + fmtRatings(s.ratings) + ' ratings</span>' +
   '</span>';
 }
 
-// PRODUCT PAGE — the block that replaces the old reviews accordion panel.
-// This is the one surface with room for the full attribution, so it names
-// AliExpress outright and says in as many words that PawHaul has no reviews
-// of its own yet. Anything less would let the stars read as PawHaul's.
-function supplierRatingPanelHtml(p) {
-  var s = supplierOf(p);
-  if (!s) {
-    return '<p class="sr-none">No rating data for this product yet.</p>';
-  }
-  return '<div class="sr-panel">' +
-    '<div class="sr-score" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
-      '<div class="sr-score-num">' + s.rating.toFixed(1) + '</div>' +
-      '<div class="sr-score-meta">' +
-        starsHtml(s.rating) +
-        '<div class="sr-score-count">' + fmtRatings(s.ratings) + ' ratings</div>' +
-      '</div>' +
-    '</div>' +
-    '<p class="sr-note">This is the rating on the <strong>AliExpress listing PawHaul ' +
-      'sources this product from</strong> — ' + s.rating.toFixed(1) + ' out of 5 across ' +
-      fmtRatings(s.ratings) + ' ratings, shown here as-is.</p>' +
-    '<p class="sr-note sr-note--muted">These are the supplier&#39;s ratings, not PawHaul&#39;s. ' +
-      'PawHaul does not collect its own customer reviews yet, so nothing on this page is ' +
-      'a review of PawHaul&#39;s service, shipping or packaging.</p>' +
-  '</div>';
-}
-
-// Fills both product-page surfaces: the one-line rating beside the price and
-// the full attributed panel in the Ratings accordion. Called by showProduct()
-// on every product open — synchronous, off local data, so there is no moment
-// where the page shows a rating for the previous product.
+// Fills the product page's ONE rating surface: the line beside the price, at
+// the top of the page next to the images. Called by showProduct() on every
+// product open — synchronous, off local data, so there is no moment where the
+// page shows a rating for the previous product.
+//
+// There is no lower panel any more. Task 103 removed the review accordion in
+// that slot and then the supplier panel that had replaced it, so this is the
+// only place a rating appears on a product page.
 function renderDetailRating() {
   var p = currentProduct;
   if (!p) return;
@@ -3215,8 +3205,6 @@ function renderDetailRating() {
     else line.removeAttribute('aria-label');
   }
 
-  var root = document.getElementById('ratingRoot');
-  if (root) root.innerHTML = supplierRatingPanelHtml(p);
 }
 
 // Kept from the review system because a dozen callers outside it use this as

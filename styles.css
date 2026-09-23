@@ -851,14 +851,23 @@ nav {
 .product-stars {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 0.45em;
   color: #FFB800;
-  font-size: 11px;
+  /* Scales with the viewport so the single line survives a 2-up grid at
+     320px and still reads at full size once the grid goes 3- and 4-up.
+     See .product-stars-num for why this is a clamp and not a fixed size. */
+  font-size: clamp(7px, 2.1vw, 11px);
   margin-bottom: 8px;
   flex-shrink: 0;
   min-height: 15px;
+  white-space: nowrap;
 }
-.product-stars span { color: var(--gray); font-size: 11px; font-weight: 600; }
+.product-stars .rv-star { width: 1.25em; height: 1.25em; }
+.product-stars span { color: var(--gray); font-weight: 600; }
+
+/* Past the 4-up breakpoint the columns stop growing, so pin the row at its
+   intended size instead of letting vw keep scaling it with the window. */
+@media (min-width: 1100px) { .product-stars { font-size: 11px; } }
 
 .product-price {
   display: flex;
@@ -3240,7 +3249,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .product-img { height: 220px; }
   .product-info { padding: 12px 12px 14px; }
   .product-name { font-size: 13px; margin-bottom: 2px; }
-  .product-stars { font-size: 11px; margin-bottom: 6px; }
+  /* margin only — the font-size is the clamp() up top, which is what keeps
+     "4.8 * * * * * . 1,749 ratings" on one line in this 2-up grid. Setting a
+     fixed 11px here overrode it and pushed the count out of the card. */
+  .product-stars { margin-bottom: 6px; }
   .price-now { font-size: 17px; }
   .price-was { font-size: 12px; }
   .btn-black { min-height: 40px; font-size: 13px; }
@@ -5187,58 +5199,55 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   white-space: nowrap;
 }
 
-/* ---- product cards (shop grid, home carousel, wishlist) ---- */
-.product-stars-txt { color: var(--gray); font-size: 11px; font-weight: 600; }
-.product-stars-txt strong { color: var(--black); font-weight: 800; }
-.product-stars-dot { margin: 0 4px; }
+/* ---- product cards (shop grid, home carousel, wishlist) ----
+   ONE line, fixed order: number, stars, "· N ratings".
+   nowrap + min-width:0 on the text is what stops "1,749 ratings" (the widest
+   count in the catalogue) pushing the stars onto a second line in a narrow
+   grid column; it ellipsises instead, which never happens at the sizes the
+   grid actually uses but fails safe if a column gets narrower. */
+/* The whole row scales from ONE font-size so the three parts always keep
+   their proportions: the star box is sized in em, the number and count in
+   em. The shop grid is 2-up on phones, which leaves a card only ~114px of
+   text width at 320px, and "4.8 * * * * * . 1,749 ratings" (the widest count
+   in the catalogue) does not fit there at desktop sizes — hence the clamp
+   rather than a fixed size with an ellipsis, which truncated the count. */
+.product-stars-num {
+  color: var(--black);
+  font-weight: 800;
+  font-size: 1.05em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.product-stars-txt {
+  color: var(--gray);
+  font-size: 1em;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-/* ---- compact rows (search results, frequently-bought-together) ---- */
+/* ---- compact rows (search results, frequently-bought-together) ----
+   Same order and the same parts as the card row, one step smaller. */
 .rating-compact {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
   font-size: 11px;
   font-weight: 700;
   color: var(--gray);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .rating-compact .rv-star { width: 12px; height: 12px; }
-.rating-compact strong { color: var(--black); font-weight: 800; }
+.rating-compact strong { color: var(--black); font-weight: 800; font-size: 11px; line-height: 1; }
 .rating-compact-count { font-weight: 600; }
 
-.search-result-meta { display: flex; align-items: center; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
-.fbt-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+/* nowrap: the price and the rating stay on one line together, or the rating
+   drops whole — never mid-phrase. */
+.search-result-meta { display: flex; align-items: center; gap: 10px; margin-top: 2px; flex-wrap: nowrap; min-width: 0; }
+.fbt-meta { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
 
-/* ---- product page: the panel that replaced the reviews accordion ---- */
-.sr-panel { display: flex; flex-direction: column; gap: 14px; }
-
-.sr-score { display: flex; align-items: center; gap: 16px; }
-.sr-score-num {
-  font-family: var(--font-display);
-  font-size: 40px;
-  line-height: 1;
-  color: var(--black);
-}
-.sr-score-meta { display: flex; flex-direction: column; gap: 5px; }
-.sr-score-meta .rv-star { width: 18px; height: 18px; }
-.sr-score-count { font-size: 13px; font-weight: 700; color: var(--gray); }
-
-.sr-note { margin: 0; font-size: 14px; line-height: 1.65; color: var(--gray); }
-.sr-note strong { color: var(--black); font-weight: 800; }
-/* The disclaimer is deliberately the same size as the copy above it, only
-   quieter — shrinking it to fine print is how a disclaimer stops being read. */
-.sr-note--muted {
-  padding-top: 12px;
-  border-top: 1px solid var(--line-soft);
-  color: var(--gray);
-  opacity: 0.9;
-}
-.sr-none { margin: 0; font-size: 14px; font-weight: 600; color: var(--gray); }
-
-@media (max-width: 600px) {
-  .sr-score-num { font-size: 34px; }
-  .search-result-meta { gap: 8px; }
-}
+@media (max-width: 600px) { .search-result-meta { gap: 8px; } }
 
 /* ---- SHOP PAY ON THE PRODUCT PAGE (task 58) ----
    Replaced the old "Buy It Now" button. Shopify's <shop-pay-button> renders a
