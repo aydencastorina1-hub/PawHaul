@@ -848,21 +848,45 @@ nav {
 }
 /* Star row + "4.8 · 322 ratings", on one line. gap (not a margin on the text)
    so the row stays centred as a unit in the carousel's centred card layout. */
+/* BASELINE row, not a flex row. align-items:center lines up the three BOXES,
+   which is not the same as lining up the ink inside them: "4.8" has no
+   descender so it sat 0.7px high, while "ratings" has one so it sat 0.5px
+   low — visibly out of line against the stars at card size. Laying the parts
+   out inline instead puts the number and the count on ONE shared text
+   baseline automatically, and leaves the star box as the single thing that
+   needs positioning (see .product-stars .rv-stars below). */
 .product-stars {
-  display: flex;
-  align-items: center;
-  gap: 0.45em;
+  display: block;
   color: #FFB800;
   /* Scales with the viewport so the single line survives a 2-up grid at
      320px and still reads at full size once the grid goes 3- and 4-up.
      See .product-stars-num for why this is a clamp and not a fixed size. */
   font-size: clamp(7px, 2.1vw, 11px);
+  line-height: 1.6;
   margin-bottom: 8px;
   flex-shrink: 0;
   min-height: 15px;
   white-space: nowrap;
 }
 .product-stars .rv-star { width: 1.25em; height: 1.25em; }
+/* Drops the star box so the star ink centres on the digits' cap band. The
+   starting point is font-metric derived, not eyeballed: cap height is ~0.705em
+   above the baseline, and the star path fills y=2..21.3 of a 24 viewBox, so
+   its ink centre sits 0.643em above the baseline when the box is
+   baseline-aligned — 0.29em too high. Both scale with em, so one value holds
+   across the whole clamp range.
+
+   TRANSFORM, not vertical-align. Measured against the RENDERED PIXELS at six
+   widths: vertical-align snaps the inline box to whole CSS pixels, so the same
+   offset landed 0.31px out at 1440 and 0.69px out at 1024 — the visible
+   "4.8 sits a bit high". A transform is applied after layout and is not
+   snapped, so the offset holds: translateY(0.14em) measures within 0.25px at
+   every width, and the residual is balanced +/- rather than always high. */
+.product-stars .rv-stars {
+  vertical-align: baseline;
+  transform: translateY(0.14em);
+  margin: 0 0.45em;
+}
 .product-stars span { color: var(--gray); font-weight: 600; }
 
 /* Past the 4-up breakpoint the columns stop growing, so pin the row at its
@@ -1687,17 +1711,35 @@ img.reviewer-av {
 /* Product-page rating line beside the price. min-height reserves the row so
    the price and Add To Cart below it do not jolt when renderDetailRating()
    fills it on product open. */
+/* Same three parts, same order and the same baseline alignment as the card
+   row — see the .product-stars block for why this is an inline baseline row
+   with a transform on the stars rather than a centred flex row. Only the
+   sizes differ: this one is not fighting a 2-up grid for width, so it is set
+   at a fixed, larger size instead of the cards' clamp. min-height reserves
+   the row so the price and Add To Cart below do not jolt when
+   renderDetailRating() fills it on product open. */
 .detail-stars {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   color: #FFB800;
-  font-size: 16px;
+  font-size: 13px;
+  line-height: 1.6;
   margin-bottom: 16px;
   min-height: 18px;
+  white-space: nowrap;
 }
-.detail-stars .rv-star { width: 17px; height: 17px; }
-.detail-stars span { color: var(--gray); font-size: 13px; font-weight: 600; }
+.detail-stars .rv-star { width: 1.3em; height: 1.3em; }
+/* 0.09em, not the cards' 0.14em: the number here is 1.25em against the cards'
+   1.05em, so its cap band sits higher above the shared baseline and the stars
+   have to come up to meet it. Swept against rendered pixels — 0.09em lands
+   within 0.06px. */
+.detail-stars .rv-stars {
+  vertical-align: baseline;
+  transform: translateY(0.09em);
+  margin: 0 0.5em;
+}
+.detail-stars .product-stars-num { color: var(--black); font-weight: 800; font-size: 1.25em; }
+.detail-stars .product-stars-txt { color: var(--gray); font-size: 1em; font-weight: 600; }
+.detail-stars span { color: var(--gray); font-weight: 600; }
 .detail-stars:empty { display: none; }
 
 .detail-price {
@@ -4131,7 +4173,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    line boxes are the same height as the real card's — it's just invisible. */
 .skel-card .product-name,
 .skel-card .product-stars,
-/* the review count carries its own colour, so it needs naming explicitly */
+/* the number and the count carry their own colours, so they need naming
+   explicitly. The skeleton row ships the SAME three parts as the real row
+   (number, star box, count) so the height it reserves matches to the pixel —
+   a lighter placeholder was 1px shorter and jolted the grid on swap. */
+.skel-card .product-stars-num,
+.skel-card .product-stars-txt,
 .skel-card .product-stars span,
 .skel-card .product-price,
 .skel-card .btn-black { color: transparent; }
@@ -5215,15 +5262,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   color: var(--black);
   font-weight: 800;
   font-size: 1.05em;
-  line-height: 1;
-  flex-shrink: 0;
 }
 .product-stars-txt {
   color: var(--gray);
   font-size: 1em;
   font-weight: 600;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 /* ---- compact rows (search results, frequently-bought-together) ----

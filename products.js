@@ -3193,18 +3193,22 @@ function renderDetailRating() {
   if (!p) return;
   var s = supplierOf(p);
 
+  // Same three parts in the same order as the cards — bold number, stars,
+  // "· N ratings" — so the product page and the card a shopper clicked
+  // through from read identically. Same class names too, so both share the
+  // one baseline-alignment rule in styles.css rather than drifting apart.
   var line = document.getElementById('detailRating');
   if (line) {
     line.innerHTML = s
-      ? starsHtml(s.rating) +
-        '<span id="detailRatingTxt">' + s.rating.toFixed(1) + ' · ' +
+      ? '<strong class="product-stars-num">' + s.rating.toFixed(1) + '</strong>' +
+        starsHtml(s.rating) +
+        '<span class="product-stars-txt" id="detailRatingTxt">· ' +
         fmtRatings(s.ratings) + ' ratings</span>'
       : '';
     line.style.display = s ? '' : 'none';
     if (s) line.setAttribute('aria-label', supplierAriaLabel(s));
     else line.removeAttribute('aria-label');
   }
-
 }
 
 // Kept from the review system because a dozen callers outside it use this as
