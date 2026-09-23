@@ -319,9 +319,17 @@ nav {
   text-decoration: none; /* now a real <a> (routing) — was a div, never needed this before */
 }
 
-/* Logo is now text-only — circle removed for a clean Ruffwear-style nav.
+/* Paw badge + wordmark on every screen size (desktop, iPad and mobile).
    No tilt/rotation on hover or tap; the logo stays completely still. */
-.logo-circle { display: none; }
+.logo-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  background: var(--black);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
 
 .logo-text {
   font-family: var(--font-display);
@@ -3192,17 +3200,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     flex-wrap: nowrap;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   }
-  /* Restore the paw badge in the nav (mobile only — desktop keeps it hidden) */
-  .logo-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px; height: 36px;
-    background: var(--black);
-    border-radius: 50%;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
+  /* Slightly smaller paw badge to fit the 60px mobile bar */
+  .logo-circle { width: 36px; height: 36px; }
   .logo-text { font-size: 21px; }
   .nav-links { display: none; }
   .nav-full { display: none; }
