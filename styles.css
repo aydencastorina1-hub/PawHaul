@@ -5272,18 +5272,27 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 /* ---- compact rows (search results, frequently-bought-together) ----
    Same order and the same parts as the card row, one step smaller. */
+/* Baseline row on the SAME geometry as the card row — number 1.05em, star
+   box 1.25em, stars nudged 0.14em — so one tuned offset covers both and they
+   cannot drift apart. It was an align-items:center flex row, which put the
+   number 0.62px above the stars for exactly the reason the cards did.
+   Only the container font-size differs, which scales the whole thing. */
 .rating-compact {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
+  display: inline-block;
+  font-size: 10px;
+  line-height: 1.6;
   font-weight: 700;
   color: var(--gray);
   white-space: nowrap;
   flex-shrink: 0;
 }
-.rating-compact .rv-star { width: 12px; height: 12px; }
-.rating-compact strong { color: var(--black); font-weight: 800; font-size: 11px; line-height: 1; }
+.rating-compact .rv-star { width: 1.25em; height: 1.25em; }
+.rating-compact .rv-stars {
+  vertical-align: baseline;
+  transform: translateY(0.14em);
+  margin: 0 0.4em;
+}
+.rating-compact strong { color: var(--black); font-weight: 800; font-size: 1.05em; }
 .rating-compact-count { font-weight: 600; }
 
 /* nowrap: the price and the rating stay on one line together, or the rating
