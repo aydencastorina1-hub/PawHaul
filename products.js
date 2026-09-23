@@ -2150,8 +2150,56 @@ function quickAdd(id) {
   addToCart(item);
 }
 
-var wishlistItems = [];
+// ==================== WISHLIST PERSISTENCE ====================
+// Same per-device scope as the cart (see SHOPIFY CART PERSISTENCE below):
+// no accounts, so the wishlist lives in this browser's localStorage. Only
+// product ids are stored, never product objects, so a returning visitor
+// always sees current names/prices/photos. Loaded synchronously right here,
+// before any grid, carousel or the wishlist page renders, so hearts paint
+// filled on first render with no flash. Ids for products that no longer
+// exist (discontinued/removed) are skipped and pruned from storage.
+var WISHLIST_KEY = 'pawhaul_wishlist';
+
+function loadStoredWishlist() {
+  var ids;
+  try { ids = JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]'); } catch (e) { ids = []; }
+  if (!Array.isArray(ids)) ids = [];
+  var seen = {};
+  var items = [];
+  ids.forEach(function (id) {
+    id = Number(id);
+    if (seen[id]) return;
+    var product = products.find(function (p) { return p.id === id; });
+    if (!product) return;
+    seen[id] = true;
+    items.push(product);
+  });
+  // Rewrite storage if anything was dropped (stale/duplicate/malformed ids).
+  if (items.length !== ids.length) saveWishlist(items);
+  return items;
+}
+
+function saveWishlist(items) {
+  try {
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify((items || wishlistItems).map(function (p) { return p.id; })));
+  } catch (e) { /* localStorage unavailable (private mode etc.) — wishlist just won't persist */ }
+}
+
+var wishlistItems = loadStoredWishlist();
 var currentShopFilter = 'all';
+
+// Keeps other open tabs of the site in step when the wishlist changes in one.
+window.addEventListener('storage', function (e) {
+  if (e.key !== WISHLIST_KEY) return;
+  wishlistItems = loadStoredWishlist();
+  updateWishlistCount();
+  document.querySelectorAll('.wishlist-btn[data-wid]').forEach(function (btn) {
+    var id = Number(btn.getAttribute('data-wid'));
+    btn.textContent = wishlistItems.some(function (w) { return w.id === id; }) ? '♥' : '♡';
+  });
+  var wlPage = document.getElementById('page-wishlist');
+  if (wlPage && wlPage.classList.contains('active')) renderWishlist();
+});
 
 function wishlist(id) {
   var product = products.find(function(p) { return p.id === id; });
@@ -2165,6 +2213,7 @@ function wishlist(id) {
     wishlistItems.push(product);
     showToast('Added to wishlist!');
   }
+  saveWishlist();
   updateWishlistCount();
   // Update heart glyphs in place so the carousel/shop never reset or scroll.
   var inWish = wishlistItems.some(function(w) { return w.id === id; });
