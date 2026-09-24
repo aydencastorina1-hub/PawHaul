@@ -1622,6 +1622,7 @@ img.reviewer-av {
    that marks a sold-out SIZE, nothing to do with pricing.) */
 
 .detail-desc { font-size: 15px; color: var(--gray); line-height: 1.7; font-weight: 600; margin-bottom: 20px; }
+.detail-desc p + p { margin-top: 12px; }
 
 /* Short one-line value statement — sits between price and the selectors,
    above the fold, so shoppers get the "why buy this" before the long

@@ -305,7 +305,7 @@ const PRODUCT_COPY = {
   },
   6: {
     title: 'LED Dog Collar — USB Rechargeable Night Collar',
-    description: 'USB rechargeable LED dog collar with three light modes for night walks. Four neck sizes from 13 to 22 inches, detachable. From $14.99 with free shipping.'
+    description: 'USB rechargeable LED dog collar with three light modes for night walks. Complete collar with a reflective stripe, four neck sizes from 13 to 22 inches. From $14.99, free shipping.'
   }
 };
 

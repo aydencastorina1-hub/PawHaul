@@ -8,7 +8,9 @@ var products = [
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
     supplier: { rating: 4.8, ratings: 322 },
-    desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
+    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
+    // product page. Facts only from the supplier listing images and this file.
+    desc: "Water and food in one bottle you can carry in one hand. The top is a clear food container that holds about 180ml of kibble. The bottom is the water bottle: about 350ml in the regular size, 550ml in the large. When your dog needs a drink, press the button on the side and water fills the drinking trough.\n\nMost dogs don't need much water on a walk. They need some at the right moment, and that moment is usually a mile from home. Cupping your hand under a normal bottle wastes most of it and soaks your sleeve. This gives them a proper trough to drink from. The food section means longer outings and hikes don't need a separate bag of kibble.\n\nWhat sets it apart from a basic dog bottle is the lock. A downward lock on the button stops water being let out by accident. A sealing gasket inside keeps the food section dry, so it can ride in a bag without leaking. The food container lifts off when you need it, and the carry strap goes round your wrist.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
@@ -66,16 +68,17 @@ var products = [
       } },
 
     features: [
-      "Leak-proof — holds water and dry food in one sealed container",
-      "Flip-out drinking spout for easy on-the-go hydration",
-      "Lightweight and durable — great for walks, hikes and travel",
-      "Ideal for small to medium dogs",
-      "BPA-free food-grade materials throughout",
-      "One-hand open and lock operation",
-      "Easy to clean — all parts detach"
+      "About 180ml of food on top, water below",
+      "350ml or 550ml water size",
+      "Press-button water release with a downward lock",
+      "Built-in sealing gasket keeps food dry",
+      "Detachable food container",
+      "Carry strap",
+      "BPA-free materials",
+      "Pink, White or Blue"
     ],
-    material: "BPA-free food-grade plastic body · Food-safe silicone drinking spout · Leak-proof sealed food compartment",
-    whatsInBox: "1× 2-in-1 Dog Water Bottle (water + food compartments)"
+    material: "BPA-free plastic body and food container · Leak-proof sealing gasket · Carry strap",
+    whatsInBox: "1× 2-in-1 Dog Water Bottle (bottle, detachable food container, carry strap)"
   },
   {
     id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "",
@@ -85,7 +88,9 @@ var products = [
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
     supplier: { rating: 4.8, ratings: 1749 },
-    desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
+    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
+    // product page. Facts only from the supplier listing images and this file.
+    desc: "A full-size dog bowl that folds down to a flat disc. It's silicone, 5.12 inches across and just under 2 inches deep when open. It presses flat when you're done, so it takes up almost no room. A carabiner is built in, so it clips to your bag, a belt loop or the leash.\n\nIf you already carry water for yourself, this is the lightest way to share it. Pour it in, let your dog drink properly instead of lapping from your palm, then shake it out and fold it. It works just as well for a portion of kibble on trips and days out.\n\nRigid travel bowls stay bulky in a bag. This one folds flat when closed, holds its shape when open, and rinses clean in seconds.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
@@ -142,15 +147,15 @@ var products = [
       } },
 
     features: [
-      "Folds completely flat for easy storage",
-      "Pops open in seconds for food or water",
-      "Built-in carabiner clip hooks onto your bag, belt, or leash",
-      "Great size for walks and travel",
-      "Easy to clean — just rinse and fold",
-      "Durable, lightweight food-grade silicone",
-      "6 colors to choose from"
+      "Folds completely flat",
+      "5.12in wide × 1.97in deep when open",
+      "Built-in carabiner clip",
+      "For water or food",
+      "Rinses clean in seconds",
+      "Food-grade silicone",
+      "Six colours"
     ],
-    material: "Food-grade silicone bowl · Built-in carabiner clip",
+    material: "Food-grade silicone · Built-in carabiner clip",
     whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
@@ -161,7 +166,9 @@ var products = [
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
     supplier: { rating: 4.5, ratings: 638 },
-    desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
+    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
+    // product page. Facts only from the supplier listing images and this file.
+    desc: "A proper everyday collar with the light built into it. A glowing LED strip runs along the nylon band, switched by a button on the collar, with three modes: fast blink, slow blink and steady glow. It charges over USB with the cable included, fills up in about 2 hours, and lasts several walks between charges.\n\nAt night a dog is low to the ground, often dark-coated and usually a few steps ahead of you. That puts it where drivers and cyclists look last. A lit collar puts light at the neck, the part that reaches the road first, so your dog is seen from any angle, not only when a headlight happens to hit them.\n\nUnlike clip-on lights that dangle and swing, the light is part of the band. It also has a reflective stripe as a backup, a quick-release buckle, a size adjuster and a chrome-plated D-ring for the leash, so it's a complete collar, not an add-on. It's rechargeable, so there are no coin batteries to buy.",
     tagline: "Be seen on every night walk, no matter how dark.",
     sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
@@ -259,15 +266,16 @@ var products = [
       } },
 
     features: [
-      "3 light modes — fast blink, slow blink, steady glow",
-      "Super bright at night — visible from far away",
-      "USB rechargeable — full charge in about 2 hours",
-      "Long battery life — holds a charge through multiple walks",
-      "Stays cool — doesn't overheat during wear",
-      "Detachable design fits any standard collar setup",
-      "4 sizes from S (13-16 in) to XL (16-22 in)"
+      "Three modes: fast blink, slow blink, steady glow",
+      "USB rechargeable, about 2 hours to full charge",
+      "On/off button on the collar",
+      "Reflective stripe for extra visibility",
+      "Quick-release buckle, size adjuster, chrome-plated D-ring",
+      "0.98in-wide nylon strap",
+      "Rated waterproof by the manufacturer",
+      "Four sizes, S to XL · five colours"
     ],
-    material: "Flexible LED light strip · USB rechargeable battery · Durable webbing band",
+    material: "Nylon strap with reflective stripe · LED light strip · Rechargeable battery · Chrome-plated D-ring",
     whatsInBox: "1× LED dog collar · 1× USB charging cable"
   },
   {
@@ -282,7 +290,9 @@ var products = [
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
     supplier: { rating: 4.9, ratings: 546 },
-    desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
+    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
+    // product page. Facts only from the supplier listing images and this file.
+    desc: "A loop of braided cord that ties your leash handle to your wrist. Clip it onto the handle, slide the loop over your hand and pull the slider snug. You hold the leash exactly as you do now. The strap just means that if your grip ever fails, the handle stays with you.\n\nThe most common way a dog gets loose isn't slipping its collar. The handle gets yanked out of a hand: a squirrel, a cold morning, a phone in the other hand, a strong dog hitting the end of the leash. Retractable handles are the worst for it, because they're chunky and a dropped one skids along the ground behind the dog.\n\nIt weighs next to nothing, clips onto any leash (retractable or standard) and adjusts to any wrist. It can stay on the leash between walks, so there's nothing to remember.",
     tagline: "If the leash slips, it stays on your wrist.",
     // Single option in Shopify (Color only). A non-empty sizes array is
     // required — showProduct() maps over it unconditionally — and a lone size
@@ -337,12 +347,12 @@ var products = [
       } },
 
     features: [
-      "Keeps the leash secured to your wrist if it slips",
-      "Adjustable — tightens to fit any wrist",
-      "Clips onto any leash, retractable or standard",
-      "Lightweight braided cord, barely noticeable to wear",
-      "Frees up your grip without letting go of your dog",
-      "6 colors to choose from"
+      "Keeps the handle on your wrist if it slips",
+      "Adjustable slider fits any wrist",
+      "Metal clip fits any leash, retractable or standard",
+      "Lightweight braided nylon cord",
+      "Stays on the leash between walks",
+      "Six colours"
     ],
     material: "Braided nylon paracord · Adjustable slide · Metal clip",
     whatsInBox: "1× Anti-Drop Leash Wrist Strap"
@@ -369,7 +379,9 @@ var products = [
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
     supplier: { rating: 4.8, ratings: 174 },
-    desc: "See and be seen on every walk. This retractable leash features a built-in LED light for visibility on nighttime walks, plus a built-in flashlight to help you spot what's ahead in the dark. Quick-release design and durable build fit dogs and cats of all sizes. Note: requires 2 AAA batteries, not included.",
+    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
+    // product page. Facts only from the supplier listing images and this file.
+    desc: "A retractable leash with two lights in the handle. A colour-changing LED ring keeps your dog and you visible. A flashlight at the front points wherever the leash does. One touch button cycles through flashlight, light ring, both, and off.\n\nAfter dark, being seen is only half the problem. You also can't see what your dog is sniffing, what's on the path, or where the kerb ends. A phone torch ties up the hand you need for everything else. With the light in the handle you're already holding, your other hand stays free.\n\nUnder the lights it's a solid retractable leash. It has nylon tape, a lock button you work with your thumb to fix the length, a U-shaped outlet that feeds the tape out and back smoothly from any angle, and a non-slip grip. It comes in 3M or 5M and runs on 2 AAA batteries, not included, which go in behind a cover on the underside.",
     tagline: "A leash that lights the dog and the path.",
 
     // Shown as a pill under the tagline and surfaced by the chatbot.
@@ -436,14 +448,16 @@ var products = [
       } },
 
     features: [
-      "Built-in LED light ring keeps your dog visible after dark",
-      "Built-in flashlight lights the path ahead",
-      "Touch control cycles flashlight, light ring and off",
-      "Quick-release brake and lock button",
-      "Suits dogs and cats of all sizes",
-      "Available in 3M and 5M lengths"
+      "Colour-changing LED light ring",
+      "Built-in LED flashlight",
+      "One button: flashlight, light ring, both, off",
+      "One-hand lock button to fix the length",
+      "U-shaped outlet for smooth 360° retraction",
+      "Ergonomic, non-slip grip",
+      "3M or 5M · Purple, Green or Orange",
+      "Runs on 2 AAA batteries (not included)"
     ],
-    material: "ABS housing · Durable nylon tape · LED light ring",
+    material: "ABS housing · Nylon tape · Metal snap clip · LED light ring and flashlight",
     whatsInBox: "1× LED flashlight retractable leash (2 AAA batteries not included)"
   }
 ];
@@ -1466,7 +1480,11 @@ function showProduct(id, opts) {
       caseNoteEl.style.display = 'none';
     }
   }
-  document.getElementById('detailDesc').textContent = currentProduct.desc;
+  // desc is plain text with blank-line paragraph breaks; each becomes a <p>.
+  var descEl = document.getElementById('detailDesc');
+  descEl.innerHTML = String(currentProduct.desc || '').split(/\n\s*\n/).map(function (para) {
+    return '<p>' + esc(para.trim()) + '</p>';
+  }).join('');
   document.getElementById('detailTagline').textContent = currentProduct.tagline || '';
   // The price-block rating line and the panel that replaced the old reviews
   // accordion are both rendered straight from this product's own `supplier`
