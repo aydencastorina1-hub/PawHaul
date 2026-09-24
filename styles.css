@@ -5045,3 +5045,110 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 .det-carousel { touch-action: pan-x pan-y pinch-zoom; }
 
 
+
+/* ============================================================
+   BUNDLES (shop page, task 112) — under the product grid. Cards are
+   rendered by renderBundles() in products.js. Two columns on desktop,
+   `wide` bundles spanning both; one column on phones.
+   ============================================================ */
+.bundles-section { margin-top: 90px; }
+.bundles-header { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.bundles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.bundle-card {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 24px 24px 22px;
+  min-width: 0;
+}
+.bundle-card--wide { grid-column: 1 / -1; }
+.bundle-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bundle-name { font-family: var(--font-display); font-size: 24px; color: var(--black); line-height: 1.2; }
+.bundle-pill {
+  flex-shrink: 0;
+  background: var(--orange);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  padding: 5px 12px;
+  border-radius: 50px;
+}
+.bundle-blurb { margin: 8px 0 16px; font-size: 14.5px; font-weight: 600; line-height: 1.6; color: var(--gray); }
+
+.bundle-items { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
+.bundle-card--wide .bundle-items { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); column-gap: 14px; }
+.bundle-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: var(--offwhite);
+  border-radius: var(--radius-sm);
+  min-width: 0;
+}
+.bundle-thumb {
+  flex: 0 0 56px;
+  width: 56px; height: 56px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+}
+.bundle-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bundle-item-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.bundle-item-name { font-size: 14px; font-weight: 800; color: var(--black); line-height: 1.3; }
+.bundle-item-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.bundle-select {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--black);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px 8px;
+  max-width: 100%;
+  cursor: pointer;
+}
+.bundle-select:focus-visible { outline: 2px solid var(--orange); outline-offset: 1px; }
+.bundle-item-price { flex-shrink: 0; font-size: 13.5px; font-weight: 800; color: var(--gray); }
+
+.bundle-foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-soft);
+}
+.bundle-prices { display: flex; flex-direction: column; gap: 2px; }
+.bundle-sep { font-size: 13px; font-weight: 700; color: var(--gray); }
+.bundle-price { display: flex; align-items: baseline; gap: 10px; }
+.bundle-price .price-now { font-size: 26px; }
+.bundle-save { font-size: 13px; font-weight: 800; color: var(--green); }
+.bundle-add { width: auto; padding-left: 26px; padding-right: 26px; }
+
+.summary-bundle span:last-child { color: var(--green); font-weight: 800; }
+
+@media (max-width: 767px) {
+  .bundles-section { margin-top: 64px; }
+  .bundles-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .bundle-card { padding: 20px 16px 18px; }
+  .bundle-card--wide .bundle-items { grid-template-columns: minmax(0, 1fr); }
+  .bundle-name { font-size: 21px; }
+  .bundle-foot { flex-direction: column; align-items: stretch; }
+  .bundle-add { width: 100%; }
+}

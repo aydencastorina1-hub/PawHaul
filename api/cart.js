@@ -3,7 +3,8 @@
 // One endpoint, dispatched by body.action, backing the persistent-cart
 // feature: products.js keeps a real Shopify cart in sync with the local
 // `cart` array (create the first time a variant is added, addLines/
-// updateLines/removeLines after that, reusing the same cart id — see the
+// updateLines/removeLines after that, discountCodes for bundle codes,
+// reusing the same cart id — see the
 // SHOPIFY CART PERSISTENCE section in products.js) and restores it from
 // Shopify on a later visit via `get`. The final Checkout button (checkout()
 // in products.js) also lands here, reusing whatever cart is already synced.
@@ -60,6 +61,20 @@ function sanitizeMerchandiseLines(rawLines) {
   return lines;
 }
 
+// Bundle discount codes (task 112). Shopify decides whether a code actually
+// discounts anything — an unknown or ineligible code comes back with
+// applicable: false rather than an error — so all this does is keep the
+// input to plain code-shaped strings.
+function sanitizeDiscountCodes(raw) {
+  var codes = [];
+  if (!Array.isArray(raw)) return codes;
+  for (var i = 0; i < raw.length && codes.length < 5; i++) {
+    var c = raw[i];
+    if (typeof c === "string" && /^[A-Za-z0-9_-]{3,40}$/.test(c) && codes.indexOf(c) === -1) codes.push(c);
+  }
+  return codes;
+}
+
 // Same idea for updateLines, which addresses a line by its own CartLine id
 // (not a variant id) plus a new quantity.
 function sanitizeUpdateLines(rawLines) {
@@ -82,7 +97,7 @@ function sanitizeUpdateLines(rawLines) {
 // client can map a Shopify line back to a local cart item and target that
 // exact line on the next quantity change/removal).
 var CART_FIELDS =
-  "id checkoutUrl lines(first: 100) { edges { node { id quantity merchandise { ... on ProductVariant { id } } } } }";
+  "id checkoutUrl discountCodes { code applicable } lines(first: 100) { edges { node { id quantity merchandise { ... on ProductVariant { id } } } } }";
 
 async function shopifyGraphql(domain, token, query, variables) {
   var res = await fetch("https://" + domain + "/api/2024-10/graphql.json", {
@@ -156,7 +171,8 @@ function respondWithMutation(res, r, mutationName) {
     ok: true,
     cartId: resultCart.id,
     checkoutUrl: resultCart.checkoutUrl,
-    lines: linesFromCart(resultCart)
+    lines: linesFromCart(resultCart),
+    discountCodes: resultCart.discountCodes || []
   });
 }
 
@@ -213,7 +229,8 @@ module.exports = async function handler(req, res) {
         ok: true,
         cartId: gotCart.id,
         checkoutUrl: gotCart.checkoutUrl,
-        lines: linesFromCart(gotCart)
+        lines: linesFromCart(gotCart),
+        discountCodes: gotCart.discountCodes || []
       });
       return;
     }
@@ -225,9 +242,9 @@ module.exports = async function handler(req, res) {
         return;
       }
       var mCreate =
-        "mutation CartCreate($lines: [CartLineInput!]!) { cartCreate(input: { lines: $lines }) { cart { " +
+        "mutation CartCreate($lines: [CartLineInput!]!, $codes: [String!]) { cartCreate(input: { lines: $lines, discountCodes: $codes }) { cart { " +
         CART_FIELDS + " } userErrors { field message } } }";
-      var rCreate = await shopifyGraphql(domain, token, mCreate, { lines: createLines });
+      var rCreate = await shopifyGraphql(domain, token, mCreate, { lines: createLines, codes: sanitizeDiscountCodes(body.discountCodes) });
       respondWithMutation(res, rCreate, "cartCreate");
       return;
     }
@@ -267,6 +284,21 @@ module.exports = async function handler(req, res) {
         CART_FIELDS + " } userErrors { field message } } }";
       var rRem = await shopifyGraphql(domain, token, mRem, { cartId: body.cartId, lineIds: lineIds });
       respondWithMutation(res, rRem, "cartLinesRemove");
+      return;
+    }
+
+    if (action === "discountCodes") {
+      // Replaces the cart's whole code list (Shopify's semantics) — the
+      // client always sends every bundle code that should be on the cart.
+      if (!isGid(body.cartId, "Cart")) {
+        res.status(400).json({ ok: false, error: "No cart id given." });
+        return;
+      }
+      var mCodes =
+        "mutation CartDiscountCodesUpdate($cartId: ID!, $codes: [String!]) { cartDiscountCodesUpdate(cartId: $cartId, discountCodes: $codes) { cart { " +
+        CART_FIELDS + " } userErrors { field message } } }";
+      var rCodes = await shopifyGraphql(domain, token, mCodes, { cartId: body.cartId, codes: sanitizeDiscountCodes(body.discountCodes) });
+      respondWithMutation(res, rCodes, "cartDiscountCodesUpdate");
       return;
     }
 
