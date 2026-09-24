@@ -35,7 +35,7 @@ for name in sorted(os.listdir(SRC_DIR)):
     widths.append(min(nw, BUCKETS[-1]) if nw < BUCKETS[-1] else nw)
     widths = sorted(set(widths))
     # Cap the top variant: nothing on this site renders wider than ~1800 CSS px
-    # even on a 2x full-bleed category hero.
+    # even on a 2x full-width image.
     widths = [w for w in widths if w <= 1800] or [min(nw, 1800)]
 
     out_widths = []

@@ -118,12 +118,15 @@ function pinCopy(product) {
 
 function hashtagsFor(product) {
   const base = ['#dogwalk', '#doggear', '#dogsofpinterest', '#puppylove'];
-  const byCategory = {
-    water: ['#doghydration', '#dogtravel', '#dogwaterbottle'],
-    leash: ['#dogleash', '#dogwalking', '#dogtraining'],
-    safety: ['#dogsafety', '#nightwalks', '#dogcollar']
+  // Per product, keyed by id.
+  const byProduct = {
+    1: ['#doghydration', '#dogtravel', '#dogwaterbottle'],
+    3: ['#doghydration', '#dogtravel', '#dogbowl'],
+    6: ['#dogsafety', '#nightwalks', '#dogcollar'],
+    9: ['#dogleash', '#dogwalking', '#dogtraining'],
+    10: ['#dogleash', '#nightwalks', '#dogsafety']
   };
-  return base.concat(byCategory[product.category] || []).join(' ');
+  return base.concat(byProduct[product.id] || []).join(' ');
 }
 
 // Pinterest fetches the image itself, so it must be a public URL. Shopify's CDN

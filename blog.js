@@ -25,7 +25,7 @@ var blogPosts = [
     metaDescription: 'A step-by-step guide to stopping leash pulling — why dogs pull, the training method that actually works, and the gear that makes it easier.',
     excerpt: 'Pulling is the single most common walk complaint dog owners have. Here is why it happens, and the training approach that fixes it without hurting your dog.',
     date: '2026-07-14',
-    updated: '2026-09-23',
+    updated: '2026-09-24',
     readMins: 7,
     image: 'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog walking calmly on a loose leash beside its owner',
@@ -68,7 +68,7 @@ var blogPosts = [
 <p>No piece of equipment trains a dog. What good gear does is remove the friction that makes people quit the training halfway through.</p>
 <p>The single biggest hardware factor is leash control. A leash that jams, or that has no way to shorten it quickly, forces you into exactly the bracing tug-of-war that triggers the opposition reflex. A retractable leash with a genuine one-touch lock lets you give a well-behaved dog room to sniff and then shorten the line instantly when a distraction appears — and locking the line short is a very different action from hauling on it.</p>
 <div class="blog-cta">
-  <p><strong>Gear that helps:</strong> the <a href="/product/retractable-dog-leash">Retractable Dog Leash</a> has a one-touch lock button and a jam-free mechanism, in 10ft and 16ft lengths. Being able to fix the length in one thumb press is what makes the stop-and-go method practical on a real street.</p>
+  <p><strong>Gear that helps:</strong> the <a href="/product/led-flashlight-retractable-dog-leash">LED Flashlight Retractable Dog Leash</a> has a lock button and a quick-release brake, in 3M and 5M lengths. Being able to fix the length in one thumb press is what makes the stop-and-go method practical on a real street — and its light ring and flashlight mean the same leash covers the dark evening sessions too.</p>
 </div>
 
 <h2>Make sure a lunge can't cost you the leash</h2>
@@ -80,7 +80,7 @@ var blogPosts = [
 
 <h2>Free your hands</h2>
 <p>The second friction point is more mundane: you cannot train a dog while juggling. Loose-leash work needs one hand on the leash and one hand free for treats and for marking good position. If one hand is permanently occupied by a bag of waste, the training simply does not happen.</p>
-<p>This is worth solving properly. A <a href="/product/poop-bag-clip">hands-free poop bag clip</a> takes the used bag off your hand and onto the leash, and a <a href="/product/poop-bag-holder">bag holder</a> keeps the unused roll where you can reach it without stopping and searching your pockets. Small things — but they are the difference between doing the routine and skipping it.</p>
+<p>This is worth solving properly. Tie the used bag off and get it out of your hand — a zipped jacket pocket or a small bag does the job — and keep the spare bags somewhere you can reach without stopping. An <a href="/product/anti-drop-leash-wrist-strap">anti-drop wrist strap</a> helps here too: with the handle secured to your wrist, you can loosen your grip to reach for a treat without any risk of dropping the leash. Small things — but they are the difference between doing the routine and skipping it.</p>
 
 <h2>What not to do</h2>
 <ul>
@@ -102,7 +102,7 @@ var blogPosts = [
     metaDescription: 'Drivers need far more stopping distance than most owners realise. Here is how far away your dog is actually visible at night, and how to fix it.',
     excerpt: 'A driver at 30mph needs about 75 feet to stop. An unlit dog on a dark road is visible from about 55. Here is how to close that gap.',
     date: '2026-07-24',
-    updated: '2026-09-23',
+    updated: '2026-09-24',
     readMins: 6,
     image: 'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog on an evening walk in low light',
@@ -148,7 +148,7 @@ var blogPosts = [
 <p>Visibility gear stops accidents. It does nothing if a spooked dog tears the leash out of your hand and bolts into the dark — and fireworks, thunder and a car backfiring all cause exactly that. It happens more at night because you are carrying more, your hands are cold, and you did not see the fox until your dog did.</p>
 <p>A loose dog in the dark is the situation all the visibility gear is trying to prevent, so the cheapest insurance is making sure the handle physically cannot leave you. A strap from the leash to your wrist does that: one sudden lunge costs you a stumble, not your dog.</p>
 <div class="blog-cta">
-  <p><strong>Gear that helps:</strong> the <a href="/product/anti-drop-leash-wrist-strap">Anti-Drop Leash Wrist Strap</a> clips onto any leash — including both retractable leashes — and adjusts to fit your wrist, so if the handle slips out of a cold hand it stays attached to you.</p>
+  <p><strong>Gear that helps:</strong> the <a href="/product/anti-drop-leash-wrist-strap">Anti-Drop Leash Wrist Strap</a> clips onto any leash — including the LED flashlight leash — and adjusts to fit your wrist, so if the handle slips out of a cold hand it stays attached to you.</p>
 </div>
 
 <h2>Route choices matter as much as gear</h2>
@@ -182,7 +182,7 @@ var blogPosts = [
     metaDescription: 'Everything worth carrying on a dog walk, sorted by walk length — the five essentials, what to add past 30 minutes, and what you can safely leave home.',
     excerpt: 'Sorted by how long you are actually going out for, from a ten-minute block loop to a half-day hike. Plus the items people carry that they do not need.',
     date: '2026-08-01',
-    updated: '2026-09-23',
+    updated: '2026-09-24',
     readMins: 8,
     image: 'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog and owner setting out on a walk',
@@ -199,9 +199,6 @@ var blogPosts = [
   <li><strong>A way to carry the used bag.</strong> Genuinely a core item, not a luxury. Otherwise you spend the rest of the walk one-handed, which means no phone, no treats, no real leash control.</li>
   <li><strong>Your phone.</strong> Not for scrolling — for the vet's number, a torch, and a photo of your dog if you ever have to show someone what you are looking for.</li>
 </ol>
-<div class="blog-cta">
-  <p><strong>Solving number four properly:</strong> the <a href="/product/poop-bag-clip">Poop Bag Clip</a> holds a tied-off bag on the leash so both your hands stay free, and the <a href="/product/poop-bag-holder">Poop Bag Holder</a> carries the unused roll on a carabiner so you are never searching your pockets one-handed with a dog pulling.</p>
-</div>
 
 <h2>Walks over 30 minutes: add water</h2>
 <p>Thirty minutes is roughly the line where water stops being optional, and it moves a lot earlier in heat — over about 24°C, take water on any walk at all.</p>
@@ -249,7 +246,7 @@ var blogPosts = [
 <p>The failure mode with dog gear is not owning too little. It is owning so much that you stop taking any of it, and end up walking out with a leash and one bag because assembling the kit became a chore. Keep the everyday set small enough that it lives by the door and goes with you automatically.</p>
 
 <h2>The by-the-door test</h2>
-<p>Everything on the essentials list should live in one place near the door and require zero decisions. Bags in the holder on the leash, light on the collar, bottle filled and ready. If getting out of the house takes more than about fifteen seconds of preparation, the gear will gradually stop coming with you — and gear you leave at home protects nobody.</p>
+<p>Everything on the essentials list should live in one place near the door and require zero decisions. Bags in your pocket, light on the collar, bottle filled and ready. If getting out of the house takes more than about fifteen seconds of preparation, the gear will gradually stop coming with you — and gear you leave at home protects nobody.</p>
 `
   },
   {

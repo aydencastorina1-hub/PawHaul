@@ -20,6 +20,7 @@
       },
       "continue": true
     },
+    { "src": "/shop/(.+)", "status": 301, "headers": { "Location": "/shop" } },
     { "src": "/", "dest": "/api/render?path=/" },
     { "src": "/sitemap\\.xml", "dest": "/api/sitemap" },
     { "src": "/feed\\.xml", "dest": "/api/feed" },

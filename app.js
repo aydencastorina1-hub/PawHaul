@@ -338,20 +338,12 @@ function closePolicyModal() {
 
 // ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
 var bundleMap = {
-  1: [2, 3],    // Water Bottle → suggest Retractable Leash + Bowl
-  // The wrist strap clips onto the leash itself, so it leads the leash's
-  // suggestions. Added rather than swapped — the existing bag pairings were
-  // not removed to make room.
-  2: [9, 5, 8], // Retractable Leash → suggest Wrist Strap + Poop Bag Clip + Poop Bag Holder
-  3: [1, 2],    // Bowl → suggest Water Bottle + Retractable Leash
-  5: [8, 2],    // Poop Bag Clip → suggest Poop Bag Holder + Retractable Leash
-  // LED Collar used to also suggest the Dog AirTag Holder; that product
-  // was removed from the catalogue, so this is now a two-item pairing (which
-  // showBundle already handles — it switches to "Combined Price" / "Add Both
-  // To Cart"). No replacement was invented for it.
-  6: [2],       // LED Collar → suggest Retractable Leash
-  8: [5, 1],    // Poop Bag Holder → suggest Poop Bag Clip + Water Bottle
-  9: [2, 5],    // Wrist Strap → suggest Retractable Leash + Poop Bag Clip
+  1: [3, 10],   // Water Bottle → suggest Bowl + LED Leash
+  3: [1, 10],   // Bowl → suggest Water Bottle + LED Leash
+  6: [10, 9],   // LED Collar → suggest LED Leash + Wrist Strap (the night-walk set)
+  // The wrist strap clips onto the leash itself, so the leash leads its
+  // suggestions.
+  9: [10, 6],   // Wrist Strap → suggest LED Leash + LED Collar
   // The LED leash is the night-visibility option, so it pairs with the
   // other two things that make a dark walk safer.
   10: [6, 9],   // LED Leash → suggest LED Collar + Wrist Strap
@@ -590,7 +582,6 @@ function trackAddToCart(product, price, size, color) {
     items: [{
       item_id: 'PH-' + product.id,
       item_name: product.name,
-      item_category: product.category,
       item_variant: [size, color].filter(Boolean).join(' / ') || undefined,
       price: Number(price) || Number(product.price) || 0,
       quantity: 1
@@ -604,8 +595,8 @@ function trackAddToCart(product, price, size, color) {
 
 // ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
-showPage = function(page, filter, opts) {
-  _origShowPage(page, filter, opts);
+showPage = function(page, opts) {
+  _origShowPage(page, opts);
   closeMobileMenu();
   closeSearch();
   if (SPA_PAGE_TITLES[page]) setSpaTitle(SPA_PAGE_TITLES[page]);
@@ -787,7 +778,7 @@ function offlineIsUp() {
 // Rotating placeholder: cycles example searches while the input is empty
 // (pauses automatically once the user types — the overlay hides via the
 // input listener below, and we skip advancing while there's text).
-var SEARCH_PLACEHOLDERS = ['Search leashes...', 'Search collars...', 'Search water bottles...', 'Search safety gear...'];
+var SEARCH_PLACEHOLDERS = ['Search leashes...', 'Search collars...', 'Search water bottles...', 'Search bowls...'];
 var searchPhTimer = null;
 var searchPhIdx = 0;
 
@@ -809,13 +800,6 @@ function startSearchPhCycle() {
 
 function stopSearchPhCycle() {
   if (searchPhTimer) { clearInterval(searchPhTimer); searchPhTimer = null; }
-}
-
-// Category card in the search panel: jump to the shop with that filter
-// active, then close the overlay.
-function searchGoCategory(cat) {
-  showPage('shop', cat || 'all');
-  closeSearch();
 }
 
 function toggleSearch() {
@@ -844,7 +828,7 @@ function closeSearch() {
   var bar = document.getElementById('navSearchBar');
   var scrim = document.getElementById('searchScrim');
   if (!bar) return;
-  bar.classList.remove('open', 'typing');
+  bar.classList.remove('open');
   if (scrim) scrim.classList.remove('open');
   syncOverlayChrome();
   stopSearchPhCycle();
@@ -862,14 +846,11 @@ function doSearch(val) {
   var q = (val || '').trim().toLowerCase();
   if (!q) { res.innerHTML = ''; return; }
   var list = (typeof products !== 'undefined') ? products : [];
-  // Name matches rank first, then category/description matches below them.
+  // Name matches rank first, then description/tag matches below them.
   var nameHits = [], otherHits = [];
   list.forEach(function(p) {
     if (p.name.toLowerCase().indexOf(q) !== -1) { nameHits.push(p); return; }
-    // productCategories() so a dual-category product is findable by BOTH of
-    // its aisles, not just the primary one.
-    var cats = (typeof productCategories === 'function') ? productCategories(p).join(' ') : (p.category || '');
-    var haystack = (cats + ' ' + (p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
+    var haystack = ((p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
     if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
   var matches = nameHits.concat(otherHits);
@@ -933,8 +914,6 @@ function doSearch(val) {
   if (inp && ph) {
     inp.addEventListener('input', function() {
       ph.classList.toggle('ph-hidden', !!inp.value);
-      // While typing, the browse-by-category cards give way to live results
-      if (bar) bar.classList.toggle('typing', !!inp.value);
     });
   }
 })();
@@ -948,7 +927,7 @@ function doSearch(val) {
 //     further than a slow drag. The handler this replaces wrote scrollLeft
 //     1:1 during the drag and then advanced exactly ONE card on release, so
 //     a flick and a crawl landed in the identical spot (measured: both
-//     327px on the collections track, on every carousel, at every width).
+//     327px on every carousel, at every width).
 //   - The scroll runs on the compositor instead of a requestAnimationFrame
 //     loop writing scrollLeft on the main thread every frame.
 //   - The browser does the snapping, so slides land flush. The reviews
@@ -1176,10 +1155,10 @@ document.addEventListener('DOMContentLoaded', function() {
   // section here can hit this, since none of them render fresh JS content
   // at boot the way the carousel does. Confirmed via real CDP screencast
   // frames on a throttled connection (opacity traced 1 -> ~0 -> 1).
-  var sel = '.collections-section, .why-section, .mission-section, .reviews-section, .faq-section, .email-section';
-  // Only reveal-gate sections that start fully below the fold. .collections-section
-  // in particular is often already partly visible in the first viewport on load, and
-  // IntersectionObserver's first callback isn't synchronous with paint — that race
+  var sel = '.why-section, .mission-section, .reviews-section, .faq-section, .email-section';
+  // Only reveal-gate sections that start fully below the fold: a section already
+  // partly visible in the first viewport on load would race IntersectionObserver
+  // — its first callback isn't synchronous with paint — that race
   // could leave an already-on-screen section sitting at opacity:0 for several hundred
   // ms (looked like a black/blank section flash) before the observer caught up.
   var els = Array.prototype.filter.call(document.querySelectorAll(sel), function(el) {
@@ -1201,9 +1180,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(revealAll, 1200);
 
   initCarousel('revCarousel', 'revCarouselPrev', 'revCarouselNext');
-  // Collections benefit carousel is static HTML (never re-rendered), so a
-  // single init here is enough — same drag/arrow/boundary logic as the rest.
-  initCarousel('collectionsCarousel', 'colCarPrev', 'colCarNext');
 });
 
 // ==================== LIFESTYLE IMAGE FADE-IN ====================
@@ -1236,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 //
 // Delegated on the document rather than bound per image, because almost
 // every photo on this site is written into the page later — product grids,
-// the detail gallery, blog cards, the shop hero band, the popups — and a
+// the detail gallery, blog cards, the popups — and a
 // listener attached at load time would miss all of them.
 //
 // Capture phase so a component that stops propagation on its own container
@@ -1583,8 +1559,8 @@ document.addEventListener('keydown', function(e) {
 // index.html and the helpers further up this file.
 
 var _trackOrigShowPage = showPage;
-showPage = function (page, filter, opts) {
-  _trackOrigShowPage(page, filter, opts);
+showPage = function (page, opts) {
+  _trackOrigShowPage(page, opts);
   trackPageView();
 };
 
@@ -1597,7 +1573,7 @@ showProduct = function (id, opts) {
     trackEvent('view_item', {
       currency: 'USD',
       value: lv.price,
-      items: [{ item_id: 'PH-' + p.id, item_name: p.name, item_category: p.category, price: lv.price }]
+      items: [{ item_id: 'PH-' + p.id, item_name: p.name, price: lv.price }]
     });
   }
   trackPageView();
@@ -1633,7 +1609,7 @@ if (typeof checkout === 'function') {
     try {
       var items = (typeof cart !== 'undefined' ? cart : []).map(function (i) {
         return {
-          item_id: 'PH-' + i.id, item_name: i.name, item_category: i.category,
+          item_id: 'PH-' + i.id, item_name: i.name,
           item_variant: [i.size, i.color].filter(Boolean).join(' / ') || undefined,
           price: Number(i.price) || 0, quantity: i.qty || 1
         };

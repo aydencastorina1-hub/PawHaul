@@ -66,9 +66,10 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 
 > If you're not sure where to begin, these three are the ones that move:
 >
-> **Retractable Dog Leash — from $12.99**
-> One-touch lock, anti-slip grip, 10ft and 16ft. The jam-free braking is the
-> whole point — cheap retractables stick, and you find out at the worst moment.
+> **LED Flashlight Retractable Dog Leash — from $22.99**
+> Retracts and locks with one button, with a light ring that keeps your dog
+> visible and a flashlight for the path ahead. 3M and 5M. Takes 2 AAA
+> batteries (not included).
 >
 > **2-in-1 Dog Water Bottle — from $16.99**
 > Water and dry food in one leak-proof bottle with a flip-out drinking spout.
@@ -80,7 +81,7 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 >
 > **WELCOME10** still works — 10% off, free shipping.
 
-**Button:** See all eight → `https://pawhaul.vercel.app/shop`
+**Button:** See all five → `https://pawhaul.vercel.app/shop`
 
 ---
 

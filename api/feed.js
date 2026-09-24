@@ -14,25 +14,15 @@
 
 const seo = require('./_seo');
 
-// Google's product taxonomy, mapped from the site's own three categories plus
-// per-product overrides where the category is too coarse (a waste-bag holder
-// is not a leash, even though the site files it under "leash").
+// Google's product taxonomy, one entry per product in the catalogue.
 const CATEGORY_BY_PRODUCT = {
   1: 'Animals & Pet Supplies > Pet Supplies > Pet Bowls, Feeders & Waterers',
-  2: 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Leashes',
   3: 'Animals & Pet Supplies > Pet Supplies > Pet Bowls, Feeders & Waterers',
-  4: 'Animals & Pet Supplies > Pet Supplies > Pet ID Tags',
-  5: 'Animals & Pet Supplies > Pet Supplies > Pet Waste Bag Dispensers & Holders',
   6: 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Collars',
-  8: 'Animals & Pet Supplies > Pet Supplies > Pet Waste Bag Dispensers & Holders'
+  9: 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Leashes',
+  10: 'Animals & Pet Supplies > Pet Supplies > Dog Supplies > Dog Leashes'
 };
 const FALLBACK_CATEGORY = 'Animals & Pet Supplies > Pet Supplies > Dog Supplies';
-
-const PRODUCT_TYPE = {
-  water: 'Dog Walk Gear > Water & Food',
-  leash: 'Dog Walk Gear > Leashes & Accessories',
-  safety: 'Dog Walk Gear > Safety'
-};
 
 function cdata(s) {
   // Feed values are wrapped in CDATA, so the only sequence that can break out
@@ -54,7 +44,7 @@ module.exports = async function handler(req, res) {
     '<channel>\n' +
     '  <title>' + cdata(seo.BRAND + ' Product Feed') + '</title>\n' +
     '  <link>' + seo.ORIGIN + '</link>\n' +
-    '  <description>' + cdata('Dog walk gear from PawHaul — leashes, water bottles, travel bowls, LED safety collars and waste bag carriers.') + '</description>\n';
+    '  <description>' + cdata('Dog walk gear from PawHaul — 2-in-1 water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps.') + '</description>\n';
 
   products.forEach(function (p) {
     const url = seo.ORIGIN + '/product/' + seo.slugify(p.name);
@@ -98,7 +88,7 @@ module.exports = async function handler(req, res) {
     // inventing an MPN to fill the field is what gets items disapproved.
     xml += '    <g:identifier_exists>no</g:identifier_exists>\n';
     xml += '    <g:google_product_category>' + cdata(CATEGORY_BY_PRODUCT[p.id] || FALLBACK_CATEGORY) + '</g:google_product_category>\n';
-    xml += '    <g:product_type>' + cdata(PRODUCT_TYPE[p.category] || 'Dog Walk Gear') + '</g:product_type>\n';
+    xml += '    <g:product_type>' + cdata('Dog Walk Gear') + '</g:product_type>\n';
     xml += '    <g:shipping>\n' +
            '      <g:country>US</g:country>\n' +
            '      <g:service>Standard</g:service>\n' +

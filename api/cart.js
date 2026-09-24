@@ -134,9 +134,9 @@ function respondWithMutation(res, r, mutationName) {
     // A DELETED variant is reported by raw GID — "The merchandise with id
     // gid://shopify/ProductVariant/48945264787712 does not exist." — which
     // means nothing to a customer. This is the message a tab left open
-    // across a variant being retired (the Poop Bag Clip's Blue, task 98)
-    // hits at checkout, and it is the ONLY route that still reaches those
-    // stale tabs, since their copy of products.js predates the change. Say
+    // across a variant or product being retired hits at checkout, and it is
+    // the ONLY route that still reaches those stale tabs, since their copy of
+    // products.js predates the change. Say
     // what to do instead; the raw text stays in the log above.
     var deadVariant = /merchandise with id/i.test(msg);
     res.status(200).json({

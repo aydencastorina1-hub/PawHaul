@@ -1,7 +1,7 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "", category: "water",
+    id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "",
     badge: "Best Seller", badgeClass: "",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
@@ -10,13 +10,6 @@ var products = [
     supplier: { rating: 4.8, ratings: 322 },
     desc: "Keep your dog hydrated and fed on every walk with this portable 2-in-1 bottle. The leak-proof design holds both water and dry food in one sleek container, with a flip-out drinking spout for easy on-the-go hydration. Lightweight, durable, and perfect for walks, hikes, and travel.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Halfway through the walk with a thirsty dog?",
-    agitate: "No tap in sight, and they're panting harder every block.",
-    solution: "Flip the spout out, pour, done in seconds — and the sealed compartment carries their food too.",
-    contrast: { without: "Cupped hands and a wet sleeve", "with": "Spout out, water down, walk on" },
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
     sizes: ["350ml", "550ml"],
@@ -85,105 +78,7 @@ var products = [
     whatsInBox: "1× 2-in-1 Dog Water Bottle (water + food compartments)"
   },
   {
-    id: 2, name: "Retractable Dog Leash", emoji: "🦮", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new",
-    // Real, verified stats from the AliExpress listing this product is
-    // sourced from — read off the live listing, not estimated. They are
-    // the SUPPLIER's numbers, never PawHaul's, and every surface that
-    // renders them says so. See supplierRatingHtml().
-    supplier: { rating: 4.9, ratings: 638 },
-    desc: "Give your dog the freedom to explore while staying fully in control. This retractable leash features a smooth, jam-free mechanism with a one-touch lock button for instant stopping power. Durable nylon construction handles dogs of all sizes with ease. Comfortable ergonomic grip keeps your hand happy on long walks.",
-    tagline: "Smooth, jam-free control that adapts to every walk.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Leash always too short, or way too long?",
-    agitate: "Wrapped round your legs one minute, dragging in the gutter the next.",
-    solution: "One thumb on the button: slack on the open stretch, locked short at the kerb.",
-    contrast: { without: "Slack you cannot control", "with": "Locked short in one click" },
-
-    // Length drives the price (labels must exactly equal the sizePrices keys).
-    sizes: ["3m (10ft)", "5m (16ft)"],
-    colors: ["Red", "Green", "Blue", "White", "Pink"],
-
-    // RE-SYNCED from Shopify (task 99): the whole pool was replaced there,
-    // so every URL below is new. One variant-assigned photo per colour,
-    // taken straight from Shopify's own image.variant_ids — not guessed
-    // from the filename or the colour in the shot.
-    images: {
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/678368BF-37CA-4B87-9BB2-1101819ADEF3.png?v=1789930342&width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/051FDB3A-A88E-49F6-831C-97F1619E4AB9.png?v=1789930256&width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/7AC23AF3-C6C0-4CAE-9498-6DDCDE0A8F23.png?v=1789930225&width=900",
-      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/1273A040-5DAA-4B74-A324-50C9B31CE6D8.png?v=1789930427&width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/622BC111-3004-4359-8440-9DEF5D0653A3.png?v=1789930295&width=900"
-    },
-
-    // Extra detail-page gallery slides — ALL five pool images with no
-    // variant attached: a non-slip-handle feature panel, a carabiner
-    // close-up, a handle/brake close-up, a numbered feature callout and
-    // the dimension diagram.
-    // The callout panels are the merchant's own clean English artwork, in
-    // the same house style as the water bottle's, and carry no measurement,
-    // no watermark and no foreign text — unlike the pool this replaced,
-    // whose callout read "3m Handle Prefer For Female".
-    // Task 102 retired the task-20/27 skip list for this product: the shop
-    // now mirrors Shopify's pool exactly, so pos10 (the 6.3 in / 5 in /
-    // 3.9 in over one body, 5.1 in / 3 in / 3.5 in over the other diagram)
-    // is back in. It and the two close-ups show a grey body this shop does
-    // not sell; they read as hardware/measurement drawings rather than as a
-    // colourway, which is why they sit in the shared pool and never in the
-    // per-colour map — slide 1 stays the only slide that claims a colour.
-    extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/31C0883B-F306-4DB4-8CC5-B500CD6E9C37.png?v=1789930462&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/A0B17F59-68B3-4BD3-A1BB-7327678FFF2F.png?v=1789930462&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/12338873-42B1-4663-A045-A52F9AE46D1F.png?v=1789930462&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/664067B2-84E3-4760-B795-2221F4CF86D3.png?v=1789930461&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/AA2C9CB0-53BC-40A4-9D31-C3CA405CE860.png?v=1789930461&width=900"
-    ],
-
-    sizePrices: {
-      "3m (10ft)": { price: 12.99, was: 19.99 },
-      "5m (16ft)": { price: 15.99, was: 22.99 }
-    },
-    price: 12.99, was: 19.99,
-
-    // NOTE: no unavailableVariants. This product was deleted and re-created
-    // in Shopify, and every combo — including Pink / 5m, which used to be out
-    // of stock — reports availableForSale and was confirmed with a real
-    // cartCreate. Do not reinstate the old Pink/5m rule without re-checking.
-
-    // Real Shopify variant GIDs (Storefront API) for checkout.
-    // Real Shopify variant GIDs (Storefront API) for checkout. REGENERATED:
-    // the original product was deleted and re-created, so the previous
-    // product id and every variant GID were stale and would have failed
-    // checkout. All ten below were confirmed with a real cartCreate.
-    shopifyVariants: { productGid: "gid://shopify/Product/9609088532736", byVariant: {
-        "3m (10ft)|Blue": "gid://shopify/ProductVariant/49182685298944",
-        "5m (16ft)|Blue": "gid://shopify/ProductVariant/49182685331712",
-        "3m (10ft)|Green": "gid://shopify/ProductVariant/49182685364480",
-        "5m (16ft)|Green": "gid://shopify/ProductVariant/49182685397248",
-        "3m (10ft)|Pink": "gid://shopify/ProductVariant/49182685430016",
-        "5m (16ft)|Pink": "gid://shopify/ProductVariant/49182685462784",
-        "3m (10ft)|Red": "gid://shopify/ProductVariant/49182685495552",
-        "5m (16ft)|Red": "gid://shopify/ProductVariant/49182685528320",
-        "3m (10ft)|White": "gid://shopify/ProductVariant/49182685561088",
-        "5m (16ft)|White": "gid://shopify/ProductVariant/49182685626624"
-      } },
-
-    features: [
-      "Smooth, jam-free retracting mechanism",
-      "One-touch lock button for instant stopping power",
-      "Durable nylon tape handles dogs of all sizes",
-      "Comfortable ergonomic anti-slip grip",
-      "Available in 3m (10ft) and 5m (16ft) lengths",
-      "360° tangle-free swivel clip",
-      "5 colors to match your dog's style"
-    ],
-    material: "Durable nylon tape · Impact-resistant casing · Ergonomic anti-slip grip · Stainless steel swivel clip",
-    whatsInBox: "1× retractable dog leash"
-  },
-  {
-    id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "", category: "water",
+    id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "",
     badge: "Popular", badgeClass: "badge-popular",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
@@ -192,13 +87,6 @@ var products = [
     supplier: { rating: 4.8, ratings: 1749 },
     desc: "Never leave home without a bowl for your dog again. This silicone collapsible bowl folds flat for easy storage and pops open in seconds for food or water. Includes a built-in carabiner clip so it hooks right onto your bag, belt, or leash. Durable, lightweight, and easy to clean.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Water to give, and nothing to pour it into?",
-    agitate: "The bottle is right there and it still ends up on the pavement.",
-    solution: "A real bowl that folds flat to a coaster and clips to the leash — open, fill, they drink.",
-    contrast: { without: "Water down the drain", "with": "A bowl on every walk" },
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
 
@@ -266,78 +154,7 @@ var products = [
     whatsInBox: "1× collapsible silicone bowl with carabiner clip"
   },
   {
-    id: 5, name: "Poop Bag Clip", price: 6.99, was: 10.99, emoji: "🧷", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new",
-    // Real, verified stats from the AliExpress listing this product is
-    // sourced from — read off the live listing, not estimated. They are
-    // the SUPPLIER's numbers, never PawHaul's, and every surface that
-    // renders them says so. See supplierRatingHtml().
-    supplier: { rating: 4.9, ratings: 95 },
-    desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
-    tagline: "Hands-free carrying for used bags, every walk.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Stuck carrying a full bag the whole way home?",
-    agitate: "Ten more minutes of walking with one hand out of action.",
-    solution: "Knot it through the clip and it rides on the leash — hands free the rest of the way.",
-    contrast: { without: "One hand out of action", "with": "Both hands back" },
-    sizes: ["Universal — fits all leashes"],
-    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
-
-    // RE-SYNCED from Shopify (task 99). The old pool's wrong-product
-    // photos are gone entirely — the round tag with unrelated branding text
-    // that used to stand in for Blue no longer exists, and Blue itself was
-    // retired (task 98). Six colours, six variant-assigned photos.
-    images: {
-      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/05311962-98DD-48BE-9B18-AA26717C4EA5.png?v=1790043744&width=900",
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/921F2642-8033-42DC-8934-66A11F537D1E.png?v=1790043784&width=900",
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D950C3DF-9AF0-4416-8427-D1F38304E8FE.png?v=1790043835&width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/9B99CB59-87DD-42C0-998C-737EDDAE99B1.png?v=1790043817&width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E9F331FB-A50C-4DB7-B66A-56CBA5DC191D.png?v=1790043893&width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E3A0D367-24B5-486D-81F4-1AD31FAD9E89.png?v=1790043866&width=900"
-    },
-
-    // Extra detail-page gallery slides — a hand holding a knotted bag by
-    // the clip, a close-up of the same, the clip riding on a leash, and one
-    // clipped to a bag. All four show the product doing the job the
-    // description claims (carrying a USED bag), which a studio shot cannot.
-    // Task 102 retired the task-20/27 skip list here: pos9 (four black clips
-    // lined up) is back in, in its own position order, so the gallery
-    // mirrors Shopify's pool one for one. It can read as a four-pack of a
-    // product sold one at a time — "1× Poop Bag Clip" in whatsInBox and the
-    // single-unit price are what set that straight.
-    extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FBB272E1-1FAC-473A-93AF-7BDDF7356226.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/65E99535-F7CD-4A0F-B319-487A9C9DBF01.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FCA197B8-16F8-48B5-9E1E-BF7750AE80F1.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/BE4DE668-334E-4929-A1EE-CCFEDC2631C5.png?v=1790044578&width=900"
-    ],
-
-    // Real Shopify variant GIDs (Storefront API) for checkout.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
-        "Orange": "gid://shopify/ProductVariant/48945264296192",
-        "Purple": "gid://shopify/ProductVariant/48945264328960",
-        "Red": "gid://shopify/ProductVariant/48945264361728",
-        "Black": "gid://shopify/ProductVariant/48945264394496",
-        "Green": "gid://shopify/ProductVariant/48945264656640",
-        "Pink": "gid://shopify/ProductVariant/48945264623872"
-      } },
-
-    features: [
-      "Hands-free clip holds a used poop bag securely",
-      "Clips easily onto any leash or belt",
-      "Keeps both hands free while walking your dog",
-      "Lightweight and compact design",
-      "Quick, hygienic cleanup every time",
-      "6 colors to choose from"
-    ],
-    material: "Durable silicone clip · Secure metal hook attachment",
-    whatsInBox: "1× Poop Bag Clip"
-  },
-  {
-    id: 6, name: "LED Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "", category: "safety",
+    id: 6, name: "LED Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "",
     badge: "Night Safety", badgeClass: "badge-night",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
@@ -346,18 +163,11 @@ var products = [
     supplier: { rating: 4.5, ratings: 638 },
     desc: "Keep your dog visible and safe on every night walk. USB rechargeable LED collar with 3 light modes — fast blink, slow blink, and steady glow. Detachable design fits any standard collar setup. Charges fully in about 2 hours and holds a charge through multiple walks.",
     tagline: "Be seen on every night walk, no matter how dark.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Your dog vanishes the moment it gets dark?",
-    agitate: "A dark dog on an unlit street is invisible to a car until it is close.",
-    solution: "A rechargeable ring of light, three modes, seen by drivers and cyclists long before you are.",
-    contrast: { without: "A shadow on a dark street", "with": "Lit up the whole walk" },
     sizes: ["S (13-16 in)", "M (14-18 in)", "L (16-20 in)", "XL (16-22 in)"],
     colors: ["Green", "Blue", "Red", "Pink", "Black"],
 
     // Renamed from "Light Up Dog Collar" (task 95). Search matches on
-    // name/category/desc, and none of them carry the old name any more, so a
+    // name/desc/tags, and neither the name nor the desc carries the old name, so a
     // customer who remembers it — or who just types how they think about the
     // thing — would get "No products found". Same reason the wrist strap
     // carries tags.
@@ -461,97 +271,11 @@ var products = [
     whatsInBox: "1× LED dog collar · 1× USB charging cable"
   },
   {
-    id: 8, name: "Poop Bag Holder", price: 7.99, was: 11.99, emoji: "🧺", image: "", category: "leash",
-    badge: "New", badgeClass: "badge-new",
-    // Real, verified stats from the AliExpress listing this product is
-    // sourced from — read off the live listing, not estimated. They are
-    // the SUPPLIER's numbers, never PawHaul's, and every surface that
-    // renders them says so. See supplierRatingHtml().
-    supplier: { rating: 4.9, ratings: 196 },
-    desc: "Always be ready for cleanup with a full roll of bags on hand. This durable canvas holder attaches to your leash with a sturdy carabiner clip, keeping unused waste bags organized and within reach on every walk — just pull a bag out whenever you need one. Simple, reliable, and built to last.",
-    tagline: "A full roll of bags, always within reach.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "Reached for a bag and found the roll empty?",
-    agitate: "Standing over a mess with nothing to pick it up with.",
-    solution: "A canvas pouch clips to the leash and keeps a full roll on you — pull one, keep moving.",
-    contrast: { without: "Bags left on the counter", "with": "A full roll on the leash" },
-    sizes: ["Universal — fits all leashes"],
-    colors: ["Green", "Blue", "Black"],
-
-    // Real product photos, hosted in this repo (see images/products/) rather
-    // than pulled from Shopify's CDN — one per colour, so the card image, the
-    // detail hero and gallery slide 1 always match the selected colour. All
-    // three are the same pouch at the same angle on white, so the swatch row
-    // reads as one set rather than three different photo shoots.
-    //
-    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
-    // these same 8 files, pixel for pixel, and Shopify's own variant_ids
-    // assign them to the same colours this map does. Shopify was brought in
-    // line with these photos, not the other way round, so they stay local —
-    // same image, but served as webp at the width the slot actually needs
-    // (see LOCAL_PHOTO_WIDTHS) instead of a full-size CDN fetch.
-    images: {
-      "Green": "/images/products/poop-bag-holder-green-main.jpg",
-      "Blue": "/images/products/poop-bag-holder-blue-main.jpg",
-      "Black": "/images/products/poop-bag-holder-black-main.jpg"
-    },
-
-    // Shared, non-colour-specific gallery slides, shown after slide 1 for
-    // every colour in this order: the green pouch with a bag pulled through,
-    // the buckle/fabric panel, the product-parameters panel, the on-the-walk
-    // shot, and the main-functions panel. These replace the old Shopify pool
-    // and clear what that audit had rejected: the text is all real English
-    // (no filler glyphs), and the only pouches shown are Green, Blue and
-    // Black — the three colours actually sold. The parameters panel's own
-    // colour chart lists exactly those three, so it agrees with the swatches
-    // instead of advertising a pink or grey that cannot be bought. Slides are
-    // a mix of colourways by nature, which is why they live in the shared
-    // pool and never in the per-colour map above — slide 1 is the only slide
-    // the page presents as "the" selected colour, and renderDetailGallery()
-    // deliberately gives these slides alt text with no colour name.
-    extraImages: [
-      "/images/products/poop-bag-holder-lifestyle-1.jpg",
-      "/images/products/poop-bag-holder-lifestyle-2.jpg",
-      "/images/products/poop-bag-holder-lifestyle-3.jpg",
-      "/images/products/poop-bag-holder-lifestyle-4.jpg",
-      "/images/products/poop-bag-holder-lifestyle-5.jpg"
-    ],
-
-    // Real Shopify variant GIDs (Storefront API) for checkout. Shopify's own
-    // product title for this listing is longer ("Canvas Dog Poop Bag
-    // Holder, Outdoor Pet Waste Bag Dispenser...") — matched by color set
-    // + price, not by title text.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276477184", byColor: {
-        "Green": "gid://shopify/ProductVariant/48945264034048",
-        "Blue": "gid://shopify/ProductVariant/48945264066816",
-        "Black": "gid://shopify/ProductVariant/48945264099584"
-      } },
-
-    features: [
-      "Holds a full roll of unused waste bags",
-      "Durable canvas construction built to last",
-      "Sturdy carabiner clip attaches to any leash",
-      "Keeps bags organized and easy to grab",
-      "Simple, reliable design for every walk",
-      "3 colors to choose from"
-    ],
-    material: "Durable canvas pouch · Sturdy metal carabiner clip",
-    whatsInBox: "1× Poop Bag Holder pouch (bag roll not included)"
-  },
-  {
     // Sourcing note: the supplier listing shows 4.9 stars and 3,000+ sold.
     // As of task 103 the star figure IS surfaced, via the `supplier` field
     // below and always attributed — the 546 there is the listing's RATINGS
     // count, which is a different number from the 3,000+ SOLD recorded here.
-    id: 9, name: "Anti-Drop Leash Wrist Strap", price: 8.99, was: 13.99, emoji: "🔗", image: "", category: "leash",
-    // Genuinely belongs in two aisles: it is a leash accessory AND a
-    // loss-prevention/safety item. `category` stays the PRIMARY one (it drives
-    // the breadcrumb, the detail-page eyebrow and the Merchant Center product
-    // type, all of which need a single value); `categories` is what filtering
-    // and search read. Any product without this field just uses `category`.
-    categories: ["leash", "safety"],
+    id: 9, name: "Anti-Drop Leash Wrist Strap", price: 8.99, was: 13.99, emoji: "🔗", image: "",
     badge: "New", badgeClass: "badge-new",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
@@ -560,20 +284,13 @@ var products = [
     supplier: { rating: 4.9, ratings: 546 },
     desc: "Never worry about dropping the leash mid-walk again. This adjustable wrist strap clips onto your dog's leash so if it ever slips from your hand, it stays safely secured to your wrist — not your dog running off. Simple, lightweight, and fits any walk.",
     tagline: "If the leash slips, it stays on your wrist.",
-    // "The problem it solves" copy — shown on the home carousel and on
-    // this product's own page. Specific to what this product actually
-    // fixes on a real walk, not generic marketing filler.
-    problem: "One hard tug away from losing the leash?",
-    agitate: "A squirrel bolts, the handle is gone, and your dog is in the road.",
-    solution: "The strap holds the handle to your wrist, so a sudden pull never becomes a loose dog.",
-    contrast: { without: "One tug from a loose dog", "with": "Handle stays on your wrist" },
     // Single option in Shopify (Color only). A non-empty sizes array is
     // required — showProduct() maps over it unconditionally — and a lone size
     // is hidden from the size picker on the detail page.
     sizes: ["Universal — adjustable, fits any leash"],
     colors: ["Green", "Black", "Gray", "Brown", "Pink", "Purple"],
 
-    // Search matches name/category/desc, none of which contain the phrases
+    // Search matches name/desc/tags, and neither the name nor the desc contains the phrases
     // people actually type for this thing.
     tags: ["wrist strap", "wristband", "anti drop", "anti-drop", "hands free leash", "leash strap", "dog walking strap"],
 
@@ -645,8 +362,7 @@ var products = [
     // set is therefore exactly Shopify's four, and every one maps to a real
     // variant GID below; the two blocked combos have no GID at all, so they
     // are refused twice over.
-    id: 10, name: "LED Flashlight Retractable Dog Leash", emoji: "🔦", image: "", category: "leash",
-    categories: ["leash", "safety"],
+    id: 10, name: "LED Flashlight Retractable Dog Leash", emoji: "🔦", image: "",
     badge: "New", badgeClass: "badge-new",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
@@ -655,10 +371,6 @@ var products = [
     supplier: { rating: 4.8, ratings: 174 },
     desc: "See and be seen on every walk. This retractable leash features a built-in LED light for visibility on nighttime walks, plus a built-in flashlight to help you spot what's ahead in the dark. Quick-release design and durable build fit dogs and cats of all sizes. Note: requires 2 AAA batteries, not included.",
     tagline: "A leash that lights the dog and the path.",
-    problem: "Can't see your dog — or the path — after dark?",
-    agitate: "You are guessing where they are and what they just picked up.",
-    solution: "The light ring keeps your dog visible while the built-in flashlight shows you the ground ahead.",
-    contrast: { without: "Walking blind after dark", "with": "Dog lit, path lit" },
 
     // Shown as a pill under the tagline and surfaced by the chatbot.
     disclaimer: "Requires 2 AAA batteries (not included)",
@@ -940,9 +652,9 @@ var RENAMED_SLUGS = {
   'light-up-dog-collar': 6   // -> "LED Dog Collar" (task 95)
 };
 
-function pageToPath(page, filter) {
+function pageToPath(page) {
   if (page === 'home') return '/';
-  if (page === 'shop') return (filter && filter !== 'all') ? '/shop/' + filter : '/shop';
+  if (page === 'shop') return '/shop';
   if (page === 'contact') return '/contact';
   if (page === 'about') return '/about';
   if (page === 'wishlist') return '/wishlist';
@@ -956,8 +668,8 @@ function pageToPath(page, filter) {
 // opts.sync: this is the browser CORRECTING us to match a URL it already
 // has (initial load, or popstate back/forward) — never push a new history
 // entry, just normalize the address bar via replaceState.
-// opts.replace: an explicit non-sync replace (e.g. filter pills — see
-// filterProducts()) — updates the URL without growing browser history.
+// opts.replace: an explicit non-sync replace — updates the URL without
+// growing browser history.
 // default: a real user-driven navigation — pushState (adds a back-button step).
 // Which nav entry should read as "you are here" for a given path. Product
 // pages count as Shop and a blog post counts as Blog — the section is what a
@@ -965,7 +677,7 @@ function pageToPath(page, filter) {
 function navKeyFor(path) {
   var p = String(path || '/').split('?')[0].replace(/\/+$/, '') || '/';
   if (p === '/') return 'home';
-  if (p === '/shop' || p.indexOf('/shop/') === 0 || p.indexOf('/product/') === 0) return 'shop';
+  if (p === '/shop' || p.indexOf('/product/') === 0) return 'shop';
   if (p === '/blog' || p.indexOf('/blog/') === 0) return 'blog';
   if (p === '/about') return 'about';
   if (p === '/contact') return 'contact';
@@ -1014,7 +726,7 @@ function dispatchRoute(route, opts) {
     // dispatchRoute, but guard anyway so a load failure degrades to Home
     // instead of throwing.
     if (typeof showPost === 'function' && showPost(route.slug, opts)) return;
-    showPage('home', null, opts);
+    showPage('home', opts);
     if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
     return;
   }
@@ -1027,12 +739,12 @@ function dispatchRoute(route, opts) {
     // Unknown/stale product slug (e.g. a since-renamed or removed product) —
     // fall back to Home rather than show a broken/empty product page, and
     // fix the address bar to match so Back doesn't just return here.
-    showPage('home', null, opts);
+    showPage('home', opts);
     if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
     return;
   }
-  if (route.type === 'page') { showPage(route.page, route.filter, opts); return; }
-  showPage('home', null, opts);
+  if (route.type === 'page') { showPage(route.page, opts); return; }
+  showPage('home', opts);
   if (opts && opts.sync) history.replaceState({ p: 1 }, '', '/');
 }
 
@@ -1041,13 +753,21 @@ window.addEventListener('popstate', function () {
 });
 
 // Click handler for real <a href="..."> nav links/buttons (nav bar, footer,
-// "Shop Leashes"-style CTAs — see index.html). Lets modifier-clicks/middle-
+// footer links — see index.html). Lets modifier-clicks/middle-
 // click fall through to native browser behavior (open in new tab, etc, using
 // the real href) instead of always hijacking the click for SPA navigation.
-function goTo(e, page, filter) {
+function goTo(e, page) {
   if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
   if (e) e.preventDefault();
-  showPage(page, filter);
+  showPage(page);
+}
+
+// Same idea for real <a href="/product/<slug>"> links (the footer's product
+// list): modifier-clicks open the real URL, a plain click stays in the SPA.
+function goToProductLink(e, id) {
+  if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
+  if (e) e.preventDefault();
+  showProduct(id);
 }
 
 // ==================== NAVIGATION ====================
@@ -1060,12 +780,7 @@ function goTo(e, page, filter) {
 // button/link appears stuck showing whatever page a hard reload landed on.
 var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product', 'route-blog', 'route-blog-post'];
 
-function showPage(page, filter, opts) {
-  // Read before the .active classes are rewritten below: the shop hero fades
-  // its content only when the visitor is already looking at the Shop page
-  // (see applyShopHero) — arriving from another page swaps it instantly.
-  var shopPageEl = document.getElementById('page-shop');
-  var shopWasActive = !!shopPageEl && shopPageEl.classList.contains('active');
+function showPage(page, opts) {
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
@@ -1086,28 +801,7 @@ function showPage(page, filter, opts) {
   document.documentElement.style.scrollBehavior = 'auto';
 
   if (page === 'home') renderHomeProducts();
-  if (page === 'shop') {
-    var f = filter || 'all';
-    // Arriving on the Shop page IS a filter change — currentShopFilter has to
-    // move with it, not just the grid. Anything that re-renders the grid later
-    // (the review-stats fetch landing, a review being posted) renders
-    // currentShopFilter, so leaving it on 'all' after a /shop/safety deep link
-    // silently repopulated the grid with every product while the pill — and
-    // now the hero — still said Safety.
-    currentShopFilter = f;
-    renderShopProducts(f);
-    // Instant when the Shop page is only now becoming visible — there is no
-    // swap for anyone to watch. Already on Shop (a footer category link, a
-    // search-popup category tile) and it fades like a pill click.
-    applyShopHero(f, { instant: !shopWasActive });
-    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-    var map = { all: 0, water: 1, leash: 2, safety: 3 };
-    var idx = map[f];
-    if (idx !== undefined) {
-      var btns = document.querySelectorAll('.filter-btn');
-      if (btns[idx]) btns[idx].classList.add('active');
-    }
-  }
+  if (page === 'shop') renderShopProducts();
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
   // The server already put the post cards in #blogIndex for a direct /blog
@@ -1118,7 +812,7 @@ function showPage(page, filter, opts) {
   // page==='product' is deliberately NOT routed here — showProduct() (which
   // is the only caller that ever passes 'product') owns that URL itself,
   // since it needs the product's slug, not just the page name.
-  navigateUrl(pageToPath(page, filter), opts);
+  navigateUrl(pageToPath(page), opts);
 
   // The actual scroll-to-top + restoring smooth scrolling for user swipes —
   // see the comment above for why this waits for the next frame instead of
@@ -1151,184 +845,13 @@ function renderHomeProducts() {
   setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
 }
 
-// ---- "The problem it solves" (task 73) ---------------------------------
-// PROBLEM -> AGITATE -> SOLVE, then a WITHOUT/WITH contrast pair and a real
-// per-product CTA. The home carousel and the product-page block are built from
-// the same three helpers below so the two instances can never drift apart.
-
-// The CTA reads "Shop the <name>", so the two product names long enough to wrap
-// the button onto a second line carry a shorter label. Everything else uses the
-// real product name.
-var PROB_SHORT_NAME = {
-  9: "Anti-Drop Wrist Strap",
-  10: "LED Flashlight Leash"
-};
-function probCtaName(p) { return PROB_SHORT_NAME[p.id] || p.name; }
-
-// SUPPORTING DETAIL BESIDE THE IMAGE. Nothing here is invented: it is either
-// the real supplier rating for this product or the site-wide shipping and
-// returns promise. There used to be a middle branch here -- "Save N%, free
-// shipping", computed from the compare-at price. That is the same unearned
-// claim as a struck-through price, only phrased as a percentage, so it went
-// with it. See variantPriceHtml for the rule.
-//
-// The chip always carries the COUNT, never a bare star: "4.8 * 322 ratings"
-// states a fact about a rating that exists, where a lone star would read as
-// PawHaul's own score. The product page spells out the AliExpress source.
-function probProofHtml(p) {
-  var s = supplierOf(p);
-  if (s) {
-    return '<span class="prob-proof" role="img" aria-label="' + esc(supplierAriaLabel(s)) + '">' +
-      starSvg(STAR_GOLD) + '<strong>' + s.rating.toFixed(1) + '</strong> · ' +
-      fmtRatings(s.ratings) + ' ratings</span>';
-  }
-  return '<span class="prob-proof">Free shipping · 30-day returns</span>';
-}
-
-// WITHOUT / WITH strip. Cross-and-tick SVGs rather than emoji: every other icon
-// on this site is drawn this way, so they inherit the brand colours and stay
-// crisp instead of rendering as a different vendor's picture on each OS.
-var PROB_ICON_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
-var PROB_ICON_TICK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5l5.5 5.5L20 7"/></svg>';
-
-function probContrastHtml(p) {
-  var c = p.contrast;
-  // Bracketed: `with` is a reserved word, so it is quoted in the data too.
-  if (!c || !c.without || !c["with"]) return '';
-  return '<div class="prob-contrast">' +
-      '<div class="prob-vs prob-vs--without">' +
-        '<span class="prob-vs-ico">' + PROB_ICON_X + '</span>' +
-        '<span class="prob-vs-txt"><em>Without</em>' + esc(c.without) + '</span>' +
-      '</div>' +
-      '<div class="prob-vs prob-vs--with">' +
-        '<span class="prob-vs-ico">' + PROB_ICON_TICK + '</span>' +
-        '<span class="prob-vs-txt"><em>With</em>' + esc(c["with"]) + '</span>' +
-      '</div>' +
-    '</div>';
-}
-
-// One slide per product that has problem/solution copy, in catalogue order.
-// Rendered from JS (not static markup) so each slide reuses the same
-// per-colour photo the cards and detail page use; the track has a CSS
-// min-height so the space is reserved before this runs.
-function renderProblemCarousel() {
-  var track = document.getElementById('problemCarousel');
-  if (!track) return;
-  // Whether the slides start hidden is decided ONCE, HERE, before the markup
-  // is built. Adding an opacity:0 class to already-painted content is exactly
-  // the fade-out-then-back-in flash the section reveal in app.js documents at
-  // length, and with no IntersectionObserver there would be nothing left to
-  // turn them back on.
-  var canReveal = ('IntersectionObserver' in window) &&
-    !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var slides = products.filter(function (p) { return p.problem && p.solution; });
-  track.innerHTML = slides.map(function (p, i) {
-    var img = productImageFor(p, p.colors && p.colors[0]);
-    var media = img
-      ? '<img ' + photoAttrs(img, 'card') + ' alt="' + esc(p.name) + '">'
-      : '<span class="prob-emoji">' + p.emoji + '</span>';
-    // Staggered by COLUMN, not by absolute index: a slide dragged in from the
-    // right is the first of its own group and must not inherit a 560ms delay
-    // just for sitting eighth in the catalogue.
-    var reveal = canReveal
-      ? ' prob-reveal" style="--prob-delay:' + ((i % 3) * 80) + 'ms'
-      : '';
-    // Clickable card rather than a link, matching the product cards: keeps
-    // modifier-click behaviour consistent, and showProduct() still writes a
-    // real /product/<slug> URL. The CTA inside stops propagation so one tap is
-    // one showProduct() call — the same idiom the card Add To Cart button uses.
-    return '<article class="prob-slide' + reveal + '" onclick="showProduct(' + p.id + ')">' +
-        '<div class="prob-slide-img">' + media + probProofHtml(p) + '</div>' +
-        '<div class="prob-slide-body">' +
-          '<p class="prob-kicker">' + esc(p.name) + '</p>' +
-          '<h3 class="prob-head">' + esc(p.problem) + '</h3>' +
-          '<p class="prob-agitate">' + esc(p.agitate || '') + '</p>' +
-          '<p class="prob-copy">' + esc(p.solution) + '</p>' +
-          probContrastHtml(p) +
-          '<button class="prob-cta" type="button" onclick="event.stopPropagation(); showProduct(' + p.id + ')">' +
-            'Shop the ' + esc(probCtaName(p)) +
-            '<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
-          '</button>' +
-        '</div>' +
-      '</article>';
-  }).join('');
-  if (canReveal) initProbReveal(track);
-  // initCarousel lives in app.js, which loads after this file — same deferred
-  // hook renderHomeProducts() uses.
-  setTimeout(function () {
-    if (typeof initCarousel === 'function') initCarousel('problemCarousel', 'probCarPrev', 'probCarNext');
-  }, 50);
-}
-
-// Fades each slide up as it enters the viewport. Observed PER SLIDE rather than
-// per section: the track scrolls horizontally, so slides four and up are clipped
-// out of view sideways and get their own entrance when they are dragged in.
-// Same safety net as the section reveal in app.js — whatever happens, every
-// slide is visible after 1.2s.
-function initProbReveal(track) {
-  var slides = track.querySelectorAll('.prob-slide');
-  var obs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (e.isIntersecting) { e.target.classList.add('is-in'); obs.unobserve(e.target); }
-    });
-  }, { threshold: 0.12 });
-  Array.prototype.forEach.call(slides, function (el) { obs.observe(el); });
-  setTimeout(function () {
-    Array.prototype.forEach.call(slides, function (el) { el.classList.add('is-in'); });
-  }, 1200);
-}
-
-// Single-product version of the same framing, on the product page. No photo and
-// no "Shop the ..." link here: the gallery is already on screen, and the
-// customer is standing on the page that CTA would have sent them to, so the
-// action that actually converts from this block is adding it to the cart.
-function renderDetailProblem() {
-  var el = document.getElementById('detailProblem');
-  if (!el) return;
-  var p = currentProduct;
-  if (!p || !p.problem || !p.solution) {
-    el.innerHTML = '';
-    return;
-  }
-  el.innerHTML =
-    '<div class="prob-detail-top">' +
-      '<p class="prob-detail-kicker">The problem it solves</p>' +
-      probProofHtml(p) +
-    '</div>' +
-    '<h3 class="prob-detail-head">' + esc(p.problem) + '</h3>' +
-    '<p class="prob-detail-agitate">' + esc(p.agitate || '') + '</p>' +
-    '<p class="prob-detail-copy">' + esc(p.solution) + '</p>' +
-    probContrastHtml(p) +
-    '<button class="prob-cta prob-cta--detail" type="button" onclick="addToCartDetail()">' +
-      'Add To Cart<span class="prob-cta-arrow" aria-hidden="true">&rarr;</span>' +
-    '</button>';
-}
-
-// A product can legitimately sit in more than one aisle (the Anti-Drop Leash
-// Wrist Strap is both a leash accessory and a safety/loss-prevention item), so
-// membership is read from `categories` when present and falls back to the
-// single `category` otherwise. Everything that filters or searches by category
-// goes through these two helpers so the rules can't drift apart.
-function productCategories(p) {
-  if (!p) return [];
-  if (Array.isArray(p.categories) && p.categories.length) return p.categories;
-  return p.category ? [p.category] : [];
-}
-
-function productInCategory(p, f) {
-  if (!f || f === 'all') return true;
-  return productCategories(p).indexOf(f) !== -1;
-}
-
-function renderShopProducts(filter) {
+function renderShopProducts() {
   var container = document.getElementById('shopProducts');
   if (!container) return;
-  var f = filter || 'all';
-  var filtered = (f === 'all') ? products.slice() : products.filter(function(p) { return productInCategory(p, f); });
   // The shop grid is never more than 4 across, so the first four cards are
   // the ones above the fold at every width. They are also the page's LCP
   // candidates, hence priority rather than plain eager.
-  container.innerHTML = filtered.map(function(p, i) {
+  container.innerHTML = products.map(function(p, i) {
     return productCard(p, i < 4 ? { priority: true } : null);
   }).join('');
 }
@@ -1401,9 +924,8 @@ var SWATCH_COLORS = {
   // Added for the Anti-Drop Leash Wrist Strap's colourway. Without these,
   // "Brown" and "Purple" fell through to the #CCCCCC fallback — Brown would
   // have rendered as a grey circle sitting next to the strap's real Gray.
-  // Note: adding `purple` also corrects the Poop Bag Clip's Purple swatch,
-  // which was silently grey for the same reason. ("White" is still missing and
-  // still falls back for the Bowl/Leash — left alone, out of scope here.)
+  // ("White" is still missing and still falls back for the Bowl and the
+  // Water Bottle — left alone, out of scope here.)
   brown: '#8B5E3C', purple: '#7C3AED'
 };
 
@@ -1545,7 +1067,6 @@ function clearBtnBusy(btn, prevHtml) {
 // The immutable is safe because a changed photo means a changed filename:
 // re-run the generator and the width suffix / -v2 style name moves with it.
 var LOCAL_PHOTO_WIDTHS = {
-  'all-gear-flatlay': [400, 800, 1200],
   'bowl-black': [400, 675],
   'bowl-blue': [400, 675],
   'bowl-green': [400, 675],
@@ -1553,9 +1074,6 @@ var LOCAL_PHOTO_WIDTHS = {
   'bowl-orange': [400, 675],
   'bowl-red': [400, 675],
   'bowl-white': [400, 675],
-  'category-leashes-control-hero': [400, 800, 1200, 1671],
-  'category-safety-visibility-hero': [400, 800, 1200, 1774],
-  'category-water-food-hero': [400, 800, 1200, 1536],
   'collar-black': [400, 800],
   'collar-black-main-v2': [400, 800, 1200],
   'collar-blue': [400, 800],
@@ -1582,14 +1100,6 @@ var LOCAL_PHOTO_WIDTHS = {
   'led-leash-lifestyle-5': [400, 800, 1200, 1254],
   'led-leash-orange-main': [400, 800, 1200, 1536],
   'led-leash-purple-main': [400, 800, 1200, 1536],
-  'poop-bag-holder-black-main': [400, 800, 1200, 1254],
-  'poop-bag-holder-blue-main': [400, 800, 1200, 1254],
-  'poop-bag-holder-green-main': [400, 800, 1200, 1254],
-  'poop-bag-holder-lifestyle-1': [400, 800, 1200, 1254],
-  'poop-bag-holder-lifestyle-2': [400, 800, 1167],
-  'poop-bag-holder-lifestyle-3': [400, 800, 1200, 1313],
-  'poop-bag-holder-lifestyle-4': [400, 800, 1105],
-  'poop-bag-holder-lifestyle-5': [400, 800, 1105],
   'water-bottle-blue-main': [400, 800, 1200],
   'water-bottle-lifestyle-1': [400, 800, 953],
   'water-bottle-lifestyle-2': [400, 800, 1000],
@@ -1607,8 +1117,7 @@ var LOCAL_PHOTO_WIDTHS = {
 var PHOTO_SIZES = {
   card: '(max-width: 767px) 50vw, 340px',   // .product-img, 300px tall in a 4-col grid
   detail: '(max-width: 900px) 100vw, 680px', // .det-carousel, 380-600px tall
-  thumb: '96px',                             // cart lines, search results, bundle rows
-  band: '100vw'                              // full-bleed category / flat-lay bands
+  thumb: '96px'                              // cart lines, search results, bundle rows
 };
 
 // Non-null only for a local photo we actually generated variants for, so a
@@ -1870,13 +1379,9 @@ function showProduct(id, opts) {
   // stats -- no fetch, so they are correct on first paint instead of popping
   // in a moment later the way the /api/reviews round-trip used to.
   renderDetailRating();
-  renderDetailProblem();
   document.getElementById('qtyNum').textContent = '1';
   renderDetailShopPay();
   initShareControl();
-
-  var cats = { walk: 'Walk Essentials', car: 'Car & Travel', treats: 'Health & Treats', home: 'Home & Grooming' };
-  document.getElementById('detailCategory').textContent = cats[currentProduct.category] || 'PawHaul';
 
   document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map((s, i) =>
     `<button class="option-btn ${i===defSizeIdx?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');
@@ -1913,7 +1418,7 @@ function showProduct(id, opts) {
   // pageToPath's comment); this product owns its own /product/<slug> URL,
   // set right below with the REAL opts (push for a real navigation, sync
   // for the initial-load/back-forward case).
-  showPage('product', null, { sync: true });
+  showPage('product', { sync: true });
   navigateUrl('/product/' + slugify(currentProduct.name), opts);
 }
 
@@ -2186,7 +1691,6 @@ function saveWishlist(items) {
 }
 
 var wishlistItems = loadStoredWishlist();
-var currentShopFilter = 'all';
 
 // Keeps other open tabs of the site in step when the wishlist changes in one.
 window.addEventListener('storage', function (e) {
@@ -2364,9 +1868,8 @@ function updateCartQty(idx, delta) {
 }
 
 // The colour on a cart line that the catalogue no longer sells, or null when
-// the line is fine. The Poop Bag Clip's Blue is the first of these: the
-// variant was deleted in Shopify (task 98), so it is gone from `colors` and
-// has no variant GID left to check out with.
+// the line is fine: a variant deleted in Shopify is gone from `colors` and has
+// no variant GID left to check out with.
 //
 // A line like this can only come from a tab left open across the change —
 // the local cart is rebuilt from `products` on every load, and a restored
@@ -2675,171 +2178,6 @@ async function checkout() {
     clearBtnBusy(btn, prevCheckoutHtml);
     showToast('Could not start checkout — please try again.', 5000);
   }
-}
-
-// ==================== FILTERS ====================
-
-// ---------------------------------------------------------------------------
-// SHOP HERO CONTENT — EDIT HERE
-//
-// One entry per shop category pill; the keys are exactly the filter names the
-// pills pass to filterProducts() ('all' is the no-filter default). Each entry
-// is three editable fields plus the photo's alt text:
-//
-//   image       full URL of the band photo
-//   alt         what the photo shows (screen readers / broken-image text)
-//   heading     the big Fredoka headline
-//   description the line under it
-//
-// To swap a photo, replace that entry's `image` string — nothing else in this
-// file or in index.html needs to change. The markup in index.html holds a copy
-// of the 'all' entry only, as the pre-JS default; if you change 'all' here,
-// change it there too (search for "SHOP HERO").
-//
-// NOTE: all four images are currently the SAME placeholder URL, to be replaced
-// with real photography. applyShopHero() skips the crossfade when consecutive
-// states share a photo, so identical URLs simply mean the picture holds still
-// while the words change.
-// ---------------------------------------------------------------------------
-var SHOP_HERO = {
-  all: {
-    image: 'https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440',
-    alt: 'A dog out on a walk in PawHaul gear',
-    heading: 'Shop Walk Gear',
-    description: 'Everything you need for the walk — water, food, safety, and control. Built for every dog, every walk.'
-  },
-  water: {
-    // Real photo (task 82). As of task 104 only `all` is still an Unsplash
-    // placeholder — water, leash and safety are all real photos now, so every
-    // pill change runs applyShopHero's real crossfade rather than
-    // short-circuiting on "same src as the one already up".
-    image: '/images/products/category-water-food-hero.jpg',
-    alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
-    heading: 'Water & Food',
-    description: 'Never run out mid-walk. Everything your dog needs to stay hydrated and fed on the go.'
-  },
-  leash: {
-    // Real photo (task 104), replacing the Unsplash placeholder this shared
-    // with `all`. It shows one of the shop's OWN products doing its job — the
-    // red retractable leash, the colourway sold as Retractable Dog Leash /
-    // Red — which is the whole argument for this category.
-    // See the object-position note in styles.css for why it is not centred.
-    image: '/images/products/category-leashes-control-hero.jpg',
-    alt: 'A man walking a golden retriever on a red retractable leash along a waterfront path at sunset',
-    heading: 'Leashes & Control',
-    description: 'Freedom for them, control for you. Built for calm, confident walks every time.'
-  },
-  safety: {
-    // Real photo (task 93) — shot after sunset, which is the whole point of
-    // this category: the leash light and the glowing lead ARE the product
-    // demo. See the object-position note in styles.css for why this one is
-    // not cropped dead centre.
-    image: '/images/products/category-safety-visibility-hero.jpg',
-    alt: 'A dog walking at dusk on a lakeside path, lit by a glowing purple LED flashlight leash',
-    heading: 'Safety & Visibility',
-    description: 'Seen and safe, day or night. Keep your dog visible and secure on every walk.'
-  }
-};
-
-// Timer for the copy's fade-out → swap → fade-in, kept module-level so a
-// second pill click mid-fade cancels the first one's pending text swap instead
-// of letting two of them land out of order.
-var shopHeroCopyTimer = null;
-
-// Points the hero band at one category's content.
-// opts.instant: apply with no animation — used when the Shop page is being
-// opened (arriving on a page should not play a transition the visitor never
-// saw start) and honoured automatically for reduced-motion visitors.
-function applyShopHero(filter, opts) {
-  var hero = document.getElementById('shopHero');
-  if (!hero) return;
-  var key = SHOP_HERO[filter] ? filter : 'all';
-  var cfg = SHOP_HERO[key];
-  if (hero.getAttribute('data-cat') === key) return; // already showing this one
-  // Set before any async work: an image that finishes loading after the
-  // visitor has clicked on to another pill checks this and bows out.
-  hero.setAttribute('data-cat', key);
-
-  var reduce = false;
-  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  var instant = !!(opts && opts.instant) || reduce;
-
-  // ---- copy
-  var copy = document.getElementById('shopHeroCopy');
-  var title = document.getElementById('shopHeroTitle');
-  var desc = document.getElementById('shopHeroDesc');
-  function setText() {
-    if (title) title.textContent = cfg.heading;
-    if (desc) desc.textContent = cfg.description;
-  }
-  clearTimeout(shopHeroCopyTimer);
-  if (instant || !copy) {
-    if (copy) copy.classList.remove('is-fading');
-    setText();
-  } else {
-    copy.classList.add('is-fading');
-    // Matches the 0.2s opacity transition on .shop-hero-copy in styles.css.
-    shopHeroCopyTimer = setTimeout(function () {
-      setText();
-      copy.classList.remove('is-fading');
-    }, 200);
-  }
-
-  // ---- photo
-  var layers = hero.querySelectorAll('.shop-hero-img');
-  if (!layers.length) return;
-  var shown = hero.querySelector('.shop-hero-img.is-active') || layers[0];
-  // Local category photos are webp variants behind a srcset; remote ones pass
-  // through unchanged. Everything that touches a layer's src goes through
-  // here, including the "already showing this" comparison below — comparing a
-  // resolved src against a raw cfg.image would never match and would re-fetch
-  // the band's photo on every pill tap.
-  var heroSrc = photoSrc(cfg.image);
-  function setLayer(el) {
-    var set = photoSrcset(cfg.image);
-    if (set) { el.sizes = PHOTO_SIZES.band; el.srcset = set; }
-    else el.removeAttribute('srcset');
-    el.src = heroSrc;
-  }
-  // Same photo as the one already up — leave it completely alone, just keep
-  // the alt text honest.
-  if (shown.getAttribute('src') === heroSrc) { shown.alt = cfg.alt || ''; return; }
-
-  if (instant) {
-    setLayer(shown);
-    shown.alt = cfg.alt || '';
-    return;
-  }
-
-  var next = (layers[0] === shown) ? layers[1] : layers[0];
-  if (!next) { setLayer(shown); shown.alt = cfg.alt || ''; return; }
-  function reveal() {
-    if (hero.getAttribute('data-cat') !== key) return; // superseded mid-load
-    // The incoming layer becomes the labelled one; the outgoing layer fades
-    // out behind it and stops being announced.
-    next.alt = cfg.alt || '';
-    next.removeAttribute('aria-hidden');
-    shown.alt = '';
-    shown.setAttribute('aria-hidden', 'true');
-    next.classList.add('is-active');
-    shown.classList.remove('is-active');
-  }
-  next.onload = reveal;
-  next.onerror = reveal; // a dead URL must not leave the band stuck on the old photo forever
-  setLayer(next);
-  if (next.complete) reveal(); // already cached: onload may never fire
-}
-
-function filterProducts(filter, btn) {
-  currentShopFilter = filter || 'all';
-  document.querySelectorAll('.shop-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
-  if (btn) btn.classList.add('active');
-  renderShopProducts(currentShopFilter);
-  applyShopHero(currentShopFilter);
-  // replace (not push): switching filter pills WHILE already on Shop keeps
-  // the URL correct for reload/sharing without spamming back-button history
-  // with every pill click.
-  navigateUrl(pageToPath('shop', currentShopFilter), { replace: true });
 }
 
 // Navigate from a search result straight to that product's own detail page.
@@ -3175,8 +2513,8 @@ function submitContact() {
 //
 // Shifting the viewBox down by 12.484 - 12 = 0.484 makes the box centre BE
 // the optical centre. That is a property of the icon, so every consumer gets
-// it: the baseline rows below, and .prob-proof, which centres the star with
-// flexbox and could not be fixed by a baseline rule at all. Nothing about the
+// it, including any consumer that centres the star with flexbox and could
+// not be fixed by a baseline rule at all. Nothing about the
 // drawn size changes — only where the ink sits inside its box.
 function starSvg(fill) {
   return '<svg viewBox="0 0.484 24 24" fill="' + fill + '" class="rv-star" aria-hidden="true">' +
@@ -3294,4 +2632,3 @@ function esc(s) {
 renderHomeProducts();
 // Rendered once at boot: the section lives in the SPA's DOM permanently,
 // so it does not need re-rendering on every return to the home page.
-renderProblemCarousel();

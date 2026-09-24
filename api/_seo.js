@@ -212,8 +212,7 @@ function parseRoute(pathname) {
   const p = String(pathname || '/').split('?')[0].replace(/\/+$/, '') || '/';
   if (p === '/') return { type: 'page', page: 'home' };
   if (p === '/shop') return { type: 'page', page: 'shop' };
-  let m = p.match(/^\/shop\/(water|leash|safety)$/);
-  if (m) return { type: 'page', page: 'shop', filter: m[1] };
+  let m;
   if (p === '/contact') return { type: 'page', page: 'contact' };
   if (p === '/about') return { type: 'page', page: 'about' };
   if (p === '/wishlist') return { type: 'page', page: 'wishlist' };
@@ -292,10 +291,6 @@ const PRODUCT_COPY = {
     title: '2-in-1 Dog Water Bottle — Leak-Proof Water & Food Bottle',
     description: 'Portable 2-in-1 dog water bottle with a flip-out drinking spout and a sealed dry food compartment. 350ml and 550ml, BPA-free. From $16.99 with free shipping.'
   },
-  2: {
-    title: 'Retractable Dog Leash — 10ft & 16ft with One-Touch Lock',
-    description: 'Jam-free retractable dog leash with a one-touch lock button and an anti-slip ergonomic grip. 10ft and 16ft lengths, five colours. From $12.99, free shipping.'
-  },
   3: {
     title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
     description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $11.99 with free shipping.'
@@ -308,45 +303,22 @@ const PRODUCT_COPY = {
     title: 'Anti-Drop Dog Leash Wrist Strap — Adjustable Safety Loop',
     description: 'Adjustable wrist strap that clips to any dog leash so a slipped grip never means a loose dog. Six colours, fits retractable and standard leads. $8.99, free shipping.'
   },
-  5: {
-    title: 'Hands-Free Dog Poop Bag Clip for Leashes',
-    description: 'Hands-free clip that holds tied-off waste bags on your leash so both hands stay free on the walk. Fits all leashes, seven colours. $6.99, free shipping.'
-  },
   6: {
     title: 'LED Dog Collar — USB Rechargeable Night Collar',
     description: 'USB rechargeable LED dog collar with three light modes for night walks. Four neck sizes from 13 to 22 inches, detachable. From $14.99 with free shipping.'
-  },
-  8: {
-    title: 'Dog Poop Bag Holder — Canvas Leash Pouch with Carabiner',
-    description: 'Durable canvas poop bag holder that clips to your leash with a carabiner, keeping a full roll of waste bags within reach. $7.99 with free shipping.'
   }
 };
 
 const PAGE_COPY = {
   home: {
     title: 'PawHaul — Dog Walk Gear: Leashes, Water Bottles & LED Collars',
-    description: 'Everything for a better dog walk: leak-proof water bottles, retractable leashes, LED safety collars and poop bag holders. Free shipping, 30-day returns.',
+    description: 'Everything for a better dog walk: leak-proof water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps. Free shipping, 30-day returns.',
     path: '/'
   },
   shop: {
-    title: 'Shop All Dog Walk Gear — Leashes, Bowls & Safety Gear',
-    description: 'Browse every PawHaul walk essential: retractable leashes, collapsible bowls, 2-in-1 water bottles, LED collars and poop bag carriers. Free shipping.',
+    title: 'Shop All Dog Walk Gear — Water Bottles, Bowls, LED Collars & Leashes',
+    description: 'Browse all five PawHaul walk essentials: the 2-in-1 water bottle, collapsible bowl, LED dog collar, LED flashlight retractable leash and anti-drop wrist strap. Free shipping.',
     path: '/shop'
-  },
-  'shop:water': {
-    title: 'Dog Water Bottles & Collapsible Travel Bowls',
-    description: 'Portable hydration for walks and hikes — leak-proof 2-in-1 dog water bottles with a flip-out spout and fold-flat silicone travel bowls. Free shipping.',
-    path: '/shop/water'
-  },
-  'shop:leash': {
-    title: 'Dog Leashes & Walk Accessories',
-    description: 'Retractable dog leashes with one-touch locking, an LED flashlight leash for night walks, anti-drop wrist straps and hands-free poop bag carriers. Free shipping.',
-    path: '/shop/leash'
-  },
-  'shop:safety': {
-    title: 'Dog Safety Gear — LED Collars & Flashlight Leashes',
-    description: 'Be seen after dark: USB rechargeable LED dog collars with three light modes, an LED flashlight retractable leash that lights the path ahead, and anti-drop leash wrist straps. Free shipping.',
-    path: '/shop/safety'
   },
   about: {
     title: 'Our Story — Why We Built PawHaul',
@@ -381,7 +353,7 @@ function organizationSchema() {
     url: ORIGIN,
     logo: ORIGIN + '/favicon-192.png',
     email: SUPPORT_EMAIL,
-    description: 'PawHaul sells dog walk gear — leashes, water bottles, travel bowls, LED safety collars and waste bag carriers.',
+    description: 'PawHaul sells dog walk gear — 2-in-1 water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps.',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',
@@ -443,7 +415,6 @@ function productSchema(p) {
     image: images.length ? images : [DEFAULT_OG],
     sku: 'PH-' + p.id,
     brand: { '@type': 'Brand', name: BRAND },
-    category: categoryLabel(p.category),
     url: url,
     offers: offers
   };
@@ -473,10 +444,6 @@ function articleSchema(post) {
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     url: url
   };
-}
-
-function categoryLabel(cat) {
-  return { water: 'Dog Water Bottles & Bowls', leash: 'Dog Leashes & Walk Accessories', safety: 'Dog Safety Gear' }[cat] || 'Dog Walk Gear';
 }
 
 function itemListSchema(products, listPath, listName) {
@@ -547,7 +514,6 @@ async function metaFor(route, products, posts) {
     meta.schemas.push(breadcrumbSchema([
       { name: 'Home', path: '/' },
       { name: 'Shop', path: '/shop' },
-      { name: categoryLabel(p.category), path: '/shop/' + p.category },
       { name: p.name, path: meta.path }
     ]));
     return meta;
@@ -572,8 +538,7 @@ async function metaFor(route, products, posts) {
   }
 
   if (route.type === 'page') {
-    const key = route.page === 'shop' && route.filter ? 'shop:' + route.filter : route.page;
-    const copy = PAGE_COPY[key];
+    const copy = PAGE_COPY[route.page];
     if (!copy) { meta.noindex = true; return meta; }
     meta.title = titleWithBrand(copy.title);
     meta.description = copy.description;
@@ -581,19 +546,8 @@ async function metaFor(route, products, posts) {
     meta.noindex = !!copy.noindex;
 
     if (route.page === 'shop') {
-      // Mirrors productInCategory() in products.js: a product may declare a
-      // `categories` array and belong to more than one aisle.
-      const inCat = function (p, f) {
-        const cats = (Array.isArray(p.categories) && p.categories.length) ? p.categories : (p.category ? [p.category] : []);
-        return cats.indexOf(f) !== -1;
-      };
-      const list = route.filter ? products.filter(function (p) { return inCat(p, route.filter); }) : products;
-      meta.schemas.push(itemListSchema(list, copy.path, copy.title));
-      meta.schemas.push(breadcrumbSchema(
-        route.filter
-          ? [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }, { name: categoryLabel(route.filter), path: copy.path }]
-          : [{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }]
-      ));
+      meta.schemas.push(itemListSchema(products, copy.path, copy.title));
+      meta.schemas.push(breadcrumbSchema([{ name: 'Home', path: '/' }, { name: 'Shop', path: '/shop' }]));
     }
     if (route.page === 'blog') {
       meta.schemas.push({
@@ -742,7 +696,7 @@ module.exports = {
   ORIGIN, PROD_HOST, BRAND, SUPPORT_EMAIL, DEFAULT_OG,
   readRootFile, extractArrayLiteral, getProducts, getPosts,
   parseRoute, slugify, esc, absolute, ogImageFor, priceRange, money,
-  categoryLabel, PRODUCT_COPY, PAGE_COPY,
+  PRODUCT_COPY, PAGE_COPY,
   metaFor, buildHead, renderPage,
   renderPostHtml, renderBlogIndexHtml,
   sha1: function (s) { return crypto.createHash('sha1').update(s).digest('hex'); }
