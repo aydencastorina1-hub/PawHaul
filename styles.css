@@ -4868,7 +4868,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 /* nowrap: the price and the rating stay on one line together, or the rating
    drops whole — never mid-phrase. */
 .search-result-meta { display: flex; align-items: center; gap: 10px; margin-top: 2px; flex-wrap: nowrap; min-width: 0; }
-.fbt-meta { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; min-width: 0; }
 
 @media (max-width: 600px) { .search-result-meta { gap: 8px; } }
 

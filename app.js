@@ -336,99 +336,16 @@ function closePolicyModal() {
   }, 5000);
 })();
 
-// ── BUNDLE / FREQUENTLY BOUGHT TOGETHER ───────────────────────
-var bundleMap = {
-  1: [3, 10],   // Water Bottle → suggest Bowl + LED Leash
-  3: [1, 10],   // Bowl → suggest Water Bottle + LED Leash
-  6: [10, 9],   // LED Collar → suggest LED Leash + Wrist Strap (the night-walk set)
-  // The wrist strap clips onto the leash itself, so the leash leads its
-  // suggestions.
-  9: [10, 6],   // Wrist Strap → suggest LED Leash + LED Collar
-  // The LED leash is the night-visibility option, so it pairs with the
-  // other two things that make a dark walk safer.
-  10: [6, 9],   // LED Leash → suggest LED Collar + Wrist Strap
-};
-
+// ── PRODUCT PAGE TITLE ───────────────────────
 var originalShowProduct = showProduct;
 showProduct = function(id, opts) {
   // opts (routing sync/push mode — see products.js) must be forwarded, not
   // dropped, or every product-page navigation would silently stop updating
   // the URL.
   originalShowProduct(id, opts);
-  showBundle(id);
   var p = products.find(function (pr) { return pr.id === id; });
   if (p) setSpaTitle(p.name);
 };
-
-function showBundle(productId) {
-  var bundleDiv = document.getElementById('bundleSuggestion');
-  var bundleItems = document.getElementById('bundleItems');
-  if (!bundleDiv || !bundleItems) return;
-
-  var companions = bundleMap[productId] || [];
-  var allIds = [productId].concat(companions);
-  var total = 0;
-  var html = '';
-
-  allIds.forEach(function(bid) {
-    var p = products.find(function(x) { return x.id === bid; });
-    if (!p) return;
-    total += lowestVariant(p).price;
-    var isMain = bid === productId;
-    var bundleImgUrl = productImageFor(p, p.colors && p.colors[0]);
-    var imgContent = bundleImgUrl ? ('<img ' + photoAttrs(bundleImgUrl, 'thumb') + ' alt="' + p.name + '" style="width:36px;height:36px;object-fit:cover;border-radius:8px;">') : ('<span style="font-size:28px;">' + p.emoji + '</span>');
-    html += '<div style="display:flex;align-items:center;gap:12px;background:white;padding:10px 14px;border-radius:10px;">' +
-      imgContent +
-      '<div style="flex:1;">' +
-        '<div style="font-weight:800;font-size:13px;line-height:1.4;">' + p.name +
-          (isMain ? ' <span style="background:var(--orange);color:white;font-size:10px;padding:2px 7px;border-radius:50px;white-space:nowrap;">This Item</span>' : '') +
-        '</div>' +
-        '<div class="fbt-meta">' +
-          '<span style="color:var(--orange);font-weight:800;font-size:13px;">$' + lowestVariant(p).price.toFixed(2) + '</span>' +
-          supplierRatingCompactHtml(p) +
-        '</div>' +
-      '</div>' +
-      '<span style="color:var(--green);font-size:14px;font-weight:900;">&#10003;</span>' +
-    '</div>';
-  });
-
-  var isPair = allIds.length === 2;
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-top:2px dashed #F0F0F0;margin-top:4px;">' +
-    '<span style="font-weight:800;font-size:14px;">' + (isPair ? 'Combined Price' : 'Bundle Total') + '</span>' +
-    '<span style="font-family:var(--font-display);font-size:20px;color:var(--orange);">$' + total.toFixed(2) + '</span>' +
-  '</div>';
-
-  bundleItems.innerHTML = html;
-  // Two-item pairings read "Add Both To Cart"; bigger bundles keep "Add Bundle To Cart".
-  var bundleBtn = document.getElementById('bundleAddBtn');
-  if (bundleBtn) bundleBtn.textContent = isPair ? 'Add Both To Cart' : 'Add Bundle To Cart';
-  bundleDiv.style.display = 'block';
-}
-
-function addBundleToCart() {
-  var currentId = currentProduct ? currentProduct.id : null;
-  if (!currentId) return;
-
-  var companions = bundleMap[currentId] || [];
-  var allIds = [currentId].concat(companions);
-
-  allIds.forEach(function(bid) {
-    var p = products.find(function(x) { return x.id === bid; });
-    if (!p) return;
-    var alreadyInCart = cart.some(function(c) { return c.id === bid; });
-    if (!alreadyInCart) {
-      // Variant products go in at their lowest-priced option (the price shown
-      // in the bundle box), tagged with its size.
-      var v = lowestVariant(p);
-      var newItem = Object.assign({}, p, { price: v.price, size: v.size || '', qty: 1 });
-      cart.push(newItem);
-      syncAddToShopify(newItem);
-    }
-  });
-
-  updateCartCount();
-  showToast('Bundle added to cart!');
-}
 
 // ==================== BLOG ====================
 // Post content lives in blog.js. The SERVER (api/_seo.js) already renders the
@@ -1550,7 +1467,7 @@ document.addEventListener('keydown', function(e) {
 
 // ==================== ANALYTICS WRAPPERS ====================
 // Applied at the very END of this file, deliberately. Each of these functions
-// is already wrapped earlier (page-navigation hooks, the bundle hook), and
+// is already wrapped earlier (page-navigation and product-page hooks), and
 // those wrappers set document.title as part of navigating. Wrapping last makes
 // these the OUTERMOST layer, so a page_view is sent after the title is
 // correct rather than reporting the previous page's title.
@@ -1589,8 +1506,8 @@ showPost = function (slug, opts) {
 // addToCart(product) takes a fully-resolved item — a copy of the product with
 // the chosen variant's price/size/color already merged in (see products.js) —
 // so everything the event needs is on the single argument. Wrapping the one
-// function covers every entry point: detail page, quick-add, bundles,
-// wishlist, and the chatbot's tool call.
+// function covers every entry point: detail page, quick-add, wishlist,
+// and the chatbot's tool call.
 var _trackOrigAddToCart = addToCart;
 addToCart = function (product) {
   var result = _trackOrigAddToCart.apply(this, arguments);

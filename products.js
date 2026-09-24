@@ -47,7 +47,7 @@ var products = [
 
     // Per-size variant pricing — maps each size option to its price.
     // `price`/`was` below mirror the default (first) size so every other part
-    // of the app (shop cards, home carousel, bundles, search) keeps working.
+    // of the app (shop cards, home carousel, search) keeps working.
     sizePrices: {
       "350ml": { price: 16.99, was: 24.99 },
       "550ml": { price: 21.99, was: 29.99 }
@@ -1209,7 +1209,7 @@ var LOCAL_PHOTO_WIDTHS = {
 var PHOTO_SIZES = {
   card: '(max-width: 767px) 50vw, 340px',   // .product-img, 300px tall in a 4-col grid
   detail: '(max-width: 900px) 100vw, 680px', // .det-carousel, 380-600px tall
-  thumb: '96px',                             // cart lines, search results, bundle rows
+  thumb: '96px',                             // cart lines, search results
   fix: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 30vw',      // home walk-fix cards
   fixLead: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 40vw'   // the first, larger one
 };
@@ -1981,7 +1981,7 @@ function retiredColorFor(item) {
 // Resolves a local cart line to the real Shopify variant GID it corresponds
 // to, using that product's shopifyVariants map (see the DATA section above).
 // Falls back to the product's first color when a line has no color recorded
-// — quick-add and "Add Both/Bundle" never show a color picker, so their
+// — quick-add never shows a color picker, so its
 // cart lines never carry one; the detail page's Add To Cart does track it.
 function resolveShopifyVariantId(item) {
   var product = products.find(function (p) { return p.id === item.id; });
@@ -2055,9 +2055,8 @@ function findShopifyLineId(lines, variantId) {
 
 // All syncXToShopify calls (below) go through this single-file promise
 // chain instead of running whenever their caller happens to fire. Without
-// it, two near-simultaneous adds with no cart yet (e.g. addBundleToCart's
-// forEach over 2+ products, or just clicking Add on two different products
-// quickly) would each read getStoredCartId() as empty before the other's
+// it, two near-simultaneous adds with no cart yet (e.g. clicking Add on two
+// different products quickly) would each read getStoredCartId() as empty before the other's
 // "create" had a chance to write it back — spawning TWO separate Shopify
 // carts and silently losing one of them (confirmed live: exactly this
 // happened before this queue was added). Serializing every mutation means
