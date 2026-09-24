@@ -10,7 +10,7 @@ var products = [
     supplier: { rating: 4.8, ratings: 322 },
     // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
     // product page. Facts only from the supplier listing images and this file.
-    desc: "Water and food in one bottle you can carry in one hand. The top is a clear food container that holds about 180ml of kibble. The bottom is the water bottle: about 350ml in the regular size, 550ml in the large. When your dog needs a drink, press the button on the side and water fills the drinking trough.\n\nMost dogs don't need much water on a walk. They need some at the right moment, and that moment is usually a mile from home. Cupping your hand under a normal bottle wastes most of it and soaks your sleeve. This gives them a proper trough to drink from. The food section means longer outings and hikes don't need a separate bag of kibble.\n\nWhat sets it apart from a basic dog bottle is the lock. A downward lock on the button stops water being let out by accident. A sealing gasket inside keeps the food section dry, so it can ride in a bag without leaking. The food container lifts off when you need it, and the carry strap goes round your wrist.",
+    desc: "This is the one you carry while you're moving. It holds water and a snack in one bottle you can hold in one hand: about 350ml of water in the regular size (550ml in the large) and about 180ml of kibble in the clear food section on top. The carry strap goes round your wrist, so it comes along without taking up a pocket.\n\nIt's built for drinks on the go. Press the button on the side, water fills the built-in trough, your dog drinks, and you keep walking, with no bowl to put down, fill and pack away. A downward lock on the button stops water leaking in your bag, and a sealing gasket keeps the food dry.\n\nIt's made for quick drinks between blocks, not long sit-down stops. For those, pair it with the Collapsible Dog Bowl: the bottle carries the water, and the bowl gives your dog somewhere to drink properly when you stop.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
@@ -68,6 +68,7 @@ var products = [
       } },
 
     features: [
+      "Made for drinks on the move — no bowl to set down",
       "About 180ml of food on top, water below",
       "350ml or 550ml water size",
       "Press-button water release with a downward lock",
@@ -90,7 +91,7 @@ var products = [
     supplier: { rating: 4.8, ratings: 1749 },
     // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
     // product page. Facts only from the supplier listing images and this file.
-    desc: "A full-size dog bowl that folds down to a flat disc. It's silicone, 5.12 inches across and just under 2 inches deep when open. It presses flat when you're done, so it takes up almost no room. A carabiner is built in, so it clips to your bag, a belt loop or the leash.\n\nIf you already carry water for yourself, this is the lightest way to share it. Pour it in, let your dog drink properly instead of lapping from your palm, then shake it out and fold it. It works just as well for a portion of kibble on trips and days out.\n\nRigid travel bowls stay bulky in a bag. This one folds flat when closed, holds its shape when open, and rinses clean in seconds.",
+    desc: "This is the one you set down when you stop. On a proper break, like halfway up a trail, at a picnic or at a rest stop on a road trip, your dog needs a real bowl to drink or eat from, not a few sips from a trough. This silicone bowl opens to 5.12 inches across and just under 2 inches deep, so they can drink their fill or eat a full portion.\n\nWhen you're done, shake it out and press it flat. It folds down to a thin disc and clips to your bag, belt loop or leash with its built-in carabiner, so it's always with you and never in the way.\n\nIt doesn't carry any water itself. It pairs with the 2-in-1 Dog Water Bottle, or with whatever bottle you already bring: the bottle is for quick drinks while you're walking, and the bowl is for when you stop and your dog needs a proper drink or meal.",
     tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
     sizes: ["5.12in diameter × 1.97in height"],
     colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
@@ -147,6 +148,7 @@ var products = [
       } },
 
     features: [
+      "Made for stops: breaks, hikes, picnics and road trips",
       "Folds completely flat",
       "5.12in wide × 1.97in deep when open",
       "Built-in carabiner clip",
@@ -814,7 +816,7 @@ function showPage(page, opts) {
   // iOS from treating the two taps as one gesture.
   document.documentElement.style.scrollBehavior = 'auto';
 
-  if (page === 'shop') renderShopProducts();
+  if (page === 'shop') { renderShopProducts(); renderBundles(); }
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
   // The server already put the post cards in #blogIndex for a direct /blog
@@ -851,6 +853,209 @@ function renderShopProducts() {
   container.innerHTML = products.map(function(p, i) {
     return productCard(p, i < 4 ? { priority: true } : null);
   }).join('');
+}
+
+// ==================== BUNDLES (shop page, task 112) ====================
+// Curated sets shown under the shop grid. The discount is REAL only because
+// Shopify applies it: each bundle has a matching AUTOMATIC discount in
+// Shopify admin ("Amount off products", pct% off exactly these products,
+// minimum quantity = number of products in the bundle, no code). Shopify
+// applies it at checkout whenever those products are in the cart, however
+// they got there. Never show a bundle price here that has no matching
+// automatic discount in Shopify.
+//
+// `ids: 'all'` means every product in the catalogue, so a new product joins
+// the Complete Walk Kit automatically. Its Shopify code must be updated to
+// include that product too, or the new item will not be discounted.
+// `wide` cards run the full width of the grid with their items side by side.
+var BUNDLES = [
+  {
+    id: 'led',
+    name: 'LED Bundle',
+    blurb: 'Light on your dog and light in your hand: the collar makes them easy to spot, the leash lights the path ahead.',
+    ids: [6, 10],
+    pct: 10
+  },
+  {
+    id: 'control',
+    name: 'Control Bundle',
+    blurb: 'Lock the length with your thumb and never lose the handle: the leash, plus a strap that keeps it on your wrist.',
+    ids: [10, 9],
+    pct: 10
+  },
+  {
+    id: 'safety',
+    name: 'Ultimate Safety Bundle',
+    blurb: 'Everything for walking after dark: a lit collar, a lit leash, and a wrist strap so a spooked dog can’t pull free.',
+    ids: [6, 10, 9],
+    pct: 12,
+    wide: true
+  },
+  {
+    id: 'kit',
+    name: 'Complete Walk Kit',
+    blurb: 'The whole PawHaul lineup: water and a snack on the move, a bowl for proper breaks, and the full after-dark set.',
+    ids: 'all',
+    pct: 15,
+    wide: true
+  }
+];
+
+function bundleProducts(b) {
+  var ids = b.ids === 'all' ? products.map(function (p) { return p.id; }) : b.ids;
+  return ids.map(function (id) { return products.find(function (p) { return p.id === id; }); }).filter(Boolean);
+}
+
+// Shopify rounds a percentage discount per line, to the cent; so does this,
+// so the saving shown matches what checkout charges.
+function pctOff(amount, pct) {
+  return Math.round(amount * pct) / 100;
+}
+
+// The size/colour the visitor picked for each product in each bundle card.
+// Starts on the same default a quick-add uses (first colour, cheapest size).
+var bundlePicks = {};
+function bundlePick(b, p) {
+  var key = b.id + ':' + p.id;
+  if (!bundlePicks[key]) {
+    var d = defaultCardVariant(p) || { size: (p.sizes || [''])[0], color: (p.colors || [null])[0] };
+    bundlePicks[key] = { size: d.size || '', color: d.color || null };
+  }
+  return bundlePicks[key];
+}
+
+function bundlePickPrice(p, pick) {
+  return priceForVariant(p, pick.size).price;
+}
+
+function bundleTotals(b) {
+  var separately = 0, save = 0;
+  bundleProducts(b).forEach(function (p) {
+    var price = bundlePickPrice(p, bundlePick(b, p));
+    separately += price;
+    save += pctOff(price, b.pct);
+  });
+  return { separately: separately, save: save, bundle: separately - save };
+}
+
+function bundleOptionSelect(b, p, field, options, current) {
+  if (!options || options.length < 2) return '';
+  var label = field === 'size' ? 'Size' : 'Colour';
+  return '<select class="bundle-select" aria-label="' + esc(p.name) + ' ' + label.toLowerCase() + '"' +
+    ' onchange="bundlePickChange(\'' + b.id + '\',' + p.id + ',\'' + field + '\',this.value)">' +
+    options.map(function (o) {
+      var off = field === 'size'
+        ? variantUnavailable(p, o, bundlePick(b, p).color)
+        : variantUnavailable(p, bundlePick(b, p).size, o);
+      return '<option value="' + esc(o) + '"' + (o === current ? ' selected' : '') + (off ? ' disabled' : '') + '>' +
+        esc(field === 'size' ? shortSizeLabel(o) : o) + (off ? ' (n/a)' : '') + '</option>';
+    }).join('') +
+  '</select>';
+}
+
+function bundleCardHtml(b) {
+  var items = bundleProducts(b);
+  var t = bundleTotals(b);
+  return '<article class="bundle-card' + (b.wide ? ' bundle-card--wide' : '') + '" id="bundle-' + b.id + '">' +
+    '<div class="bundle-top">' +
+      '<h3 class="bundle-name">' + esc(b.name) + '</h3>' +
+      '<span class="bundle-pill">Save ' + b.pct + '%</span>' +
+    '</div>' +
+    '<p class="bundle-blurb">' + esc(b.blurb) + '</p>' +
+    '<ul class="bundle-items">' + items.map(function (p) {
+      var pick = bundlePick(b, p);
+      var img = productImageFor(p, pick.color);
+      return '<li class="bundle-item">' +
+        '<a class="bundle-thumb" href="/product/' + slugify(p.name) + '" onclick="goToProductLink(event,' + p.id + ')">' +
+          (img ? '<img ' + photoAttrs(img, 'thumb') + ' alt="' + esc(p.name) + '">' : p.emoji) +
+        '</a>' +
+        '<div class="bundle-item-info">' +
+          '<span class="bundle-item-name">' + esc(p.name) + '</span>' +
+          '<span class="bundle-item-opts">' +
+            bundleOptionSelect(b, p, 'size', p.sizes, pick.size) +
+            bundleOptionSelect(b, p, 'color', p.colors, pick.color) +
+          '</span>' +
+        '</div>' +
+        '<span class="bundle-item-price">$' + bundlePickPrice(p, pick).toFixed(2) + '</span>' +
+      '</li>';
+    }).join('') + '</ul>' +
+    '<div class="bundle-foot">' +
+      '<div class="bundle-prices">' +
+        '<span class="bundle-sep">Bought separately $' + t.separately.toFixed(2) + '</span>' +
+        '<span class="bundle-price"><span class="price-now">$' + t.bundle.toFixed(2) + '</span>' +
+          '<span class="bundle-save">You save $' + t.save.toFixed(2) + '</span></span>' +
+      '</div>' +
+      '<button class="btn-black bundle-add" type="button" onclick="addBundleToCart(\'' + b.id + '\')">Add Bundle to Cart</button>' +
+    '</div>' +
+  '</article>';
+}
+
+function renderBundles() {
+  var el = document.getElementById('shopBundles');
+  if (!el) return;
+  el.innerHTML = BUNDLES.map(bundleCardHtml).join('');
+}
+
+function bundlePickChange(bundleId, productId, field, value) {
+  var b = BUNDLES.find(function (x) { return x.id === bundleId; });
+  var p = products.find(function (x) { return x.id === productId; });
+  if (!b || !p) return;
+  var pick = bundlePick(b, p);
+  pick[field] = value;
+  // A size/colour pair Shopify does not sell (e.g. a 3M leash in Green):
+  // move the OTHER option to the first combination that exists.
+  if (variantUnavailable(p, pick.size, pick.color)) {
+    var pool = field === 'size' ? (p.colors || []) : (p.sizes || []);
+    for (var i = 0; i < pool.length; i++) {
+      var trySize = field === 'size' ? pick.size : pool[i];
+      var tryColor = field === 'size' ? pool[i] : pick.color;
+      if (!variantUnavailable(p, trySize, tryColor)) { pick.size = trySize; pick.color = tryColor; break; }
+    }
+  }
+  var card = document.getElementById('bundle-' + b.id);
+  if (card) card.outerHTML = bundleCardHtml(b);
+}
+
+function addBundleToCart(bundleId) {
+  var b = BUNDLES.find(function (x) { return x.id === bundleId; });
+  if (!b) return;
+  bundleProducts(b).forEach(function (p) {
+    var pick = bundlePick(b, p);
+    var item = Object.assign({}, p, { price: bundlePickPrice(p, pick), size: pick.size || '' });
+    if (pick.color) item.color = pick.color;
+    addToCart(item);
+  });
+  showToast(b.name + ' added to cart! ' + b.pct + '% off is applied at checkout.');
+}
+
+// Every product of the bundle is in the cart — the condition Shopify's
+// automatic discount checks.
+function bundleInCart(b) {
+  return bundleProducts(b).every(function (p) { return cart.some(function (i) { return i.id === p.id; }); });
+}
+
+// Estimated saving for the cart page, mirroring Shopify: each bundle whose
+// products are all in the cart takes pct% off every line of those products;
+// where two bundles share a product, the bigger percentage wins (the
+// discounts are set not to combine). Shopify's checkout is the final word.
+function bundleSavingsForCart() {
+  var bundles = BUNDLES.filter(bundleInCart);
+  if (!bundles.length) return { amount: 0, bundles: [] };
+  var amount = 0;
+  var used = [];
+  cart.forEach(function (item) {
+    if (retiredColorFor(item)) return;
+    var best = null;
+    bundles.forEach(function (b) {
+      if (bundleProducts(b).some(function (p) { return p.id === item.id; }) && (!best || b.pct > best.pct)) best = b;
+    });
+    if (!best) return;
+    amount += pctOff(item.price * item.qty, best.pct);
+    if (used.indexOf(best) === -1) used.push(best);
+  });
+  // Only the bundles actually giving a discount are listed, so a cart with
+  // the Ultimate Safety set does not also claim the LED and Control ones.
+  return { amount: amount, bundles: BUNDLES.filter(function (b) { return used.indexOf(b) !== -1; }) };
 }
 
 // SITE-WIDE PRICE RULE: product cards always show the LOWEST price option —
@@ -1796,7 +2001,8 @@ function renderCart() {
   // either — it shows in the cart as something to fix, not as a charge.
   var subtotal = cart.reduce((sum, item) => sum + (retiredColorFor(item) ? 0 : item.price * item.qty), 0);
   var shipping = 0;
-  var total = subtotal + shipping;
+  var bundleSave = bundleSavingsForCart();
+  var total = subtotal - bundleSave.amount + shipping;
 
   container.innerHTML = `
     <div class="cart-layout">
@@ -1848,8 +2054,12 @@ function renderCart() {
       <div class="cart-summary">
         <h3>Order Summary</h3>
         <div class="summary-row"><span>Subtotal</span><span>$${subtotal.toFixed(2)}</span></div>
+        ${bundleSave.bundles.map(function (b) {
+          return '<div class="summary-row summary-bundle"><span>' + esc(b.name) + ' (' + b.pct + '% off)</span><span>applied at checkout</span></div>';
+        }).join('')}
+        ${bundleSave.amount ? '<div class="summary-row summary-bundle"><span>Bundle savings</span><span>−$' + bundleSave.amount.toFixed(2) + '</span></div>' : ''}
         <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
-        <div class="summary-row total"><span>Total</span><span>$${total.toFixed(2)}</span></div>
+        <div class="summary-row total"><span>${bundleSave.amount ? 'Estimated total' : 'Total'}</span><span>$${total.toFixed(2)}</span></div>
         <button class="checkout-btn" onclick="checkout()"><span class="checkout-btn-label">Checkout Securely →</span></button>
         ${shopPayBlockHtml()}
         <p class="cart-returns-line">30-day returns • Free shipping on every order</p>
