@@ -166,7 +166,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: bloc
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=109" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=110" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -175,7 +175,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: bloc
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=4">
-  <link rel="preload" as="script" href="/products.js?v=73">
+  <link rel="preload" as="script" href="/products.js?v=74">
   <link rel="preload" as="script" href="/app.js?v=59">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -395,10 +395,22 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: bloc
   </div>
 
 
-  <!-- TASK 109 PLACEHOLDER: a new combined home page section goes HERE,
-       between the hero and Best Sellers. It replaces the "Everything You
-       Need For The Walk" carousel and "The Problem It Solves" carousel,
-       both removed in task 108. Nothing renders here until it is built. -->
+  <!-- WALK FIXES (task 109) — "stuff you didn't know you needed". One card per
+       product, each leading with the walk problem it solves. Cards are
+       rendered by renderWalkFixes() in products.js (copy lives in WALK_FIXES
+       there); the grid has fixed row heights in CSS, so it holds its final
+       size before that render and nothing below it jumps. Desktop: a bento
+       grid with the first card spanning two rows. Tablet: two columns.
+       Phone: a horizontal swipe row. -->
+  <section class="fixes-section" aria-labelledby="fixesTitle">
+    <div class="fixes-header">
+      <div class="section-tag">The Walk, Fixed</div>
+      <h2 class="section-title" id="fixesTitle">Stuff You Didn't Know You <span>Needed</span></h2>
+      <p class="section-sub">Five walk problems nobody warns you about, and the small thing that fixes each one.</p>
+    </div>
+    <div class="fixes-grid" id="walkFixes"></div>
+    <p class="fixes-swipe" aria-hidden="true">Swipe for all five &rarr;</p>
+  </section>
 
   <!-- BESTSELLERS -->
   <section class="bestsellers" id="bestsellers">
@@ -1224,7 +1236,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post { display: bloc
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=4"></script>
-  <script src="/products.js?v=73"></script>
+  <script src="/products.js?v=74"></script>
   <script src="/app.js?v=59"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above

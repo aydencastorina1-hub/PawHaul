@@ -856,6 +856,97 @@ function renderShopProducts() {
   }).join('');
 }
 
+// ==================== WALK FIXES (home, task 109) ====================
+// "Stuff you didn't know you needed": one card per product, each opening on
+// the walk problem it fixes rather than on the product. Copy lives here, not
+// on the product objects, because it only exists for this section. Every
+// claim must stay true to the product's own desc/features above.
+//
+// `img` is the hook photo — the product in use where a clean in-use shot
+// exists — and `fit` says how to frame it: 'cover' for photos, 'contain' for
+// a studio cutout on white. Omit `img` to fall back to the product's own
+// first-colour photo (productImageFor). `pos` is an optional object-position
+// for a photo whose subject is not centred.
+//
+// Cards have FIXED heights at every breakpoint (see .fix-card in styles.css),
+// so #walkFixes reserves its final size before this renders and nothing
+// below it moves when it does.
+var WALK_FIXES = [
+  {
+    id: 1,
+    problem: "Your dog's thirsty. The nearest tap is a mile back.",
+    fix: "Water and food in one leak-proof bottle. Flip the spout out and they're drinking in seconds.",
+    img: '/images/products/water-bottle-lakeside.jpg',
+    alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
+    fit: 'cover'
+  },
+  {
+    id: 10,
+    problem: "After dark you can't see your dog, or what they just picked up.",
+    fix: "A light ring on your dog and a flashlight for the path, both in the handle. Takes 2 AAA batteries.",
+    img: '/images/products/led-leash-lifestyle-4.jpg',
+    alt: 'A hand holding the LED Flashlight Retractable Dog Leash, its flashlight beam lighting the dark',
+    fit: 'cover'
+  },
+  {
+    id: 6,
+    problem: "At night, your dog is the hardest thing on the street to see.",
+    fix: "A USB-rechargeable collar with three light modes, so drivers spot them first.",
+    img: '/images/products/collar-lifestyle-6.jpg',
+    alt: 'A dog walking at night wearing a glowing LED Dog Collar',
+    fit: 'cover'
+  },
+  {
+    id: 9,
+    problem: "One squirrel. One hard tug. The leash is gone.",
+    fix: "A strap that ties the handle to your wrist, so a lunge never becomes a loose dog.",
+    fit: 'contain'
+  },
+  {
+    id: 3,
+    problem: "You brought the water. You forgot the bowl.",
+    fix: "Folds flat, clips to your bag, pops open in a second.",
+    img: '/images/products/bowl-lifestyle-1.jpg',
+    alt: 'A golden retriever drinking from a red Collapsible Dog Bowl',
+    fit: 'cover',
+    pos: 'center 78%'   // portrait photo: keep the bowl, not the dog's back, in frame
+  }
+];
+
+function renderWalkFixes() {
+  var grid = document.getElementById('walkFixes');
+  if (!grid) return;
+  grid.innerHTML = WALK_FIXES.map(function (f, i) {
+    var p = products.find(function (x) { return x.id === f.id; });
+    if (!p) return '';
+    var img = f.img || productImageFor(p, p.colors && p.colors[0]);
+    var alt = f.img ? f.alt : p.name;
+    var num = (i + 1 < 10 ? '0' : '') + (i + 1);
+    // A real link (crawlable, middle-clickable) that stays inside the SPA on
+    // a plain click — same contract as the footer's product links.
+    return '<a class="fix-card fix-card--' + f.fit + (i === 0 ? ' fix-card--lead' : '') + '"' +
+        ' href="/product/' + slugify(p.name) + '" onclick="goToProductLink(event,' + p.id + ')">' +
+        '<div class="fix-media">' +
+          (img ? '<img ' + photoAttrs(img, i === 0 ? 'fixLead' : 'fix') + ' alt="' + esc(alt) + '"' +
+            (f.pos ? ' style="object-position:' + f.pos + '"' : '') + '>' : '') +
+          '<span class="fix-num" aria-hidden="true">' + num + '</span>' +
+        '</div>' +
+        '<div class="fix-body">' +
+          '<p class="fix-problem">' + esc(f.problem) + '</p>' +
+          '<div class="fix-solution">' +
+            '<span class="fix-label">The fix</span>' +
+            '<span class="fix-name">' + esc(p.name) + '</span>' +
+            '<span class="fix-copy">' + esc(f.fix) + '</span>' +
+          '</div>' +
+          '<div class="fix-foot">' +
+            '<span class="fix-price">' + priceDisplayHtml(p) + '</span>' +
+            '<span class="fix-cta">Shop it<span aria-hidden="true"> &rarr;</span></span>' +
+          '</div>' +
+        '</div>' +
+      '</a>';
+  }).join('');
+}
+
 // SITE-WIDE PRICE RULE: product cards always show the LOWEST price option —
 // never a range. lowestVariant() finds the cheapest size variant (or the base
 // price for single-price products); its label drives the default selection on
@@ -1101,6 +1192,7 @@ var LOCAL_PHOTO_WIDTHS = {
   'led-leash-orange-main': [400, 800, 1200, 1536],
   'led-leash-purple-main': [400, 800, 1200, 1536],
   'water-bottle-blue-main': [400, 800, 1200],
+  'water-bottle-lakeside': [400, 800, 1200, 1536],
   'water-bottle-lifestyle-1': [400, 800, 953],
   'water-bottle-lifestyle-2': [400, 800, 1000],
   'water-bottle-lifestyle-3': [400, 800, 1000],
@@ -1117,7 +1209,9 @@ var LOCAL_PHOTO_WIDTHS = {
 var PHOTO_SIZES = {
   card: '(max-width: 767px) 50vw, 340px',   // .product-img, 300px tall in a 4-col grid
   detail: '(max-width: 900px) 100vw, 680px', // .det-carousel, 380-600px tall
-  thumb: '96px'                              // cart lines, search results, bundle rows
+  thumb: '96px',                             // cart lines, search results, bundle rows
+  fix: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 30vw',      // home walk-fix cards
+  fixLead: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 40vw'   // the first, larger one
 };
 
 // Non-null only for a local photo we actually generated variants for, so a
@@ -2632,3 +2726,4 @@ function esc(s) {
 renderHomeProducts();
 // Rendered once at boot: the section lives in the SPA's DOM permanently,
 // so it does not need re-rendering on every return to the home page.
+renderWalkFixes();
