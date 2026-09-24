@@ -49,7 +49,7 @@ var products = [
 
     // Per-size variant pricing — maps each size option to its price.
     // `price`/`was` below mirror the default (first) size so every other part
-    // of the app (shop cards, home carousel, search) keeps working.
+    // of the app (shop cards, search) keeps working.
     sizePrices: {
       "350ml": { price: 16.99, was: 24.99 },
       "550ml": { price: 21.99, was: 29.99 }
@@ -814,7 +814,6 @@ function showPage(page, opts) {
   // iOS from treating the two taps as one gesture.
   document.documentElement.style.scrollBehavior = 'auto';
 
-  if (page === 'home') renderHomeProducts();
   if (page === 'shop') renderShopProducts();
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
@@ -838,27 +837,11 @@ function showPage(page, opts) {
 }
 
 // ==================== RENDER PRODUCTS ====================
-// NOTE: both grids ship static loading-skeleton cards in index.html that
-// reserve the exact height these renders will produce (see the LOADING
-// SKELETON comments there). If you change the featured list below, the
-// product catalogue, a product's colours or its sizes, update the skeletons
-// to match — otherwise the page starts jumping on load again.
-function renderHomeProducts() {
-  var container = document.getElementById('homeProducts');
-  // Home carousel = these 4 specific products (best sellers), in this exact
-  // order. (Shop page still shows all products — dropping one from here only
-  // takes it out of this carousel.)
-  var featuredIds = [1, 6, 3, 10]; // Water Bottle, LED Collar, Dog Bowl, LED Flashlight Leash
-  var featured = featuredIds
-    .map(function(fid) { return products.find(function(p) { return p.id === fid; }); })
-    .filter(Boolean);
-  // Eager but LOW priority: these four sit just under the hero, so they
-  // should not still be lazy when the visitor scrolls, but they must not
-  // compete with the hero photo's own preload for the first bytes either.
-  container.innerHTML = featured.map((p, i) => productCard(p, i < 4 ? { eager: true } : null)).join('');
-  setTimeout(function() { if (typeof initCarousel === 'function') initCarousel('homeProducts', 'prodCarouselPrev', 'prodCarouselNext'); }, 50);
-}
-
+// NOTE: the shop grid ships static loading-skeleton cards in index.html that
+// reserve the exact height this render will produce (see the LOADING
+// SKELETON comment there). If you change the product catalogue, a product's
+// colours or its sizes, update the skeletons to match — otherwise the page
+// starts jumping on load again.
 function renderShopProducts() {
   var container = document.getElementById('shopProducts');
   if (!container) return;
@@ -867,97 +850,6 @@ function renderShopProducts() {
   // candidates, hence priority rather than plain eager.
   container.innerHTML = products.map(function(p, i) {
     return productCard(p, i < 4 ? { priority: true } : null);
-  }).join('');
-}
-
-// ==================== WALK FIXES (home, task 109) ====================
-// "Stuff you didn't know you needed": one card per product, each opening on
-// the walk problem it fixes rather than on the product. Copy lives here, not
-// on the product objects, because it only exists for this section. Every
-// claim must stay true to the product's own desc/features above.
-//
-// `img` is the hook photo — the product in use where a clean in-use shot
-// exists — and `fit` says how to frame it: 'cover' for photos, 'contain' for
-// a studio cutout on white. Omit `img` to fall back to the product's own
-// first-colour photo (productImageFor). `pos` is an optional object-position
-// for a photo whose subject is not centred.
-//
-// Cards have FIXED heights at every breakpoint (see .fix-card in styles.css),
-// so #walkFixes reserves its final size before this renders and nothing
-// below it moves when it does.
-var WALK_FIXES = [
-  {
-    id: 1,
-    problem: "Your dog's thirsty. The nearest tap is a mile back.",
-    fix: "Water and food in one leak-proof bottle. Flip the spout out and they're drinking in seconds.",
-    img: '/images/products/water-bottle-lakeside.jpg',
-    alt: 'A golden retriever drinking from a portable dog water bottle held by its owner, beside a lake',
-    fit: 'cover'
-  },
-  {
-    id: 10,
-    problem: "After dark you can't see your dog, or what they just picked up.",
-    fix: "A light ring on your dog and a flashlight for the path, both in the handle. Takes 2 AAA batteries.",
-    img: '/images/products/led-leash-lifestyle-4.jpg',
-    alt: 'A hand holding the LED Flashlight Retractable Dog Leash, its flashlight beam lighting the dark',
-    fit: 'cover'
-  },
-  {
-    id: 6,
-    problem: "At night, your dog is the hardest thing on the street to see.",
-    fix: "A USB-rechargeable collar with three light modes, so drivers spot them first.",
-    img: '/images/products/collar-lifestyle-6.jpg',
-    alt: 'A dog walking at night wearing a glowing LED Dog Collar',
-    fit: 'cover'
-  },
-  {
-    id: 9,
-    problem: "One squirrel. One hard tug. The leash is gone.",
-    fix: "A strap that ties the handle to your wrist, so a lunge never becomes a loose dog.",
-    fit: 'contain'
-  },
-  {
-    id: 3,
-    problem: "You brought the water. You forgot the bowl.",
-    fix: "Folds flat, clips to your bag, pops open in a second.",
-    img: '/images/products/bowl-lifestyle-1.jpg',
-    alt: 'A golden retriever drinking from a red Collapsible Dog Bowl',
-    fit: 'cover',
-    pos: 'center 78%'   // portrait photo: keep the bowl, not the dog's back, in frame
-  }
-];
-
-function renderWalkFixes() {
-  var grid = document.getElementById('walkFixes');
-  if (!grid) return;
-  grid.innerHTML = WALK_FIXES.map(function (f, i) {
-    var p = products.find(function (x) { return x.id === f.id; });
-    if (!p) return '';
-    var img = f.img || productImageFor(p, p.colors && p.colors[0]);
-    var alt = f.img ? f.alt : p.name;
-    var num = (i + 1 < 10 ? '0' : '') + (i + 1);
-    // A real link (crawlable, middle-clickable) that stays inside the SPA on
-    // a plain click — same contract as the footer's product links.
-    return '<a class="fix-card fix-card--' + f.fit + (i === 0 ? ' fix-card--lead' : '') + '"' +
-        ' href="/product/' + slugify(p.name) + '" onclick="goToProductLink(event,' + p.id + ')">' +
-        '<div class="fix-media">' +
-          (img ? '<img ' + photoAttrs(img, i === 0 ? 'fixLead' : 'fix') + ' alt="' + esc(alt) + '"' +
-            (f.pos ? ' style="object-position:' + f.pos + '"' : '') + '>' : '') +
-          '<span class="fix-num" aria-hidden="true">' + num + '</span>' +
-        '</div>' +
-        '<div class="fix-body">' +
-          '<p class="fix-problem">' + esc(f.problem) + '</p>' +
-          '<div class="fix-solution">' +
-            '<span class="fix-label">The fix</span>' +
-            '<span class="fix-name">' + esc(p.name) + '</span>' +
-            '<span class="fix-copy">' + esc(f.fix) + '</span>' +
-          '</div>' +
-          '<div class="fix-foot">' +
-            '<span class="fix-price">' + priceDisplayHtml(p) + '</span>' +
-            '<span class="fix-cta">Shop it<span aria-hidden="true"> &rarr;</span></span>' +
-          '</div>' +
-        '</div>' +
-      '</a>';
   }).join('');
 }
 
@@ -1001,7 +893,7 @@ function hasPriceRange(p) {
 
 // Builds the inner HTML of a .product-price block: the lowest real selling
 // price, prefixed "From" when sizes actually vary in price. Shared by the shop
-// grid, the home carousel and the wishlist so they always stay consistent.
+// grid and the wishlist so they always stay consistent.
 function priceDisplayHtml(p) {
   var v = lowestVariant(p);
   var prefix = hasPriceRange(p) ? '<span class="price-from">From </span>' : '';
@@ -1018,7 +910,7 @@ function variantUnavailable(p, size, color) {
   });
 }
 
-// ── Compact on-card variant pickers (home carousel + shop grid) ──
+// ── Compact on-card variant pickers (shop grid) ──
 // Tiny color swatches + size pills rendered between the reviews and the
 // price. Selection lives in the card's own DOM (active classes), so every
 // card picks independently; cardAdd() reads it back at add-to-cart time.
@@ -1206,7 +1098,6 @@ var LOCAL_PHOTO_WIDTHS = {
   'led-leash-orange-main': [400, 800, 1200, 1536],
   'led-leash-purple-main': [400, 800, 1200, 1536],
   'water-bottle-blue-main': [400, 800, 1200],
-  'water-bottle-lakeside': [400, 800, 1200, 1536],
   'water-bottle-lifestyle-1': [400, 800, 953],
   'water-bottle-lifestyle-2': [400, 800, 1000],
   'water-bottle-lifestyle-3': [400, 800, 1000],
@@ -1223,9 +1114,7 @@ var LOCAL_PHOTO_WIDTHS = {
 var PHOTO_SIZES = {
   card: '(max-width: 767px) 50vw, 340px',   // .product-img, 300px tall in a 4-col grid
   detail: '(max-width: 900px) 100vw, 680px', // .det-carousel, 380-600px tall
-  thumb: '96px',                             // cart lines, search results
-  fix: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 30vw',      // home walk-fix cards
-  fixLead: '(max-width: 767px) 84vw, (max-width: 1023px) 46vw, 40vw'   // the first, larger one
+  thumb: '96px'                              // cart lines, search results
 };
 
 // Non-null only for a local photo we actually generated variants for, so a
@@ -2669,7 +2558,7 @@ function fmtRatings(n) {
   return Number(n).toLocaleString('en-US');
 }
 
-// PRODUCT CARDS — shop grid, home carousel and wishlist. One horizontal line
+// PRODUCT CARDS — shop grid and wishlist. One horizontal line
 // in a fixed order, per the task-103 reference: NUMBER first, then the stars,
 // then "· N ratings". Neutral by design: it states the rating and how many
 // ratings there are, and claims nothing about who gave them. A product with no
@@ -2740,7 +2629,3 @@ function esc(s) {
 }
 
 // ==================== INIT ====================
-renderHomeProducts();
-// Rendered once at boot: the section lives in the SPA's DOM permanently,
-// so it does not need re-rendering on every return to the home page.
-renderWalkFixes();

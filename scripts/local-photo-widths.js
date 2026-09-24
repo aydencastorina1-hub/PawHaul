@@ -33,7 +33,6 @@ var LOCAL_PHOTO_WIDTHS = {
   'led-leash-orange-main': [400, 800, 1200, 1536],
   'led-leash-purple-main': [400, 800, 1200, 1536],
   'water-bottle-blue-main': [400, 800, 1200],
-  'water-bottle-lakeside': [400, 800, 1200, 1536],
   'water-bottle-lifestyle-1': [400, 800, 953],
   'water-bottle-lifestyle-2': [400, 800, 1000],
   'water-bottle-lifestyle-3': [400, 800, 1000],
