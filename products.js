@@ -675,6 +675,7 @@ function pageToPath(page) {
   if (page === 'about') return '/about';
   if (page === 'wishlist') return '/wishlist';
   if (page === 'cart') return '/cart';
+  if (page === 'bundles') return '/bundles';
   if (page === 'blog') return '/blog';
   // 'product' and 'blog-post' own their own URLs (showProduct / showPost) —
   // they need a slug, not just a page name, so they are never routed here.
@@ -694,6 +695,7 @@ function navKeyFor(path) {
   var p = String(path || '/').split('?')[0].replace(/\/+$/, '') || '/';
   if (p === '/') return 'home';
   if (p === '/shop' || p.indexOf('/product/') === 0) return 'shop';
+  if (p === '/bundles') return 'bundles';
   if (p === '/blog' || p.indexOf('/blog/') === 0) return 'blog';
   if (p === '/about') return 'about';
   if (p === '/contact') return 'contact';
@@ -794,7 +796,7 @@ function goToProductLink(e, id) {
 // keeps pinning the ORIGINAL load page's display forever, even after this
 // function removes/adds .active on the correct elements, so every nav
 // button/link appears stuck showing whatever page a hard reload landed on.
-var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product', 'route-blog', 'route-blog-post'];
+var ROUTE_BOOTSTRAP_CLASSES = ['route-home', 'route-shop', 'route-contact', 'route-about', 'route-wishlist', 'route-cart', 'route-product', 'route-blog', 'route-blog-post', 'route-bundles'];
 
 function showPage(page, opts) {
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
@@ -816,7 +818,8 @@ function showPage(page, opts) {
   // iOS from treating the two taps as one gesture.
   document.documentElement.style.scrollBehavior = 'auto';
 
-  if (page === 'shop') { renderShopProducts(); renderBundles(); }
+  if (page === 'shop') renderShopProducts();
+  if (page === 'bundles') renderBundles();
   if (page === 'cart') renderCart();
   if (page === 'wishlist') renderWishlist();
   // The server already put the post cards in #blogIndex for a direct /blog
@@ -852,11 +855,24 @@ function renderShopProducts() {
   // candidates, hence priority rather than plain eager.
   container.innerHTML = products.map(function(p, i) {
     return productCard(p, i < 4 ? { priority: true } : null);
-  }).join('');
+  }).join('') + shopBundlePromoHtml();
 }
 
-// ==================== BUNDLES (shop page, task 112) ====================
-// Curated sets shown under the shop grid. The discount is REAL only because
+// Last cell of the shop grid: a pointer to the Bundles page. Only shown on
+// iPads (see .shop-promo in styles.css), where the grid is 2 across and the
+// fifth product would otherwise sit next to an empty space.
+function shopBundlePromoHtml() {
+  var best = BUNDLES.reduce(function (m, b) { return Math.max(m, b.pct); }, 0);
+  return '<a class="shop-promo" href="/bundles" onclick="goTo(event,\'bundles\')">' +
+      '<span class="shop-promo-tag">Bundle &amp; Save</span>' +
+      '<span class="shop-promo-head">Want it all for less?</span>' +
+      '<span class="shop-promo-copy">Grab the gear that works best together and save up to ' + best + '%. The discount comes off automatically at checkout.</span>' +
+      '<span class="shop-promo-cta">Check out the bundles<span aria-hidden="true"> &rarr;</span></span>' +
+    '</a>';
+}
+
+// ==================== BUNDLES (bundles page, tasks 112-113) ====================
+// Curated sets shown on the /bundles page. The discount is REAL only because
 // Shopify applies it: each bundle has a matching AUTOMATIC discount in
 // Shopify admin ("Amount off products", pct% off exactly these products,
 // minimum quantity = number of products in the bundle, no code). Shopify

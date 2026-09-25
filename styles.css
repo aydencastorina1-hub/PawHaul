@@ -5047,12 +5047,11 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 
 
 /* ============================================================
-   BUNDLES (shop page, task 112) — under the product grid. Cards are
+   BUNDLES (the /bundles page, tasks 112-113). Cards are
    rendered by renderBundles() in products.js. Two columns on desktop,
    `wide` bundles spanning both; one column on phones.
    ============================================================ */
-.bundles-section { margin-top: 90px; }
-.bundles-header { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.bundles-page { padding: 60px 5% 100px; }
 .bundles-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5144,11 +5143,55 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 .summary-bundle span:last-child { color: var(--green); font-weight: 800; }
 
 @media (max-width: 767px) {
-  .bundles-section { margin-top: 64px; }
+  .bundles-page { padding: 32px 4% 70px; }
   .bundles-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .bundle-card { padding: 20px 16px 18px; }
   .bundle-card--wide .bundle-items { grid-template-columns: minmax(0, 1fr); }
   .bundle-name { font-size: 21px; }
   .bundle-foot { flex-direction: column; align-items: stretch; }
   .bundle-add { width: 100%; }
+}
+
+/* ============================================================
+   SHOP GRID ON iPAD (task 113). Touchscreen + tablet width is how an iPad
+   is told apart from a laptop of the same width (and from phones, which
+   are narrower): two big cards per row, and the empty cell beside the
+   fifth product becomes a pointer to the Bundles page. Everywhere else
+   the promo card stays hidden and the grid is unchanged.
+   ============================================================ */
+.shop-promo { display: none; }
+@media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+  .shop-grid .product-img { height: clamp(300px, 36vw, 420px); }
+  .shop-grid .product-info { padding: 18px 20px 20px; }
+  .shop-grid .product-name { font-size: 17px; }
+  .shop-grid .btn-black { min-height: 48px; font-size: 15px; }
+  .shop-promo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 14px;
+    padding: 34px 30px;
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: #fff;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .shop-promo:active { transform: scale(0.98); }
+  .shop-promo-tag {
+    align-self: flex-start;
+    background: var(--orange);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 50px;
+  }
+  .shop-promo-head { font-family: var(--font-display); font-size: clamp(28px, 3.6vw, 38px); line-height: 1.12; }
+  .shop-promo-copy { font-size: 16px; font-weight: 600; line-height: 1.6; color: rgba(255,255,255,0.8); }
+  .shop-promo-cta { font-size: 16px; font-weight: 800; color: var(--orange-light); }
 }

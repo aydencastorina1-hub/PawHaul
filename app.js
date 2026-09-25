@@ -455,6 +455,7 @@ var SPA_PAGE_TITLES = {
   about: 'Our Story',
   contact: 'Contact',
   blog: 'The PawHaul Blog',
+  bundles: 'Bundles',
   cart: 'Your Cart',
   wishlist: 'Your Wishlist'
 };

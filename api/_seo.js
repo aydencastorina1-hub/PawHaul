@@ -217,6 +217,7 @@ function parseRoute(pathname) {
   if (p === '/about') return { type: 'page', page: 'about' };
   if (p === '/wishlist') return { type: 'page', page: 'wishlist' };
   if (p === '/cart') return { type: 'page', page: 'cart' };
+  if (p === '/bundles') return { type: 'page', page: 'bundles' };
   if (p === '/blog') return { type: 'page', page: 'blog' };
   m = p.match(/^\/blog\/([a-z0-9-]+)$/);
   if (m) return { type: 'post', slug: m[1] };
@@ -329,6 +330,11 @@ const PAGE_COPY = {
     title: 'Contact PawHaul — Customer Support',
     description: 'Questions about an order, a return or a product? Email ' + SUPPORT_EMAIL + ' or use the contact form. We reply within 24 hours.',
     path: '/contact'
+  },
+  bundles: {
+    title: 'Dog Walk Gear Bundles — Save Up to 15%',
+    description: 'PawHaul bundles: the LED collar and flashlight leash, the anti-drop wrist strap, or the complete walk kit. Save up to 15%, applied automatically at checkout.',
+    path: '/bundles'
   },
   blog: {
     title: 'The PawHaul Blog — Dog Walking Guides & Gear Advice',
