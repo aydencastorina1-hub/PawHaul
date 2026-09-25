@@ -175,8 +175,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        skeletons are on screen. URLs must match the <script> tags below
        character-for-character (version query included) or the browser fetches
        each file twice. -->
-  <link rel="preload" as="script" href="/blog.js?v=6">
-  <link rel="preload" as="script" href="/products.js?v=84">
+  <link rel="preload" as="script" href="/blog.js?v=7">
+  <link rel="preload" as="script" href="/products.js?v=85">
   <link rel="preload" as="script" href="/app.js?v=63">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -538,7 +538,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Do you have bundles?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes, two, each 20% off both products. The LED Bundle is the LED Dog Collar and the LED Flashlight Retractable Dog Leash. The Walk &amp; Rest Bundle is the 2-in-1 Dog Water Bottle (for drinks on the move) and the Collapsible Dog Bowl (for when you stop). The discount comes off automatically at checkout whenever both products of a bundle are in your cart. <a href="/bundles" onclick="goTo(event,'bundles')">See the bundles</a>.</div>
+        <div class="faq-a">Yes, two, each 20% off both products. The LED Bundle is the LED Dog Collar and the LED Flashlight Retractable Dog Leash. The Hydration Bundle is the 2-in-1 Dog Water Bottle (for drinks on the move) and the Collapsible Dog Bowl (for when you stop). The discount comes off automatically at checkout whenever both products of a bundle are in your cart. <a href="/bundles" onclick="goTo(event,'bundles')">See the bundles</a>.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Does the Anti-Drop Leash Wrist Strap fit any leash?<span class="faq-icon">+</span></div>
@@ -1184,8 +1184,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
   <!-- Blog post data. Must precede app.js (which renders it) and is separate
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
-  <script src="/blog.js?v=6"></script>
-  <script src="/products.js?v=84"></script>
+  <script src="/blog.js?v=7"></script>
+  <script src="/products.js?v=85"></script>
   <script src="/app.js?v=63"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above

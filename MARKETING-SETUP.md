@@ -292,7 +292,7 @@ Shopify admin → **Discounts** → **Create discount** → **Amount off product
 | Title | % off | Specific products | Minimum quantity of items |
 |---|---|---|---|
 | LED Bundle | 20% | LED Dog Collar, LED Flashlight Retractable Dog Leash | 2 |
-| Walk & Rest Bundle | 20% | 2-in-1 Dog Water Bottle, Collapsible Dog Bowl | 2 |
+| Hydration Bundle | 20% | 2-in-1 Dog Water Bottle, Collapsible Dog Bowl | 2 |
 
 Leave **Combinations** off, no end date. The bundle list itself lives in the
 `BUNDLES` table in `products.js`; if you change a bundle there, change its

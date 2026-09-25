@@ -209,7 +209,7 @@ var blogPosts = [
   <li>An <strong>all-in-one bottle</strong> with a flip-out drinking trough. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> also seals a dry food compartment into the same body, which covers the longer outings where a meal lands mid-walk.</li>
   <li>A <strong>collapsible bowl</strong> plus whatever bottle you are already carrying for yourself. Best when you are bringing your own water anyway and would rather not carry two bottles. A <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips to a belt loop with its carabiner, and weighs almost nothing.</li>
 </ul>
-<p>They do different jobs. The bottle is for quick drinks while you keep walking; the bowl is for when you stop and your dog needs a proper drink or a meal. On longer walks it is worth carrying both, which is why they come together as the <a href="/bundles">Walk &amp; Rest Bundle</a>, 20% off.</p>
+<p>They do different jobs. The bottle is for quick drinks while you keep walking; the bowl is for when you stop and your dog needs a proper drink or a meal. On longer walks it is worth carrying both, which is why they come together as the <a href="/bundles">Hydration Bundle</a>, 20% off.</p>
 
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
@@ -311,7 +311,7 @@ var blogPosts = [
   <li><strong>An integrated bottle</strong> with a flip-out trough. One hand, no assembly, nothing to hold. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> comes in 350ml and 550ml — use the formula above to pick. A 20kg dog on hour-long summer walks wants the 550ml; a small dog on 30-minute walks is well covered by the 350ml. It also seals a dry food compartment in the same body, which matters on longer outings.</li>
   <li><strong>A collapsible bowl</strong> with whatever bottle you already carry. The <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips on with a carabiner, and pops open in a second. It also holds a lot more than a cupped hand, which makes a real difference for a big dog.</li>
 </ul>
-<p>Or carry both: the bottle for sips on the move, the bowl for the break. Together they are the <a href="/bundles">Walk &amp; Rest Bundle</a>, 20% off.</p>
+<p>Or carry both: the bottle for sips on the move, the bowl for the break. Together they are the <a href="/bundles">Hydration Bundle</a>, 20% off.</p>
 
 <h2>Puddles, streams, and other people's bowls</h2>
 <p>Standing water is worth avoiding where you reasonably can. Puddles, ponds and communal bowls carry giardia, leptospirosis and blue-green algae — the last of which is genuinely lethal and blooms in warm, still water in summer. Rivers and fast-moving streams are lower risk but not zero.</p>

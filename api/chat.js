@@ -20,8 +20,9 @@ var SYSTEM_PROMPT = [
   // link) can still ask about these, and the assistant has to answer that
   // they are gone rather than go silent or improvise from stale knowledge.
   "BUNDLES (on the Bundles page, linked in the site menu at /bundles):",
-  "- LED Bundle: LED Dog Collar + LED Flashlight Retractable Dog Leash, 20% off both.",
-  "- Walk & Rest Bundle: 2-in-1 Dog Water Bottle + Collapsible Dog Bowl, 20% off both. The bottle is for quick drinks ON THE MOVE; the bowl is for when you STOP so the dog can drink or eat properly.",
+  "- LED Bundle: LED Dog Collar + LED Flashlight Retractable Dog Leash, 20% off both. Why they pair: the collar makes the dog visible, the leash lights the path ahead. Bundle price depends on the sizes picked: S collar + 3M leash is $30.38 (instead of $37.98); M + 3M $31.98; L + 3M $33.58; XL + 3M $35.18; S + 5M $32.78; M + 5M $34.38; L + 5M $35.98; XL + 5M $37.58 (instead of $46.98). The leash still needs 2 AAA batteries, not included.",
+  "- Hydration Bundle: 2-in-1 Dog Water Bottle + Collapsible Dog Bowl, 20% off both. Why they pair: they do DIFFERENT jobs, not the same one. The bottle is for quick drinks ON THE MOVE, without stopping; the bowl is for when you STOP (breaks, hikes, road trips) so the dog can properly drink or eat. Bundle price: with the 350ml bottle $23.18 (instead of $28.98); with the 550ml bottle $27.18 (instead of $33.98).",
+  "- If a customer asks about buying several items, a deal, a discount or a combo, mention the matching bundle. Quote bundle prices exactly as listed above; never estimate other numbers.",
   "- There are only these two bundles.",
   "- The discount is applied automatically at checkout whenever all of a bundle's products are in the cart, with no code needed. The easiest way is the bundle card on the Bundles page (pick sizes and colours, press Add Bundle to Cart), but adding the same products one by one gets the same discount.",
   "",

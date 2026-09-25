@@ -906,8 +906,8 @@ var BUNDLES = [
     imgAlt: 'A dog walking at night in a glowing LED Dog Collar'
   },
   {
-    id: 'water',
-    name: 'Walk & Rest Bundle',
+    id: 'hydration',
+    name: 'Hydration Bundle',
     blurb: 'Two different jobs. The bottle is for quick drinks on the move, no stopping. The bowl is for when you do stop, so your dog can drink or eat properly.',
     ids: [1, 3],
     // One line under each product saying what it is FOR, so the pair reads
@@ -1066,7 +1066,7 @@ function renderDetailBundle() {
     var others = bundleProducts(b).filter(function (x) { return x.id !== p.id; });
     var t = bundleTotals(b);
     return '<a class="detail-bundle" href="/bundles" onclick="goTo(event,\'bundles\')">' +
-        '<span class="detail-bundle-tag">Bundle &amp; save ' + b.pct + '%</span>' +
+        '<span class="detail-bundle-tag">Better together &middot; save ' + b.pct + '%</span>' +
         '<span class="detail-bundle-text">Pair it with the <strong>' + others.map(function (x) { return esc(x.name); }).join(' and ') +
           '</strong> in the ' + esc(b.name) + ': <strong>$' + t.bundle.toFixed(2) + '</strong> instead of $' + t.separately.toFixed(2) + '.</span>' +
         '<span class="detail-bundle-cta">See the bundle<span aria-hidden="true"> &rarr;</span></span>' +
