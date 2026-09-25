@@ -847,13 +847,22 @@ function showPage(page, opts) {
 // SKELETON comment there). If you change the product catalogue, a product's
 // colours or its sizes, update the skeletons to match — otherwise the page
 // starts jumping on load again.
+// Order of the cards on the Shop page, by product id. Products missing from
+// this list still show, after these.
+var SHOP_ORDER = [1, 10, 6, 9, 3]; // Water Bottle, LED Leash, LED Collar, Wrist Strap, Bowl
+
+function shopOrderedProducts() {
+  var rank = function (p) { var i = SHOP_ORDER.indexOf(p.id); return i === -1 ? 999 : i; };
+  return products.slice().sort(function (a, b) { return rank(a) - rank(b); });
+}
+
 function renderShopProducts() {
   var container = document.getElementById('shopProducts');
   if (!container) return;
   // The shop grid is never more than 4 across, so the first four cards are
   // the ones above the fold at every width. They are also the page's LCP
   // candidates, hence priority rather than plain eager.
-  container.innerHTML = products.map(function(p, i) {
+  container.innerHTML = shopOrderedProducts().map(function(p, i) {
     return productCard(p, i < 4 ? { priority: true } : null);
   }).join('') + shopBundlePromoHtml();
 }
