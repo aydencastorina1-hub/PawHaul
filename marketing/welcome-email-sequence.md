@@ -79,8 +79,8 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 > USB rechargeable, three light modes, four neck sizes. If you walk after dark
 > at all, this is the one that actually changes something.
 >
-> Want two? The LED collar and LED leash, or the water bottle and bowl, come
-> together as bundles for 20% off both: `https://pawhaul.vercel.app/bundles`
+> Want two? The LED collar and LED leash, the water bottle and bowl, or the
+> LED leash and wrist strap come together as bundles for 20% off both: `https://pawhaul.vercel.app/bundles`
 >
 > **WELCOME10** still works — 10% off, free shipping.
 

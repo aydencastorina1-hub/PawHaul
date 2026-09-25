@@ -287,14 +287,21 @@ saving; Shopify applies it. Until these exist, customers see 20% off and pay
 full price.
 
 Shopify admin → **Discounts** → **Create discount** → **Amount off products**
-→ **Automatic discount** (not a code). Make two:
+→ **Automatic discount** (not a code). Make three:
 
 | Title | % off | Specific products | Minimum quantity of items |
 |---|---|---|---|
 | LED Bundle | 20% | LED Dog Collar, LED Flashlight Retractable Dog Leash | 2 |
 | Hydration Bundle | 20% | 2-in-1 Dog Water Bottle, Collapsible Dog Bowl | 2 |
+| Visibility Duo | 20% | LED Flashlight Retractable Dog Leash, Anti-Drop Leash Wrist Strap | 2 |
 
-Leave **Combinations** off, no end date. The bundle list itself lives in the
+Under **Combinations**, tick **Product discounts** (and nothing else), no end
+date. That lets two bundles with different products apply in the same order
+(e.g. the LED Bundle and the Hydration Bundle together); with it off, Shopify
+applies only the single best discount to the whole order. A single item never
+gets two product discounts, so the LED leash, which is in two bundles (LED
+Bundle and Visibility Duo), is only ever discounted once. The site and the
+chatbot never promise more than that. The bundle list itself lives in the
 `BUNDLES` table in `products.js`; if you change a bundle there, change its
 discount here to match.
 

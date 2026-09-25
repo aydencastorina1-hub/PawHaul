@@ -333,7 +333,7 @@ const PAGE_COPY = {
   },
   bundles: {
     title: 'Dog Walk Gear Bundles — 20% Off',
-    description: 'PawHaul bundles: the LED collar with the LED flashlight leash, or the 2-in-1 water bottle with the collapsible bowl. 20% off each bundle, applied automatically at checkout.',
+    description: 'PawHaul bundles: the LED collar with the LED flashlight leash, the 2-in-1 water bottle with the collapsible bowl, or the LED flashlight leash with the anti-drop wrist strap. 20% off each bundle, applied automatically at checkout.',
     path: '/bundles'
   },
   blog: {

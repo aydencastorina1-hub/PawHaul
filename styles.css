@@ -5059,7 +5059,19 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   max-width: 1180px;
   margin: 0 auto;
 }
+/* Two-column widths: an odd last card sits centred under the pair. */
+@media (min-width: 701px) and (max-width: 1199px) {
+  .bundles-grid > .bundle-card:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 11px); }
+}
+/* Three bundles: one row of three on wide screens, stacked foot so the
+   narrower cards keep the price and button readable. */
+@media (min-width: 1200px) {
+  .bundles-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 1320px; }
+  .bundles-grid .bundle-foot { flex-direction: column; align-items: stretch; gap: 12px; }
+  .bundles-grid .bundle-add { width: 100%; }
+}
 .bundle-card {
+  scroll-margin-top: 90px;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -5255,6 +5267,9 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 }
 .detail-bundle + .detail-bundle { margin-top: 10px; }
 .detail-bundle-tag { font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--orange); }
+.detail-bundle-tagline { font-size: 16px; font-weight: 900; line-height: 1.3; margin-top: -2px; }
+.detail-bundle-head { margin: 16px 0 0; font-size: 13px; font-weight: 800; color: var(--gray, #555); }
+.detail-bundle-head + .detail-bundle { margin-top: 8px; }
 .detail-bundle-text { font-size: 14px; font-weight: 600; line-height: 1.55; }
 .detail-bundle-cta { font-size: 14px; font-weight: 800; color: var(--orange); }
 .cart-bundle-nudge {

@@ -780,6 +780,18 @@ function goTo(e, page) {
   showPage(page);
 }
 
+// A product-page bundle callout: open the Bundles page on THAT bundle's card
+// (the LED leash has two callouts; each should land on its own bundle).
+function goToBundle(e, bundleId) {
+  if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
+  if (e) e.preventDefault();
+  showPage('bundles');
+  setTimeout(function () {
+    var card = document.getElementById('bundle-' + bundleId);
+    if (card) card.scrollIntoView({ block: 'start', behavior: 'auto' });
+  }, 60);
+}
+
 // Same idea for real <a href="/product/<slug>"> links (the footer's product
 // list): modifier-clicks open the real URL, a plain click stays in the SPA.
 function goToProductLink(e, id) {
@@ -894,12 +906,15 @@ function shopBundlePromoHtml() {
 // automatic discount in Shopify.
 //
 // `img` is the card's lifestyle photo (`imgPos` an optional object-position);
-// `roles` an optional one-line purpose under each product's name.
+// `roles` an optional one-line purpose under each product's name; `tagline`
+// the short "what this set is for" line on product-page callouts, which keeps
+// two bundles sharing a product (the LED leash is in two) clearly apart.
 var BUNDLES = [
   {
     id: 'led',
     name: 'LED Bundle',
     blurb: 'Light on your dog and light in your hand: the collar makes them easy to spot, the leash lights the path ahead.',
+    tagline: 'Light for both of you',
     ids: [6, 10],
     pct: 20,
     img: '/images/products/collar-lifestyle-6.jpg',
@@ -909,6 +924,7 @@ var BUNDLES = [
     id: 'hydration',
     name: 'Hydration Bundle',
     blurb: 'Two different jobs. The bottle is for quick drinks on the move, no stopping. The bowl is for when you do stop, so your dog can drink or eat properly.',
+    tagline: 'Water on the move and at the stop',
     ids: [1, 3],
     // One line under each product saying what it is FOR, so the pair reads
     // as two jobs rather than two ways of doing the same thing.
@@ -917,6 +933,18 @@ var BUNDLES = [
     img: '/images/products/bowl-lifestyle-1.jpg',
     imgAlt: 'A golden retriever eating from a red Collapsible Dog Bowl on a break',
     imgPos: 'center 78%'
+  },
+  {
+    id: 'visibility',
+    name: 'Visibility Duo',
+    blurb: 'The leash keeps you visible, the strap keeps you from ever losing it. The light ring and flashlight make you both easy to spot after dark; the wrist strap ties the handle to your wrist, so a yank or a slip never sends it skidding off behind your dog.',
+    tagline: 'Stay seen, never drop the leash',
+    ids: [10, 9],
+    roles: { 10: 'Keeps you visible: light ring and flashlight', 9: 'Keeps hold of it: the handle stays on your wrist' },
+    pct: 20,
+    img: '/images/products/led-leash-lifestyle-5.jpg',
+    imgAlt: 'Three LED Flashlight Retractable Dog Leashes glowing in the dark',
+    imgPos: 'center 75%'
   }
 ];
 
@@ -1062,11 +1090,15 @@ function renderDetailBundle() {
   if (!el) return;
   var p = currentProduct;
   var list = p ? bundlesFor(p.id) : [];
-  el.innerHTML = list.map(function (b) {
+  // More than one bundle (the LED leash): say so first, then one separate
+  // callout per bundle, each led by its own name and what it is for.
+  el.innerHTML = (list.length > 1 ? '<p class="detail-bundle-head">Comes in ' + list.length + ' bundles, pick either:</p>' : '') +
+    list.map(function (b) {
     var others = bundleProducts(b).filter(function (x) { return x.id !== p.id; });
     var t = bundleTotals(b);
-    return '<a class="detail-bundle" href="/bundles" onclick="goTo(event,\'bundles\')">' +
-        '<span class="detail-bundle-tag">Better together &middot; save ' + b.pct + '%</span>' +
+    return '<a class="detail-bundle" href="/bundles#bundle-' + b.id + '" onclick="goToBundle(event,\'' + b.id + '\')">' +
+        '<span class="detail-bundle-tag">' + esc(b.name) + ' &middot; save ' + b.pct + '%</span>' +
+        (b.tagline ? '<span class="detail-bundle-tagline">' + esc(b.tagline) + '</span>' : '') +
         '<span class="detail-bundle-text">Pair it with the <strong>' + others.map(function (x) { return esc(x.name); }).join(' and ') +
           '</strong> in the ' + esc(b.name) + ': <strong>$' + t.bundle.toFixed(2) + '</strong> instead of $' + t.separately.toFixed(2) + '.</span>' +
         '<span class="detail-bundle-cta">See the bundle<span aria-hidden="true"> &rarr;</span></span>' +
@@ -1076,10 +1108,15 @@ function renderDetailBundle() {
 
 // Cart: bundles the visitor is one step away from — some of the products
 // are in the cart, some are not. Offers to add the missing ones.
+// Skips a bundle that shares a product with a bundle already complete in the
+// cart (the LED leash is in two): the leash is only discounted once, so finishing
+// the second one is not promised to save anything more.
 function bundleNudgesForCart() {
+  var complete = BUNDLES.filter(bundleInCart);
   return BUNDLES.filter(function (b) {
     var have = bundleProducts(b).filter(function (p) { return cart.some(function (i) { return i.id === p.id; }); });
-    return have.length > 0 && have.length < b.ids.length;
+    if (!(have.length > 0 && have.length < b.ids.length)) return false;
+    return !complete.some(function (c) { return c.ids.some(function (id) { return b.ids.indexOf(id) !== -1; }); });
   }).map(function (b) {
     var missing = bundleProducts(b).filter(function (p) { return !cart.some(function (i) { return i.id === p.id; }); });
     return '<div class="cart-bundle-nudge">' +
@@ -1096,24 +1133,27 @@ function bundleInCart(b) {
   return bundleProducts(b).every(function (p) { return cart.some(function (i) { return i.id === p.id; }); });
 }
 
-// Estimated saving for the cart page, mirroring Shopify: each bundle whose
-// products are all in the cart takes pct% off every line of those products;
-// where two bundles share a product, the bigger percentage wins (the
-// discounts are set not to combine). Shopify's checkout is the final word.
+// Estimated saving for the cart page. Each bundle whose products are all in
+// the cart takes pct% off every line of those products. A line only ever
+// takes one bundle discount, so bundles sharing a product (the LED leash is in
+// two) are picked one at a time, bigger percentage first, first listed on a
+// tie, and a bundle whose product is already claimed is left out. That errs
+// low, never high. Shopify's checkout is the final word.
 function bundleSavingsForCart() {
-  var bundles = BUNDLES.filter(bundleInCart);
-  if (!bundles.length) return { amount: 0, bundles: [] };
+  var complete = BUNDLES.filter(bundleInCart).sort(function (x, y) {
+    return (y.pct - x.pct) || (BUNDLES.indexOf(x) - BUNDLES.indexOf(y));
+  });
+  var used = [], claimed = [];
+  complete.forEach(function (b) {
+    if (b.ids.some(function (id) { return claimed.indexOf(id) !== -1; })) return;
+    used.push(b);
+    claimed = claimed.concat(b.ids);
+  });
   var amount = 0;
-  var used = [];
   cart.forEach(function (item) {
     if (retiredColorFor(item)) return;
-    var best = null;
-    bundles.forEach(function (b) {
-      if (bundleProducts(b).some(function (p) { return p.id === item.id; }) && (!best || b.pct > best.pct)) best = b;
-    });
-    if (!best) return;
-    amount += pctOff(item.price * item.qty, best.pct);
-    if (used.indexOf(best) === -1) used.push(best);
+    var b = used.find(function (x) { return x.ids.indexOf(item.id) !== -1; });
+    if (b) amount += pctOff(item.price * item.qty, b.pct);
   });
   // Only the bundles actually giving a discount are listed.
   return { amount: amount, bundles: BUNDLES.filter(function (b) { return used.indexOf(b) !== -1; }) };

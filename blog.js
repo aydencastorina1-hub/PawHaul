@@ -150,6 +150,7 @@ var blogPosts = [
 <p>A loose dog in the dark is the situation all the visibility gear is trying to prevent, so the cheapest insurance is making sure the handle physically cannot leave you. A strap from the leash to your wrist does that: one sudden lunge costs you a stumble, not your dog.</p>
 <div class="blog-cta">
   <p><strong>Gear that helps:</strong> the <a href="/product/anti-drop-leash-wrist-strap">Anti-Drop Leash Wrist Strap</a> clips onto any leash — including the LED flashlight leash — and adjusts to fit your wrist, so if the handle slips out of a cold hand it stays attached to you.</p>
+  <p>With the LED leash it makes the <a href="/bundles">Visibility Duo</a>: the leash keeps you seen, the strap keeps you from losing it, 20% off both.</p>
 </div>
 
 <h2>Route choices matter as much as gear</h2>
