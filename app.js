@@ -772,6 +772,15 @@ function doSearch(val) {
     if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
   var matches = nameHits.concat(otherHits);
+  // "bundle", "deal", "save"... also offer the Bundles page, above any products.
+  var bundleRow = /bundl|deal|discount|sav|offer|set|kit|combo/.test(q)
+    ? '<div class="search-result-item" onclick="closeSearch();showPage(\'bundles\')">' +
+        '<span class="search-result-thumb search-result-thumb--bundle" aria-hidden="true">%</span>' +
+        '<div class="search-result-info"><div class="search-result-name">Bundles</div>' +
+        '<div class="search-result-meta"><span class="search-result-price">20% off two products together</span></div></div>' +
+      '</div>'
+    : '';
+  if (matches.length === 0 && bundleRow) { res.innerHTML = bundleRow; return; }
   if (matches.length === 0) {
     res.innerHTML = '<div class="search-no-results">' +
       '<span class="snr-emoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#C9C2B8" style="width:34px;height:34px;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>' +
@@ -784,7 +793,7 @@ function doSearch(val) {
   // query is regex-escaped, so this stays injection-safe.
   var safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   var hl = new RegExp('(' + safe + ')', 'ig');
-  res.innerHTML = matches.map(function(p) {
+  res.innerHTML = bundleRow + matches.map(function(p) {
     var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
     var thumb = thumbUrl
       ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt="">'

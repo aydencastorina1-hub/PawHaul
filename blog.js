@@ -102,7 +102,7 @@ var blogPosts = [
     metaDescription: 'Drivers need far more stopping distance than most owners realise. Here is how far away your dog is actually visible at night, and how to fix it.',
     excerpt: 'A driver at 30mph needs about 75 feet to stop. An unlit dog on a dark road is visible from about 55. Here is how to close that gap.',
     date: '2026-07-24',
-    updated: '2026-09-24',
+    updated: '2026-09-25',
     readMins: 6,
     image: 'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog on an evening walk in low light',
@@ -142,6 +142,7 @@ var blogPosts = [
 <p>The neat answer is to put the light in the leash handle, which is already in your hand. A lit leash marks the line between you and the dog — the part a cyclist is most likely to ride straight into — and a torch in the handle points wherever your hand does.</p>
 <div class="blog-cta">
   <p><strong>Gear that helps:</strong> the <a href="/product/led-flashlight-retractable-dog-leash">LED Flashlight Retractable Dog Leash</a> has an LED light ring that keeps your dog visible plus a built-in flashlight for the path ahead, switched with a touch control. It retracts and locks with one button, in 3M and 5M lengths. It runs on 2 AAA batteries (not included).</p>
+  <p>Pair it with the LED Dog Collar in the <a href="/bundles">LED Bundle</a> and get 20% off both.</p>
 </div>
 
 <h3>Layer three: keep hold of the leash</h3>
@@ -182,7 +183,7 @@ var blogPosts = [
     metaDescription: 'Everything worth carrying on a dog walk, sorted by walk length — the five essentials, what to add past 30 minutes, and what you can safely leave home.',
     excerpt: 'Sorted by how long you are actually going out for, from a ten-minute block loop to a half-day hike. Plus the items people carry that they do not need.',
     date: '2026-08-01',
-    updated: '2026-09-24',
+    updated: '2026-09-25',
     readMins: 8,
     image: 'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog and owner setting out on a walk',
@@ -208,7 +209,7 @@ var blogPosts = [
   <li>An <strong>all-in-one bottle</strong> with a flip-out drinking trough. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> also seals a dry food compartment into the same body, which covers the longer outings where a meal lands mid-walk.</li>
   <li>A <strong>collapsible bowl</strong> plus whatever bottle you are already carrying for yourself. Best when you are bringing your own water anyway and would rather not carry two bottles. A <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips to a belt loop with its carabiner, and weighs almost nothing.</li>
 </ul>
-<p>Both work. Which suits you comes down to whether you would rather carry one combined item or clip a flat disc to your bag.</p>
+<p>They do different jobs. The bottle is for quick drinks while you keep walking; the bowl is for when you stop and your dog needs a proper drink or a meal. On longer walks it is worth carrying both, which is why they come together as the <a href="/bundles">Walk &amp; Rest Bundle</a>, 20% off.</p>
 
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
@@ -256,7 +257,7 @@ var blogPosts = [
     metaDescription: 'A simple formula for how much water to carry, when to offer it, and the early signs of dehydration most owners miss until it is well advanced.',
     excerpt: 'A simple formula by dog weight and walk length, when to offer water, and the early dehydration signs most owners miss.',
     date: '2026-08-08',
-    updated: '2026-08-08',
+    updated: '2026-09-25',
     readMins: 6,
     image: 'https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1200',
     imageAlt: 'A dog drinking water during a walk',
@@ -310,6 +311,7 @@ var blogPosts = [
   <li><strong>An integrated bottle</strong> with a flip-out trough. One hand, no assembly, nothing to hold. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> comes in 350ml and 550ml — use the formula above to pick. A 20kg dog on hour-long summer walks wants the 550ml; a small dog on 30-minute walks is well covered by the 350ml. It also seals a dry food compartment in the same body, which matters on longer outings.</li>
   <li><strong>A collapsible bowl</strong> with whatever bottle you already carry. The <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips on with a carabiner, and pops open in a second. It also holds a lot more than a cupped hand, which makes a real difference for a big dog.</li>
 </ul>
+<p>Or carry both: the bottle for sips on the move, the bowl for the break. Together they are the <a href="/bundles">Walk &amp; Rest Bundle</a>, 20% off.</p>
 
 <h2>Puddles, streams, and other people's bowls</h2>
 <p>Standing water is worth avoiding where you reasonably can. Puddles, ponds and communal bowls carry giardia, leptospirosis and blue-green algae — the last of which is genuinely lethal and blooms in warm, still water in summer. Rivers and fast-moving streams are lower risk but not zero.</p>

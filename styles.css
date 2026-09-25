@@ -5238,3 +5238,47 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   margin: 0 auto;
   text-shadow: 0 1px 8px rgba(0,0,0,0.3);
 }
+
+/* Product page "comes in a bundle" box and the cart's complete-the-bundle
+   nudge (task 116). */
+.detail-bundle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border: 2px solid var(--orange);
+  border-radius: var(--radius-sm);
+  background: var(--orange-pale);
+  color: var(--black);
+  text-decoration: none;
+}
+.detail-bundle + .detail-bundle { margin-top: 10px; }
+.detail-bundle-tag { font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--orange); }
+.detail-bundle-text { font-size: 14px; font-weight: 600; line-height: 1.55; }
+.detail-bundle-cta { font-size: 14px; font-weight: 800; color: var(--orange); }
+.cart-bundle-nudge {
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--orange-pale);
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.cart-bundle-add {
+  margin-top: 8px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.search-result-thumb--bundle {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--orange); color: #fff; font-weight: 900; font-size: 20px;
+}

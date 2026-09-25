@@ -279,6 +279,25 @@ lot of phone scanners.
 
 ---
 
+## 10. Bundle discounts — 5 minutes
+
+**Unlocks:** the 20% bundle prices shown on the site's Bundles page, product
+pages and cart actually being charged at checkout. The site only *shows* the
+saving; Shopify applies it. Until these exist, customers see 20% off and pay
+full price.
+
+Shopify admin → **Discounts** → **Create discount** → **Amount off products**
+→ **Automatic discount** (not a code). Make two:
+
+| Title | % off | Specific products | Minimum quantity of items |
+|---|---|---|---|
+| LED Bundle | 20% | LED Dog Collar, LED Flashlight Retractable Dog Leash | 2 |
+| Walk & Rest Bundle | 20% | 2-in-1 Dog Water Bottle, Collapsible Dog Bowl | 2 |
+
+Leave **Combinations** off, no end date. The bundle list itself lives in the
+`BUNDLES` table in `products.js`; if you change a bundle there, change its
+discount here to match.
+
 ## What I could not do, and why
 
 | | Why not |

@@ -1049,6 +1049,47 @@ function addBundleToCart(bundleId) {
   showToast(b.name + ' added to cart! ' + b.pct + '% off is applied at checkout.');
 }
 
+// The bundles a product belongs to.
+function bundlesFor(productId) {
+  return BUNDLES.filter(function (b) { return b.ids.indexOf(productId) !== -1; });
+}
+
+// Product page: "this comes in a bundle" box under the trust badges, priced
+// at the same defaults the bundle card starts on. Empty for products that
+// are in no bundle.
+function renderDetailBundle() {
+  var el = document.getElementById('detailBundle');
+  if (!el) return;
+  var p = currentProduct;
+  var list = p ? bundlesFor(p.id) : [];
+  el.innerHTML = list.map(function (b) {
+    var others = bundleProducts(b).filter(function (x) { return x.id !== p.id; });
+    var t = bundleTotals(b);
+    return '<a class="detail-bundle" href="/bundles" onclick="goTo(event,\'bundles\')">' +
+        '<span class="detail-bundle-tag">Bundle &amp; save ' + b.pct + '%</span>' +
+        '<span class="detail-bundle-text">Pair it with the <strong>' + others.map(function (x) { return esc(x.name); }).join(' and ') +
+          '</strong> in the ' + esc(b.name) + ': <strong>$' + t.bundle.toFixed(2) + '</strong> instead of $' + t.separately.toFixed(2) + '.</span>' +
+        '<span class="detail-bundle-cta">See the bundle<span aria-hidden="true"> &rarr;</span></span>' +
+      '</a>';
+  }).join('');
+}
+
+// Cart: bundles the visitor is one step away from — some of the products
+// are in the cart, some are not. Offers to add the missing ones.
+function bundleNudgesForCart() {
+  return BUNDLES.filter(function (b) {
+    var have = bundleProducts(b).filter(function (p) { return cart.some(function (i) { return i.id === p.id; }); });
+    return have.length > 0 && have.length < b.ids.length;
+  }).map(function (b) {
+    var missing = bundleProducts(b).filter(function (p) { return !cart.some(function (i) { return i.id === p.id; }); });
+    return '<div class="cart-bundle-nudge">' +
+        '<p><strong>Add the ' + missing.map(function (p) { return esc(p.name); }).join(' and ') + '</strong> to get ' + b.pct + '% off both (' + esc(b.name) + ').</p>' +
+        '<button class="cart-bundle-add" type="button" onclick="' + missing.map(function (p) { return 'quickAdd(' + p.id + ');'; }).join('') + 'renderCart();">' +
+          'Add ' + (missing.length === 1 ? 'it' : 'them') + ' &rarr;</button>' +
+      '</div>';
+  }).join('');
+}
+
 // Every product of the bundle is in the cart — the condition Shopify's
 // automatic discount checks.
 function bundleInCart(b) {
@@ -1607,6 +1648,7 @@ function showProduct(id, opts) {
   renderDetailRating();
   document.getElementById('qtyNum').textContent = '1';
   renderDetailShopPay();
+  renderDetailBundle();
   initShareControl();
 
   document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map((s, i) =>
@@ -2079,6 +2121,7 @@ function renderCart() {
         }).join('')}
         ${bundleSave.amount ? '<div class="summary-row summary-bundle"><span>Bundle savings</span><span>−$' + bundleSave.amount.toFixed(2) + '</span></div>' : ''}
         <div class="summary-row"><span>Shipping</span><span style="color:var(--green)">FREE</span></div>
+        ${bundleNudgesForCart()}
         <div class="summary-row total"><span>${bundleSave.amount ? 'Estimated total' : 'Total'}</span><span>$${total.toFixed(2)}</span></div>
         <button class="checkout-btn" onclick="checkout()"><span class="checkout-btn-label">Checkout Securely →</span></button>
         ${shopPayBlockHtml()}
