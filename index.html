@@ -176,7 +176,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
-  <link rel="preload" as="script" href="/products.js?v=86">
+  <link rel="preload" as="script" href="/products.js?v=88">
   <link rel="preload" as="script" href="/app.js?v=63">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -1185,7 +1185,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
-  <script src="/products.js?v=86"></script>
+  <script src="/products.js?v=88"></script>
   <script src="/app.js?v=63"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above

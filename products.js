@@ -974,6 +974,13 @@ function bundlePickPrice(p, pick) {
   return priceForVariant(p, pick.size).price;
 }
 
+// Bundle prices are shown rounded UP to the next .99 ($30.38 -> $30.99).
+// Checkout takes the exact pct% off, so the customer pays that or a few
+// cents less, never more.
+function roundUp99(amount) {
+  return Math.floor(Math.round(amount * 100) / 100) + 0.99;
+}
+
 function bundleTotals(b) {
   var separately = 0, save = 0;
   bundleProducts(b).forEach(function (p) {
@@ -981,7 +988,8 @@ function bundleTotals(b) {
     separately += price;
     save += pctOff(price, b.pct);
   });
-  return { separately: separately, save: save, bundle: separately - save };
+  var bundle = roundUp99(separately - save);
+  return { separately: separately, save: separately - bundle, bundle: bundle };
 }
 
 function bundleOptionSelect(b, p, field, options, current) {
@@ -1149,11 +1157,17 @@ function bundleSavingsForCart() {
     used.push(b);
     claimed = claimed.concat(b.ids);
   });
+  // Per bundle, its lines' discounted total is rounded up to the next .99,
+  // the same as the bundle cards show.
   var amount = 0;
-  cart.forEach(function (item) {
-    if (retiredColorFor(item)) return;
-    var b = used.find(function (x) { return x.ids.indexOf(item.id) !== -1; });
-    if (b) amount += pctOff(item.price * item.qty, b.pct);
+  used.forEach(function (b) {
+    var lines = 0, save = 0;
+    cart.forEach(function (item) {
+      if (retiredColorFor(item) || b.ids.indexOf(item.id) === -1) return;
+      lines += item.price * item.qty;
+      save += pctOff(item.price * item.qty, b.pct);
+    });
+    amount += lines - roundUp99(lines - save);
   });
   // Only the bundles actually giving a discount are listed.
   return { amount: amount, bundles: BUNDLES.filter(function (b) { return used.indexOf(b) !== -1; }) };
