@@ -864,10 +864,14 @@ function renderShopProducts() {
 function shopBundlePromoHtml() {
   var best = BUNDLES.reduce(function (m, b) { return Math.max(m, b.pct); }, 0);
   return '<a class="shop-promo" href="/bundles" onclick="goTo(event,\'bundles\')">' +
+      '<span class="shop-promo-media"><img ' + photoAttrs('/images/products/led-leash-lifestyle-4.jpg', 'card') +
+        ' alt="The LED Flashlight Retractable Dog Leash lighting the path at night"></span>' +
+      '<span class="shop-promo-body">' +
       '<span class="shop-promo-tag">Bundle &amp; Save</span>' +
       '<span class="shop-promo-head">Want it all for less?</span>' +
-      '<span class="shop-promo-copy">Grab the gear that works best together and save up to ' + best + '%. The discount comes off automatically at checkout.</span>' +
+      '<span class="shop-promo-copy">Get the gear that works best together for ' + best + '% off. The discount comes off automatically at checkout.</span>' +
       '<span class="shop-promo-cta">Check out the bundles<span aria-hidden="true"> &rarr;</span></span>' +
+      '</span>' +
     '</a>';
 }
 
@@ -880,46 +884,35 @@ function shopBundlePromoHtml() {
 // they got there. Never show a bundle price here that has no matching
 // automatic discount in Shopify.
 //
-// `ids: 'all'` means every product in the catalogue, so a new product joins
-// the Complete Walk Kit automatically. Its Shopify code must be updated to
-// include that product too, or the new item will not be discounted.
-// `wide` cards run the full width of the grid with their items side by side.
+// `img` is the card's lifestyle photo (`imgPos` an optional object-position);
+// `roles` an optional one-line purpose under each product's name.
 var BUNDLES = [
   {
     id: 'led',
     name: 'LED Bundle',
     blurb: 'Light on your dog and light in your hand: the collar makes them easy to spot, the leash lights the path ahead.',
     ids: [6, 10],
-    pct: 10
+    pct: 20,
+    img: '/images/products/collar-lifestyle-6.jpg',
+    imgAlt: 'A dog walking at night in a glowing LED Dog Collar'
   },
   {
-    id: 'control',
-    name: 'Control Bundle',
-    blurb: 'Lock the length with your thumb and never lose the handle: the leash, plus a strap that keeps it on your wrist.',
-    ids: [10, 9],
-    pct: 10
-  },
-  {
-    id: 'safety',
-    name: 'Ultimate Safety Bundle',
-    blurb: 'Everything for walking after dark: a lit collar, a lit leash, and a wrist strap so a spooked dog can’t pull free.',
-    ids: [6, 10, 9],
-    pct: 12,
-    wide: true
-  },
-  {
-    id: 'kit',
-    name: 'Complete Walk Kit',
-    blurb: 'The whole PawHaul lineup: water and a snack on the move, a bowl for proper breaks, and the full after-dark set.',
-    ids: 'all',
-    pct: 15,
-    wide: true
+    id: 'water',
+    name: 'Walk & Rest Bundle',
+    blurb: 'Two different jobs. The bottle is for quick drinks on the move, no stopping. The bowl is for when you do stop, so your dog can drink or eat properly.',
+    ids: [1, 3],
+    // One line under each product saying what it is FOR, so the pair reads
+    // as two jobs rather than two ways of doing the same thing.
+    roles: { 1: 'On the move: quick drinks without stopping', 3: 'When you stop: a proper drink or meal' },
+    pct: 20,
+    img: '/images/products/bowl-lifestyle-1.jpg',
+    imgAlt: 'A golden retriever eating from a red Collapsible Dog Bowl on a break',
+    imgPos: 'center 78%'
   }
 ];
 
 function bundleProducts(b) {
-  var ids = b.ids === 'all' ? products.map(function (p) { return p.id; }) : b.ids;
-  return ids.map(function (id) { return products.find(function (p) { return p.id === id; }); }).filter(Boolean);
+  return b.ids.map(function (id) { return products.find(function (p) { return p.id === id; }); }).filter(Boolean);
 }
 
 // Shopify rounds a percentage discount per line, to the cent; so does this,
@@ -972,7 +965,9 @@ function bundleOptionSelect(b, p, field, options, current) {
 function bundleCardHtml(b) {
   var items = bundleProducts(b);
   var t = bundleTotals(b);
-  return '<article class="bundle-card' + (b.wide ? ' bundle-card--wide' : '') + '" id="bundle-' + b.id + '">' +
+  return '<article class="bundle-card" id="bundle-' + b.id + '">' +
+    (b.img ? '<div class="bundle-media"><img ' + photoAttrs(b.img, 'card') + ' alt="' + esc(b.imgAlt || b.name) + '"' +
+      (b.imgPos ? ' style="object-position:' + b.imgPos + '"' : '') + '></div>' : '') +
     '<div class="bundle-top">' +
       '<h3 class="bundle-name">' + esc(b.name) + '</h3>' +
       '<span class="bundle-pill">Save ' + b.pct + '%</span>' +
@@ -987,6 +982,7 @@ function bundleCardHtml(b) {
         '</a>' +
         '<div class="bundle-item-info">' +
           '<span class="bundle-item-name">' + esc(p.name) + '</span>' +
+          (b.roles && b.roles[p.id] ? '<span class="bundle-item-role">' + esc(b.roles[p.id]) + '</span>' : '') +
           '<span class="bundle-item-opts">' +
             bundleOptionSelect(b, p, 'size', p.sizes, pick.size) +
             bundleOptionSelect(b, p, 'color', p.colors, pick.color) +
@@ -1069,8 +1065,7 @@ function bundleSavingsForCart() {
     amount += pctOff(item.price * item.qty, best.pct);
     if (used.indexOf(best) === -1) used.push(best);
   });
-  // Only the bundles actually giving a discount are listed, so a cart with
-  // the Ultimate Safety set does not also claim the LED and Control ones.
+  // Only the bundles actually giving a discount are listed.
   return { amount: amount, bundles: BUNDLES.filter(function (b) { return used.indexOf(b) !== -1; }) };
 }
 

@@ -167,7 +167,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=117" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=119" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -176,7 +176,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=5">
-  <link rel="preload" as="script" href="/products.js?v=81">
+  <link rel="preload" as="script" href="/products.js?v=82">
   <link rel="preload" as="script" href="/app.js?v=62">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -842,7 +842,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
   <div class="blog-hero">
     <span class="section-tag">Bundle &amp; Save</span>
     <h1>Better Together</h1>
-    <p>Gear that works as a set, for less. Save up to 15%, applied automatically at checkout.</p>
+    <p>Gear that works as a set, for less. 20% off each bundle, applied automatically at checkout.</p>
   </div>
   <div class="bundles-page">
     <div class="bundles-grid" id="shopBundles"></div>
@@ -1178,7 +1178,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=5"></script>
-  <script src="/products.js?v=81"></script>
+  <script src="/products.js?v=82"></script>
   <script src="/app.js?v=62"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
