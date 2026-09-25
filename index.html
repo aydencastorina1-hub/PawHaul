@@ -167,7 +167,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=116" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=117" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -597,11 +597,16 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 
 <!-- ==================== SHOP PAGE ==================== -->
 <div id="page-shop" class="page" style="background:white;">
-  <!-- Plain text header, same component as the blog's (.blog-hero). -->
-  <div class="blog-hero">
-    <h1>Shop Walk Gear</h1>
-    <p>Five essentials for every walk — water, food, visibility and control. Built for every dog.</p>
-  </div>
+  <!-- Photo band behind the page title. One fixed lifestyle photo; eager but
+       low priority so it never competes with the product photos below. -->
+  <section class="shop-hero">
+    <img class="shop-hero-img" src="https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1777302284475-037113500d0c?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="A dog out on a walk in PawHaul gear" loading="eager" fetchpriority="low">
+    <div class="shop-hero-overlay"></div>
+    <div class="shop-hero-copy">
+      <h1>Shop Walk Gear</h1>
+      <p>Five essentials for every walk — water, food, visibility and control. Built for every dog.</p>
+    </div>
+  </section>
   <div class="shop-page">
     <!-- LOADING SKELETON — these placeholder cards are static HTML so the shop grid
          has its FINAL height from the very first paint, before products.js has
