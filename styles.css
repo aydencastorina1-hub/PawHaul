@@ -4348,10 +4348,25 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
 
   /* ---------- footer ---------- */
+  /* Bottom padding: env(safe-area-inset-bottom) is the "proper" way to clear
+     the home indicator / gesture bar, same pattern as the header's own
+     safe-area-inset-top above — but it only ever returns a real, non-zero
+     value on a page that opts into edge-to-edge layout via
+     `viewport-fit=cover` in the viewport meta tag, which this site does not
+     (a bigger, riskier, site-wide change: it would also affect how the
+     fixed announce-bar/nav stack and the overscroll colour-matching sit
+     against the notch and status bar, all tuned assuming the contained,
+     non-cover viewport this site currently uses). Without it, env() here
+     silently resolves to 0px, same as it already did on the header's
+     padding-top. `max()` is what makes this actually fix the reported bug
+     today: it guarantees a real 40px floor regardless of whether env()
+     is doing anything, and would automatically prefer the more precise
+     safe-area value over that floor if this page ever does adopt
+     viewport-fit=cover later. */
   .mob-menu-footer {
     border-top: 1px solid var(--line-soft);
     background: var(--light-gray);
-    padding: 18px 20px calc(20px + env(safe-area-inset-bottom));
+    padding: 18px 20px max(40px, calc(20px + env(safe-area-inset-bottom)));
   }
   .mob-menu-tagline { font-size: 11px; color: #8A8A8A; }
 
