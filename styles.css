@@ -5310,6 +5310,15 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
    (0.25-0.3s, --ease), so a tap feels immediate but never snappy-cheap.
    ============================================================ */
 
+/* ── Scroll: no rubber-band bounce past the top or bottom of the page.
+   A fast fling now stops cleanly at the edge instead of overshooting and
+   springing back. This also turns off pull-to-refresh on phones (accepted,
+   task 116). iOS Safari 16+ and Chrome/Android honour it; older browsers
+   keep bouncing, where the navy canvas colour (see OVERSCROLL / RUBBER-BAND
+   in the mobile block) still covers the gap. Scrollers inside the page
+   (carousels, chat, search results) keep their own settings. ── */
+html, body { overscroll-behavior-y: none; }
+
 /* ── Press feedback: icon buttons and arrows ── */
 .carousel-btn, .det-prev, .det-next {
   transition: opacity 0.2s var(--ease), background 0.2s var(--ease), scale 0.25s var(--ease);
