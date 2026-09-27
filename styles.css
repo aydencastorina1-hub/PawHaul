@@ -2723,6 +2723,21 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .hamburger:active { transform: scale(0.9); }
 
 /* Right-slide panel — enabled via mobile media query */
+/* The panel itself is no longer the scroll container (see .mob-menu-nav
+   below) — fixes the tagline footer sometimes rendering on top of the last
+   menu item on first open, only correcting itself once you scrolled.
+   That came from pinning the footer with `margin-top: auto` inside THIS
+   element while it was also the thing with `overflow-y: auto`: the auto
+   margin only clears once the browser has settled how tall the header+nav
+   content actually is against this container's height, and on iOS Safari
+   that settling can visibly lag one frame behind the panel's own slide-in
+   transform — the panel paints with the footer still at its stale
+   (overlapping) spot until something (a scroll) forces a relayout. Splitting
+   the scrolling out to .mob-menu-nav removes the auto-margin entirely: the
+   footer is now just a normal, un-pinned flex child sitting right after a
+   nav area that always fills the remaining space, so there is no longer a
+   free-space calculation for the footer's position to race in the first
+   place — it can't overlap anything, first frame or any frame after. */
 .mob-menu {
   display: none;
   position: fixed;
@@ -2736,7 +2751,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   transform: translateX(100%);
   transition: transform 0.28s ease, visibility 0.28s;
   pointer-events: none;
-  overflow-y: auto;
 }
 .mob-menu.open {
   visibility: visible;
@@ -2809,7 +2823,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .mob-menu-brand-text span { color: var(--orange); }
 
 .mob-menu-footer {
-  margin-top: auto;
+  /* No margin-top:auto — it doesn't need one now that .mob-menu-nav is the
+     flexible element above it (see that rule's comment): a plain flex child
+     sitting after a flex:1 sibling already lands at the bottom, with no
+     free-space calculation to race against the panel's open animation. */
+  flex-shrink: 0;
   padding: 16px 20px 22px;
   text-align: center;
   border-top: 1px solid #F5F5F5;
@@ -4214,6 +4232,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     box-shadow: none;
     z-index: auto;
     padding: 14px 12px 6px;
+    /* The panel's OWN scroll container now (see the big comment on .mob-menu
+       above): flex:1 makes it claim exactly the space between the fixed
+       header and the footer below, min-height:0 is what actually lets a
+       flex child shrink enough to scroll instead of stretching the panel,
+       and overflow-y:auto turns that claimed space into the scroller when
+       the link list is taller than it. */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
   }
   .mob-menu-group {
     font-family: var(--font-body);
