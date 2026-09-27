@@ -2723,21 +2723,18 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .hamburger:active { transform: scale(0.9); }
 
 /* Right-slide panel — enabled via mobile media query */
-/* The panel itself is no longer the scroll container (see .mob-menu-nav
-   below) — fixes the tagline footer sometimes rendering on top of the last
-   menu item on first open, only correcting itself once you scrolled.
-   That came from pinning the footer with `margin-top: auto` inside THIS
-   element while it was also the thing with `overflow-y: auto`: the auto
-   margin only clears once the browser has settled how tall the header+nav
-   content actually is against this container's height, and on iOS Safari
-   that settling can visibly lag one frame behind the panel's own slide-in
-   transform — the panel paints with the footer still at its stale
-   (overlapping) spot until something (a scroll) forces a relayout. Splitting
-   the scrolling out to .mob-menu-nav removes the auto-margin entirely: the
-   footer is now just a normal, un-pinned flex child sitting right after a
-   nav area that always fills the remaining space, so there is no longer a
-   free-space calculation for the footer's position to race in the first
-   place — it can't overlap anything, first frame or any frame after. */
+/* Nothing in this panel scrolls (explicit request) — no overflow property
+   anywhere in the header/.mob-menu-nav/footer chain. The link list is short
+   enough to always fit a real phone screen at its natural height, and the
+   footer below it pins to the bottom with its own `margin-top: auto` (see
+   .mob-menu-footer).
+
+   The footer-overlapping-the-last-row bug reported here traced to something
+   simpler than it first looked: .mob-menu-nav's own rule (further down this
+   file, in the mobile media query) never re-declared `height`, so it was
+   quietly inheriting `height: 60px` from the site's bare `nav {}` rule —
+   see that rule's own comment for the full story. Fixed there, not here;
+   this element's `margin-top: auto` was correct the whole time. */
 .mob-menu {
   display: none;
   position: fixed;
@@ -2823,10 +2820,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 .mob-menu-brand-text span { color: var(--orange); }
 
 .mob-menu-footer {
-  /* No margin-top:auto — it doesn't need one now that .mob-menu-nav is the
-     flexible element above it (see that rule's comment): a plain flex child
-     sitting after a flex:1 sibling already lands at the bottom, with no
-     free-space calculation to race against the panel's open animation. */
+  /* Pinned to the bottom of the (non-scrolling) panel: all the leftover
+     vertical space becomes one clean gap above the footer, rather than a
+     fixed number that would look cramped on a tall phone or too roomy on a
+     short one. (The bug that made this look broken was .mob-menu-nav's
+     height, not this margin — see that rule's comment.) */
+  margin-top: auto;
   flex-shrink: 0;
   padding: 16px 20px 22px;
   text-align: center;
@@ -4224,23 +4223,33 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      inherits the site header's sticky positioning, navy background, flex-row
      layout and z-index:500, and ends up laid out across the panel header
      swallowing clicks on the close button. Any future <nav> in this document
-     hits the same trap. */
+     hits the same trap — and it caught a NEW one: task 118 later gave the
+     site's mobile nav bar `height: 60px` (for the fixed announce-bar+nav
+     stack), and because this rule never re-declared `height`, the class
+     selector here still lost that one property to the bare-tag rule (a
+     class beats a tag on properties BOTH declare, but declares nothing for
+     a property either). That silently clamped this whole link list's box
+     to 60px tall while its 10 real children kept rendering at their full
+     size past that boundary (overflow:visible doesn't clip, it just means
+     the box's own geometry stops matching where its content visibly ends) —
+     which is exactly what put the footer, positioned right after that
+     60px box, up over the last couple of rows instead of below all of
+     them. `height: auto` below is the actual fix; explicit `height`
+     is why this needs restating even though `position`/`background`/etc.
+     already guard the rest of the bare `nav` rule. */
   .mob-menu-nav {
     position: static;
     display: block;
     background: none;
     box-shadow: none;
     z-index: auto;
-    padding: 14px 12px 6px;
-    /* The panel's OWN scroll container now (see the big comment on .mob-menu
-       above): flex:1 makes it claim exactly the space between the fixed
-       header and the footer below, min-height:0 is what actually lets a
-       flex child shrink enough to scroll instead of stretching the panel,
-       and overflow-y:auto turns that claimed space into the scroller when
-       the link list is taller than it. */
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
+    height: auto;
+    /* Fixed, not scrollable (per explicit request): natural block height,
+       no flex-grow, no overflow. The link list is short enough to always
+       fit a real phone screen, and the extra bottom padding here is the
+       deliberate breathing room before the footer below. */
+    flex-shrink: 0;
+    padding: 14px 12px 32px;
   }
   .mob-menu-group {
     font-family: var(--font-body);
