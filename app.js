@@ -17,7 +17,12 @@ function toggleChat() {
       win.style.display = 'none';
     }, 180);
   }
-  btn.innerHTML = chatOpen ? '&#10005;' : '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"28\" height=\"28\" fill=\"white\"><ellipse cx=\"50\" cy=\"67\" rx=\"20\" ry=\"16\"/><ellipse cx=\"27\" cy=\"47\" rx=\"9\" ry=\"12\"/><ellipse cx=\"42\" cy=\"35\" rx=\"9\" ry=\"12\"/><ellipse cx=\"58\" cy=\"35\" rx=\"9\" ry=\"12\"/><ellipse cx=\"73\" cy=\"47\" rx=\"9\" ry=\"12\"/></svg>';
+  // Closed-state icon: a chat bubble (task 117), not the paw. Keep this SVG
+  // in sync with the one inlined on #chatToggle in index.html.
+  btn.innerHTML = chatOpen ? '&#10005;' : '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"26\" height=\"26\" fill=\"white\"><path d=\"M12 3C6.48 3 2 6.58 2 11c0 2.24 1.17 4.26 3.06 5.7-.11.94-.5 2.06-1.3 3.15a.5.5 0 0 0 .54.78c1.94-.5 3.4-1.28 4.4-1.98A12.6 12.6 0 0 0 12 19c5.52 0 10-3.58 10-8s-4.48-8-10-8z\"/></svg>';
+  // Tapping the toggle at all (open or close) means the first-visit greeting
+  // bubble has done its job.
+  if (typeof dismissChatGreeting === 'function') dismissChatGreeting();
   // input focus removed to prevent keyboard covering chat on mobile
 }
 
@@ -1479,6 +1484,50 @@ function markOfferClaimed() {
     document.addEventListener('mouseleave', exitIntent);
     listening = true;
   }
+})();
+
+// ── FIRST-VISIT CHAT GREETING (task 117) ──────────────────────────
+// A small bubble near the chat icon, shown ONCE EVER per device — unlike the
+// offer popup above (which reappears every visit until claimed), this one
+// writes its localStorage flag the moment it's shown, so a later reload or
+// visit never shows it again regardless of whether it was dismissed or the
+// chat was opened. Kept independent of the offer popup's own flag/timer.
+var CHAT_GREETING_SEEN_KEY = 'pawhaul_chat_greeting_seen';
+
+function dismissChatGreeting() {
+  var el = document.getElementById('chatGreeting');
+  if (!el || !el.classList.contains('show')) return;
+  el.classList.add('dismissing');
+  setTimeout(function () {
+    el.classList.remove('show', 'dismissing');
+    el.style.display = 'none';
+  }, 200);
+}
+
+(function () {
+  function alreadySeen() {
+    try { return !!localStorage.getItem(CHAT_GREETING_SEEN_KEY); } catch (e) { return false; }
+  }
+  function markSeen() {
+    try { localStorage.setItem(CHAT_GREETING_SEEN_KEY, '1'); } catch (e) {}
+  }
+  function reveal() {
+    if (chatOpen || alreadySeen()) return;
+    // Don't stack on top of the email popup if it happens to be up at the
+    // same moment — try again shortly rather than cluttering the screen.
+    var offerOverlay = document.getElementById('offerOverlay');
+    if (offerOverlay && offerOverlay.classList.contains('active')) {
+      setTimeout(reveal, 2000);
+      return;
+    }
+    var el = document.getElementById('chatGreeting');
+    if (!el) return;
+    markSeen();
+    el.style.display = 'flex';
+    // rAF so the .show transition actually plays instead of starting already-on.
+    requestAnimationFrame(function () { el.classList.add('show'); });
+  }
+  setTimeout(reveal, 3000);
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).

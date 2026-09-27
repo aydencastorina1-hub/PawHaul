@@ -270,17 +270,22 @@ input, textarea, select { font-size: 16px; }
    black-flash bug: no opacity, no transform, nothing here composites
    against whatever's behind the page. */
 
-/* ANNOUNCE BAR */
+/* ANNOUNCE BAR — slim single line sitting above the nav: message left,
+   secondary note right (task 117 reference proportions; wording unchanged). */
 .announce-bar {
   background: var(--orange);
   color: white;
-  text-align: center;
-  padding: 10px 20px;
-  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 20px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .announce-bar::before {
@@ -296,7 +301,9 @@ input, textarea, select { font-size: 16px; }
   to { transform: translateX(100%); }
 }
 
-.announce-bar span { margin: 0 10px; opacity: 0.6; }
+.announce-main, .announce-secondary { overflow: hidden; text-overflow: ellipsis; }
+.announce-dot { margin: 0 8px; opacity: 0.6; }
+.announce-secondary { opacity: 0.85; font-weight: 700; }
 
 /* NAVBAR */
 nav {
@@ -5391,4 +5398,63 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   #policyModal, #policyModal > div, #policyModal.policy-closing { animation: none; }
   .faq-a { transition: none; }
   [class]:active, #chatToggle:active, #backToTop:active { scale: none; }
+}
+
+/* ============================================================
+   FIRST-VISIT CHAT GREETING (task 117) — a small dismissible bubble near
+   the chat icon, shown once ever per device (armed in app.js). Not the
+   chat window itself; tapping the text opens it, the × just dismisses.
+   ============================================================ */
+.chat-greeting {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  max-width: 240px;
+  background: white;
+  color: var(--black);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  box-shadow: 0 10px 30px rgba(26,26,46,0.18);
+  position: relative;
+}
+/* Little tail pointing down at the chat button, like a speech bubble. */
+.chat-greeting::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; right: 22px;
+  width: 14px; height: 14px;
+  background: white;
+  transform: rotate(45deg);
+  box-shadow: 3px 3px 6px rgba(26,26,46,0.06);
+}
+.chat-greeting.show {
+  display: flex;
+  animation: chatGreetingIn 0.4s var(--ease) backwards;
+}
+.chat-greeting.dismissing { animation: chatGreetingOut 0.2s var(--ease-exit) forwards; }
+@keyframes chatGreetingIn { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes chatGreetingOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.97); } }
+.chat-greeting-text {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.chat-greeting-close {
+  order: 2;
+  flex-shrink: 0;
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-size: 13px;
+  line-height: 1;
+  padding: 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.chat-greeting-close:active { opacity: 0.55; }
+@media (prefers-reduced-motion: reduce) {
+  .chat-greeting.show, .chat-greeting.dismissing { animation: none; }
 }

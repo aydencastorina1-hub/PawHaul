@@ -167,7 +167,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=124" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=125" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -177,7 +177,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
   <link rel="preload" as="script" href="/products.js?v=89">
-  <link rel="preload" as="script" href="/app.js?v=64">
+  <link rel="preload" as="script" href="/app.js?v=65">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -197,9 +197,10 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 <div class="cursor" id="cursor"></div>
 <div class="toast" id="toast">Added to cart!</div>
 
-<!-- ANNOUNCE BAR -->
+<!-- ANNOUNCE BAR — slim single line, message left, secondary note right (task 117) -->
 <div class="announce-bar">
-  Free Shipping On All Orders <span>•</span> 30-Day Returns <span>•</span> New Walk Gear Added Regularly
+  <span class="announce-main">Free Shipping On All Orders <span class="announce-dot">•</span> 30-Day Returns</span>
+  <span class="announce-secondary">New Walk Gear Added Regularly</span>
 </div>
 
 <!-- NAVBAR -->
@@ -376,17 +377,13 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     </script>
     <!-- Dark overlay -->
     <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.0) 100%);"></div>
-    <!-- Text overlay -->
+    <!-- Text overlay — trimmed to headline + one line + up to 2 CTAs (task 117) -->
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6%;text-align:right;">
-      <div style="display:inline-flex;align-items:center;gap:6px;background:var(--orange);color:white;padding:5px 14px;border-radius:50px;font-size:12px;font-weight:800;margin-bottom:18px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="currentColor" style="width:1.1em;height:1.1em;vertical-align:-0.18em" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg> Dog Walk Essentials</div>
       <h1 style="font-family:var(--font-display);font-size:clamp(32px,7vw,56px);color:white;line-height:1.1;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,0.3);">Every Walk.<br><span style="color:var(--orange);">Every Dog.</span><br>Every Time.</h1>
-      <p style="font-size:15px;color:rgba(255,255,255,0.88);font-weight:600;line-height:1.8;margin-bottom:26px;max-width:180px;margin-left:auto;text-align:right;">The gear your dog deserves — water, food, safety and more. Built for every walk.</p>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:16px;">
-        <span style="font-size:16px;display:inline-flex;gap:2px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></span>
-        <span style="color:rgba(255,255,255,0.75);font-size:12px;font-weight:700;">5-star rated</span>
-      </div>
+      <p style="font-size:15px;color:rgba(255,255,255,0.88);font-weight:600;line-height:1.6;margin-bottom:26px;max-width:220px;margin-left:auto;text-align:right;">Gear built for every walk, every dog.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
         <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</a>
+        <a class="btn-white" href="/bundles" onclick="goTo(event,'bundles')" style="font-size:14px;padding:13px 28px;">See Bundles</a>
       </div>
     </div>
   </section>
@@ -1124,6 +1121,14 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 <!-- CHATBOT -->
 <div id="chatWidget" style="position:fixed;bottom:24px;right:16px;z-index:9999;font-family:var(--font-body);display:flex;flex-direction:column;align-items:flex-end;max-width:320px;width:calc(100vw - 32px);">
 
+  <!-- First-visit greeting bubble (task 117) — shown once ever per device via
+       chatGreetingArm() in app.js, dismissed by its own × or by opening the
+       chat. Never the chat window itself, just a nudge toward the icon. -->
+  <div id="chatGreeting" class="chat-greeting" role="status">
+    <button type="button" class="chat-greeting-close" onclick="dismissChatGreeting()" aria-label="Dismiss">&#10005;</button>
+    <span class="chat-greeting-text" onclick="toggleChat()">Hi! I'm the PawHaul Assistant — need help finding something?</span>
+  </div>
+
   <div id="chatWindow" style="display:none;width:100%;max-width:320px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:12px;overflow:hidden;max-height:70vh;">
 
     <div style="background:#1a1a2e;padding:14px 16px;display:flex;align-items:center;gap:10px;">
@@ -1160,7 +1165,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     </div>
   </div>
 
-  <button id="chatToggle" onclick="toggleChat()" style="width:58px;height:58px;border-radius:50%;background:#E8630A;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(232,99,10,0.45);font-size:24px;display:flex;align-items:center;justify-content:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></button>
+  <!-- Chat bubble icon, not the paw (task 117) — CHAT_SVG below is also inlined in app.js's toggleChat() for the closed state; keep both in sync. -->
+  <button id="chatToggle" onclick="toggleChat()" style="width:58px;height:58px;border-radius:50%;background:#E8630A;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(232,99,10,0.45);font-size:24px;display:flex;align-items:center;justify-content:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="white"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.24 1.17 4.26 3.06 5.7-.11.94-.5 2.06-1.3 3.15a.5.5 0 0 0 .54.78c1.94-.5 3.4-1.28 4.4-1.98A12.6 12.6 0 0 0 12 19c5.52 0 10-3.58 10-8s-4.48-8-10-8z"/></svg></button>
 </div>
 
 
@@ -1186,7 +1192,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
   <script src="/products.js?v=89"></script>
-  <script src="/app.js?v=64"></script>
+  <script src="/app.js?v=65"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
