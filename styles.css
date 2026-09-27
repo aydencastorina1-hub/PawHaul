@@ -5297,3 +5297,98 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   display: flex; align-items: center; justify-content: center;
   background: var(--orange); color: #fff; font-weight: 900; font-size: 20px;
 }
+
+/* ============================================================
+   FEEL / POLISH PASS (task 116) — motion and press feedback only.
+   Nothing here changes layout, content or what anything does.
+   Press states use the independent `scale` property, not `transform`, so
+   they stack on top of any transform an element already uses to position
+   itself (the arrows' translateY(-50%), the wishlist heart's hover grow)
+   instead of replacing it. iOS only shows :active at all because of the
+   touchstart listener in app.js ("TAP FEEDBACK ON iOS").
+   Timing: the press lands fast (0.08s) and the release eases back slower
+   (0.25-0.3s, --ease), so a tap feels immediate but never snappy-cheap.
+   ============================================================ */
+
+/* ── Press feedback: icon buttons and arrows ── */
+.carousel-btn, .det-prev, .det-next {
+  transition: opacity 0.2s var(--ease), background 0.2s var(--ease), scale 0.25s var(--ease);
+}
+.carousel-btn:not(.disabled):active, .det-prev:not(.disabled):active, .det-next:not(.disabled):active {
+  scale: 0.9; transition-duration: 0.08s;
+}
+.wishlist-btn:active { scale: 0.86; transition-duration: 0.08s; }
+.qty-btn, .remove-btn {
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), scale 0.25s var(--ease);
+}
+.qty-btn:active, .remove-btn:active { scale: 0.9; transition-duration: 0.08s; }
+#chatToggle, #backToTop {
+  transition: opacity 0.25s var(--ease), scale 0.25s var(--ease), box-shadow 0.25s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+#chatToggle:active, #backToTop:active { scale: 0.92; transition-duration: 0.08s; }
+
+/* ── Press feedback: options, small buttons ── */
+.option-btn:active { scale: 0.95; transition-duration: 0.08s; }
+.sticky-atc-btn, .cart-bundle-add, .offer-copy-btn {
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), scale 0.25s var(--ease);
+}
+.sticky-atc-btn:active, .cart-bundle-add:active, .offer-copy-btn:active { scale: 0.96; transition-duration: 0.08s; }
+
+/* ── Press feedback: cards and callouts ── */
+.detail-bundle, .bundle-thumb { transition: scale 0.3s var(--ease), background 0.2s var(--ease); -webkit-tap-highlight-color: transparent; }
+.blog-card { transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), scale 0.3s var(--ease); -webkit-tap-highlight-color: transparent; }
+.detail-bundle:active, .blog-card:active { scale: 0.985; transition-duration: 0.1s; }
+.bundle-thumb:active { scale: 0.94; transition-duration: 0.08s; }
+
+/* ── Press feedback: rows and text links (a dip, not a shrink) ── */
+.faq-q { transition: background 0.2s var(--ease); -webkit-tap-highlight-color: transparent; }
+.faq-q:active { background: var(--offwhite); transition-duration: 0.06s; }
+.pd-acc-head, .back-btn, .quick-answer-link, .logo, .offer-dismiss, footer a {
+  transition: opacity 0.25s var(--ease), color 0.2s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.pd-acc-head:active, .back-btn:active, .quick-answer-link:active, .logo:active, .offer-dismiss:active, footer a:active {
+  opacity: 0.55; transition-duration: 0.06s;
+}
+.social-btn:active { scale: 0.92; transition-duration: 0.08s; }
+
+/* ── FAQ: open to the answer's real height (set inline by toggleFaq), so
+   long answers are no longer cut off at 200px on phones and every answer
+   opens at the same pace. 1000px is only the fallback for goToFaq(). ── */
+.faq-a { transition: max-height 0.4s var(--ease), padding 0.4s var(--ease); }
+.faq-item.open .faq-a { max-height: 1000px; }
+
+/* ── Page navigation: a short fade on the new page's content. Opacity
+   only, on the page's CHILDREN (the page's own white background stays
+   solid, so the mobile navy canvas can't show through), no transform (the
+   old slide-up's "drop and snap back" can't happen), and `backwards` fill
+   so nothing lingers once it's done. The first page load never fades:
+   page-transition is only added by in-site navigation. ── */
+@keyframes pageFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.page.page-transition > * { animation: pageFadeIn 0.22s cubic-bezier(0.25, 0.1, 0.25, 1) backwards; }
+
+/* ── Chat window: rises in from the button, drops back out on close ── */
+@keyframes chatWinIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes chatWinOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(10px) scale(0.98); } }
+#chatWindow { transform-origin: bottom right; animation: chatWinIn 0.32s var(--ease) backwards; }
+#chatWindow.chat-closing { animation: chatWinOut 0.18s var(--ease-exit) forwards; pointer-events: none; }
+#chatMessages { overscroll-behavior: contain; }
+
+/* ── Policy modal (shipping/returns/privacy): fade + gentle rise ── */
+@keyframes policyFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes policyFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes policyRise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+#policyModal { animation: policyFadeIn 0.24s ease backwards; overscroll-behavior: contain; }
+#policyModal > div { animation: policyRise 0.36s var(--ease) backwards; }
+#policyModal.policy-closing { animation: policyFadeOut 0.18s ease forwards; pointer-events: none; }
+
+/* ── Toast: glides in, fades out without the quick drop ── */
+.toast { transition: transform 0.45s var(--ease), opacity 0.3s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page.page-transition > *, #chatWindow, #chatWindow.chat-closing,
+  #policyModal, #policyModal > div, #policyModal.policy-closing { animation: none; }
+  .faq-a { transition: none; }
+  [class]:active, #chatToggle:active, #backToTop:active { scale: none; }
+}

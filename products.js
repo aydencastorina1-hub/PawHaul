@@ -2514,8 +2514,14 @@ function goToProduct(id) {
 }
 
 // ==================== UI HELPERS ====================
+// Opens/closes to the answer's EXACT height (set inline), so the motion is
+// the same speed for short and long answers and nothing is clipped. The CSS
+// max-height on .faq-item.open .faq-a covers class-only opens (goToFaq).
 function toggleFaq(el) {
-  el.parentElement.classList.toggle('open');
+  var item = el.parentElement;
+  var a = item.querySelector('.faq-a');
+  var open = item.classList.toggle('open');
+  if (a) a.style.maxHeight = open ? (a.scrollHeight + 24) + 'px' : '';
 }
 
 // Jump from Contact's "quick answers" links to a specific FAQ item on the

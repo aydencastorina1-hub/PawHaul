@@ -4,7 +4,19 @@ function toggleChat() {
   chatOpen = !chatOpen;
   var win = document.getElementById('chatWindow');
   var btn = document.getElementById('chatToggle');
-  win.style.display = chatOpen ? 'block' : 'none';
+  // Open: display:block starts the CSS entrance (chatWinIn, styles.css).
+  // Close: play the exit first, then hide. A re-open mid-exit cancels it.
+  clearTimeout(toggleChat._t);
+  win.classList.remove('chat-closing');
+  if (chatOpen) {
+    win.style.display = 'block';
+  } else {
+    win.classList.add('chat-closing');
+    toggleChat._t = setTimeout(function () {
+      win.classList.remove('chat-closing');
+      win.style.display = 'none';
+    }, 180);
+  }
   btn.innerHTML = chatOpen ? '&#10005;' : '<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\" width=\"28\" height=\"28\" fill=\"white\"><ellipse cx=\"50\" cy=\"67\" rx=\"20\" ry=\"16\"/><ellipse cx=\"27\" cy=\"47\" rx=\"9\" ry=\"12\"/><ellipse cx=\"42\" cy=\"35\" rx=\"9\" ry=\"12\"/><ellipse cx=\"58\" cy=\"35\" rx=\"9\" ry=\"12\"/><ellipse cx=\"73\" cy=\"47\" rx=\"9\" ry=\"12\"/></svg>';
   // input focus removed to prevent keyboard covering chat on mobile
 }
@@ -290,6 +302,8 @@ function showPolicy(type) {
     if (!modal || !title || !body) return;
     title.textContent = p.title;
     body.innerHTML = p.body;
+    clearTimeout(closePolicyModal._t);
+    modal.classList.remove('policy-closing');
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
   } catch(e) { return; }
@@ -298,10 +312,25 @@ function showPolicy(type) {
 function closePolicyModal() {
   try {
     var modal = document.getElementById('policyModal');
-    if (modal) modal.style.display = 'none';
+    // Short fade-out (policy-closing, styles.css) before it's hidden.
+    if (modal) {
+      modal.classList.add('policy-closing');
+      clearTimeout(closePolicyModal._t);
+      closePolicyModal._t = setTimeout(function () {
+        modal.classList.remove('policy-closing');
+        modal.style.display = 'none';
+      }, 180);
+    }
     document.body.style.overflow = '';
   } catch(e) { return; }
 }
+
+// ── TAP FEEDBACK ON iOS ───────────────────────────────────────
+// iOS Safari only applies :active styles when the page has a touchstart
+// listener somewhere. Without one, every press state in styles.css
+// (buttons, cards, arrows, options) is skipped on iPhone and taps feel
+// dead. Empty and passive: it never blocks or delays scrolling or clicks.
+document.addEventListener('touchstart', function () {}, { passive: true });
 
 // ── BACK TO TOP ───────────────────────────────────────────────
 (function() {
