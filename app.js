@@ -352,6 +352,49 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   }, { passive: true });
 })();
 
+// ── MOBILE HERO HEIGHT LOCK (task 120) ──────────────────────────
+// Belt-and-suspenders on top of the CSS fix (styles.css: #heroSection uses
+// 100svh, not 100dvh, in the mobile media query). That CSS fix depends on
+// the browser actually supporting the svh unit; browsers that don't just
+// drop the whole declaration as invalid and fall back to whatever height
+// rule matches next, which can still be one that tracks the toolbar live —
+// so the same "photo zooms/jumps while you scroll" bug (task 119) can come
+// back in exactly the browsers most likely to be behind on CSS support.
+// This locks the actual measured height in JS instead, which needs no
+// viewport-unit support at all: measured once at load (before any scroll
+// has had a chance to move the toolbar), then written as an inline
+// !important height, which beats anything in styles.css regardless of
+// whether that browser understands svh, dvh or neither.
+// Only recomputes on a WIDTH change, never on a bare resize: an iOS/Android
+// toolbar collapsing changes the visual viewport's HEIGHT only, so gating
+// on width is what stops that same toolbar animation from re-triggering
+// this and undoing the lock — a real rotation or window resize always
+// changes width too, so those still get picked up.
+(function () {
+  var hero = document.getElementById('heroSection');
+  if (!hero) return;
+  var MOBILE_MAX = 900; // matches styles.css's `@media (max-width: 900px)`
+  var lastWidth = window.innerWidth;
+
+  function lock() {
+    if (window.innerWidth > MOBILE_MAX) {
+      hero.style.removeProperty('height'); // desktop: let styles.css's own rules govern it
+      return;
+    }
+    var announceH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-announce-h')) || 0;
+    var navH = 60; // the fixed mobile nav bar's own height (styles.css)
+    var h = Math.max(window.innerHeight - announceH - navH, 420); // 420 matches the CSS min-height floor
+    hero.style.setProperty('height', h + 'px', 'important');
+  }
+
+  lock();
+  window.addEventListener('resize', function () {
+    if (window.innerWidth === lastWidth) return; // height-only change: the toolbar, not a real resize
+    lastWidth = window.innerWidth;
+    lock();
+  }, { passive: true });
+})();
+
 // ── HERO SLIDESHOW ────────────────────────────────────────────
 // Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
 // looping forever. All 4 are loaded eagerly at high priority (index.html)
