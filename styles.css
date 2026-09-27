@@ -2944,13 +2944,62 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR ─────────────────────────────────────── */
-  .announce-bar { display: none; }
+  /* ── ANNOUNCE BAR (task 118) ──────────────────────────────
+     Joins the fixed top-of-screen stack ABOVE the nav, matching the
+     reference's mobile layout (bar -> header/logo -> hero). --mob-announce-h
+     is the one number that has to stay true to the bar's real rendered
+     height: nav's `top`, .page/#page-home's padding-top and the hero's
+     height calc below all read it, so this bar can never leave a gap or an
+     overlap against the nav. It's a fixed padding/font/line-height with no
+     wrapping (nowrap + ellipsis on each side), so the height is exact and
+     doesn't depend on font-loading timing or text length — no JS
+     measurement needed.
 
-  /* ── NAV: fixed small bar at the very top ────────────── */
-  nav {
+     The bar is now the TOPMOST fixed element, which walks straight into the
+     task-91 bug: the OVERSCROLL/RUBBER-BAND rule below matches html/body's
+     background to the NAV's navy so the transient gap iOS opens above fixed
+     elements (when its toolbar collapses/expands — see that rule's own
+     comment for the mechanism) reads as "the header stretching" instead of
+     a mismatched colour flash. With an orange bar now sitting above that
+     navy nav, the same gap would open a navy sliver directly above orange —
+     the exact bug, recoloured. Retuning html/body itself isn't an option:
+     the BOTTOM overscroll pull still needs to match navy (the footer's
+     gradient end). So instead .announce-bar::before extends the bar's own
+     orange upward by 200px, well past anything Safari's toolbar can open,
+     fixed independently of html/body — a gap above the bar always finds
+     orange already painted there, whatever html/body's colour is doing. */
+  :root { --mob-announce-h: 30px; }
+  .announce-bar {
+    display: flex;
     position: fixed;
     top: 0; left: 0; right: 0;
+    height: var(--mob-announce-h);
+    z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
+    padding: 0 4%;
+    font-size: 10.5px;
+    gap: 8px;
+  }
+  .announce-bar::before {
+    /* Overrides the desktop shimmer-sweep ::before (same selector) with the
+       upward colour-bleed described above — mobile gets no shimmer, this
+       matters more here. */
+    content: '';
+    position: fixed;
+    top: -200px; left: 0; right: 0;
+    height: 200px;
+    background: var(--orange);
+    animation: none;
+    z-index: -1;
+  }
+  .announce-main, .announce-secondary { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .announce-main { flex: 1 1 auto; min-width: 0; }
+  .announce-secondary { flex: 0 1 38%; }
+  .announce-dot { margin: 0 5px; }
+
+  /* ── NAV: fixed bar, now sitting right under the announce bar ────── */
+  nav {
+    position: fixed;
+    top: var(--mob-announce-h); left: 0; right: 0;
     height: 60px;
     padding: 0 4%;
     z-index: 900;
@@ -2974,39 +3023,49 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mob-menu { display: flex; }
 
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
-  /* padding-top clears the 60px fixed nav. padding-bottom:0 so a white page never
-     shows a strip below its footer — the footer sits flush and the navy body
-     (var(--navy), which the mobile footer now ends on) extends below it on
-     overscroll with no gap. */
-  .page { padding-top: 60px; padding-bottom: 0; }
-  /* Home: push the hero below the 60px fixed nav so the top is never cut off */
-  #page-home { padding-top: 60px; }
+  /* padding-top clears the fixed announce bar + nav (task 118: was a flat
+     60px before the bar joined the stack). padding-bottom:0 so a white page
+     never shows a strip below its footer — the footer sits flush and the
+     navy body (var(--navy), which the mobile footer now ends on) extends
+     below it on overscroll with no gap. */
+  .page { padding-top: calc(var(--mob-announce-h) + 60px); padding-bottom: 0; }
+  /* Home: push the hero below the fixed stack so the top is never cut off */
+  #page-home { padding-top: calc(var(--mob-announce-h) + 60px); }
   /* Footer-less pages fill the viewport so their own light bg (not the deep-navy body)
      covers the screen on a short page like an empty cart. */
   #page-cart, #page-product { min-height: 100vh; }
 
-  /* ── HERO (slideshow background) ──────────────────────── */
-  #heroSection { height: min(540px, 80vh) !important; }
+  /* ── HERO (slideshow background) — task 118: fills essentially the whole
+     screen below the fixed announce-bar+nav stack on first load, text/CTAs
+     sitting near the bottom of the image (reference layout), not centered.
+     100dvh (not 100vh) so mobile Safari's animating toolbar can't leave the
+     hero taller than the actual visible area for a frame. min-height is a
+     floor for short-viewport landscape phones, where 100dvh minus the fixed
+     stack could otherwise get uncomfortably short. */
+  #heroSection { height: calc(100dvh - var(--mob-announce-h) - 60px) !important; min-height: 420px; }
   #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
-  #heroSection > div:last-child {
+  .hero-copy {
     align-items: center !important;
     text-align: center !important;
+    justify-content: flex-end !important;
     padding: 0 6% !important;
-    padding-top: 24px !important;
-    padding-bottom: 24px !important;
+    /* Clears the floating chat launcher (#chatToggle: 58px tall, 24px off the
+       bottom — index.html — so its top edge sits 82px up from the screen
+       bottom) with a 14px buffer, so the bottom-right CTA button never sits
+       under it. Without this the hero's own bottom padding would be free to
+       go much smaller and still look "near the bottom" like the reference,
+       but the chat button is fixed and always wins that corner. */
+    padding-bottom: 96px !important;
   }
-  /* Center the "Dog Walk Essentials" badge in the space between the hero top and the headline.
-     Capped so the centered hero block doesn't push the bottom CTA buttons past the hero edge. */
-  #heroSection > div:last-child > div:nth-child(1) { margin-top: 12px; }
   #heroSection .hero-overlay {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.65) 100%) !important;
+    /* Stronger and taller at the bottom now that the copy lives there,
+       instead of a middle-weighted gradient built for centered text. */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.72) 100%) !important;
   }
   #heroSection h1 { font-size: clamp(26px, 8vw, 40px) !important; }
   #heroSection p { max-width: 290px !important; text-align: center !important; margin-left: auto !important; margin-right: auto !important; }
-  #heroSection > div:last-child > div:nth-child(3) { align-items: center !important; }
-  #heroSection > div:last-child > div:last-child { justify-content: center !important; flex-direction: column !important; width: 100% !important; }
-  #heroSection .btn-primary { width: 100% !important; justify-content: center !important; }
-  #heroSection > div:last-child > div:last-child button { width: 100% !important; text-align: center !important; justify-content: center !important; }
+  .hero-cta { justify-content: center !important; flex-direction: column !important; width: 100% !important; }
+  #heroSection .btn-primary, #heroSection .btn-white { width: 100% !important; justify-content: center !important; }
 
   /* ── HERO (gradient/grid fallback) ───────────────────── */
   .hero { grid-template-columns: 1fr; padding: 36px 5% 0; min-height: auto; }
@@ -5401,22 +5460,27 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 }
 
 /* ============================================================
-   FIRST-VISIT CHAT GREETING (task 117) — a small dismissible bubble near
-   the chat icon, shown once ever per device (armed in app.js). Not the
-   chat window itself; tapping the text opens it, the × just dismisses.
+   FIRST-VISIT CHAT GREETING (task 117, redesigned task 118) — a small
+   dismissible card near the chat icon, shown once ever per device (armed
+   in app.js). Not the chat window itself; tapping the card opens it, the
+   × just dismisses. Behavior is unchanged from task 117 — this is the
+   visual redesign only: a round orange paw avatar (echoes the chat toggle
+   button itself), a small caps name line, the message, and an explicit
+   "Chat with us →" call to action instead of plain clickable text.
    ============================================================ */
 .chat-greeting {
   display: none;
-  align-items: center;
-  gap: 8px;
-  max-width: 240px;
+  flex-direction: column;
+  width: 272px;
+  max-width: calc(100vw - 48px);
   background: white;
   color: var(--black);
-  border-radius: 16px;
-  padding: 12px 14px;
-  margin-bottom: 12px;
-  box-shadow: 0 10px 30px rgba(26,26,46,0.18);
+  border-radius: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 16px 40px rgba(26,26,46,0.26), 0 4px 12px rgba(26,26,46,0.08);
   position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 /* Little tail pointing down at the chat button, like a speech bubble. */
 .chat-greeting::after {
@@ -5435,26 +5499,60 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 .chat-greeting.dismissing { animation: chatGreetingOut 0.2s var(--ease-exit) forwards; }
 @keyframes chatGreetingIn { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
 @keyframes chatGreetingOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.97); } }
-.chat-greeting-text {
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.45;
+
+.chat-greeting-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 34px 16px 14px;
   cursor: pointer;
+  transition: background 0.15s var(--ease);
+}
+.chat-greeting-row:active { background: var(--offwhite); }
+.chat-greeting-avatar {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(232,99,10,0.35);
+}
+.chat-greeting-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.chat-greeting-name {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--gray);
+}
+.chat-greeting-text {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--black);
+}
+.chat-greeting-cta {
+  margin-top: 4px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--orange);
 }
 .chat-greeting-close {
-  order: 2;
-  flex-shrink: 0;
-  align-self: flex-start;
-  background: none;
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--offwhite);
   border: none;
   color: var(--gray);
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1;
-  padding: 2px;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s var(--ease), color 0.15s var(--ease);
 }
-.chat-greeting-close:active { opacity: 0.55; }
+.chat-greeting-close:active { background: var(--line-soft); color: var(--black); }
 @media (prefers-reduced-motion: reduce) {
   .chat-greeting.show, .chat-greeting.dismissing { animation: none; }
 }

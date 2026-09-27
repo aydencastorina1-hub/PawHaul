@@ -167,7 +167,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=125" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=126" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -197,8 +197,11 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 <div class="cursor" id="cursor"></div>
 <div class="toast" id="toast">Added to cart!</div>
 
-<!-- ANNOUNCE BAR — slim single line, message left, secondary note right (task 117) -->
-<div class="announce-bar">
+<!-- ANNOUNCE BAR — slim single line, message left, secondary note right (task
+     117). On mobile (task 118) it joins the fixed top-of-screen stack above
+     the nav (see the ANNOUNCE BAR / NAV rules in styles.css's mobile block);
+     id="announceBar" is only for that CSS/comment cross-reference. -->
+<div class="announce-bar" id="announceBar">
   <span class="announce-main">Free Shipping On All Orders <span class="announce-dot">•</span> 30-Day Returns</span>
   <span class="announce-secondary">New Walk Gear Added Regularly</span>
 </div>
@@ -377,11 +380,14 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     </script>
     <!-- Dark overlay -->
     <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.0) 100%);"></div>
-    <!-- Text overlay — trimmed to headline + one line + up to 2 CTAs (task 117) -->
-    <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6%;text-align:right;">
+    <!-- Text overlay — trimmed to headline + one line + up to 2 CTAs (task 117).
+         .hero-copy/.hero-cta classes (task 118) give the mobile block in
+         styles.css real selectors instead of the old div:nth-child guesses,
+         which broke the moment the badge/star-row divs above were removed. -->
+    <div class="hero-copy" style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;padding:0 6%;text-align:right;">
       <h1 style="font-family:var(--font-display);font-size:clamp(32px,7vw,56px);color:white;line-height:1.1;margin-bottom:14px;text-shadow:0 2px 12px rgba(0,0,0,0.3);">Every Walk.<br><span style="color:var(--orange);">Every Dog.</span><br>Every Time.</h1>
       <p style="font-size:15px;color:rgba(255,255,255,0.88);font-weight:600;line-height:1.6;margin-bottom:26px;max-width:220px;margin-left:auto;text-align:right;">Gear built for every walk, every dog.</p>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="hero-cta" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;">
         <a class="btn-primary" href="/shop" onclick="goTo(event,'shop')" style="font-size:14px;padding:13px 28px;">Shop Walk Gear →</a>
         <a class="btn-white" href="/bundles" onclick="goTo(event,'bundles')" style="font-size:14px;padding:13px 28px;">See Bundles</a>
       </div>
@@ -1121,12 +1127,20 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 <!-- CHATBOT -->
 <div id="chatWidget" style="position:fixed;bottom:24px;right:16px;z-index:9999;font-family:var(--font-body);display:flex;flex-direction:column;align-items:flex-end;max-width:320px;width:calc(100vw - 32px);">
 
-  <!-- First-visit greeting bubble (task 117) — shown once ever per device via
-       chatGreetingArm() in app.js, dismissed by its own × or by opening the
-       chat. Never the chat window itself, just a nudge toward the icon. -->
+  <!-- First-visit greeting bubble (task 117, redesigned task 118) — shown
+       once ever per device via the IIFE in app.js, dismissed by its own ×
+       or by opening the chat. Never the chat window itself, just a nudge
+       toward the icon. Same behavior as task 117: only the look changed. -->
   <div id="chatGreeting" class="chat-greeting" role="status">
     <button type="button" class="chat-greeting-close" onclick="dismissChatGreeting()" aria-label="Dismiss">&#10005;</button>
-    <span class="chat-greeting-text" onclick="toggleChat()">Hi! I'm the PawHaul Assistant — need help finding something?</span>
+    <div class="chat-greeting-row" onclick="toggleChat()">
+      <div class="chat-greeting-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
+      <div class="chat-greeting-body">
+        <span class="chat-greeting-name">PawHaul Assistant</span>
+        <span class="chat-greeting-text">Hi! Need help finding something?</span>
+        <span class="chat-greeting-cta">Chat with us <span aria-hidden="true">→</span></span>
+      </div>
+    </div>
   </div>
 
   <div id="chatWindow" style="display:none;width:100%;max-width:320px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:12px;overflow:hidden;max-height:70vh;">
