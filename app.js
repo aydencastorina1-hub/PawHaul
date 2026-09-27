@@ -1505,6 +1505,13 @@ function dismissChatGreeting() {
 }
 
 (function () {
+  // Task 119: was a flat 3s-after-load timer, which fired while the visitor
+  // was still looking at the hero and sat right over its CTA buttons (the
+  // hero fills nearly the whole screen on mobile — task 118). Now it waits
+  // for the visitor to actually scroll down a bit, so it only ever appears
+  // once the hero's buttons are no longer the thing on screen.
+  var SCROLL_THRESHOLD = 150;
+
   function alreadySeen() {
     try { return !!localStorage.getItem(CHAT_GREETING_SEEN_KEY); } catch (e) { return false; }
   }
@@ -1527,7 +1534,12 @@ function dismissChatGreeting() {
     // rAF so the .show transition actually plays instead of starting already-on.
     requestAnimationFrame(function () { el.classList.add('show'); });
   }
-  setTimeout(reveal, 3000);
+  function onScroll() {
+    if (window.scrollY < SCROLL_THRESHOLD) return;
+    window.removeEventListener('scroll', onScroll);
+    reveal();
+  }
+  if (!alreadySeen()) window.addEventListener('scroll', onScroll, { passive: true });
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).

@@ -3038,11 +3038,20 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* ── HERO (slideshow background) — task 118: fills essentially the whole
      screen below the fixed announce-bar+nav stack on first load, text/CTAs
      sitting near the bottom of the image (reference layout), not centered.
-     100dvh (not 100vh) so mobile Safari's animating toolbar can't leave the
-     hero taller than the actual visible area for a frame. min-height is a
-     floor for short-viewport landscape phones, where 100dvh minus the fixed
-     stack could otherwise get uncomfortably short. */
-  #heroSection { height: calc(100dvh - var(--mob-announce-h) - 60px) !important; min-height: 420px; }
+
+     100svh, NOT 100dvh (task 119 fix) — 100dvh tracks Safari's toolbar live,
+     so the very act of scrolling (which is what collapses the toolbar) grew
+     the hero taller mid-scroll: object-fit:cover then reveals more of the
+     same image into the newly-taller box, which reads as the photo zooming/
+     jumping while you scroll. 100svh is the SMALL viewport height — the
+     size with the toolbar fully shown — so it's one fixed number that never
+     changes after first paint, whatever the toolbar does later. The only
+     cost is the hero is very slightly shorter than the absolute max once
+     the toolbar auto-hides, which is invisible next to a scroll-triggered
+     resize. min-height is a floor for short-viewport landscape phones,
+     where 100svh minus the fixed stack could otherwise get uncomfortably
+     short. */
+  #heroSection { height: calc(100svh - var(--mob-announce-h) - 60px) !important; min-height: 420px; }
   #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   .hero-copy {
     align-items: center !important;
