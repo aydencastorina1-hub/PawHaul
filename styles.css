@@ -271,8 +271,13 @@ input, textarea, select { font-size: 16px; }
    against whatever's behind the page. */
 
 /* ANNOUNCE BAR — slim single line sitting above the nav: message left,
-   secondary note right (task 117 reference proportions; wording unchanged). */
-.announce-bar {
+   secondary note right (task 117 reference proportions; wording unchanged).
+   .announce-bar is a plain wrapper here (desktop needs no safe-area strip
+   or fixed positioning); .announce-bar-inner (task 120) carries the actual
+   coloured bar so a mobile-only neutral strip can be added to the OUTER
+   element without a single box needing two different background colours —
+   see the mobile rule's own comment for why. */
+.announce-bar-inner {
   background: var(--orange);
   color: white;
   display: flex;
@@ -288,7 +293,7 @@ input, textarea, select { font-size: 16px; }
   white-space: nowrap;
 }
 
-.announce-bar::before {
+.announce-bar-inner::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -2961,53 +2966,81 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR (task 118) ──────────────────────────────
+  /* ── ANNOUNCE BAR (task 118, safe-area strip + bigger task 120) ────
      Joins the fixed top-of-screen stack ABOVE the nav, matching the
-     reference's mobile layout (bar -> header/logo -> hero). --mob-announce-h
-     is the one number that has to stay true to the bar's real rendered
-     height: nav's `top`, .page/#page-home's padding-top and the hero's
-     height calc below all read it, so this bar can never leave a gap or an
-     overlap against the nav. It's a fixed padding/font/line-height with no
-     wrapping (nowrap + ellipsis on each side), so the height is exact and
-     doesn't depend on font-loading timing or text length — no JS
-     measurement needed.
+     reference's mobile layout (bar -> header/logo -> hero).
 
-     The bar is now the TOPMOST fixed element, which walks straight into the
+     .announce-bar (outer) is a plain neutral-background positioning shell:
+     `padding-top: env(safe-area-inset-top)` reserves exactly the status
+     bar/notch/Dynamic-Island height (real, device-correct values — see the
+     viewport-fit=cover note in index.html's <head>, which is what makes
+     env() return anything but 0 here) as NEUTRAL background, so the status
+     bar sits on that instead of directly on the orange bar. Reported bug:
+     iOS Safari tints the strip behind the status bar by sampling whatever
+     is at the very top of the page (see index.html's theme-color comment)
+     — with the orange bar previously starting at true y=0, that strip
+     sampled orange with no gap, unlike the reference's clean neutral band.
+     .announce-bar-inner is the actual visible coloured bar, unchanged in
+     spirit from before, just taller (task 120 sizing).
+
+     --mob-announce-h is the OUTER box's total height (safe-area strip +
+     inner bar) — the one number nav's `top`, .page/#page-home's padding-top
+     and the hero's height calc all read, so this can never leave a gap or
+     overlap against the nav. It varies by device (the env() term), which is
+     exactly why app.js's hero-height lock measures the real rendered
+     element instead of trying to parse this calc() expression as a plain
+     number — a CSS custom property holding calc()/env() resolves fine
+     through `var()` in other CSS, but is NOT resolved into a plain px value
+     by JS's getComputedStyle().getPropertyValue(), which only ever hands
+     back the literal specified text.
+
+     The bar is the TOPMOST fixed element, which walks straight into the
      task-91 bug: the OVERSCROLL/RUBBER-BAND rule below matches html/body's
      background to the NAV's navy so the transient gap iOS opens above fixed
      elements (when its toolbar collapses/expands — see that rule's own
      comment for the mechanism) reads as "the header stretching" instead of
-     a mismatched colour flash. With an orange bar now sitting above that
-     navy nav, the same gap would open a navy sliver directly above orange —
-     the exact bug, recoloured. Retuning html/body itself isn't an option:
-     the BOTTOM overscroll pull still needs to match navy (the footer's
-     gradient end). So instead .announce-bar::before extends the bar's own
-     orange upward by 200px, well past anything Safari's toolbar can open,
-     fixed independently of html/body — a gap above the bar always finds
-     orange already painted there, whatever html/body's colour is doing. */
-  :root { --mob-announce-h: 30px; }
+     a mismatched colour flash. With this bar's own neutral strip now sitting
+     above the orange, that same transient gap needs to find NEUTRAL, not
+     orange, or it recreates the exact bug with a new pair of colours.
+     Retuning html/body itself isn't an option: the BOTTOM overscroll pull
+     still needs to match navy (the footer's gradient end). So instead
+     .announce-bar::before bleeds the outer shell's own neutral colour
+     upward by 200px, well past anything Safari's toolbar can open, fixed
+     independently of html/body — a gap above the bar always finds neutral
+     already painted there, whatever html/body's colour is doing. */
+  :root {
+    --mob-announce-h: calc(36px + env(safe-area-inset-top));
+    --mob-nav-h: 68px;
+  }
   .announce-bar {
-    display: flex;
+    display: block;
     position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--mob-announce-h);
     z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
-    padding: 0 4%;
-    font-size: 10.5px;
-    gap: 8px;
+    background: var(--offwhite);
+    padding-top: env(safe-area-inset-top);
   }
   .announce-bar::before {
-    /* Overrides the desktop shimmer-sweep ::before (same selector) with the
-       upward colour-bleed described above — mobile gets no shimmer, this
-       matters more here. */
     content: '';
     position: fixed;
     top: -200px; left: 0; right: 0;
     height: 200px;
-    background: var(--orange);
-    animation: none;
+    background: var(--offwhite);
     z-index: -1;
   }
+  .announce-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 4%;
+    font-size: 12px;
+    gap: 8px;
+    animation: none; /* mobile gets no shimmer-sweep */
+  }
+  .announce-bar-inner::before { display: none; } /* desktop-only shimmer sweep */
   .announce-main, .announce-secondary { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .announce-main { flex: 1 1 auto; min-width: 0; }
   .announce-secondary { flex: 0 1 38%; }
@@ -3017,22 +3050,23 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   nav {
     position: fixed;
     top: var(--mob-announce-h); left: 0; right: 0;
-    height: 60px;
+    height: var(--mob-nav-h);
     padding: 0 4%;
     z-index: 900;
     flex-wrap: nowrap;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   }
-  /* Slightly smaller paw badge to fit the 60px mobile bar */
-  .logo-circle { width: 36px; height: 36px; }
-  .logo-text { font-size: 21px; }
+  /* Paw badge/logo sized to fit the --mob-nav-h bar (task 120: bumped up from
+     36px/21px to sit closer to the reference's scale). */
+  .logo-circle { width: 40px; height: 40px; }
+  .logo-text { font-size: 23px; }
   .nav-links { display: none; }
   .nav-full { display: none; }
   .nav-search-btn { display: flex; }
   .nav-center { justify-content: center; }
   .cart-btn-text { display: none; }
   /* Cart becomes a plain white icon with an orange count badge (Ruffwear-style) */
-  .cart-btn { background: none; color: #fff; padding: 8px; font-size: 20px; box-shadow: none; }
+  .cart-btn { background: none; color: #fff; padding: 8px; font-size: 22px; box-shadow: none; }
   .cart-btn:hover, .cart-btn:active { background: none; transform: none; box-shadow: none; }
   .cart-count { background: var(--orange); top: -2px; right: -2px; }
   .nav-right { gap: 6px; }
@@ -3045,9 +3079,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      never shows a strip below its footer — the footer sits flush and the
      navy body (var(--navy), which the mobile footer now ends on) extends
      below it on overscroll with no gap. */
-  .page { padding-top: calc(var(--mob-announce-h) + 60px); padding-bottom: 0; }
+  .page { padding-top: calc(var(--mob-announce-h) + var(--mob-nav-h)); padding-bottom: 0; }
   /* Home: push the hero below the fixed stack so the top is never cut off */
-  #page-home { padding-top: calc(var(--mob-announce-h) + 60px); }
+  #page-home { padding-top: calc(var(--mob-announce-h) + var(--mob-nav-h)); }
   /* Footer-less pages fill the viewport so their own light bg (not the deep-navy body)
      covers the screen on a short page like an empty cart. */
   #page-cart, #page-product { min-height: 100vh; }
@@ -3068,7 +3102,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      resize. min-height is a floor for short-viewport landscape phones,
      where 100svh minus the fixed stack could otherwise get uncomfortably
      short. */
-  #heroSection { height: calc(100svh - var(--mob-announce-h) - 60px) !important; min-height: 420px; }
+  #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h)) !important; min-height: 420px; }
   #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   .hero-copy {
     align-items: center !important;

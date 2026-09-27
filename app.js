@@ -380,9 +380,17 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   var lastWidth = window.innerWidth;
   var lockedPx = null;
 
+  var announceBar = document.getElementById('announceBar');
+
   function computeHeight() {
-    var announceH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-announce-h')) || 0;
-    var navH = 60; // the fixed mobile nav bar's own height (styles.css)
+    // --mob-announce-h (styles.css) is now `calc(36px + env(safe-area-inset-top))`
+    // (task 120), so it varies by device and getComputedStyle().getPropertyValue()
+    // on a custom property only ever returns that literal calc()/env() text, not
+    // a resolved number — parseFloat on it would silently become NaN. Measuring
+    // the real element's rendered height sidesteps that entirely and is correct
+    // regardless of how complex the CSS driving it gets.
+    var announceH = announceBar ? announceBar.getBoundingClientRect().height : 0;
+    var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-nav-h')) || 68;
     return Math.max(window.innerHeight - announceH - navH, 420); // 420 matches the CSS min-height floor
   }
 
