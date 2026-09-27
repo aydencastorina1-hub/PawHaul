@@ -352,47 +352,71 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   }, { passive: true });
 })();
 
-// ── MOBILE HERO HEIGHT LOCK (task 120) ──────────────────────────
-// Belt-and-suspenders on top of the CSS fix (styles.css: #heroSection uses
-// 100svh, not 100dvh, in the mobile media query). That CSS fix depends on
-// the browser actually supporting the svh unit; browsers that don't just
-// drop the whole declaration as invalid and fall back to whatever height
-// rule matches next, which can still be one that tracks the toolbar live —
-// so the same "photo zooms/jumps while you scroll" bug (task 119) can come
-// back in exactly the browsers most likely to be behind on CSS support.
-// This locks the actual measured height in JS instead, which needs no
-// viewport-unit support at all: measured once at load (before any scroll
-// has had a chance to move the toolbar), then written as an inline
-// !important height, which beats anything in styles.css regardless of
-// whether that browser understands svh, dvh or neither.
-// Only recomputes on a WIDTH change, never on a bare resize: an iOS/Android
-// toolbar collapsing changes the visual viewport's HEIGHT only, so gating
-// on width is what stops that same toolbar animation from re-triggering
-// this and undoing the lock — a real rotation or window resize always
-// changes width too, so those still get picked up.
+// ── MOBILE HERO HEIGHT LOCK (task 120, hardened task 121) ────────
+// On top of the CSS fix (styles.css: #heroSection uses 100svh, not 100dvh,
+// in the mobile media query) — that CSS fix depends on the browser actually
+// supporting the svh unit, and even in a WebKit-based browser that does
+// (confirmed still happening in Chrome for iOS, which is WebKit under Apple's
+// platform rules same as Safari) a `resize`-event-only defense turned out not
+// to be enough: some mobile browsers' toolbar-collapse animation changes the
+// rendered box size of a `position` element WITHOUT ever firing a `resize`
+// on `window` at all, so the original version of this fix (recompute only on
+// a window resize) never got a chance to intervene, and 100svh alone doesn't
+// stop the actual PAINTED size of the box from drifting during that
+// animation either.
+//
+// This version doesn't wait for an event that might not fire: a
+// ResizeObserver watches the element's OWN rendered box directly, and
+// reasserts the locked height the instant that box's size drifts from what
+// was locked, for ANY reason. It only treats innerWidth actually changing as
+// a legitimate reason to recompute (a real rotation or window resize); every
+// other observed change is corrected back to the same locked value. Setting
+// that same value back doesn't loop forever: the observer's next callback
+// sees the box already matches and does nothing further.
 (function () {
   var hero = document.getElementById('heroSection');
   if (!hero) return;
   var MOBILE_MAX = 900; // matches styles.css's `@media (max-width: 900px)`
   var lastWidth = window.innerWidth;
+  var lockedPx = null;
 
-  function lock() {
-    if (window.innerWidth > MOBILE_MAX) {
-      hero.style.removeProperty('height'); // desktop: let styles.css's own rules govern it
-      return;
-    }
+  function computeHeight() {
     var announceH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-announce-h')) || 0;
     var navH = 60; // the fixed mobile nav bar's own height (styles.css)
-    var h = Math.max(window.innerHeight - announceH - navH, 420); // 420 matches the CSS min-height floor
-    hero.style.setProperty('height', h + 'px', 'important');
+    return Math.max(window.innerHeight - announceH - navH, 420); // 420 matches the CSS min-height floor
   }
 
-  lock();
-  window.addEventListener('resize', function () {
-    if (window.innerWidth === lastWidth) return; // height-only change: the toolbar, not a real resize
-    lastWidth = window.innerWidth;
-    lock();
-  }, { passive: true });
+  function apply() {
+    if (window.innerWidth > MOBILE_MAX) {
+      hero.style.removeProperty('height'); // desktop: let styles.css's own rules govern it
+      lockedPx = null;
+      return;
+    }
+    lockedPx = computeHeight();
+    hero.style.setProperty('height', lockedPx + 'px', 'important');
+  }
+
+  apply();
+
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function (entries) {
+      if (lockedPx === null) return; // desktop right now — nothing to enforce
+      var widthChanged = window.innerWidth !== lastWidth;
+      if (widthChanged) { lastWidth = window.innerWidth; apply(); return; }
+      var seen = Math.round(entries[0].contentRect.height);
+      if (seen !== lockedPx) hero.style.setProperty('height', lockedPx + 'px', 'important');
+    });
+    ro.observe(hero);
+  } else {
+    // No ResizeObserver (very old browser): fall back to the resize-event-only
+    // version, still correct on any browser where the box size only ever
+    // changes alongside a real `resize` event.
+    window.addEventListener('resize', function () {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+      apply();
+    }, { passive: true });
+  }
 })();
 
 // ── HERO SLIDESHOW ────────────────────────────────────────────

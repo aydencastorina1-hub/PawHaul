@@ -177,7 +177,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
   <link rel="preload" as="script" href="/products.js?v=89">
-  <link rel="preload" as="script" href="/app.js?v=67">
+  <link rel="preload" as="script" href="/app.js?v=68">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1204,7 +1204,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
   <script src="/products.js?v=89"></script>
-  <script src="/app.js?v=67"></script>
+  <script src="/app.js?v=68"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
