@@ -3022,10 +3022,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (task 125: 56px inner, flat 40px padding — no
+       padding-top exactly (task 126: 56px inner, flat 20px padding — no
        env() involved in either number, ever, per task 124) or nav/page/hero
        all end up assuming a shorter bar than what's actually rendered. */
-    --mob-announce-h: calc(56px + 40px);
+    --mob-announce-h: calc(56px + 20px);
     --mob-nav-h: 68px;
   }
   .announce-bar {
@@ -3059,10 +3059,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        never spike, on any device, in any Safari version. The one real cost
        is this no longer grows on a device with a genuinely large notch/
        Dynamic-Island inset — worth it over the shake.
-       40px (task 125: was 14px) matches the reference's own proportions —
-       there the neutral strip above the coloured bar is nearly as tall as
-       the bar itself, not a thin sliver. */
-    padding-top: 40px;
+       20px (task 126: was 40px, per direct feedback — less white). */
+    padding-top: 20px;
   }
   .announce-bar::before {
     content: '';
