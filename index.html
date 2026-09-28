@@ -34,19 +34,14 @@
      replacing sampling with one constant colour — which is the one thing
      this tag has to keep doing, whatever colour it's pinned to.
 
-     Task 120 tried pinning it to a neutral/offwhite to match a real
-     safe-area strip added to .announce-bar (styles.css, under
-     env(safe-area-inset-top) now that viewport-fit=cover is set) — the
-     idea being a neutral gap between the status bar and the orange bar,
-     like the reference site this was chasing. Confirmed on a real device
-     it didn't hold: not visibly, however that strip and this tag actually
-     interact in current Safari. Task 121 gives up on getting a neutral gap
-     specifically and pins this back to navy instead — matching the nav
-     directly below the orange bar, and matching .announce-bar's own
-     background (styles.css), so status bar -> orange -> navy nav reads as
-     one deliberate stack. If the announce bar's background ever changes,
-     change this with it. -->
-<meta name="theme-color" content="#1a1a2e">
+     Pinned to the announce bar's own neutral (--offwhite #f8f6f2, styles.css)
+     — a real gap between the status bar and the orange bar, confirmed
+     working on a real device once .announce-bar's safe-area padding got a
+     guaranteed minimum height (task 122: env(safe-area-inset-top) alone can
+     legally be 0, which is what silently made every earlier colour choice
+     here look like it was doing nothing). If the announce bar's background
+     ever changes, change this with it. -->
+<meta name="theme-color" content="#f8f6f2">
 <!-- FOUC guard for elements whose "closed" look depends on styles.css: on WebKit
      (confirmed via Safari-engine testing, not reproducible on Chromium) these can
      render in their raw/unstyled state for the first render — and because
@@ -189,7 +184,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=135" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=136" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser

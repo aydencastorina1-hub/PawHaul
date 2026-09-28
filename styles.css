@@ -2966,28 +2966,30 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR (task 118, safe-area strip task 120, navy task 121) ──
+  /* ── ANNOUNCE BAR (task 118, safe-area strip task 120-122) ──────────
      Joins the fixed top-of-screen stack ABOVE the nav, matching the
      reference's mobile layout (bar -> header/logo -> hero).
 
-     .announce-bar (outer) is a positioning shell: `padding-top:
-     env(safe-area-inset-top)` reserves the status bar/notch/Dynamic-Island
-     height (a real, device-correct value now that viewport-fit=cover is
-     set — see index.html's <head>) above `.announce-bar-inner`, the actual
-     visible coloured bar. Task 120 tried a NEUTRAL background here, to put
-     a clean gap between the status bar and the orange bar (matching a
-     reference site). Confirmed on a real device it didn't visibly hold —
-     task 121 gives up on that specific look and pins this strip's
-     background to NAVY instead, matching the nav directly below the orange
-     bar (and index.html's theme-color, which needs to keep matching this).
-     The env(safe-area-inset-top) padding stays regardless: harmless if
-     Safari doesn't honour it as hoped, correctly reserving real space if
-     it does.
+     .announce-bar (outer) is a neutral (--offwhite) positioning shell:
+     `padding-top` reserves space above `.announce-bar-inner` (the actual
+     orange bar) so the status bar sits on a clean neutral strip instead of
+     directly on the orange. The real bug across task 120-121's failed
+     attempts (neutral, then navy, then a duplicate theme-color tag) was
+     never the colour: it was that this padding was ONLY
+     `env(safe-area-inset-top)`, which is legally 0 in plenty of real
+     situations, so the strip could render at literally zero height — no
+     colour was ever going to be visible with nothing to paint it on.
+     Fixed (task 122) with `max(24px, env(safe-area-inset-top))`: a real,
+     always-visible floor on every device, taller still on a device that
+     reports a genuine larger inset. Confirmed working via an actual
+     rendered screenshot at 0 inset (this codebase's test environment, and
+     the exact failure case).
 
      --mob-announce-h is the OUTER box's total height (safe-area strip +
      inner bar) — the one number nav's `top`, .page/#page-home's padding-top
      and the hero's height calc all read, so this can never leave a gap or
-     overlap against the nav. It varies by device (the env() term), which is
+     overlap against the nav. Its formula must track .announce-bar's own
+     padding-top exactly. It varies by device (the env() term), which is
      exactly why app.js's hero-height lock measures the real rendered
      element instead of trying to parse this calc() expression as a plain
      number — a CSS custom property holding calc()/env() resolves fine
@@ -3000,13 +3002,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      background to the NAV's navy so the transient gap iOS opens above fixed
      elements (when its toolbar collapses/expands — see that rule's own
      comment for the mechanism) reads as "the header stretching" instead of
-     a mismatched colour flash. Now that this bar's own strip is ALSO navy,
-     that transient gap finding navy (via .announce-bar::before, which
-     bleeds the same navy upward by 200px, independent of html/body) reads
-     the same way — nothing above the orange bar can ever show a
-     mismatched colour, regardless of what html/body's own background is
-     doing (it still has to stay navy at its own end, matching the
-     footer's gradient, for the BOTTOM overscroll pull). */
+     a mismatched colour flash. With this bar's own neutral strip now
+     sitting above the orange, that same transient gap needs to find
+     neutral, not navy or orange, or it recreates the exact bug with a new
+     pair of colours. Retuning html/body itself isn't an option: the BOTTOM
+     overscroll pull still needs to match navy (the footer's gradient end).
+     So instead .announce-bar::before bleeds the outer shell's own neutral
+     colour upward by 200px, well past anything Safari's toolbar can open,
+     fixed independently of html/body — a gap above the bar always finds
+     neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar's own padding-top formula exactly (task 122:
        max(24px, env(...)), not env() alone) or nav/page/hero all end up
@@ -3028,7 +3032,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     top: 0; left: 0; right: 0;
     height: var(--mob-announce-h);
     z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
-    background: var(--navy);
+    background: var(--offwhite);
     /* max(), not env() alone (task 122): env(safe-area-inset-top) is legally
        0 on plenty of real devices/situations (no notch, or Safari just not
        reporting one the way this was built assuming it would) — relying on
@@ -3044,7 +3048,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     position: fixed;
     top: -200px; left: 0; right: 0;
     height: 200px;
-    background: var(--navy);
+    background: var(--offwhite);
     z-index: -1;
   }
   .announce-bar-inner {
