@@ -22,7 +22,6 @@
      unstyled canvas black before styles.css applies, causing a flash on load. -->
 <meta name="color-scheme" content="light">
 <!-- iOS Safari tints the strip behind the status bar / around the notch.
-     Two different mechanisms, and task 120 tripped over the difference:
 
      With NO theme-color at all, Safari derives that tint by SAMPLING the
      page itself — you can literally read a blurred copy of whatever is at
@@ -31,23 +30,23 @@
      menu puts a full-screen dark scrim over the page and takes it away
      again, so that strip changed colour at the end of every close:
      reported as the top of the site flashing, above the navy header, and
-     it was never the header itself. That's the bug a PINNED theme-color
-     fixes, by replacing sampling with one constant colour.
+     it was never the header itself. A PINNED theme-color fixes that, by
+     replacing sampling with one constant colour — which is the one thing
+     this tag has to keep doing, whatever colour it's pinned to.
 
-     But once a theme-color IS set, Safari uses THAT value for the status
-     bar strip directly, no matter what's actually rendered in the DOM
-     underneath it — which is exactly why task 120's real safe-area strip
-     (styles.css: .announce-bar's neutral background under
-     env(safe-area-inset-top), now that viewport-fit=cover makes that a
-     real value) never showed on Safari: the strip existed in the page,
-     correctly sized, and Safari tinted right over it with the navy this
-     tag was still pinned to.
-     Now pinned to the announce bar's own neutral (--offwhite #f8f6f2) —
-     genuinely the top of the page since task 120 restructured it there —
-     so both mechanisms agree: still one constant colour (no flash), and
-     now the CORRECT one (matches what task 120 actually put there). If
-     the announce bar's background ever changes, change this with it. -->
-<meta name="theme-color" content="#f8f6f2">
+     Task 120 tried pinning it to a neutral/offwhite to match a real
+     safe-area strip added to .announce-bar (styles.css, under
+     env(safe-area-inset-top) now that viewport-fit=cover is set) — the
+     idea being a neutral gap between the status bar and the orange bar,
+     like the reference site this was chasing. Confirmed on a real device
+     it didn't hold: not visibly, however that strip and this tag actually
+     interact in current Safari. Task 121 gives up on getting a neutral gap
+     specifically and pins this back to navy instead — matching the nav
+     directly below the orange bar, and matching .announce-bar's own
+     background (styles.css), so status bar -> orange -> navy nav reads as
+     one deliberate stack. If the announce bar's background ever changes,
+     change this with it. -->
+<meta name="theme-color" content="#1a1a2e">
 <!-- FOUC guard for elements whose "closed" look depends on styles.css: on WebKit
      (confirmed via Safari-engine testing, not reproducible on Chromium) these can
      render in their raw/unstyled state for the first render — and because
@@ -190,7 +189,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=133" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=134" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser

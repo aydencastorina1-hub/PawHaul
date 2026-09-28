@@ -2966,22 +2966,23 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR (task 118, safe-area strip + bigger task 120) ────
+  /* ── ANNOUNCE BAR (task 118, safe-area strip task 120, navy task 121) ──
      Joins the fixed top-of-screen stack ABOVE the nav, matching the
      reference's mobile layout (bar -> header/logo -> hero).
 
-     .announce-bar (outer) is a plain neutral-background positioning shell:
-     `padding-top: env(safe-area-inset-top)` reserves exactly the status
-     bar/notch/Dynamic-Island height (real, device-correct values — see the
-     viewport-fit=cover note in index.html's <head>, which is what makes
-     env() return anything but 0 here) as NEUTRAL background, so the status
-     bar sits on that instead of directly on the orange bar. Reported bug:
-     iOS Safari tints the strip behind the status bar by sampling whatever
-     is at the very top of the page (see index.html's theme-color comment)
-     — with the orange bar previously starting at true y=0, that strip
-     sampled orange with no gap, unlike the reference's clean neutral band.
-     .announce-bar-inner is the actual visible coloured bar, unchanged in
-     spirit from before, just taller (task 120 sizing).
+     .announce-bar (outer) is a positioning shell: `padding-top:
+     env(safe-area-inset-top)` reserves the status bar/notch/Dynamic-Island
+     height (a real, device-correct value now that viewport-fit=cover is
+     set — see index.html's <head>) above `.announce-bar-inner`, the actual
+     visible coloured bar. Task 120 tried a NEUTRAL background here, to put
+     a clean gap between the status bar and the orange bar (matching a
+     reference site). Confirmed on a real device it didn't visibly hold —
+     task 121 gives up on that specific look and pins this strip's
+     background to NAVY instead, matching the nav directly below the orange
+     bar (and index.html's theme-color, which needs to keep matching this).
+     The env(safe-area-inset-top) padding stays regardless: harmless if
+     Safari doesn't honour it as hoped, correctly reserving real space if
+     it does.
 
      --mob-announce-h is the OUTER box's total height (safe-area strip +
      inner bar) — the one number nav's `top`, .page/#page-home's padding-top
@@ -2999,26 +3000,32 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      background to the NAV's navy so the transient gap iOS opens above fixed
      elements (when its toolbar collapses/expands — see that rule's own
      comment for the mechanism) reads as "the header stretching" instead of
-     a mismatched colour flash. With this bar's own neutral strip now sitting
-     above the orange, that same transient gap needs to find NEUTRAL, not
-     orange, or it recreates the exact bug with a new pair of colours.
-     Retuning html/body itself isn't an option: the BOTTOM overscroll pull
-     still needs to match navy (the footer's gradient end). So instead
-     .announce-bar::before bleeds the outer shell's own neutral colour
-     upward by 200px, well past anything Safari's toolbar can open, fixed
-     independently of html/body — a gap above the bar always finds neutral
-     already painted there, whatever html/body's colour is doing. */
+     a mismatched colour flash. Now that this bar's own strip is ALSO navy,
+     that transient gap finding navy (via .announce-bar::before, which
+     bleeds the same navy upward by 200px, independent of html/body) reads
+     the same way — nothing above the orange bar can ever show a
+     mismatched colour, regardless of what html/body's own background is
+     doing (it still has to stay navy at its own end, matching the
+     footer's gradient, for the BOTTOM overscroll pull). */
   :root {
     --mob-announce-h: calc(36px + env(safe-area-inset-top));
     --mob-nav-h: 68px;
   }
+  /* Navy, not neutral (task 121): a neutral/offwhite strip here depends on
+     iOS actually rendering the page's own DOM behind the status bar and on
+     Safari using theme-color for that same area rather than something else
+     entirely — neither was confirmed to reliably hold in practice. Navy
+     sidesteps needing either to work: it already matches the nav directly
+     below the orange bar, so status bar -> navy -> orange -> navy nav reads
+     as one deliberate stack regardless of exactly how much (if any) of this
+     strip's real height Safari ends up honouring. */
   .announce-bar {
     display: block;
     position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--mob-announce-h);
     z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
-    background: var(--offwhite);
+    background: var(--navy);
     padding-top: env(safe-area-inset-top);
   }
   .announce-bar::before {
@@ -3026,7 +3033,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     position: fixed;
     top: -200px; left: 0; right: 0;
     height: 200px;
-    background: var(--offwhite);
+    background: var(--navy);
     z-index: -1;
   }
   .announce-bar-inner {
