@@ -3008,7 +3008,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      doing (it still has to stay navy at its own end, matching the
      footer's gradient, for the BOTTOM overscroll pull). */
   :root {
-    --mob-announce-h: calc(36px + env(safe-area-inset-top));
+    /* Must track .announce-bar's own padding-top formula exactly (task 122:
+       max(24px, env(...)), not env() alone) or nav/page/hero all end up
+       assuming a shorter bar than what's actually rendered. */
+    --mob-announce-h: calc(36px + max(24px, env(safe-area-inset-top)));
     --mob-nav-h: 68px;
   }
   /* Navy, not neutral (task 121): a neutral/offwhite strip here depends on
@@ -3026,7 +3029,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     height: var(--mob-announce-h);
     z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
     background: var(--navy);
-    padding-top: env(safe-area-inset-top);
+    /* max(), not env() alone (task 122): env(safe-area-inset-top) is legally
+       0 on plenty of real devices/situations (no notch, or Safari just not
+       reporting one the way this was built assuming it would) — relying on
+       it alone meant this strip could render at literally zero height and
+       produce no visible gap at all, which is what kept happening no matter
+       what colour it was set to. 24px is a real, guaranteed-visible floor
+       that shows up on every device regardless of env(); a device that DOES
+       report a taller real inset gets that larger value instead. */
+    padding-top: max(24px, env(safe-area-inset-top));
   }
   .announce-bar::before {
     content: '';
