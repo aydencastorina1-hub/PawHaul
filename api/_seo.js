@@ -654,8 +654,16 @@ function buildHead(meta, isProdHost) {
     '<meta name="twitter:card" content="' + TWITTER_CARD + '">',
     '<meta name="twitter:title" content="' + esc(meta.title) + '">',
     '<meta name="twitter:description" content="' + esc(meta.description) + '">',
-    '<meta name="twitter:image" content="' + esc(meta.ogImage) + '">',
-    '<meta name="theme-color" content="#1a1a2e">'
+    '<meta name="twitter:image" content="' + esc(meta.ogImage) + '">'
+    // NO theme-color here. index.html already has the one canonical tag
+    // (near the top of <head>, before <title>, so this function's TITLE_RE
+    // replace — which swaps out everything from <title> on — never touches
+    // it). A second copy WAS here, hardcoded to the old navy value, and
+    // because both ended up in the final served page, editing only
+    // index.html's tag (task 120's Safari fix) silently did nothing: this
+    // one kept winning. Never re-add a theme-color line in this function —
+    // change index.html's tag instead, and see ITS comment for why the
+    // exact value matters (it has to match .announce-bar's background).
   ];
 
   // Ownership proofs — see SITE_VERIFICATION at the top of this file.
