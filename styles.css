@@ -2975,8 +2975,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      orange bar) so the status bar sits on a clean neutral strip instead of
      directly on the orange.
 
-     That padding-top is a flat 14px, not env(safe-area-inset-top) in any
-     form — after three rounds of this looking "fixed" in every check done
+     That padding-top is a flat number (40px, task 125), not
+     env(safe-area-inset-top) in any form — after three rounds of this
+     looking "fixed" in every check done
      here but still broken on a real device, task 124 finally caught why on
      a screen recording: with viewport-fit=cover engaged, current Safari
      RENEGOTIATES env(safe-area-inset-top) live as its own address bar
@@ -3021,10 +3022,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (task 124: 48px inner, flat 14px padding — no
-       env() involved in either number any more) or nav/page/hero all end
-       up assuming a shorter bar than what's actually rendered. */
-    --mob-announce-h: calc(48px + 14px);
+       padding-top exactly (task 125: 56px inner, flat 40px padding — no
+       env() involved in either number, ever, per task 124) or nav/page/hero
+       all end up assuming a shorter bar than what's actually rendered. */
+    --mob-announce-h: calc(56px + 40px);
     --mob-nav-h: 68px;
   }
   .announce-bar {
@@ -3042,23 +3043,26 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        for what actually was. */
     transform: translateZ(0);
     will-change: transform;
-    /* Flat 14px, NOT env(safe-area-inset-top) in any form (task 124) — this
-       is why the whole stack was visibly shaking on a fast scroll. Traced
-       it frame-by-frame in a screen recording: env(safe-area-inset-top)
-       isn't the static, hardware-only number this was built assuming it
-       was. With viewport-fit=cover engaged, current Safari renegotiates it
-       LIVE as its own address bar slides in and out on scroll — spiking to
-       roughly 200px mid-animation before easing back down — the same live-
-       tracking behaviour 100dvh has (task 119's hero fix, same root
+    /* Flat number, NOT env(safe-area-inset-top) in any form (task 124) —
+       this is why the whole stack was visibly shaking on a fast scroll.
+       Traced it frame-by-frame in a screen recording: env(safe-area-inset-
+       top) isn't the static, hardware-only number this was built assuming
+       it was. With viewport-fit=cover engaged, current Safari renegotiates
+       it LIVE as its own address bar slides in and out on scroll — spiking
+       to roughly 200px mid-animation before easing back down — the same
+       live-tracking behaviour 100dvh has (task 119's hero fix, same root
        category of bug), just on a property nobody expected to move at all.
        Every previous round here (max() with a floor, colour swaps) still
        read the live env() value and inherited every spike, since max()
        only guards against the value being too SMALL, never too LARGE. The
-       fix is to stop reading it at all: a flat, unconditional 14px can
+       fix is to stop reading it at all: a flat, unconditional number can
        never spike, on any device, in any Safari version. The one real cost
        is this no longer grows on a device with a genuinely large notch/
-       Dynamic-Island inset — worth it over the shake. */
-    padding-top: 14px;
+       Dynamic-Island inset — worth it over the shake.
+       40px (task 125: was 14px) matches the reference's own proportions —
+       there the neutral strip above the coloured bar is nearly as tall as
+       the bar itself, not a thin sliver. */
+    padding-top: 40px;
   }
   .announce-bar::before {
     content: '';
@@ -3072,7 +3076,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 48px; /* task 124: was 44px, a little taller again per request */
+    height: 56px; /* task 125: was 48px — grown alongside the strip above it so the two stay in the reference's proportion, not shrinking to a sliver by comparison */
     box-sizing: border-box;
     padding: 0 4%;
     font-size: 12px;
