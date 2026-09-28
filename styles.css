@@ -2966,39 +2966,44 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR (task 118, safe-area strip task 120-122) ──────────
+  /* ── ANNOUNCE BAR (task 118, safe-area saga task 120-124) ───────────
      Joins the fixed top-of-screen stack ABOVE the nav, matching the
      reference's mobile layout (bar -> header/logo -> hero).
 
      .announce-bar (outer) is a neutral (--offwhite) positioning shell:
      `padding-top` reserves space above `.announce-bar-inner` (the actual
      orange bar) so the status bar sits on a clean neutral strip instead of
-     directly on the orange. The real bug across task 120-121's failed
-     attempts (neutral, then navy, then a duplicate theme-color tag) was
-     never the colour: it was that this padding was ONLY
-     `env(safe-area-inset-top)`, which is legally 0 in plenty of real
-     situations, so the strip could render at literally zero height — no
-     colour was ever going to be visible with nothing to paint it on.
-     Fixed (task 122) with `max(_, env(safe-area-inset-top))`: a real,
-     always-visible floor on every device, taller still on a device that
-     reports a genuine larger inset. Confirmed working via an actual
-     rendered screenshot at 0 inset (this codebase's test environment, and
-     the exact failure case). Floor shrunk 24px -> 14px and the inner bar
-     grown 36px -> 44px in task 123, so the orange bar reads as the
-     dominant element and the neutral strip as a thin reveal above it, not
-     equal partners — exact values live on .announce-bar/-inner themselves.
+     directly on the orange.
 
-     --mob-announce-h is the OUTER box's total height (safe-area strip +
-     inner bar) — the one number nav's `top`, .page/#page-home's padding-top
-     and the hero's height calc all read, so this can never leave a gap or
-     overlap against the nav. Its formula must track .announce-bar's own
-     padding-top exactly. It varies by device (the env() term), which is
-     exactly why app.js's hero-height lock measures the real rendered
-     element instead of trying to parse this calc() expression as a plain
-     number — a CSS custom property holding calc()/env() resolves fine
-     through `var()` in other CSS, but is NOT resolved into a plain px value
-     by JS's getComputedStyle().getPropertyValue(), which only ever hands
-     back the literal specified text.
+     That padding-top is a flat 14px, not env(safe-area-inset-top) in any
+     form — after three rounds of this looking "fixed" in every check done
+     here but still broken on a real device, task 124 finally caught why on
+     a screen recording: with viewport-fit=cover engaged, current Safari
+     RENEGOTIATES env(safe-area-inset-top) live as its own address bar
+     slides in and out on scroll, spiking to roughly 200px mid-animation
+     before easing back down — the same live-tracking behaviour 100dvh has
+     (see the hero height rule below, task 119), just on a property this was
+     built assuming was a static, hardware-only number. That live spike is
+     what was actually shaking the whole top stack on a fast scroll — not a
+     compositing/paint-lag issue, an env() VALUE issue, and no amount of
+     max()-ing against a floor helps when the live value is too LARGE, not
+     too small. A flat number can't spike, on any device or Safari version;
+     the cost is it no longer grows on a device with a genuinely large
+     notch/Dynamic-Island inset, which is worth it over the shake.
+     .announce-bar-inner's height and this padding-top are the two numbers
+     that set how much of the strip reads as orange vs. neutral — bumped a
+     couple of times per direct feedback (currently 48px / 14px).
+
+     --mob-announce-h is the OUTER box's total height (padding + inner bar)
+     — the one number nav's `top`, .page/#page-home's padding-top and the
+     hero's height calc all read, so this can never leave a gap or overlap
+     against the nav. Must track .announce-bar's own numbers exactly. It's
+     still a calc() (not a plain px value) even though neither term
+     involves env() any more, which is why app.js's hero-height lock keeps
+     measuring the real rendered element instead of parsing this custom
+     property as a number — a CSS custom property is returned as its
+     literal specified TEXT by JS's getComputedStyle().getPropertyValue(),
+     "calc(48px + 14px)" included, never resolved into "62px".
 
      The bar is the TOPMOST fixed element, which walks straight into the
      task-91 bug: the OVERSCROLL/RUBBER-BAND rule below matches html/body's
@@ -3016,20 +3021,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top formula exactly (task 123: 44px inner, max(14px, env(...))
-       floor) or nav/page/hero all end up assuming a shorter bar than what's
-       actually rendered. */
-    --mob-announce-h: calc(44px + max(14px, env(safe-area-inset-top)));
+       padding-top exactly (task 124: 48px inner, flat 14px padding — no
+       env() involved in either number any more) or nav/page/hero all end
+       up assuming a shorter bar than what's actually rendered. */
+    --mob-announce-h: calc(48px + 14px);
     --mob-nav-h: 68px;
   }
-  /* Navy, not neutral (task 121): a neutral/offwhite strip here depends on
-     iOS actually rendering the page's own DOM behind the status bar and on
-     Safari using theme-color for that same area rather than something else
-     entirely — neither was confirmed to reliably hold in practice. Navy
-     sidesteps needing either to work: it already matches the nav directly
-     below the orange bar, so status bar -> navy -> orange -> navy nav reads
-     as one deliberate stack regardless of exactly how much (if any) of this
-     strip's real height Safari ends up honouring. */
   .announce-bar {
     display: block;
     position: fixed;
@@ -3040,23 +3037,28 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     /* GPU-composite this the same way `nav` already is (see that rule): a
        fixed element that ISN'T on its own compositor layer can visibly lag
        a frame or two behind the content scrolling under it during a fast
-       fling, which on a stack of TWO fixed bars (this one and nav) reads as
-       them briefly shaking/jittering relative to each other before they
-       catch up. Promoting both fixes it — do the same to any future fixed
-       element added to this stack. */
+       fling. Doesn't hurt to keep this, but it turned out NOT to be the
+       cause of the reported shaking — see the padding-top comment below
+       for what actually was. */
     transform: translateZ(0);
     will-change: transform;
-    /* max(), not env() alone (task 122): env(safe-area-inset-top) is legally
-       0 on plenty of real devices/situations (no notch, or Safari just not
-       reporting one the way this was built assuming it would) — relying on
-       it alone meant this strip could render at literally zero height and
-       produce no visible gap at all, which is what kept happening no matter
-       what colour it was set to. 14px (task 123: was 24px, shrunk so the
-       orange bar reads as the dominant element and the neutral gap as a
-       thin reveal, not equal partners) is a real, guaranteed-visible floor
-       that shows up on every device regardless of env(); a device that DOES
-       report a taller real inset gets that larger value instead. */
-    padding-top: max(14px, env(safe-area-inset-top));
+    /* Flat 14px, NOT env(safe-area-inset-top) in any form (task 124) — this
+       is why the whole stack was visibly shaking on a fast scroll. Traced
+       it frame-by-frame in a screen recording: env(safe-area-inset-top)
+       isn't the static, hardware-only number this was built assuming it
+       was. With viewport-fit=cover engaged, current Safari renegotiates it
+       LIVE as its own address bar slides in and out on scroll — spiking to
+       roughly 200px mid-animation before easing back down — the same live-
+       tracking behaviour 100dvh has (task 119's hero fix, same root
+       category of bug), just on a property nobody expected to move at all.
+       Every previous round here (max() with a floor, colour swaps) still
+       read the live env() value and inherited every spike, since max()
+       only guards against the value being too SMALL, never too LARGE. The
+       fix is to stop reading it at all: a flat, unconditional 14px can
+       never spike, on any device, in any Safari version. The one real cost
+       is this no longer grows on a device with a genuinely large notch/
+       Dynamic-Island inset — worth it over the shake. */
+    padding-top: 14px;
   }
   .announce-bar::before {
     content: '';
@@ -3070,7 +3072,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 44px; /* task 123: was 36px, taller so it reads as the dominant bar */
+    height: 48px; /* task 124: was 44px, a little taller again per request */
     box-sizing: border-box;
     padding: 0 4%;
     font-size: 12px;
