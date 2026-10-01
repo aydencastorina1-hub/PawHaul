@@ -1701,14 +1701,15 @@ function markOfferClaimed() {
   }
 })();
 
-// ── FIRST-VISIT CHAT GREETING (task 117) ──────────────────────────
-// A small bubble near the chat icon, shown ONCE EVER per device — unlike the
-// offer popup above (which reappears every visit until claimed), this one
-// writes its localStorage flag the moment it's shown, so a later reload or
-// visit never shows it again regardless of whether it was dismissed or the
-// chat was opened. Kept independent of the offer popup's own flag/timer.
-var CHAT_GREETING_SEEN_KEY = 'pawhaul_chat_greeting_seen';
-
+// ── CHAT GREETING (task 117, now EVERY VISIT per direct feedback) ──
+// A small bubble near the chat icon, scroll-triggered. Used to be once ever
+// per device via a permanent localStorage flag; that's gone now — it shows
+// on every fresh visit, same trigger as before (scroll past the hero). What
+// stays is "once PER VISIT": a plain in-memory flag (not localStorage/
+// sessionStorage), same pattern as the offer popup's own shownThisVisit
+// below, so scrolling past the threshold, back up, and down again doesn't
+// re-trigger it a second time in the same visit — only a fresh page load
+// (a real new visit) resets it.
 function dismissChatGreeting() {
   var el = document.getElementById('chatGreeting');
   if (!el || !el.classList.contains('show')) return;
@@ -1726,15 +1727,10 @@ function dismissChatGreeting() {
   // for the visitor to actually scroll down a bit, so it only ever appears
   // once the hero's buttons are no longer the thing on screen.
   var SCROLL_THRESHOLD = 150;
+  var shownThisVisit = false;
 
-  function alreadySeen() {
-    try { return !!localStorage.getItem(CHAT_GREETING_SEEN_KEY); } catch (e) { return false; }
-  }
-  function markSeen() {
-    try { localStorage.setItem(CHAT_GREETING_SEEN_KEY, '1'); } catch (e) {}
-  }
   function reveal() {
-    if (chatOpen || alreadySeen()) return;
+    if (chatOpen || shownThisVisit) return;
     // Don't stack on top of the email popup if it happens to be up at the
     // same moment — try again shortly rather than cluttering the screen.
     var offerOverlay = document.getElementById('offerOverlay');
@@ -1744,7 +1740,7 @@ function dismissChatGreeting() {
     }
     var el = document.getElementById('chatGreeting');
     if (!el) return;
-    markSeen();
+    shownThisVisit = true;
     el.style.display = 'flex';
     // rAF so the .show transition actually plays instead of starting already-on.
     requestAnimationFrame(function () { el.classList.add('show'); });
@@ -1754,7 +1750,7 @@ function dismissChatGreeting() {
     window.removeEventListener('scroll', onScroll);
     reveal();
   }
-  if (!alreadySeen()) window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
 })();
 
 // Escape closes whichever overlay is up (search first, then the offer).

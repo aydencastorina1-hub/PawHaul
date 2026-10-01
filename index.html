@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=154" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=155" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -175,7 +175,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
   <link rel="preload" as="script" href="/products.js?v=89">
-  <link rel="preload" as="script" href="/app.js?v=73">
+  <link rel="preload" as="script" href="/app.js?v=74">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1296,7 +1296,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
   <script src="/products.js?v=89"></script>
-  <script src="/app.js?v=73"></script>
+  <script src="/app.js?v=74"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
@@ -1413,8 +1413,11 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        keeps it hidden forever, same flag as everything else offer-related)
        the instant an email is actually submitted, from either entry point. -->
   <div id="offerSideTab" class="offer-side-tab">
-    <button type="button" class="offer-side-tab-label" onclick="reopenOfferFromTab()">Get 10% Off</button>
     <button type="button" class="offer-side-tab-close" onclick="dismissOfferSideTab()" aria-label="Dismiss">&#x2715;</button>
+    <button type="button" class="offer-side-tab-label" onclick="reopenOfferFromTab()">
+      <svg class="offer-side-tab-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.59 13.41 11 3.83A2 2 0 0 0 9.58 3.2L4 3a1 1 0 0 0-1 1l.2 5.58a2 2 0 0 0 .6 1.42l9.58 9.58a2 2 0 0 0 2.83 0l4.38-4.38a2 2 0 0 0 0-2.79z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg>
+      <span>Get 10% Off</span>
+    </button>
   </div>
 <!-- ==================== OFFLINE SCREEN (task 81) ====================
      Shown instead of the browser's own "no internet" page whenever the device

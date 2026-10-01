@@ -1217,10 +1217,15 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
 }
 .offer-continue:hover { border-color: var(--orange); background: rgba(232,99,10,0.08); }
 
-/* GET 10% OFF SIDE TAB (task 122) — vertical tab protruding from the left
-   edge, reference-matched structure (their "Spin to Win" tab) but in the
-   site's own navy/orange, not the reference's tan/yellow. Hidden by default
-   and shown only via .show (dismissOffer()/markOfferClaimed() in app.js);
+/* GET 10% OFF SIDE TAB (task 122, restyled per "make it look more
+   appealing" feedback) — vertical tab protruding from the left edge,
+   reference-matched structure (their "Spin to Win" tab) but in the site's
+   own brand colours. Switched from plain navy to the orange/orange-light
+   gradient the rest of the offer UI already uses (popup button, discount
+   badges) so it actually reads as a deal worth tapping, plus a tag icon and
+   a slow attention-pulse on the shadow — subtle enough not to be annoying
+   (6s cycle), present enough to catch a passing eye. Hidden by default and
+   shown only via .show (dismissOffer()/markOfferClaimed() in app.js);
    mobile-only, same scope as the rest of task 122's reference-match work —
    see the ≤900px block below for the part that actually reveals it. */
 .offer-side-tab {
@@ -1230,32 +1235,51 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
   left: 0;
   transform: translateY(-50%) translateX(-100%);
   z-index: 480;
-  background: var(--navy);
+  background: linear-gradient(160deg, var(--orange-light), var(--orange));
   color: #fff;
-  border-radius: 0 10px 10px 0;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  border-radius: 0 16px 16px 0;
+  box-shadow: 4px 0 24px rgba(232,99,10,0.45);
   flex-direction: column;
   align-items: center;
-  padding: 10px 6px;
+  padding: 14px 8px 12px;
   transition: transform 0.3s var(--ease);
+  animation: offerTabPulse 6s ease-in-out infinite;
 }
 .offer-side-tab.show { transform: translateY(-50%) translateX(0); }
+@keyframes offerTabPulse {
+  0%, 60%, 100% { box-shadow: 4px 0 24px rgba(232,99,10,0.45); }
+  80% { box-shadow: 4px 0 30px 6px rgba(232,99,10,0.75); }
+}
+.offer-side-tab-icon {
+  width: 22px; height: 22px;
+  margin-bottom: 6px;
+  flex-shrink: 0;
+}
+/* The icon stays upright; only the text itself is rotated into a vertical
+   column — writing-mode/rotate on the whole button would also sideways-flip
+   the icon, since it isn't text. */
 .offer-side-tab-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: none;
   border: none;
   color: #fff;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 0.3px;
   cursor: pointer;
-  padding: 6px 2px;
+  padding: 2px;
+}
+.offer-side-tab-label span {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.4px;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
-.offer-side-tab-label:hover { color: var(--orange-light); }
+.offer-side-tab-label:hover span { color: var(--navy-2); }
 .offer-side-tab-close {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.22);
   border: none;
   color: #fff;
   width: 20px; height: 20px;
@@ -1266,13 +1290,16 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   -webkit-tap-highlight-color: transparent;
 }
-.offer-side-tab-close:hover { background: rgba(255,255,255,0.28); }
+.offer-side-tab-close:hover { background: rgba(255,255,255,0.38); }
 
 @media (max-width: 900px) {
   .offer-side-tab.show { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .offer-side-tab { animation: none; }
 }
 
 /* Near full-screen on mobile: photo banner on top, content below.
