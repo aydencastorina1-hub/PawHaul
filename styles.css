@@ -3010,17 +3010,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   html { scroll-behavior: smooth; }
   nav { transform: translateZ(0); will-change: transform; }
 
-  /* The nav is ALREADY `position: fixed` on mobile — see the "NAV: fixed small
-     bar at the very top" rule further down this block — and `.page` /
-     `#page-home` already carry the 60px padding that compensates for it. Do
-     not add either again here: a second `body { padding-top: 60px }` double-
-     compensates and opens a 60px gap between the header and the hero.
-     It also means the strip of page that appears above the header on iOS is
-     NOT the sticky-vs-fixed problem it looks like. A fixed element is attached
-     to the layout viewport, and iOS lets the visual viewport extend above that
-     while Safari's top bar moves — so the band above the header shows the
-     scroller, which is painted in the taller space. See the mobile-menu
-     overlay rules near the end of this file for what is done about it. */
+  /* nav is `position: sticky` on mobile (per direct feedback: only nav stays
+     pinned while scrolling, the announce bar above it scrolls away — see the
+     "NAV: the ONLY thing that stays pinned" rule further down this block).
+     Sticky/static elements occupy their own real space in the document, so
+     `.page`/`#page-home` need NO compensating padding-top the way a
+     position:fixed nav would have required — do not add one here. The
+     mobile-menu overlay (opened by the hamburger) is a separate, still-fixed,
+     full-screen element with its own iOS visual-viewport handling — see its
+     rules near the end of this file — unrelated to nav's own positioning. */
 
   /* `.page { -webkit-overflow-scrolling: touch }` USED TO BE HERE. Removed —
      it is the cause of the "first tap on a card does nothing until you scroll"
@@ -3049,7 +3047,20 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   * { touch-action: manipulation; }
 
   /* ── PREVENT HORIZONTAL SCROLL ─────────────────────────── */
-  html, body { overflow-x: hidden; max-width: 100%; }
+  /* html ONLY, not body — this used to be `html, body { overflow-x: hidden }`,
+     and that extra `body` is what was silently breaking `position: sticky`
+     for EVERYTHING on mobile (nav included), discovered chasing why nav
+     wasn't staying pinned once the announce bar became non-fixed. Setting a
+     non-visible overflow-x on an element forces its overflow-y to `auto` per
+     the CSS overflow spec (not just on html, which already carries this same
+     overflow-x rule at the top of this file with no ill effect — confirmed
+     desktop's already-sticky nav keeps working fine with it) — but doing
+     that on BODY as well turns body into its own competing scroll container
+     that isn't actually what `window.scrollTo`/touch-scrolling moves, which
+     is what broke sticky's "nearest scrolling ancestor" tracking. html alone
+     already clips horizontal overflow from every descendant; body doesn't
+     need its own copy of the same rule. */
+  html { overflow-x: hidden; max-width: 100%; }
 
   /* ── OVERSCROLL / RUBBER-BAND ─────────────────────────── */
   /* iOS Safari paints the html/body background — the canvas — in the strip the
@@ -3104,60 +3115,31 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* sections with decorative elements that extend beyond their bounds */
   .email-section { overflow: hidden; }
 
-  /* ── ANNOUNCE BAR (task 118, safe-area saga task 120-124) ───────────
-     Joins the fixed top-of-screen stack ABOVE the nav, matching the
-     reference's mobile layout (bar -> header/logo -> hero).
+  /* ── ANNOUNCE BAR (task 118; safe-area saga tasks 120-124; now scrolls
+     away, per direct feedback — only nav stays pinned) ─────────────────
+     Sits ABOVE nav in normal document flow, matching the reference's mobile
+     layout (bar -> header/logo -> hero) on first paint, then scrolls off
+     screen like any other content once you scroll past it — it is NOT
+     position:fixed or sticky (see that rule's own comment).
 
-     .announce-bar (outer) is a neutral (--offwhite) positioning shell:
-     `padding-top` reserves space above `.announce-bar-inner` (the actual
-     orange bar) so the status bar sits on a clean neutral strip instead of
-     directly on the orange.
+     .announce-bar (outer) is a neutral (--offwhite) shell: `padding-top`
+     reserves space above `.announce-bar-inner` (the actual orange bar) so
+     the status bar sits on a clean neutral strip instead of directly on the
+     orange while the bar is still visible at the top. That padding-top is
+     `min(env(safe-area-inset-top, 0px), 59px)` — a real per-device safe-area
+     value, clamped to stop Safari's live toolbar-animation spike from ever
+     visibly moving it. Full reasoning (why flat numbers were tried and
+     abandoned, then env() was dropped entirely over the shake bug, then
+     brought back clamped) lives on that padding-top declaration itself —
+     not repeated here to avoid the two explanations drifting apart.
 
-     That padding-top is a flat number (40px, task 125), not
-     env(safe-area-inset-top) in any form — after three rounds of this
-     looking "fixed" in every check done
-     here but still broken on a real device, task 124 finally caught why on
-     a screen recording: with viewport-fit=cover engaged, current Safari
-     RENEGOTIATES env(safe-area-inset-top) live as its own address bar
-     slides in and out on scroll, spiking to roughly 200px mid-animation
-     before easing back down — the same live-tracking behaviour 100dvh has
-     (see the hero height rule below, task 119), just on a property this was
-     built assuming was a static, hardware-only number. That live spike is
-     what was actually shaking the whole top stack on a fast scroll — not a
-     compositing/paint-lag issue, an env() VALUE issue, and no amount of
-     max()-ing against a floor helps when the live value is too LARGE, not
-     too small. A flat number can't spike, on any device or Safari version;
-     the cost is it no longer grows on a device with a genuinely large
-     notch/Dynamic-Island inset, which is worth it over the shake.
-     .announce-bar-inner's height and this padding-top are the two numbers
-     that set how much of the strip reads as orange vs. neutral — bumped a
-     couple of times per direct feedback (currently 48px / 14px).
-
-     --mob-announce-h is the OUTER box's total height (padding + inner bar)
-     — the one number nav's `top`, .page/#page-home's padding-top and the
-     hero's height calc all read, so this can never leave a gap or overlap
-     against the nav. Must track .announce-bar's own numbers exactly. It's
-     still a calc() (not a plain px value) even though neither term
-     involves env() any more, which is why app.js's hero-height lock keeps
-     measuring the real rendered element instead of parsing this custom
-     property as a number — a CSS custom property is returned as its
-     literal specified TEXT by JS's getComputedStyle().getPropertyValue(),
-     "calc(48px + 14px)" included, never resolved into "62px".
-
-     The bar is the TOPMOST fixed element, which walks straight into the
-     task-91 bug: the OVERSCROLL/RUBBER-BAND rule below matches html/body's
-     background to the NAV's navy so the transient gap iOS opens above fixed
-     elements (when its toolbar collapses/expands — see that rule's own
-     comment for the mechanism) reads as "the header stretching" instead of
-     a mismatched colour flash. With this bar's own neutral strip now
-     sitting above the orange, that same transient gap needs to find
-     neutral, not navy or orange, or it recreates the exact bug with a new
-     pair of colours. Retuning html/body itself isn't an option: the BOTTOM
-     overscroll pull still needs to match navy (the footer's gradient end).
-     So instead .announce-bar::before bleeds the outer shell's own neutral
-     colour upward by 200px, well past anything Safari's toolbar can open,
-     fixed independently of html/body — a gap above the bar always finds
-     neutral already painted there, whatever html/body's colour is doing. */
+     --mob-announce-h is the outer box's total height (padding + inner bar) —
+     read by the hero's height calc and by app.js's hero-height lock (which
+     measures the real rendered element rather than parsing this custom
+     property, since getComputedStyle() on a calc()/env() property returns
+     its literal text, never a resolved number). Must track
+     .announce-bar-inner's height + this padding-top exactly or the hero
+     ends up assuming a different bar height than what's actually rendered. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
        padding-top exactly (44px inner; padding-top is now the clamped
@@ -3175,19 +3157,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
   .announce-bar {
     display: block;
-    position: fixed;
-    top: 0; left: 0; right: 0;
+    /* NOT fixed/sticky (per direct feedback) — this bar should scroll away
+       with the page and never be seen again once you've scrolled past it;
+       only `nav` below stays pinned. Normal static flow does exactly that on
+       its own: it just sits at the top of the document like any other
+       element and scrolls off naturally. height/z-index/the GPU-compositing
+       hint (transform/will-change) that used to live here were all specific
+       to being position:fixed and are gone along with it — a static element
+       needs none of them. */
     height: var(--mob-announce-h);
-    z-index: 901; /* above nav (900) — they never overlap, but keep the stack order explicit */
     background: var(--offwhite);
-    /* GPU-composite this the same way `nav` already is (see that rule): a
-       fixed element that ISN'T on its own compositor layer can visibly lag
-       a frame or two behind the content scrolling under it during a fast
-       fling. Doesn't hurt to keep this, but it turned out NOT to be the
-       cause of the reported shaking — see the padding-top comment below
-       for what actually was. */
-    transform: translateZ(0);
-    will-change: transform;
     /* env(safe-area-inset-top) IS back, but CAPPED with min() — a real photo
        on an actual notch/Dynamic-Island device showed the orange bar (set to
        a flat 0px per the previous round's "no white strip" feedback) running
@@ -3221,14 +3200,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        just caught — so this is the trade being made going forward. */
     padding-top: min(env(safe-area-inset-top, 0px), 59px);
   }
-  .announce-bar::before {
-    content: '';
-    position: fixed;
-    top: -200px; left: 0; right: 0;
-    height: 200px;
-    background: var(--offwhite);
-    z-index: -1;
-  }
+  /* .announce-bar::before (the 200px neutral-colour "bleed up" above the bar)
+     is gone — it existed purely to cover the transient gap iOS's overscroll
+     rubber-banding could open above a FIXED topmost element. Now that the
+     bar scrolls away with the page like any other static content, that gap
+     can't occur above it in the first place; the rule had nothing left to
+     fix. */
   .announce-bar-inner {
     display: flex;
     align-items: center;
@@ -3286,10 +3263,22 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      is simply never a candidate again, on this device, ever. */
   html.offer-claimed .announce-slide--offer { display: none; }
 
-  /* ── NAV: fixed bar, now sitting right under the announce bar ────── */
+  /* ── NAV: the ONLY thing that stays pinned while scrolling ─────────
+     position:sticky, not fixed — per direct feedback, the announce bar above
+     should scroll away and disappear, while nav keeps riding along at the
+     top. Sticky is exactly this: nav sits in normal flow right after the
+     (now also normal-flow) announce bar on first paint — orange above navy,
+     same as before — and only "sticks" to top:0 once scrolling would
+     otherwise carry it past the top of the viewport. No left/right/z-index
+     needed the way position:fixed required them: a sticky element doesn't
+     need to be told its horizontal bounds the way a fixed one did — sticky
+     keeps the width/position it already has from normal flow. z-index kept
+     as-is (still matters for sticky, same as any positioned element — e.g.
+     .nav-search-bar's dropdown is explicitly z-index:905 to render above
+     this). */
   nav {
-    position: fixed;
-    top: var(--mob-announce-h); left: 0; right: 0;
+    position: sticky;
+    top: 0;
     height: var(--mob-nav-h);
     padding: 0 4%;
     z-index: 900;
@@ -3338,20 +3327,25 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mob-menu { display: flex; }
 
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
-  /* padding-top clears the fixed announce bar + nav (task 118: was a flat
-     60px before the bar joined the stack). padding-bottom:0 so a white page
-     never shows a strip below its footer — the footer sits flush and the
-     navy body (var(--navy), which the mobile footer now ends on) extends
-     below it on overscroll with no gap. */
-  .page { padding-top: calc(var(--mob-announce-h) + var(--mob-nav-h)); padding-bottom: 0; }
-  /* Home: push the hero below the fixed stack so the top is never cut off */
-  #page-home { padding-top: calc(var(--mob-announce-h) + var(--mob-nav-h)); }
+  /* No padding-top needed anymore: the announce bar is normal static flow
+     and nav is sticky (not fixed) — both now occupy real space in the
+     document, so .page naturally starts right after them with no gap, the
+     same as it would after any other normal-flow element. The old
+     calc(--mob-announce-h + --mob-nav-h) padding-top existed specifically to
+     compensate for BOTH of them being taken OUT of flow by position:fixed;
+     with neither one fixed anymore, reserving that same space twice would
+     leave an empty gap between nav and the page content. padding-bottom:0 so
+     a white page never shows a strip below its footer — the footer sits
+     flush and the navy body (var(--navy), which the mobile footer now ends
+     on) extends below it on overscroll with no gap. */
+  .page { padding-top: 0; padding-bottom: 0; }
+  #page-home { padding-top: 0; }
   /* Footer-less pages fill the viewport so their own light bg (not the deep-navy body)
      covers the screen on a short page like an empty cart. */
   #page-cart, #page-product { min-height: 100vh; }
 
   /* ── HERO (slideshow background) — task 118: fills essentially the whole
-     screen below the fixed announce-bar+nav stack on first load, text/CTAs
+     screen below the announce-bar+nav stack on first load, text/CTAs
      sitting near the bottom of the image (reference layout), not centered.
 
      100svh, NOT 100dvh (task 119 fix) — 100dvh tracks Safari's toolbar live,
@@ -3364,8 +3358,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      cost is the hero is very slightly shorter than the absolute max once
      the toolbar auto-hides, which is invisible next to a scroll-triggered
      resize. min-height is a floor for short-viewport landscape phones,
-     where 100svh minus the fixed stack could otherwise get uncomfortably
-     short. */
+     where 100svh minus the announce-bar+nav stack could otherwise get
+     uncomfortably short. */
   /* -44px per direct feedback: "a little shorter" than the full remaining
      viewport height. */
   #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h) - 44px) !important; min-height: 420px; }
@@ -3391,8 +3385,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        bottom edge — more padding-bottom on the flex container means less
        room for the last child before it, not more.
        #heroSection's own height is `100svh - stack - 44px` (the hero-shrink
-       feedback), and its top sits right at the bottom of that fixed stack —
-       so the HERO's bottom edge always lands ~44px above the true viewport
+       feedback), and its top sits right at the bottom of the announce-bar+nav
+       stack — so the HERO's bottom edge always lands ~44px above the true viewport
        bottom, regardless of device height. That means the floor this
        padding actually needs is only 96 - 44 = 52px, not 96 — 96 was the
        right number before the hero got shorter, and kept the button sitting

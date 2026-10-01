@@ -383,11 +383,11 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   var announceBar = document.getElementById('announceBar');
 
   function computeHeight() {
-    // --mob-announce-h (styles.css) is now `calc(36px + env(safe-area-inset-top))`
-    // (task 120), so it varies by device and getComputedStyle().getPropertyValue()
-    // on a custom property only ever returns that literal calc()/env() text, not
-    // a resolved number — parseFloat on it would silently become NaN. Measuring
-    // the real element's rendered height sidesteps that entirely and is correct
+    // --mob-announce-h (styles.css) is a calc()/min()/env() expression, so it
+    // varies by device and getComputedStyle().getPropertyValue() on a custom
+    // property only ever returns that literal text, not a resolved number —
+    // parseFloat on it would silently become NaN. Measuring the real
+    // element's rendered height sidesteps that entirely and is correct
     // regardless of how complex the CSS driving it gets.
     var announceH = announceBar ? announceBar.getBoundingClientRect().height : 0;
     var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-nav-h')) || 68;
