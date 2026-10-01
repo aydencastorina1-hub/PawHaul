@@ -427,23 +427,95 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   }
 })();
 
-// ── HERO SLIDESHOW ────────────────────────────────────────────
-// Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
-// looping forever. All 4 are loaded eagerly at high priority (index.html)
-// since the starting slide is randomized — the actual random pick and the
-// matching preload link + initial .active class are decided as early as
-// possible in <head>/inline (see index.html); this just continues the
-// rotation from whichever slide that was.
+// ── HERO VIDEO (task 121) ────────────────────────────────────────────
+// Replaces the old 4-photo crossfade with a single looping muted background
+// video. The <video> in index.html deliberately carries no `autoplay` or
+// `preload` attribute — this decides whether the file is ever fetched or
+// played at all, based on prefers-reduced-motion (task 116's convention:
+// respect reduced motion by never starting the motion in the first place,
+// not by starting it and immediately stopping it). A reduced-motion visitor
+// downloads zero video bytes and keeps the static poster frame forever,
+// which also happens to be the required fallback behaviour.
 (function () {
-  var slides = document.querySelectorAll('#heroSection .hero-slide');
-  if (slides.length < 2) return;
-  var idx = window.__heroStartIdx || 0;
-  setInterval(function () {
-    if (document.hidden) return; // pause in background tabs
-    idx = (idx + 1) % slides.length;
-    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
-  }, 5000);
+  var video = document.getElementById('heroVideo');
+  if (!video) return;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
+  video.preload = 'auto';
+  video.autoplay = true;
+  var playPromise = video.play();
+  // Autoplay can still be rejected in rare cases even when muted+playsinline
+  // (e.g. a very aggressive power-saving mode) — the poster frame just stays
+  // up in that case, same as a reduced-motion visitor sees, so there's
+  // nothing else to handle here.
+  if (playPromise && playPromise.catch) playPromise.catch(function () {});
+  // Pause in background tabs (same reasoning the old interval-based
+  // crossfade had: no point decoding/painting frames nobody can see) and
+  // resume on return.
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) video.pause();
+    else video.play().catch(function () {});
+  });
 })();
+
+// ── ANNOUNCE BAR ROTATOR (task 122, mobile only) ──────────────────────
+// Crossfades through whichever .announce-slide elements are actually visible
+// (desktop never runs this — .announce-rotator stays display:none there, so
+// getElementById still finds it but the loop below finds zero slides and
+// bails). The 10% Off slide is hidden by a plain CSS rule the moment
+// html.offer-claimed is set (pre-paint from localStorage, or live via
+// markOfferClaimed()), and getSlides() re-reads computed style on every
+// tick — so an email submitted mid-rotation drops that slide out within one
+// cycle with no extra code path, the same way the hero crossfade paused
+// itself in background tabs rather than needing a separate "stopped" state.
+(function () {
+  var rotator = document.getElementById('announceRotator');
+  if (!rotator) return;
+  var ROTATE_MS = 3500;
+  var idx = -1;
+
+  function getSlides() {
+    var all = rotator.querySelectorAll('.announce-slide');
+    var visible = [];
+    for (var i = 0; i < all.length; i++) {
+      if (getComputedStyle(all[i]).display !== 'none') visible.push(all[i]);
+    }
+    return visible;
+  }
+
+  function show(nextIdx) {
+    var slides = getSlides();
+    if (!slides.length) return;
+    for (var i = 0; i < slides.length; i++) slides[i].classList.remove('active');
+    idx = ((nextIdx % slides.length) + slides.length) % slides.length;
+    slides[idx].classList.add('active');
+  }
+
+  show(0);
+  setInterval(function () {
+    if (document.hidden) return; // pause in background tabs, same as the hero crossfade did
+    show(idx + 1);
+  }, ROTATE_MS);
+})();
+
+// Tapping the announce bar's "10% Off Your First Order" slide scrolls down to
+// the home page's email-capture section instead of following the bare "#"
+// href (kept as a real href so it still does SOMETHING with JS disabled or
+// mid-load). Offset by both fixed bars' actual rendered height rather than
+// trying to parse --mob-announce-h, which is a calc()/env() expression, not
+// a flat number — same reasoning as the mobile hero-height-lock above.
+function scrollToEmailSection(e) {
+  if (e) e.preventDefault();
+  var target = document.getElementById('emailSection');
+  if (!target) return;
+  var nav = document.getElementById('mainNav');
+  var announceBar = document.getElementById('announceBar');
+  var offset = (nav ? nav.getBoundingClientRect().height : 0) +
+               (announceBar ? announceBar.getBoundingClientRect().height : 0) + 12;
+  var y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: Math.max(y, 0), behavior: reduce ? 'auto' : 'smooth' });
+}
 
 // ── PRODUCT PAGE TITLE ───────────────────────
 var originalShowProduct = showProduct;
@@ -1267,9 +1339,66 @@ function dismissOffer() {
   var overlay = document.getElementById('offerOverlay');
   var popup = document.getElementById('offerPopup');
   if (!overlay || !popup) return;
+  // Read BEFORE removing: dismissOffer() is also called defensively on every
+  // `pageshow` and whenever the offline screen comes up (see those call
+  // sites), specifically because it's supposed to be a harmless no-op when
+  // the popup was never open. Without this check every fresh page load would
+  // "dismiss" an already-closed popup and pop the side tab up unprompted.
+  var wasOpen = popup.classList.contains('active');
   overlay.classList.remove('active');
   popup.classList.remove('active');
   syncOverlayChrome();
+  // task 122: collapse into the side tab instead of vanishing outright — but
+  // ONLY when an actually-open popup just got dismissed without a claim.
+  // dismissOffer() is also what the post-success "Continue Shopping" button
+  // calls; by the time that fires, showOfferResult() has already run
+  // markOfferClaimed(), so offerAlreadyClaimed() is true there too and the
+  // tab correctly never shows.
+  if (wasOpen && !offerAlreadyClaimed()) showOfferSideTab();
+}
+
+// ── GET 10% OFF SIDE TAB (task 122) ───────────────────────────────────
+// A low-friction way back into the offer after a visitor closes the popup
+// without submitting an email, instead of it just disappearing with no
+// trace. Pure in-memory UI state, same as the popup's own "shown this visit"
+// flag — nothing here is written to storage, and nothing needs to be: once
+// claimed, markOfferClaimed()'s permanent flag hides it right alongside
+// everything else offer-related, and a fresh visit just runs the normal
+// popup flow again from the top.
+function showOfferSideTab() {
+  if (offerAlreadyClaimed()) return; // safety net; see markOfferClaimed()
+  var tab = document.getElementById('offerSideTab');
+  if (tab) tab.classList.add('show');
+}
+
+function hideOfferSideTab() {
+  var tab = document.getElementById('offerSideTab');
+  if (tab) tab.classList.remove('show');
+}
+
+// The tab's own small X — dismisses just the tab, same as closing the popup
+// did, without reopening anything.
+function dismissOfferSideTab() {
+  hideOfferSideTab();
+}
+
+// Tapping the tab's label reopens the full popup. The popup's open/close
+// listeners (overlay click, #offerClose, Escape) were already bound the
+// first time reveal() (below) showed it — showOfferSideTab() only ever runs
+// after that has happened at least once — so this just re-triggers the same
+// show animation rather than re-binding anything.
+function reopenOfferFromTab() {
+  hideOfferSideTab();
+  var overlay = document.getElementById('offerOverlay');
+  var popup = document.getElementById('offerPopup');
+  if (!overlay || !popup) return;
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      overlay.classList.add('active');
+      popup.classList.add('active');
+      syncOverlayChrome();
+    });
+  });
 }
 
 // FORMAT validation only — this deliberately does NOT check deliverability or
@@ -1478,6 +1607,10 @@ function markOfferClaimed() {
   // Kill any armed timer too, or a submission through the home-page box would
   // still be followed by the popup firing seconds later on this same view.
   if (typeof window.disarmOfferPopup === 'function') window.disarmOfferPopup();
+  // task 122: the side tab must disappear the instant the offer is claimed,
+  // from either entry point, and never come back — same moment everything
+  // else offer-related (the popup, the home page's 10% off box) retires.
+  hideOfferSideTab();
 }
 
 // Shows ONCE PER VISIT until the visitor actually submits an email: 5s after

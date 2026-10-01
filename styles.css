@@ -231,23 +231,21 @@ body {
    floor survives their higher specificity. */
 input, textarea, select { font-size: 16px; }
 
-/* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
-   rotation driven from app.js). Every slide stays centered on its subject.
-   Light placeholder fallback so a slow-loading image never flashes black/navy
-   before it decodes — the individual .hero-slide <img>s also carry the
-   universal shimmer (see top of file) while their own bytes are in flight. */
+/* HERO VIDEO (task 121) — single looping background video, replacing the old
+   4-photo crossfade. Light placeholder fallback so a slow-loading poster
+   never flashes black/navy before it decodes. No shimmer animation here
+   (unlike the universal `img` rule at the top of this file): the poster
+   attribute itself already shows instantly, and a <video> isn't an <img> so
+   it never picked up that rule in the first place. */
 #heroSection { background: var(--img-placeholder); }
-#heroSection .hero-slide {
+#heroSection .hero-media {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  opacity: 0;
-  transition: opacity 1.5s ease-in-out;
 }
-#heroSection .hero-slide.active { opacity: 1; }
 
 /* CUSTOM CURSOR */
 .cursor { display: none; }
@@ -309,6 +307,9 @@ input, textarea, select { font-size: 16px; }
 .announce-main, .announce-secondary { overflow: hidden; text-overflow: ellipsis; }
 .announce-dot { margin: 0 8px; opacity: 0.6; }
 .announce-secondary { opacity: 0.85; font-weight: 700; }
+/* task 122's rotating single-message bar is mobile-only (≤900px below) — on
+   desktop/tablet this stays hidden and the two spans above are what render. */
+.announce-rotator { display: none; }
 
 /* NAVBAR */
 nav {
@@ -1198,6 +1199,64 @@ nav {
   -webkit-tap-highlight-color: transparent;
 }
 .offer-continue:hover { border-color: var(--orange); background: rgba(232,99,10,0.08); }
+
+/* GET 10% OFF SIDE TAB (task 122) — vertical tab protruding from the left
+   edge, reference-matched structure (their "Spin to Win" tab) but in the
+   site's own navy/orange, not the reference's tan/yellow. Hidden by default
+   and shown only via .show (dismissOffer()/markOfferClaimed() in app.js);
+   mobile-only, same scope as the rest of task 122's reference-match work —
+   see the ≤900px block below for the part that actually reveals it. */
+.offer-side-tab {
+  display: none;
+  position: fixed;
+  top: 58%;
+  left: 0;
+  transform: translateY(-50%) translateX(-100%);
+  z-index: 480;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 0 10px 10px 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  transition: transform 0.3s var(--ease);
+}
+.offer-side-tab.show { transform: translateY(-50%) translateX(0); }
+.offer-side-tab-label {
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  padding: 6px 2px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+.offer-side-tab-label:hover { color: var(--orange-light); }
+.offer-side-tab-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.offer-side-tab-close:hover { background: rgba(255,255,255,0.28); }
+
+@media (max-width: 900px) {
+  .offer-side-tab.show { display: flex; }
+}
 
 /* Near full-screen on mobile: photo banner on top, content below.
    Internal scroll (rare, tiny screens) instead of overflowing the viewport. */
@@ -3150,10 +3209,50 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     animation: none; /* mobile gets no shimmer-sweep */
   }
   .announce-bar-inner::before { display: none; } /* desktop-only shimmer sweep */
-  .announce-main, .announce-secondary { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .announce-main { flex: 1 1 auto; min-width: 0; }
-  .announce-secondary { flex: 0 1 38%; }
+  /* task 122: the desktop two-message layout is replaced on mobile by a
+     single centered rotating message (.announce-rotator below), matching the
+     reference's single-line bar. */
+  .announce-main, .announce-secondary { display: none; }
   .announce-dot { margin: 0 5px; }
+
+  /* ── ANNOUNCE ROTATOR (task 122, mobile only) ─────────────────────────
+     Slides are stacked via absolute positioning inside a relatively-
+     positioned, fixed-height box (height = one line of this font, matching
+     .announce-bar-inner's own font-size) and crossfaded by toggling .active
+     — same fade pattern as the old hero crossfade, just on text instead of
+     photos. JS (announceRotate() in app.js) only ever toggles .active; it
+     never adds/removes slides from the DOM. */
+  .announce-rotator {
+    display: block; /* overrides the desktop default's display:none */
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 16px; /* ~1 line at this bar's 12px font-size + line-height */
+    text-align: center;
+  }
+  .announce-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+  }
+  .announce-slide.active { opacity: 1; pointer-events: auto; }
+  /* The one slide that's a real link (not just text) gets an underline so it
+     reads as tappable, same as any other inline text link on the site. */
+  .announce-slide--offer { text-decoration: underline; text-underline-offset: 2px; }
+  /* Permanent once an email's been submitted (html.offer-claimed — set
+     pre-paint from localStorage and live by markOfferClaimed()): this slide
+     is simply never a candidate again, on this device, ever. */
+  html.offer-claimed .announce-slide--offer { display: none; }
 
   /* ── NAV: fixed bar, now sitting right under the announce bar ────── */
   nav {
@@ -3172,7 +3271,19 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .nav-links { display: none; }
   .nav-full { display: none; }
   .nav-search-btn { display: flex; }
-  .nav-center { justify-content: center; }
+  /* Header row (task 122): hamburger / centered logo / search+cart, matching
+     the reference structure — was logo-left / search+cart+hamburger-right.
+     The hamburger moved to be nav's first DOM child (index.html) rather than
+     just reordered here, so this is purely "hide the now-empty nav-center"
+     plus letting .logo itself take the freed middle space and center its own
+     content there; .nav-right's width is NOT identical to the hamburger's
+     (search+cart together run wider than one 40px icon button), so the logo
+     reads as centered-in-the-remaining-space rather than optically centered
+     on the full screen width — close enough to the reference at a glance,
+     and exact optical centering would need the two side groups to match
+     widths, which they structurally don't (one icon vs two). */
+  .nav-center { display: none; }
+  .logo { flex: 1; justify-content: center; }
   .cart-btn-text { display: none; }
   /* Cart becomes a plain white icon with an orange count badge (Ruffwear-style) */
   .cart-btn { background: none; color: #fff; padding: 8px; font-size: 22px; box-shadow: none; }
@@ -3212,12 +3323,18 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      where 100svh minus the fixed stack could otherwise get uncomfortably
      short. */
   #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h)) !important; min-height: 420px; }
-  #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+  #heroSection .hero-media { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   .hero-copy {
     align-items: center !important;
     text-align: center !important;
-    justify-content: flex-end !important;
+    /* task 122: headline/sub now live at the TOP of the hero and .hero-cta at
+       the BOTTOM (reference layout) — supersedes task 118's bottom-clustered
+       layout. .hero-text and .hero-cta are .hero-copy's only two flex
+       children (see the wrapper div in index.html), so space-between puts
+       one at each end instead of drifting the subtext to the middle. */
+    justify-content: space-between !important;
     padding: 0 6% !important;
+    padding-top: 28px !important;
     /* Clears the floating chat launcher (#chatToggle: 58px tall, 24px off the
        bottom — index.html — so its top edge sits 82px up from the screen
        bottom) with a 14px buffer, so the bottom-right CTA button never sits
@@ -3227,9 +3344,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     padding-bottom: 96px !important;
   }
   #heroSection .hero-overlay {
-    /* Stronger and taller at the bottom now that the copy lives there,
-       instead of a middle-weighted gradient built for centered text. */
-    background: linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.72) 100%) !important;
+    /* Dark at BOTH ends now (task 122 moved the headline to the top, the CTA
+       stays at the bottom) — a vignette rather than the old bottom-only
+       gradient built for copy clustered at the bottom. */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0.12) 58%, rgba(0,0,0,0.72) 100%) !important;
   }
   #heroSection h1 { font-size: clamp(26px, 8vw, 40px) !important; }
   #heroSection p { max-width: 290px !important; text-align: center !important; margin-left: auto !important; margin-right: auto !important; }
@@ -3593,14 +3711,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    Mobile (≤767px) is final and untouched by construction.
    ============================================================ */
 @media (min-width: 768px) {
-  /* IMAGE CROPS — the hero slides include two PORTRAIT photos; at wide
-     aspect ratios a center-center crop showed sky instead of the subject.
-     Per-slide object-position keeps the dog/person in frame. !important
-     is required to beat the ≤900 mobile block's own !important rule in
-     the 768–900 overlap (these selectors are more specific + later). */
-  #heroSection .hero-slide:nth-of-type(1) { object-position: center 70% !important; } /* man + dog low in frame, sky above */
-  #heroSection .hero-slide:nth-of-type(3) { object-position: center 45% !important; } /* shaking dog's ears clipped at top */
-  #heroSection .hero-slide:nth-of-type(4) { object-position: center 72% !important; } /* small dog near bottom edge */
+  /* IMAGE CROPS */
   .lifestyle-banner img { object-position: center 38%; }  /* dogs' heads sit above center */
   .about-hero-img { object-position: center 60%; }        /* running puppy sits below center */
 
