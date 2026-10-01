@@ -3160,11 +3160,17 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (44px inner; padding-top now 0 — the white strip
-       above the bar was removed entirely per direct feedback, was 20px) or
+       padding-top exactly (44px inner; padding-top is now the clamped
+       env(safe-area-inset-top) — see that rule's comment for why — so this
+       variable is itself a live, per-device value, not a flat number) or
        nav/page/hero all end up assuming a shorter bar than what's actually
-       rendered. */
-    --mob-announce-h: calc(44px + 0px);
+       rendered. This is fine for CSS consumers (anything using var()) since
+       the browser resolves it like any other value; it's NOT fine to
+       parseFloat() in JS (a custom property's computed value is always the
+       literal text, calc()/env() included) — which is exactly why the
+       mobile hero-height lock in app.js measures the real rendered
+       #announceBar element instead of reading this variable. */
+    --mob-announce-h: calc(44px + min(env(safe-area-inset-top, 0px), 59px));
     --mob-nav-h: 68px;
   }
   .announce-bar {
@@ -3182,31 +3188,38 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        for what actually was. */
     transform: translateZ(0);
     will-change: transform;
-    /* Flat number, NOT env(safe-area-inset-top) in any form (task 124) —
-       this is why the whole stack was visibly shaking on a fast scroll.
-       Traced it frame-by-frame in a screen recording: env(safe-area-inset-
-       top) isn't the static, hardware-only number this was built assuming
-       it was. With viewport-fit=cover engaged, current Safari renegotiates
-       it LIVE as its own address bar slides in and out on scroll — spiking
-       to roughly 200px mid-animation before easing back down — the same
-       live-tracking behaviour 100dvh has (task 119's hero fix, same root
-       category of bug), just on a property nobody expected to move at all.
-       Every previous round here (max() with a floor, colour swaps) still
-       read the live env() value and inherited every spike, since max()
-       only guards against the value being too SMALL, never too LARGE. The
-       fix is to stop reading it at all: a flat, unconditional number can
-       never spike, on any device, in any Safari version. The one real cost
-       is this no longer grows on a device with a genuinely large notch/
-       Dynamic-Island inset — worth it over the shake.
-       0px (per direct follow-up feedback: no white strip at all, shift
-       everything up — was 20px, before that 40px (task 126)). This gives up
-       the original task 120 goal entirely (a neutral strip so the iOS status
-       bar doesn't sit directly on the orange bar) in favor of what was
-       explicitly asked for here; if that status-bar overlap ever comes back
-       up, the fix is reopening this exact tradeoff, not reintroducing
-       env(safe-area-inset-top) — that's still the flat-number constraint
-       from the shake-bug fix above, unchanged by this value being 0. */
-    padding-top: 0px;
+    /* env(safe-area-inset-top) IS back, but CAPPED with min() — a real photo
+       on an actual notch/Dynamic-Island device showed the orange bar (set to
+       a flat 0px per the previous round's "no white strip" feedback) running
+       straight up through the status bar and into the camera cutout itself.
+       A flat number can't know how big any given device's notch is, so "0"
+       was simply wrong on that hardware, not just a style choice. The
+       feedback since has been explicit: go right up to the real safe-area
+       boundary — "the limit" — automatically, per device, but never past it,
+       and never with a manually-chosen white gap.
+
+       The reason this was ripped out before (task 124) still stands: with
+       viewport-fit=cover engaged, Safari RENEGOTIATES env(safe-area-inset-
+       top) LIVE as its own address bar slides in and out on scroll, spiking
+       to roughly 200px mid-animation on top of whatever the device's real
+       resting inset is — traced frame-by-frame in a screen recording at the
+       time. The old fix (previous round, and task 124 before it) was to
+       stop reading the value at all. The fix THIS round is narrower: clamp
+       it instead. min(env(...), 59px) — 59px covers every current notch/
+       Dynamic-Island inset (typically 44–59px) — means the live spike can
+       shoot up to 200px internally and the clamped OUTPUT never moves past
+       59px regardless, since min() only ever lets the SMALLER of the two
+       numbers through. On any device whose resting inset is already at or
+       above the cap (every current notch/Dynamic-Island iPhone), the clamped
+       value never changes during the spike at all — there is nothing left
+       to shake. The cost is scoped to devices with NO notch (inset normally
+       0): there the clamped value can still move between 0 and 59 during
+       the animation, a real but far smaller version of the original 200px
+       jump, and only on hardware that's now several generations old. Flat
+       numbers (including flat 0) remain wrong on every device whose actual
+       inset isn't exactly that number — which is the bug a real screenshot
+       just caught — so this is the trade being made going forward. */
+    padding-top: min(env(safe-area-inset-top, 0px), 59px);
   }
   .announce-bar::before {
     content: '';
