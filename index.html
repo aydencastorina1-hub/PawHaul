@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=152" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=153" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -211,14 +211,23 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
      .announce-main/.announce-secondary are mutually exclusive via CSS at the
      900px breakpoint, never both visible at once.
 
-     All 3 rotator slides are always in the DOM; the first (10% Off) is a
-     real link rather than being injected/removed by JS, so it works even
-     before app.js has run. html.offer-claimed (set pre-paint from
-     localStorage — see the <head> script — and live by markOfferClaimed())
-     hides it with a plain CSS rule, and announceRotate() (app.js) treats a
-     hidden slide as absent by checking computed style rather than ever
-     touching the DOM itself — so an email submitted mid-rotation drops the
-     slide out of the cycle immediately with no separate code path. -->
+     All rotator slides are always in the DOM; the first (10% Off) is a real
+     link rather than being injected/removed by JS, so it works even before
+     app.js has run. html.offer-claimed (set pre-paint from localStorage —
+     see the <head> script — and live by markOfferClaimed()) hides it with a
+     plain CSS rule, and announceRotate() (app.js) treats a hidden slide as
+     absent by checking computed style rather than ever touching the DOM
+     itself — so an email submitted mid-rotation drops the slide out of the
+     cycle immediately with no separate code path. announceRotate() reads
+     however many .announce-slide elements exist at the time, so adding more
+     (per direct feedback: fold the trust bar's own messages into this same
+     rotation) needed no JS change at all.
+
+     The trust bar below (.trust-bar) is hidden on mobile now that its
+     content lives here instead — desktop keeps it exactly as it was. -->
+<!-- The trust bar's own icons live only in that desktop section — these
+     slides are plain text, matching the rest of the rotator rather than
+     trying to fit an icon into a single centered line. -->
 <!-- SAFE-AREA NOTCH STRIP (mobile only) — a plain, always-present white strip
      pinned to the literal top of the viewport, exactly --safe-top tall
      (styles.css: min(env(safe-area-inset-top,0px),59px), same clamped value
@@ -240,7 +249,10 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="announce-rotator" id="announceRotator" aria-live="polite">
       <a href="#emailSection" class="announce-slide announce-slide--offer active" onclick="scrollToEmailSection(event)">Get 10% Off Your First Order</a>
       <span class="announce-slide">Free Shipping On All Orders</span>
+      <span class="announce-slide">All Dog Sizes</span>
+      <span class="announce-slide">Secure Checkout</span>
       <span class="announce-slide">30-Day Returns <span class="announce-dot">•</span> New Products Added Regularly</span>
+      <span class="announce-slide">Easy Payments</span>
     </div>
   </div>
 </div>

@@ -3251,6 +3251,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      reference's single-line bar. */
   .announce-main, .announce-secondary { display: none; }
   .announce-dot { margin: 0 5px; }
+  /* The trust bar's own messages (Free Shipping, All Dog Sizes, Secure
+     Checkout, 30 Day Returns, Easy Payments) now rotate through the
+     announce bar above instead, per direct feedback — this section is
+     redundant on mobile and hidden; desktop keeps it exactly as it was. */
+  .trust-bar { display: none; }
 
   /* ── ANNOUNCE ROTATOR (task 122, mobile only) ─────────────────────────
      Slides are stacked via absolute positioning inside a relatively-
