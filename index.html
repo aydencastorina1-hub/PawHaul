@@ -184,7 +184,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=140" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=141" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -424,6 +424,29 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></span> 30 Day Returns</div>
     <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Easy Payments</div>
   </div>
+
+  <!-- BEST PRODUCT — first section below the fold on the homepage. Spotlights the
+       2-in-1 Dog Water Bottle (our best-selling product) with a cutout product shot
+       (background keyed to transparent from the pink listing photo, see
+       images/products/water-bottle-cutout*.{png,webp}) instead of a flat product photo,
+       sales copy on why hydration gear is a must-carry rather than a nice-to-have, a
+       primary "Shop Now" CTA straight to the product page, and a secondary "Read More"
+       CTA to the blog (the hydration-focused posts in blog.js) for people who want the
+       reasoning before they buy. -->
+  <section class="best-product-section">
+    <div class="bp-image-wrap">
+      <img class="bp-image" src="/images/products/water-bottle-cutout-800.webp" srcset="/images/products/water-bottle-cutout-500.webp 500w, /images/products/water-bottle-cutout-800.webp 800w, /images/products/water-bottle-cutout-1100.webp 1100w" sizes="(max-width: 900px) 70vw, 480px" alt="PawHaul 2-in-1 Dog Water Bottle" loading="lazy" decoding="async" width="871" height="1171" onclick="goToProductLink(event,1)" style="cursor:pointer;">
+    </div>
+    <div class="bp-content">
+      <div class="section-tag" style="background:rgba(255,255,255,0.18);color:white;">Our Best Product</div>
+      <h2 class="bp-title">The Bottle That Ends<br>"We Forgot Water."</h2>
+      <p class="bp-desc">Dogs dehydrate on walks whether or not it's obvious — and a bowl at the bottom of your bag or a bottle you have to cup your hand under means water gets skipped. The 2-in-1 Dog Water Bottle fixes that with a flip-out drinking trough and a sealed food compartment in one leak-proof body, so there's never a reason to cut a walk short again.</p>
+      <div class="bp-actions">
+        <a class="btn-white" href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">Shop Now →</a>
+        <a class="btn-outline-white" href="/blog" onclick="goTo(event,'blog')">Read More</a>
+      </div>
+    </div>
+  </section>
 
 
   <!-- WHY PAWHAUL -->

@@ -869,6 +869,74 @@ nav {
    this site. See variantPriceHtml in products.js. */
 .price-from { font-size: 11px; color: var(--gray); font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
 
+/* BEST PRODUCT — spotlight section right under the trust bar, before WHY PAWHAUL.
+   Orange background like the rest of the brand's CTA sections; the product shot
+   is a transparent cutout (images/products/water-bottle-cutout*) so it reads as a
+   floating hero object rather than a boxed-in product photo. */
+.best-product-section {
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  padding: 90px 6%;
+  overflow: hidden;
+}
+
+.bp-image-wrap { flex: 0 0 auto; display: flex; justify-content: center; }
+.bp-image {
+  width: 340px;
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 30px 40px rgba(0,0,0,0.25));
+  transform: rotate(-4deg);
+  /* This is a real cutout with transparent pixels (not a photo that fills its
+     box once decoded), so the sitewide `img` shimmer-placeholder background
+     would otherwise show through it forever instead of just until it loads. */
+  background: none;
+  animation: none;
+}
+
+.bp-content { max-width: 520px; color: white; }
+.bp-title {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3.6vw, 42px);
+  line-height: 1.15;
+  margin-bottom: 18px;
+  letter-spacing: 0.01em;
+}
+.bp-desc {
+  font-size: 16.5px;
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+.bp-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn-outline-white {
+  display: inline-block;
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255,255,255,0.7);
+  text-decoration: none;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease);
+}
+.btn-outline-white:hover { background: rgba(255,255,255,0.12); border-color: white; transform: translateY(-3px); }
+
+@media (max-width: 900px) {
+  .best-product-section { flex-direction: column; text-align: center; gap: 36px; padding: 64px 6%; }
+  .bp-content { max-width: 100%; }
+  .bp-actions { justify-content: center; }
+  .bp-image { width: 230px; transform: rotate(-3deg); }
+}
+
 /* WHY SECTION */
 .why-section {
   /* Subtle depth: barely-there navy gradient instead of a flat fill.
