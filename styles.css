@@ -3365,16 +3365,21 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     padding-top: 64px !important;
     /* Clears the floating chat launcher (#chatToggle: 58px tall, 24px off the
        bottom — index.html — so its top edge sits 82px up from the screen
-       bottom) with a 14px buffer, so the CTA button never sits under it.
+       bottom) with a 14px buffer: the button's bottom edge must stay at or
+       above (viewport bottom - 96px).
        NOTE: a BIGGER number here pushes the button further UP, away from the
        bottom edge — more padding-bottom on the flex container means less
-       room for the last child before it, not more. A previous round bumped
-       this to 120px meaning to push the button lower and got the direction
-       backwards; per direct follow-up feedback ("towards the bottom") this
-       is back down near the 96px floor, which is the closest to the true
-       bottom edge the button can safely sit without touching the chat
-       button. */
-    padding-bottom: 96px !important;
+       room for the last child before it, not more.
+       #heroSection's own height is `100svh - stack - 44px` (the hero-shrink
+       feedback), and its top sits right at the bottom of that fixed stack —
+       so the HERO's bottom edge always lands ~44px above the true viewport
+       bottom, regardless of device height. That means the floor this
+       padding actually needs is only 96 - 44 = 52px, not 96 — 96 was the
+       right number before the hero got shorter, and kept the button sitting
+       well short of the hero's own bottom edge afterward ("in the middle of
+       empty space" per feedback) even though it was still technically clear
+       of the chat button. 56px keeps a small margin over that 52px floor. */
+    padding-bottom: 56px !important;
   }
   #heroSection .hero-overlay {
     /* Dark at BOTH ends now (task 122 moved the headline to the top, the CTA
