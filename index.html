@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=143" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=144" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -224,24 +224,29 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <span class="announce-main">Free Shipping On All Orders <span class="announce-dot">•</span> 30-Day Returns</span>
     <span class="announce-secondary">New Walk Gear Added Regularly</span>
     <div class="announce-rotator" id="announceRotator" aria-live="polite">
-      <a href="#emailSection" class="announce-slide announce-slide--offer active" onclick="scrollToEmailSection(event)">10% Off Your First Order</a>
-      <span class="announce-slide">Free Shipping</span>
+      <a href="#emailSection" class="announce-slide announce-slide--offer active" onclick="scrollToEmailSection(event)">Get 10% Off Your First Order</a>
+      <span class="announce-slide">Free Shipping On All Orders</span>
       <span class="announce-slide">30-Day Returns <span class="announce-dot">•</span> New Products Added Regularly</span>
     </div>
   </div>
 </div>
 
-<!-- NAVBAR — on mobile (task 122) this reorders to hamburger / centered logo /
-     search+cart via CSS `order` in the ≤900px block below; the hamburger is
-     moved to be the FIRST element in the DOM (rather than just re-ordered
-     visually) so the mobile tab/reading order actually matches what's on
-     screen, instead of a sighted-only visual reorder that leaves a screen
-     reader hitting the logo and both icon buttons before ever reaching the
-     menu button that visually comes first. -->
+<!-- NAVBAR — on mobile (task 122/123) this reorders to hamburger+search /
+     centered logo / cart. The hamburger AND the search button are both moved
+     to be nav's first two DOM children (rather than just re-ordered
+     visually), same reasoning as before: mobile tab/reading order should
+     match what's on screen instead of a sighted-only visual reorder. -->
 <nav id="mainNav">
   <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
+  <button class="nav-search-btn" id="navSearchBtn" onclick="toggleSearch()" aria-label="Search">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  </button>
+  <!-- Logo: desktop keeps icon-then-wordmark (paw-circle, "PawHaul"); mobile
+       (task 123) visually swaps that to wordmark-then-icon via CSS `order`
+       on the two inner elements, not by reordering them in the DOM — the
+       link's accessible name ("PawHaul") is unaffected either way. -->
   <a class="logo" href="/" onclick="goTo(event,'home');closeMobileMenu();closeSearch()">
     <div class="logo-circle"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="26" height="26" fill="white"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <span class="logo-text">Paw<span>Haul</span></span>
@@ -257,9 +262,6 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     </ul>
   </div>
   <div class="nav-right">
-    <button class="nav-search-btn" id="navSearchBtn" onclick="toggleSearch()" aria-label="Search">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    </button>
     <a class="cart-btn" href="/cart" onclick="goTo(event,'cart')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;vertical-align:-0.18em" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></a>
   </div>
 </nav>
