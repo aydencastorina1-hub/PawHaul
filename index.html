@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=150" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=152" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -219,6 +219,20 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
      hidden slide as absent by checking computed style rather than ever
      touching the DOM itself — so an email submitted mid-rotation drops the
      slide out of the cycle immediately with no separate code path. -->
+<!-- SAFE-AREA NOTCH STRIP (mobile only) — a plain, always-present white strip
+     pinned to the literal top of the viewport, exactly --safe-top tall
+     (styles.css: min(env(safe-area-inset-top,0px),59px), same clamped value
+     announce-bar's own padding uses). Added after direct feedback that the
+     area behind the status bar/notch was showing navy instead of white once
+     the announce bar stopped being position:fixed (it can now scroll away,
+     leaving nav — which has no safe-area padding of its own — as the
+     topmost thing under the notch). Rather than teach nav its own
+     scroll-dependent safe-area treatment (sticky has no CSS way to know
+     "I am currently stuck" without JS), this is simpler and fully decoupled
+     from scroll state: a fixed strip that's always there, above everything,
+     always the same colour, whether the announce bar or nav happens to be
+     underneath it at any given scroll position. -->
+<div class="safe-top-strip" aria-hidden="true"></div>
 <div class="announce-bar" id="announceBar">
   <div class="announce-bar-inner">
     <span class="announce-main">Free Shipping On All Orders <span class="announce-dot">•</span> 30-Day Returns</span>

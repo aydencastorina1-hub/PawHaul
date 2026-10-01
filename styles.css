@@ -310,6 +310,12 @@ input, textarea, select { font-size: 16px; }
 /* task 122's rotating single-message bar is mobile-only (≤900px below) — on
    desktop/tablet this stays hidden and the two spans above are what render. */
 .announce-rotator { display: none; }
+/* The notch-safe-area strip is mobile-only too — desktop's announce bar was
+   never position:fixed (so it never needed this), and --safe-top itself is
+   only defined inside the mobile :root block below, so without this rule
+   the div would render at `height:auto` on desktop (harmlessly collapsing
+   to 0 in practice, but relying on that rather than saying so explicitly). */
+.safe-top-strip { display: none; }
 
 /* NAVBAR */
 nav {
@@ -3141,19 +3147,41 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      .announce-bar-inner's height + this padding-top exactly or the hero
      ends up assuming a different bar height than what's actually rendered. */
   :root {
+    /* The clamped safe-area inset (see .announce-bar's padding-top for the
+       full reasoning) — one source of truth, read by .announce-bar,
+       --mob-announce-h, and .safe-top-strip below, so all three can never
+       drift to slightly different heights. */
+    --safe-top: min(env(safe-area-inset-top, 0px), 59px);
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (44px inner; padding-top is now the clamped
-       env(safe-area-inset-top) — see that rule's comment for why — so this
-       variable is itself a live, per-device value, not a flat number) or
-       nav/page/hero all end up assuming a shorter bar than what's actually
-       rendered. This is fine for CSS consumers (anything using var()) since
-       the browser resolves it like any other value; it's NOT fine to
-       parseFloat() in JS (a custom property's computed value is always the
-       literal text, calc()/env() included) — which is exactly why the
-       mobile hero-height lock in app.js measures the real rendered
-       #announceBar element instead of reading this variable. */
-    --mob-announce-h: calc(44px + min(env(safe-area-inset-top, 0px), 59px));
+       padding-top exactly (44px inner; padding-top is now --safe-top — see
+       that rule's comment for why — so this variable is itself a live,
+       per-device value, not a flat number) or nav/page/hero all end up
+       assuming a shorter bar than what's actually rendered. This is fine for
+       CSS consumers (anything using var()) since the browser resolves it
+       like any other value; it's NOT fine to parseFloat() in JS (a custom
+       property's computed value is always the literal text, calc()/env()
+       included) — which is exactly why the mobile hero-height lock in
+       app.js measures the real rendered #announceBar element instead of
+       reading this variable. */
+    --mob-announce-h: calc(44px + var(--safe-top));
     --mob-nav-h: 68px;
+  }
+  /* SAFE-AREA NOTCH STRIP — see the matching comment on this element in
+     index.html for why this exists (nav, now sticky instead of fixed, has
+     no safe-area awareness of its own and would otherwise sit navy right up
+     under the status bar once the announce bar has scrolled away). Always
+     fixed at the literal top of the viewport, regardless of scroll position
+     or what's rendered beneath it — when the announce bar is still visible
+     underneath, this just harmlessly overlays the same colour its own
+     padding-top already paints there. */
+  .safe-top-strip {
+    display: block;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--safe-top);
+    background: var(--offwhite);
+    z-index: 950; /* above nav (900) and the announce bar (normal flow, no z-index) */
+    pointer-events: none;
   }
   .announce-bar {
     display: block;
@@ -3198,7 +3226,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        numbers (including flat 0) remain wrong on every device whose actual
        inset isn't exactly that number — which is the bug a real screenshot
        just caught — so this is the trade being made going forward. */
-    padding-top: min(env(safe-area-inset-top, 0px), 59px);
+    padding-top: var(--safe-top);
   }
   /* .announce-bar::before (the 200px neutral-colour "bleed up" above the bar)
      is gone — it existed purely to cover the transient gap iOS's overscroll
