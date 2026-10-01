@@ -3160,11 +3160,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (44px inner — skinnier per direct feedback, was
-       56px from task 125; flat 20px padding, no env() involved in either
-       number, ever, per task 124's shake fix) or nav/page/hero all end up
-       assuming a shorter bar than what's actually rendered. */
-    --mob-announce-h: calc(44px + 20px);
+       padding-top exactly (44px inner; padding-top now 0 — the white strip
+       above the bar was removed entirely per direct feedback, was 20px) or
+       nav/page/hero all end up assuming a shorter bar than what's actually
+       rendered. */
+    --mob-announce-h: calc(44px + 0px);
     --mob-nav-h: 68px;
   }
   .announce-bar {
@@ -3198,8 +3198,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        never spike, on any device, in any Safari version. The one real cost
        is this no longer grows on a device with a genuinely large notch/
        Dynamic-Island inset — worth it over the shake.
-       20px (task 126: was 40px, per direct feedback — less white). */
-    padding-top: 20px;
+       0px (per direct follow-up feedback: no white strip at all, shift
+       everything up — was 20px, before that 40px (task 126)). This gives up
+       the original task 120 goal entirely (a neutral strip so the iOS status
+       bar doesn't sit directly on the orange bar) in favor of what was
+       explicitly asked for here; if that status-bar overlap ever comes back
+       up, the fix is reopening this exact tradeoff, not reintroducing
+       env(safe-area-inset-top) — that's still the flat-number constraint
+       from the shake-bug fix above, unchanged by this value being 0. */
+    padding-top: 0px;
   }
   .announce-bar::before {
     content: '';
