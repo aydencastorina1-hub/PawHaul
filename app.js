@@ -391,7 +391,14 @@ document.addEventListener('touchstart', function () {}, { passive: true });
     // regardless of how complex the CSS driving it gets.
     var announceH = announceBar ? announceBar.getBoundingClientRect().height : 0;
     var navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--mob-nav-h')) || 68;
-    return Math.max(window.innerHeight - announceH - navH, 420); // 420 matches the CSS min-height floor
+    // The extra -44 must match styles.css's #heroSection height calc() EXACTLY
+    // (both shrink the hero the same "a little shorter" amount per direct
+    // feedback) — this inline, !important JS value is what the browser
+    // actually renders, so if only the CSS calc() changes this silently wins
+    // over it and the hero looks untouched, which is exactly what happened
+    // the first time this number changed here without updating this file too.
+    var SHRINK_PX = 44;
+    return Math.max(window.innerHeight - announceH - navH - SHRINK_PX, 420); // 420 matches the CSS min-height floor
   }
 
   function apply() {

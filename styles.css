@@ -3160,10 +3160,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      neutral already painted there, whatever html/body's colour is doing. */
   :root {
     /* Must track .announce-bar-inner's height + .announce-bar's own
-       padding-top exactly (task 126: 56px inner, flat 20px padding — no
-       env() involved in either number, ever, per task 124) or nav/page/hero
-       all end up assuming a shorter bar than what's actually rendered. */
-    --mob-announce-h: calc(56px + 20px);
+       padding-top exactly (44px inner — skinnier per direct feedback, was
+       56px from task 125; flat 20px padding, no env() involved in either
+       number, ever, per task 124's shake fix) or nav/page/hero all end up
+       assuming a shorter bar than what's actually rendered. */
+    --mob-announce-h: calc(44px + 20px);
     --mob-nav-h: 68px;
   }
   .announce-bar {
@@ -3212,7 +3213,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 56px; /* task 125: was 48px — grown alongside the strip above it so the two stay in the reference's proportion, not shrinking to a sliver by comparison */
+    height: 44px; /* skinnier per direct feedback — was 56px (task 125) */
     box-sizing: border-box;
     padding: 0 4%;
     font-size: 12px;
@@ -3345,7 +3346,9 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      resize. min-height is a floor for short-viewport landscape phones,
      where 100svh minus the fixed stack could otherwise get uncomfortably
      short. */
-  #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h)) !important; min-height: 420px; }
+  /* -44px per direct feedback: "a little shorter" than the full remaining
+     viewport height. */
+  #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h) - 44px) !important; min-height: 420px; }
   #heroSection .hero-media { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   .hero-copy {
     align-items: center !important;
@@ -3362,13 +3365,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     padding-top: 64px !important;
     /* Clears the floating chat launcher (#chatToggle: 58px tall, 24px off the
        bottom — index.html — so its top edge sits 82px up from the screen
-       bottom) with a 14px buffer, so the bottom-right CTA button never sits
-       under it. Without this the hero's own bottom padding would be free to
-       go much smaller and still look "near the bottom" like the reference,
-       but the chat button is fixed and always wins that corner. Bumped
-       further (task 123) now that it's the only CTA button, so it sits
-       clearly lower rather than right at that minimum clearance. */
-    padding-bottom: 120px !important;
+       bottom) with a 14px buffer, so the CTA button never sits under it.
+       NOTE: a BIGGER number here pushes the button further UP, away from the
+       bottom edge — more padding-bottom on the flex container means less
+       room for the last child before it, not more. A previous round bumped
+       this to 120px meaning to push the button lower and got the direction
+       backwards; per direct follow-up feedback ("towards the bottom") this
+       is back down near the 96px floor, which is the closest to the true
+       bottom edge the button can safely sit without touching the chat
+       button. */
+    padding-bottom: 96px !important;
   }
   #heroSection .hero-overlay {
     /* Dark at BOTH ends now (task 122 moved the headline to the top, the CTA
