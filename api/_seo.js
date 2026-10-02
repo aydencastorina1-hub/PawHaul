@@ -293,8 +293,8 @@ const PRODUCT_COPY = {
     description: 'Portable 2-in-1 dog water bottle with a flip-out drinking spout and a sealed dry food compartment. 350ml and 550ml, BPA-free. From $16.99 with free shipping.'
   },
   3: {
-    title: 'Collapsible Dog Bowl — Portable Silicone Travel Bowl',
-    description: 'Food-grade silicone dog bowl that folds flat and pops open in seconds. Built-in carabiner clips to a leash or belt loop. $11.99 with free shipping.'
+    title: 'Poop Bag Clip — Hands-Free Waste Bag Carrier',
+    description: 'Hands-free silicone clip that holds a used poop bag securely on your leash or belt. Six colours. $6.99 with free shipping.'
   },
   10: {
     title: 'LED Flashlight Retractable Dog Leash — Light Up Night Lead',
@@ -313,12 +313,12 @@ const PRODUCT_COPY = {
 const PAGE_COPY = {
   home: {
     title: 'PawHaul — Dog Walk Gear: Leashes, Water Bottles & LED Collars',
-    description: 'Everything for a better dog walk: leak-proof water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps. Free shipping, 30-day returns.',
+    description: 'Everything for a better dog walk: leak-proof water bottles, hands-free poop bag clips, LED safety collars, a light-up retractable leash and anti-drop wrist straps. Free shipping, 30-day returns.',
     path: '/'
   },
   shop: {
-    title: 'Shop All Dog Walk Gear — Water Bottles, Bowls, LED Collars & Leashes',
-    description: 'Browse all five PawHaul walk essentials: the 2-in-1 water bottle, collapsible bowl, LED dog collar, LED flashlight retractable leash and anti-drop wrist strap. Free shipping.',
+    title: 'Shop All Dog Walk Gear — Water Bottles, Poop Bag Clips, LED Collars & Leashes',
+    description: 'Browse all five PawHaul walk essentials: the 2-in-1 water bottle, poop bag clip, LED dog collar, LED flashlight retractable leash and anti-drop wrist strap. Free shipping.',
     path: '/shop'
   },
   about: {
@@ -333,7 +333,7 @@ const PAGE_COPY = {
   },
   bundles: {
     title: 'Dog Walk Gear Bundles — 20% Off',
-    description: 'PawHaul bundles: the LED collar with the LED flashlight leash, the 2-in-1 water bottle with the collapsible bowl, or the LED flashlight leash with the anti-drop wrist strap. 20% off each bundle, applied automatically at checkout.',
+    description: 'PawHaul bundles: the LED collar with the LED flashlight leash, the 2-in-1 water bottle with the poop bag clip, or the LED flashlight leash with the anti-drop wrist strap. 20% off each bundle, applied automatically at checkout.',
     path: '/bundles'
   },
   blog: {
@@ -359,7 +359,7 @@ function organizationSchema() {
     url: ORIGIN,
     logo: ORIGIN + '/favicon-192.png',
     email: SUPPORT_EMAIL,
-    description: 'PawHaul sells dog walk gear — 2-in-1 water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps.',
+    description: 'PawHaul sells dog walk gear — 2-in-1 water bottles, poop bag clips, LED safety collars, a light-up retractable leash and anti-drop wrist straps.',
     contactPoint: {
       '@type': 'ContactPoint',
       contactType: 'customer support',

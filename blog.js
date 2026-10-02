@@ -80,7 +80,7 @@ var blogPosts = [
 
 <h2>Free your hands</h2>
 <p>The second friction point is more mundane: you cannot train a dog while juggling. Loose-leash work needs one hand on the leash and one hand free for treats and for marking good position. If one hand is permanently occupied by a bag of waste, the training simply does not happen.</p>
-<p>This is worth solving properly. Tie the used bag off and get it out of your hand — a zipped jacket pocket or a small bag does the job — and keep the spare bags somewhere you can reach without stopping. An <a href="/product/anti-drop-leash-wrist-strap">anti-drop wrist strap</a> helps here too: with the handle secured to your wrist, you can loosen your grip to reach for a treat without any risk of dropping the leash. Small things — but they are the difference between doing the routine and skipping it.</p>
+<p>This is worth solving properly. A <a href="/product/poop-bag-clip">hands-free poop bag clip</a> takes the used bag off your hand and onto the leash, and an <a href="/product/anti-drop-leash-wrist-strap">anti-drop wrist strap</a> helps too: with the handle secured to your wrist, you can loosen your grip to reach for a treat without any risk of dropping the leash. Small things — but they are the difference between doing the routine and skipping it.</p>
 
 <h2>What not to do</h2>
 <ul>
@@ -162,7 +162,7 @@ var blogPosts = [
 </ul>
 
 <h2>The gear people forget in winter</h2>
-<p>Night walks in winter are also cold walks, and cold weather quietly changes what your dog needs. Dogs still dehydrate in the cold — they just do not look like they are panting for it, so owners skip water. On longer evening walks, carry it. A <a href="/product/2-in-1-dog-water-bottle">bottle with a flip-out spout</a> or a <a href="/product/collapsible-dog-bowl">collapsible bowl</a> takes ten seconds to use and removes any reason to cut a walk short.</p>
+<p>Night walks in winter are also cold walks, and cold weather quietly changes what your dog needs. Dogs still dehydrate in the cold — they just do not look like they are panting for it, so owners skip water. On longer evening walks, carry it. A <a href="/product/2-in-1-dog-water-bottle">bottle with a flip-out spout</a> takes ten seconds to use and removes any reason to cut a walk short.</p>
 
 <h2>A quick pre-walk check</h2>
 <p>It takes fifteen seconds and it catches almost everything:</p>
@@ -201,16 +201,14 @@ var blogPosts = [
   <li><strong>A way to carry the used bag.</strong> Genuinely a core item, not a luxury. Otherwise you spend the rest of the walk one-handed, which means no phone, no treats, no real leash control.</li>
   <li><strong>Your phone.</strong> Not for scrolling — for the vet's number, a torch, and a photo of your dog if you ever have to show someone what you are looking for.</li>
 </ol>
+<div class="blog-cta">
+  <p><strong>Solving number four properly:</strong> the <a href="/product/poop-bag-clip">Poop Bag Clip</a> holds a tied-off bag on the leash so both your hands stay free.</p>
+</div>
 
 <h2>Walks over 30 minutes: add water</h2>
 <p>Thirty minutes is roughly the line where water stops being optional, and it moves a lot earlier in heat — over about 24°C, take water on any walk at all.</p>
 <p>Dogs cool themselves by panting, which means they lose water much faster than we do while showing far fewer obvious signs. By the time a dog is visibly struggling, it has been dehydrated for a while.</p>
-<p>You have two sensible options:</p>
-<ul>
-  <li>An <strong>all-in-one bottle</strong> with a flip-out drinking trough. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> also seals a dry food compartment into the same body, which covers the longer outings where a meal lands mid-walk.</li>
-  <li>A <strong>collapsible bowl</strong> plus whatever bottle you are already carrying for yourself. Best when you are bringing your own water anyway and would rather not carry two bottles. A <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips to a belt loop with its carabiner, and weighs almost nothing.</li>
-</ul>
-<p>They do different jobs. The bottle is for quick drinks while you keep walking; the bowl is for when you stop and your dog needs a proper drink or a meal. On longer walks it is worth carrying both, which is why they come together as the <a href="/bundles">Hydration Bundle</a>, 20% off.</p>
+<p>The sensible option is an <strong>all-in-one bottle</strong> with a flip-out drinking trough. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> also seals a dry food compartment into the same body, which covers the longer outings where a meal lands mid-walk.</p>
 
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
@@ -307,12 +305,7 @@ var blogPosts = [
 
 <h2>Carrying it without the hassle</h2>
 <p>The reason dogs go without water on walks is almost never that owners do not care. It is that the setup is annoying — a human bottle you have to cup your hand under, or a bowl at the bottom of a bag, and the walk is short so you skip it.</p>
-<p>Two setups remove that friction:</p>
-<ul>
-  <li><strong>An integrated bottle</strong> with a flip-out trough. One hand, no assembly, nothing to hold. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> comes in 350ml and 550ml — use the formula above to pick. A 20kg dog on hour-long summer walks wants the 550ml; a small dog on 30-minute walks is well covered by the 350ml. It also seals a dry food compartment in the same body, which matters on longer outings.</li>
-  <li><strong>A collapsible bowl</strong> with whatever bottle you already carry. The <a href="/product/collapsible-dog-bowl">silicone bowl</a> folds flat, clips on with a carabiner, and pops open in a second. It also holds a lot more than a cupped hand, which makes a real difference for a big dog.</li>
-</ul>
-<p>Or carry both: the bottle for sips on the move, the bowl for the break. Together they are the <a href="/bundles">Hydration Bundle</a>, 20% off.</p>
+<p>The setup that removes that friction is <strong>an integrated bottle</strong> with a flip-out trough. One hand, no assembly, nothing to hold. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> comes in 350ml and 550ml — use the formula above to pick. A 20kg dog on hour-long summer walks wants the 550ml; a small dog on 30-minute walks is well covered by the 350ml. It also seals a dry food compartment in the same body, which matters on longer outings.</p>
 
 <h2>Puddles, streams, and other people's bowls</h2>
 <p>Standing water is worth avoiding where you reasonably can. Puddles, ponds and communal bowls carry giardia, leptospirosis and blue-green algae — the last of which is genuinely lethal and blooms in warm, still water in summer. Rivers and fast-moving streams are lower risk but not zero.</p>

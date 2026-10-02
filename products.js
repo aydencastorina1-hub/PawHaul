@@ -10,7 +10,7 @@ var products = [
     supplier: { rating: 4.8, ratings: 322 },
     // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
     // product page. Facts only from the supplier listing images and this file.
-    desc: "This is the one you carry while you're moving. It holds water and a snack in one bottle you can hold in one hand: about 350ml of water in the regular size (550ml in the large) and about 180ml of kibble in the clear food section on top. The carry strap goes round your wrist, so it comes along without taking up a pocket.\n\nIt's built for drinks on the go. Press the button on the side, water fills the built-in trough, your dog drinks, and you keep walking, with no bowl to put down, fill and pack away. A downward lock on the button stops water leaking in your bag, and a sealing gasket keeps the food dry.\n\nIt's made for quick drinks between blocks, not long sit-down stops. For those, pair it with the Collapsible Dog Bowl: the bottle carries the water, and the bowl gives your dog somewhere to drink properly when you stop.",
+    desc: "This is the one you carry while you're moving. It holds water and a snack in one bottle you can hold in one hand: about 350ml of water in the regular size (550ml in the large) and about 180ml of kibble in the clear food section on top. The carry strap goes round your wrist, so it comes along without taking up a pocket.\n\nIt's built for drinks on the go. Press the button on the side, water fills the built-in trough, your dog drinks, and you keep walking, with no bowl to put down, fill and pack away. A downward lock on the button stops water leaking in your bag, and a sealing gasket keeps the food dry.\n\nIt's made for quick drinks between blocks, keeping one hand free for the leash the rest of the way.",
     tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
 
     // Variant options (Shopify-ready). Size drives the price; color does not.
@@ -82,83 +82,73 @@ var products = [
     whatsInBox: "1× 2-in-1 Dog Water Bottle (bottle, detachable food container, carry strap)"
   },
   {
-    id: 3, name: "Collapsible Dog Bowl", price: 11.99, was: 18.99, emoji: "🥣", image: "",
+    // The Collapsible Dog Bowl occupied this id (and the 1/3/6/9/10 numbering
+    // generally) until it was replaced site-wide by the Poop Bag Clip the
+    // store used to carry. All the data below (price, images, variant GIDs,
+    // copy) is the REAL content this product had before it was discontinued
+    // (see the "DISCONTINUED" note that used to live in api/chat.js, and
+    // commit 1c4a5da which removed it) — recovered from git history, not
+    // invented. The Shopify product/variant GIDs are from before it was
+    // taken out of the store; if it was deleted rather than archived there,
+    // "Add to Cart" for this product will fail at checkout until it exists
+    // in Shopify again with matching variant GIDs.
+    id: 3, name: "Poop Bag Clip", price: 6.99, was: 10.99, emoji: "🧷", image: "",
     badge: "Popular", badgeClass: "badge-popular",
     // Real, verified stats from the AliExpress listing this product is
     // sourced from — read off the live listing, not estimated. They are
     // the SUPPLIER's numbers, never PawHaul's, and every surface that
     // renders them says so. See supplierRatingHtml().
-    supplier: { rating: 4.8, ratings: 1749 },
-    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
-    // product page. Facts only from the supplier listing images and this file.
-    desc: "This is the one you set down when you stop. On a proper break, like halfway up a trail, at a picnic or at a rest stop on a road trip, your dog needs a real bowl to drink or eat from, not a few sips from a trough. This silicone bowl opens to 5.12 inches across and just under 2 inches deep, so they can drink their fill or eat a full portion.\n\nWhen you're done, shake it out and press it flat. It folds down to a thin disc and clips to your bag, belt loop or leash with its built-in carabiner, so it's always with you and never in the way.\n\nIt doesn't carry any water itself. It pairs with the 2-in-1 Dog Water Bottle, or with whatever bottle you already bring: the bottle is for quick drinks while you're walking, and the bowl is for when you stop and your dog needs a proper drink or meal.",
-    tagline: "Folds flat, pops open in seconds — water or food, anywhere.",
-    sizes: ["5.12in diameter × 1.97in height"],
-    colors: ["Red", "Blue", "Orange", "Green", "White", "Black"],
+    supplier: { rating: 4.9, ratings: 95 },
+    desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
+    tagline: "Hands-free carrying for used bags, every walk.",
+    sizes: ["Universal — fits all leashes"],
+    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
 
-    // RE-SYNCED from Shopify (task 99). These REPLACE the local
-    // images/products/bowl-*.jpg crops, and the reason those existed is
-    // gone: they were cropped by hand because every Shopify variant photo
-    // carried a burned-in measurement diagram. The re-shot pool has none —
-    // six clean studio shots at one consistent angle, each with its own
-    // matching carabiner — so the source of truth goes back to Shopify.
-    // The old local files are now unreferenced (kept on disk, like the
-    // pre-79 collar set, pending the user's word).
+    // RE-SYNCED from Shopify (task 99), recovered from before this product
+    // was discontinued. Six colours, six variant-assigned photos.
     images: {
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/99B5501A-6912-4471-BFDA-E75A4CA2808C.png?v=1789928225&width=900",
-      "Blue": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/475223E9-2911-41AD-8402-B9DF0D07B188.png?v=1789928246&width=900",
-      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/82088BE3-AB5D-4539-BBEA-94C16C5845BB.png?v=1789928267&width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/B2146D24-A830-44AF-8D2A-8DF25FFA4D90.png?v=1789928296&width=900",
-      "White": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2CE939E3-AD2C-471E-82A8-F1A87A72C42A.png?v=1789928320&width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/0B2E56CB-BCD6-4717-A467-1FA77CF89FA6.png?v=1789928337&width=900"
+      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/05311962-98DD-48BE-9B18-AA26717C4EA5.png?v=1790043744&width=900",
+      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/921F2642-8033-42DC-8934-66A11F537D1E.png?v=1790043784&width=900",
+      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D950C3DF-9AF0-4416-8427-D1F38304E8FE.png?v=1790043835&width=900",
+      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/9B99CB59-87DD-42C0-998C-737EDDAE99B1.png?v=1790043817&width=900",
+      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E9F331FB-A50C-4DB7-B66A-56CBA5DC191D.png?v=1790043893&width=900",
+      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E3A0D367-24B5-486D-81F4-1AD31FAD9E89.png?v=1790043866&width=900"
     },
 
-    // Extra detail-page gallery slides — all five shared pool images, in
-    // Shopify's own position order (pos7 … pos11).
-    //
-    // Task 102 retired the task-20/27 skip list here: the gallery now
-    // mirrors Shopify's pool one for one. That knowingly puts colours this
-    // shop does not sell on screen — pos8's montage shows a yellow and a
-    // pink bowl, pos11's phone size-reference (5.1 in / 3.5 in / 1.9 in) is
-    // shot in pink — so slide 1 remains the ONLY slide that claims to show
-    // the selected colour, and the colour swatches remain the only place a
-    // buyer picks one.
-    //
-    // pos7 stays the CROPPED local copy: the pool original stacks five
-    // bowls beside the one the dog is eating from, which reads as a
-    // multi-pack of a product sold singly. images/products/bowl-lifestyle-1.jpg
-    // is that same photo with the stack cropped out of frame — the image is
-    // present, just framed on the one bowl in use.
+    // Extra detail-page gallery slides — a hand holding a knotted bag by the
+    // clip, a close-up of the same, the clip riding on a leash, and one
+    // clipped to a bag. All show the product doing the job the description
+    // claims (carrying a USED bag), which a studio shot alone cannot.
     extraImages: [
-      "/images/products/bowl-lifestyle-1.jpg",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/649F0CE6-2494-42DF-94BE-A9D3FD787024.png?v=1789928528&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D7F9C6D8-41EA-44A4-BF2F-509EB4820D00.png?v=1789928528&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/86F6DB3D-B47A-490F-9A7B-7B7D0CB3A4BD.png?v=1789928528&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E30A5796-62AB-4CE8-BF4F-158AA947326F.png?v=1789928528&width=900"
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FBB272E1-1FAC-473A-93AF-7BDDF7356226.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/65E99535-F7CD-4A0F-B319-487A9C9DBF01.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FCA197B8-16F8-48B5-9E1E-BF7750AE80F1.png?v=1790044578&width=900",
+      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/BE4DE668-334E-4929-A1EE-CCFEDC2631C5.png?v=1790044578&width=900"
     ],
 
-    // Real Shopify variant GIDs (Storefront API) for checkout.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276542720", byColor: {
-        "Red": "gid://shopify/ProductVariant/48945265082624",
-        "Blue": "gid://shopify/ProductVariant/48945265115392",
-        "Orange": "gid://shopify/ProductVariant/48945265148160",
-        "Green": "gid://shopify/ProductVariant/48945265213696",
-        "White": "gid://shopify/ProductVariant/48945265246464",
-        "Black": "gid://shopify/ProductVariant/48945265279232"
+    // Real Shopify variant GIDs (Storefront API) for checkout, carried over
+    // from before this product was discontinued — see the note above the id
+    // field about why these may need re-creating in Shopify.
+    shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
+        "Orange": "gid://shopify/ProductVariant/48945264296192",
+        "Purple": "gid://shopify/ProductVariant/48945264328960",
+        "Red": "gid://shopify/ProductVariant/48945264361728",
+        "Black": "gid://shopify/ProductVariant/48945264394496",
+        "Green": "gid://shopify/ProductVariant/48945264656640",
+        "Pink": "gid://shopify/ProductVariant/48945264623872"
       } },
 
     features: [
-      "Made for stops: breaks, hikes, picnics and road trips",
-      "Folds completely flat",
-      "5.12in wide × 1.97in deep when open",
-      "Built-in carabiner clip",
-      "For water or food",
-      "Rinses clean in seconds",
-      "Food-grade silicone",
-      "Six colours"
+      "Hands-free clip holds a used poop bag securely",
+      "Clips easily onto any leash or belt",
+      "Keeps both hands free while walking your dog",
+      "Lightweight and compact design",
+      "Quick, hygienic cleanup every time",
+      "6 colors to choose from"
     ],
-    material: "Food-grade silicone · Built-in carabiner clip",
-    whatsInBox: "1× collapsible silicone bowl with carabiner clip"
+    material: "Durable silicone clip · Secure metal hook attachment",
+    whatsInBox: "1× Poop Bag Clip"
   },
   {
     id: 6, name: "LED Dog Collar", price: 14.99, was: 21.99, emoji: "💡", image: "",
@@ -861,7 +851,7 @@ function showPage(page, opts) {
 // starts jumping on load again.
 // Order of the cards on the Shop page, by product id. Products missing from
 // this list still show, after these.
-var SHOP_ORDER = [1, 10, 6, 9, 3]; // Water Bottle, LED Leash, LED Collar, Wrist Strap, Bowl
+var SHOP_ORDER = [1, 10, 6, 9, 3]; // Water Bottle, LED Leash, LED Collar, Wrist Strap, Poop Bag Clip
 
 function shopOrderedProducts() {
   var rank = function (p) { var i = SHOP_ORDER.indexOf(p.id); return i === -1 ? 999 : i; };
@@ -922,17 +912,16 @@ var BUNDLES = [
   },
   {
     id: 'hydration',
-    name: 'Hydration Bundle',
-    blurb: 'Two different jobs. The bottle is for quick drinks on the move, no stopping. The bowl is for when you do stop, so your dog can drink or eat properly.',
-    tagline: 'Water on the move and at the stop',
+    name: 'Walk Essentials Bundle',
+    blurb: 'Two different jobs. The bottle keeps your dog hydrated and fed on the move. The clip keeps your hands free for everything else, bag duty included.',
+    tagline: 'Hydrated and hands-free',
     ids: [1, 3],
     // One line under each product saying what it is FOR, so the pair reads
     // as two jobs rather than two ways of doing the same thing.
-    roles: { 1: 'On the move: quick drinks without stopping', 3: 'When you stop: a proper drink or meal' },
+    roles: { 1: 'On the move: quick drinks without stopping', 3: 'Keeps your hands free for bag duty' },
     pct: 20,
-    img: '/images/products/bowl-lifestyle-1.jpg',
-    imgAlt: 'A golden retriever eating from a red Collapsible Dog Bowl on a break',
-    imgPos: 'center 78%'
+    img: 'https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900',
+    imgAlt: 'A Poop Bag Clip holding a tied-off bag on a leash',
   },
   {
     id: 'visibility',
@@ -1241,8 +1230,8 @@ var SWATCH_COLORS = {
   // Added for the Anti-Drop Leash Wrist Strap's colourway. Without these,
   // "Brown" and "Purple" fell through to the #CCCCCC fallback — Brown would
   // have rendered as a grey circle sitting next to the strap's real Gray.
-  // ("White" is still missing and still falls back for the Bowl and the
-  // Water Bottle — left alone, out of scope here.)
+  // ("White" is still missing and still falls back for the Water Bottle —
+  // left alone, out of scope here.)
   brown: '#8B5E3C', purple: '#7C3AED'
 };
 

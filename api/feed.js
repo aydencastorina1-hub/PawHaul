@@ -44,7 +44,7 @@ module.exports = async function handler(req, res) {
     '<channel>\n' +
     '  <title>' + cdata(seo.BRAND + ' Product Feed') + '</title>\n' +
     '  <link>' + seo.ORIGIN + '</link>\n' +
-    '  <description>' + cdata('Dog walk gear from PawHaul — 2-in-1 water bottles, collapsible bowls, LED safety collars, a light-up retractable leash and anti-drop wrist straps.') + '</description>\n';
+    '  <description>' + cdata('Dog walk gear from PawHaul — 2-in-1 water bottles, poop bag clips, LED safety collars, a light-up retractable leash and anti-drop wrist straps.') + '</description>\n';
 
   products.forEach(function (p) {
     const url = seo.ORIGIN + '/product/' + seo.slugify(p.name);

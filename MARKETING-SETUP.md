@@ -292,7 +292,7 @@ Shopify admin → **Discounts** → **Create discount** → **Amount off product
 | Title | % off | Specific products | Minimum quantity of items |
 |---|---|---|---|
 | LED Bundle | 20% | LED Dog Collar, LED Flashlight Retractable Dog Leash | 2 |
-| Hydration Bundle | 20% | 2-in-1 Dog Water Bottle, Collapsible Dog Bowl | 2 |
+| Walk Essentials Bundle | 20% | 2-in-1 Dog Water Bottle, Poop Bag Clip | 2 |
 | Visibility Duo | 20% | LED Flashlight Retractable Dog Leash, Anti-Drop Leash Wrist Strap | 2 |
 
 Under **Combinations**, tick **Product discounts** (and nothing else), no end
