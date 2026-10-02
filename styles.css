@@ -351,13 +351,16 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
 
 /* Paw badge + wordmark on every screen size (desktop, iPad and mobile).
    No tilt/rotation on hover or tap; the logo stays completely still. */
+/* task 123: real <img> now (the new logo is its own finished circular badge
+   — orange ring, cream interior, no wrapper background/padding needed the
+   way the old flat paw-on-black-circle icon did). border-radius stays as a
+   safety clip against any stray edge pixels; object-fit:cover keeps it from
+   stretching if the box and image aspect ratio ever drift. */
 .logo-circle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 40px; height: 40px;
-  background: var(--black);
   border-radius: 50%;
+  object-fit: cover;
   flex-shrink: 0;
 }
 
@@ -2979,14 +2982,14 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   padding: 22px 20px 18px;
   border-bottom: 1px solid #F5F5F5;
 }
+/* task 123: real <img> now — see .logo-circle's comment, same reasoning. */
 .mob-menu-brand-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   width: 40px;
   height: 40px;
-  background: var(--black);
   border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 .mob-menu-brand-text {
   font-family: var(--font-display);
@@ -4557,7 +4560,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: var(--orange);
     box-shadow: 0 4px 14px rgba(232, 99, 10, 0.35);
     flex-shrink: 0;
   }
@@ -5397,15 +5399,15 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 .offline-inner { max-width: 420px; display: flex; flex-direction: column; align-items: center; }
 
+/* task 123: real <img> now — see .logo-circle's comment, same reasoning. */
 .offline-paw {
   width: 72px; height: 72px;
-  display: flex; align-items: center; justify-content: center;
+  display: block;
   border-radius: 50%;
-  background: var(--orange);
+  object-fit: cover;
   margin-bottom: 22px;
   flex-shrink: 0;
 }
-.offline-paw svg { width: 38px; height: 38px; fill: #fff; display: block; }
 
 .offline-title {
   font-family: var(--font-display);
@@ -5940,12 +5942,12 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   transition: background 0.15s var(--ease);
 }
 .chat-greeting-row:active { background: var(--offwhite); }
+/* task 123: real <img> now — see .logo-circle's comment, same reasoning. */
 .chat-greeting-avatar {
   flex-shrink: 0;
   width: 34px; height: 34px;
   border-radius: 50%;
-  background: var(--orange);
-  display: flex; align-items: center; justify-content: center;
+  object-fit: cover;
   box-shadow: 0 3px 8px rgba(232,99,10,0.35);
 }
 .chat-greeting-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
