@@ -1256,11 +1256,15 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
           Hey! I'm your PawHaul guide. Ask me about our walk gear, shipping, returns or anything else!
         </div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;padding-left:38px;">
-        <button onclick="askQuick('What products do you sell?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">What do you sell?</button>
-        <button onclick="askQuick('How long does shipping take?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Shipping?</button>
-        <button onclick="askQuick('What is your best product?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Best product?</button>
-        <button onclick="askQuick('What is your return policy?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Returns?</button>
+      <div style="display:flex;flex-direction:column;gap:5px;padding-left:38px;">
+        <div style="display:flex;gap:5px;">
+          <button onclick="askQuick('What products do you sell?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">What do you sell?</button>
+          <button onclick="askQuick('How long does shipping take?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Shipping?</button>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button onclick="askQuick('What is your best product?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Best product?</button>
+          <button onclick="askQuick('What is your return policy?')" style="background:#FFF0E8;border:1px solid #E8630A;color:#E8630A;padding:4px 10px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-body);">Returns?</button>
+        </div>
       </div>
     </div>
 
