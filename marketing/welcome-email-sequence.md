@@ -71,16 +71,17 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 > visible and a flashlight for the path ahead. 3M and 5M. Takes 2 AAA
 > batteries (not included).
 >
-> **2-in-1 Dog Water Bottle — from $16.99**
-> Water and dry food in one leak-proof bottle with a flip-out drinking spout.
-> 350ml for neighbourhood loops, 550ml for real distance.
+> **2-in-1 Portable Dog Water Bottle — from $9.99**
+> A stainless steel bottle with a foldable silicone bowl built into the cap —
+> unfold, pour, done. Plastic, Stainless Steel or Stainless Steel Deluxe.
 >
 > **LED Dog Collar — from $14.99**
 > USB rechargeable, three light modes, four neck sizes. If you walk after dark
 > at all, this is the one that actually changes something.
 >
-> Want two? The LED collar and LED leash, the water bottle and bowl, or the
-> LED leash and wrist strap come together as bundles for 20% off both: `https://pawhaul.vercel.app/bundles`
+> Want two? The LED collar and LED leash, the water bottle and poop bag clip,
+> the water bottle and the foldable bowl, or the LED leash and wrist strap
+> come together as bundles: `https://pawhaul.vercel.app/bundles`
 >
 > **WELCOME10** still works — 10% off, free shipping.
 

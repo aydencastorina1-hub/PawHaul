@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=158" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=159" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -173,8 +173,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        skeletons are on screen. URLs must match the <script> tags below
        character-for-character (version query included) or the browser fetches
        each file twice. -->
-  <link rel="preload" as="script" href="/blog.js?v=9">
-  <link rel="preload" as="script" href="/products.js?v=91">
+  <link rel="preload" as="script" href="/blog.js?v=10">
+  <link rel="preload" as="script" href="/products.js?v=92">
   <link rel="preload" as="script" href="/app.js?v=76">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -468,27 +468,77 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Easy Payments</div>
   </div>
 
-  <!-- BEST PRODUCT — first section below the fold on the homepage. Spotlights the
-       2-in-1 Dog Water Bottle (our best-selling product) with a cutout product shot
-       (background keyed to transparent from the pink listing photo, see
-       images/products/water-bottle-cutout*.{png,webp}) instead of a flat product photo,
-       sales copy on why hydration gear is a must-carry rather than a nice-to-have, a
-       primary "Shop Now" CTA straight to the product page, and a secondary "Read More"
-       CTA to the blog (the hydration-focused posts in blog.js) for people who want the
-       reasoning before they buy. -->
+  <!-- BEST PRODUCT — first section below the fold on the homepage (task 115,
+       updated task 127). Spotlights the 2-in-1 Portable Dog Water Bottle (our
+       best-selling product, now a different product in the same slot — see
+       products.js id 1's comment) with sales copy on why hydration gear is a
+       must-carry rather than a nice-to-have, a primary "Shop Now" CTA straight
+       to the product page, and a secondary "Read More" CTA to the blog (the
+       hydration-focused posts in blog.js) for people who want the reasoning
+       before they buy.
+
+       NO REAL PHOTO YET for the new product — the old cutout shot
+       (images/products/water-bottle-cutout*) was the OLD bottle and does not
+       match this one, so it's replaced with a clearly-labeled placeholder
+       (.bp-image-placeholder, styles.css) instead of a real product image.
+       Swap the whole .bp-image-wrap back to an <img class="bp-image"> (same
+       markup the old cutout used) once a real cutout/photo exists. -->
   <section class="best-product-section">
     <div class="bp-image-wrap">
-      <img class="bp-image" src="/images/products/water-bottle-cutout-800.webp" srcset="/images/products/water-bottle-cutout-500.webp 500w, /images/products/water-bottle-cutout-800.webp 800w, /images/products/water-bottle-cutout-1100.webp 1100w" sizes="(max-width: 900px) 70vw, 480px" alt="PawHaul 2-in-1 Dog Water Bottle" loading="lazy" decoding="async" width="871" height="1171" onclick="goToProductLink(event,1)" style="cursor:pointer;">
+      <div class="bp-image bp-image-placeholder" onclick="goToProductLink(event,1)" style="cursor:pointer;" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
+        <span class="bp-image-placeholder-emoji" aria-hidden="true">🍼</span>
+        <span class="bp-image-placeholder-tag">Photo coming soon</span>
+      </div>
     </div>
     <div class="bp-content">
       <div class="section-tag" style="background:rgba(255,255,255,0.18);color:white;">Our Best Product</div>
       <h2 class="bp-title">The Bottle That Ends<br>"We Forgot Water."</h2>
-      <p class="bp-desc">Dogs dehydrate on walks whether or not it's obvious — and a bowl at the bottom of your bag or a bottle you have to cup your hand under means water gets skipped. The 2-in-1 Dog Water Bottle fixes that with a flip-out drinking trough and a sealed food compartment in one leak-proof body, so there's never a reason to cut a walk short again.</p>
+      <p class="bp-desc">Dogs dehydrate on walks whether or not it's obvious — and a bowl at the bottom of your bag or a bottle you have to cup your hand under means water gets skipped. The 2-in-1 Portable Dog Water Bottle fixes that with a foldable silicone bowl built into the cap: unfold it, pour, and your dog has a real bowl to drink from, so there's never a reason to cut a walk short again.</p>
       <div class="bp-actions">
-        <a class="btn-white" href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">Shop Now →</a>
+        <a class="btn-white" href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">Shop Now →</a>
         <a class="btn-outline-white" href="/blog" onclick="goTo(event,'blog')">Read More</a>
       </div>
     </div>
+  </section>
+
+  <!-- MEET OUR PORTABLE BOTTLES (task 126, built alongside task 127) — helps a
+       visitor pick between the two new hydration products: the 2-in-1
+       Portable Bottle (a complete bottle+bowl, for someone starting from
+       scratch) and the Foldable Water Bowl (just the bowl, for someone who
+       already carries their own bottle). Neither has a real photo yet — both
+       cards use the same placeholder treatment as the BEST PRODUCT section
+       above, just restyled for this section's white background. -->
+  <section class="bottle-compare-section">
+    <div class="bottle-compare-header">
+      <div class="section-tag">Pick Your Hydration Setup</div>
+      <h2 class="section-title">Meet Our <span>Portable Bottles</span></h2>
+      <p class="section-sub">Two ways to make sure your dog never goes without water on a walk.</p>
+    </div>
+    <div class="bottle-compare-grid">
+      <article class="bottle-compare-card">
+        <div class="bottle-compare-media" onclick="goToProductLink(event,1)" style="cursor:pointer;" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
+          <span class="bottle-compare-emoji" aria-hidden="true">🍼</span>
+          <span class="bottle-compare-soon">Photo coming soon</span>
+        </div>
+        <h3 class="bottle-compare-name">2-in-1 Portable Dog Water Bottle</h3>
+        <p class="bottle-compare-price">From $9.99</p>
+        <p class="bottle-compare-desc">A stainless steel water bottle with a foldable silicone bowl built right in — unfold it, pour, and your dog has a stable spot to drink or eat on the go. Compact enough to toss in a bag or clip to a leash, built for walks, hikes, and travel. Rust-resistant construction holds up to daily outdoor use.</p>
+        <p class="bottle-compare-best-for"><strong>Best for:</strong> starting from scratch with one all-in-one bottle.</p>
+        <a class="btn-black" href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">Shop the Bottle →</a>
+      </article>
+      <article class="bottle-compare-card">
+        <div class="bottle-compare-media" onclick="goToProductLink(event,2)" style="cursor:pointer;" role="img" aria-label="Foldable Dog Water Bowl — product photo coming soon">
+          <span class="bottle-compare-emoji" aria-hidden="true">🥤</span>
+          <span class="bottle-compare-soon">Photo coming soon</span>
+        </div>
+        <h3 class="bottle-compare-name">Foldable Dog Water Bowl</h3>
+        <p class="bottle-compare-price">From $7.99</p>
+        <p class="bottle-compare-desc">A foldable silicone cap that turns any standard water bottle into an instant dog water bowl. No dedicated bottle needed — just screw it onto a bottle you already have, unfold, and pour. Leak-proof and ultra-packable, perfect for spontaneous walks when you didn't plan ahead.</p>
+        <p class="bottle-compare-best-for"><strong>Best for:</strong> you already carry your own bottle and just need a bowl.</p>
+        <a class="btn-black" href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Shop the Bowl →</a>
+      </article>
+    </div>
+    <p class="bottle-compare-bundle-note">Want both? They come together in the <a href="/bundles#bundle-portable-hydration" onclick="goToBundle(event,'portable-hydration')">Hydration Bundle</a>, 15% off.</p>
   </section>
 
 
@@ -583,7 +633,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="reviews-grid" id="revCarousel">
       <div class="review-card">
         <div class="review-stars"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#FFB800" style="width:1em;height:1em;vertical-align:-0.12em;display:inline-block" aria-hidden="true"><path d="M12 2l2.92 6.62 7.08.6-5.4 4.7 1.62 7.08L12 17.3 5.78 21l1.62-7.08-5.4-4.7 7.08-.6z"/></svg></div>
-        <p class="review-text">"The 2-in-1 Dog Water Bottle is the one thing I grab every morning. The flip-out spout makes it so easy to give her a drink mid-walk, and the food side is genuinely leak-proof — kibble stays sealed and fresh. Took it on a weekend trip too. Perfect size for my medium dog."</p>
+        <p class="review-text">"The 2-in-1 Portable Dog Water Bottle is the one thing I grab every morning. The fold-out bowl makes it so easy to give her a proper drink mid-walk instead of cupping my hand, and it folds right back flat when she's done. Took it on a weekend trip too. Perfect size for my medium dog."</p>
         <div class="reviewer"><img class="reviewer-av" loading="lazy" src="https://images.unsplash.com/photo-1552053831-71594a27632d?w=200&q=90" alt="Sarah M. with her golden retriever"><div><div class="reviewer-name">Sarah M.</div><div class="reviewer-loc">Portland, OR</div></div><div class="verified">✓ Verified</div></div>
       </div>
       <div class="review-card">
@@ -609,15 +659,15 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Do your products work for all dog sizes?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes! Every PawHaul product is designed to work for all dog sizes. The 2-in-1 Dog Water Bottle comes in 350ml and 550ml, the LED Flashlight Retractable Dog Leash comes in 3M and 5M lengths, the LED Dog Collar comes in four sizes from S to XL, and the Anti-Drop Leash Wrist Strap adjusts to fit any wrist.</div>
+        <div class="faq-a">Yes! Every PawHaul product is designed to work for all dog sizes. The 2-in-1 Portable Dog Water Bottle's fold-out bowl works for any size dog, the LED Flashlight Retractable Dog Leash comes in 3M and 5M lengths, the LED Dog Collar comes in four sizes from S to XL, and the Anti-Drop Leash Wrist Strap adjusts to fit any wrist.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Can I buy multiple products together?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Absolutely — and we recommend it! The 2-in-1 Dog Water Bottle, Poop Bag Clip, LED Dog Collar, LED Flashlight Retractable Dog Leash and Anti-Drop Leash Wrist Strap are all designed to work together as a complete walk setup. Add them all to your cart and they ship together for free.</div>
+        <div class="faq-a">Absolutely — and we recommend it! The 2-in-1 Portable Dog Water Bottle, Foldable Dog Water Bowl, Poop Bag Clip, LED Dog Collar, LED Flashlight Retractable Dog Leash and Anti-Drop Leash Wrist Strap are all designed to work together as a complete walk setup. Add them all to your cart and they ship together for free.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Are the products durable for daily use?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Every PawHaul product is built for daily walks. The 2-in-1 Dog Water Bottle is 100% leak proof, the LED leash has a durable build and the wrist strap is braided cord, the LED collar is USB rechargeable and doesn't overheat, and the poop bag clip is durable silicone with a secure metal hook that won't rust.</div>
+        <div class="faq-a">Every PawHaul product is built for daily walks. The 2-in-1 Portable Dog Water Bottle's stainless steel body is rust-resistant, the LED leash has a durable build and the wrist strap is braided cord, the LED collar is USB rechargeable and doesn't overheat, and the poop bag clip is durable silicone with a secure metal hook that won't rust.</div>
       </div>
       <div class="faq-item" id="faq-returns">
         <div class="faq-q" onclick="toggleFaq(this)">What is your return policy?<span class="faq-icon">+</span></div>
@@ -629,7 +679,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Do you have bundles?<span class="faq-icon">+</span></div>
-        <div class="faq-a">Yes, three, each 20% off both products. The LED Bundle is the LED Dog Collar and the LED Flashlight Retractable Dog Leash. The Walk Essentials Bundle is the 2-in-1 Dog Water Bottle (for drinks on the move) and the Poop Bag Clip (for hands-free bag duty). The Visibility Duo is the LED Flashlight Retractable Dog Leash and the Anti-Drop Leash Wrist Strap: the leash keeps you visible, the strap keeps you from losing it. The discount comes off automatically at checkout whenever both products of a bundle are in your cart. <a href="/bundles" onclick="goTo(event,'bundles')">See the bundles</a>.</div>
+        <div class="faq-a">Yes, four. The LED Bundle is the LED Dog Collar and the LED Flashlight Retractable Dog Leash, 20% off both. The Walk Essentials Bundle is the 2-in-1 Portable Dog Water Bottle (for drinks on the move) and the Poop Bag Clip (for hands-free bag duty), 20% off both. The Hydration Bundle is the 2-in-1 Portable Dog Water Bottle and the Foldable Dog Water Bowl, 15% off both. The Visibility Duo is the LED Flashlight Retractable Dog Leash and the Anti-Drop Leash Wrist Strap: the leash keeps you visible, the strap keeps you from losing it, 20% off both. The discount comes off automatically at checkout whenever both products of a bundle are in your cart. <a href="/bundles" onclick="goTo(event,'bundles')">See the bundles</a>.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)">Does the Anti-Drop Leash Wrist Strap fit any leash?<span class="faq-icon">+</span></div>
@@ -678,7 +728,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
           <a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a>
         </div>
       </div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track My Order</a></li><li><a onclick="showPolicy('shipping')" style="cursor:pointer;">Shipping Info</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Returns</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li><li><a onclick="showPolicy('terms')" style="cursor:pointer;">Terms of Service</a></li><li><a onclick="showPolicy('refund')" style="cursor:pointer;">Refund Policy</a></li></ul></div>
     </div>
@@ -715,7 +765,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
          grid renders them (SHOP_ORDER in products.js) — add or remove one whenever the
          catalogue changes, or the grid will jump as the cards render. -->
     <div class="shop-grid" id="shopProducts">
-      <!-- 2-in-1 Dog Water Bottle -->
+      <!-- 2-in-1 Portable Dog Water Bottle -->
       <div class="product-card skel-card" aria-hidden="true">
         <div class="product-img-wrap"><div class="product-img"></div></div>
         <div class="product-info">
@@ -771,7 +821,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
@@ -799,7 +849,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
              the link glyph plus a "Copy Link" label when it does not. Swapping
              a class beats rebuilding innerHTML on every product open. -->
         <div class="detail-title-row">
-          <h1 id="detailName">2-in-1 Dog Water Bottle</h1>
+          <h1 id="detailName">2-in-1 Portable Dog Water Bottle</h1>
           <button class="detail-share-btn" type="button" id="detailShareBtn" onclick="shareProduct()" aria-label="Share this product" title="Share this product">
             <svg class="icon-share" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15.5V3.5"/><path d="M8 7.5l4-4 4 4"/><path d="M5 12.5v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>
             <svg class="icon-link" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3A5 5 0 0 0 13 3l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3A5 5 0 0 0 11 21l1.5-1.5"/></svg>
@@ -818,11 +868,11 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
              (api/feed.js refuses to emit g:sale_price for the same reason).
              The `was` data stays in products.js; it must not come back here. -->
         <div class="detail-price">
-          <span class="now" id="detailPrice">$16.99</span>
+          <span class="now" id="detailPrice">$9.99</span>
         </div>
-        <p class="detail-tagline" id="detailTagline">Water and food in one leak-proof bottle — never cut a walk short again.</p>
+        <p class="detail-tagline" id="detailTagline">A bottle and a bowl in one — unfold, pour, done.</p>
         <p class="detail-case-note" id="detailCaseNote" style="display:none;"></p>
-        <div class="option-label">Size</div>
+        <div class="option-label" id="detailSizeLabel">Size</div>
         <div class="options-row" id="detailSizes"></div>
         <div class="option-label">Color</div>
         <div class="options-row" id="detailColors"></div>
@@ -940,7 +990,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
   <div class="blog-hero">
     <span class="section-tag">Bundle &amp; Save</span>
     <h1>Better Together</h1>
-    <p>Gear that works as a set, for less. 20% off each bundle, applied automatically at checkout.</p>
+    <p>Gear that works as a set, for less. Up to 20% off each bundle, applied automatically at checkout.</p>
   </div>
   <div class="bundles-page">
     <div class="bundles-grid" id="shopBundles"></div>
@@ -949,7 +999,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for dog owners. Water, food, leashes, safety — everything for the walk.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a onclick="showTrackOrder()" style="cursor:pointer;">Track Order</a></li><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li><li><a onclick="showPolicy('privacy')" style="cursor:pointer;">Privacy Policy</a></li></ul></div>
     </div>
@@ -968,7 +1018,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><span class="footer-brand-logo">Paw<span>Haul</span></span><p>Walk gear built for dog owners.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
@@ -1014,7 +1064,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
       </div>
       <div class="story-sec">
         <h3><span class="story-num">02</span>Building The First Product</h3>
-        <p>So I built the first PawHaul product: a bottle that holds both water and food in one leak-proof container, with a flip-out spout so your dog can drink in seconds, no bowl, no mess, no cutting the walk short again.</p>
+        <p>So I built the first PawHaul product: a bottle with a foldable silicone bowl built right into the cap, so your dog can drink in seconds — unfold it, pour, no separate bowl to carry, no cutting the walk short again.</p>
       </div>
       <figure class="story-pullquote">
         <span class="pq-mark" aria-hidden="true">&ldquo;</span>
@@ -1072,7 +1122,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
@@ -1161,7 +1211,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
@@ -1189,7 +1239,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
@@ -1204,7 +1254,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div class="paw-divider paw-divider--on-dark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="22" height="22"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
     <div class="footer-grid">
       <div><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img src="/images/brand/logo-circle.png" width="46" height="46" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;"><span class="footer-brand-logo" style="margin:0">Paw<span>Haul</span></span></div><p>Walk gear built for every walk and every dog.</p><div class="social-row"><a class="social-btn" href="https://www.tiktok.com/@theofficialpawhaul" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on TikTok" title="PawHaul on TikTok"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.77.12v-3.2a5.8 5.8 0 0 0-.77-.05 5.79 5.79 0 1 0 5.79 5.79V9.01a7.35 7.35 0 0 0 4.29 1.38V7.3a4.29 4.29 0 0 1-3.34-1.48z"/></svg></a><a class="social-btn" href="https://www.facebook.com/share/1E6ATbBLPM/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="PawHaul on Facebook" title="PawHaul on Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;display:block" aria-hidden="true" focusable="false"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg></a></div></div>
-      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
+      <div class="footer-col"><h4>Shop</h4><ul><li><a href="/shop" onclick="goTo(event,'shop')">All Walk Gear</a></li><li><a href="/bundles" onclick="goTo(event,'bundles')">Bundles</a></li><li><a href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">2-in-1 Water Bottle</a></li><li><a href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Foldable Water Bowl</a></li><li><a href="/product/poop-bag-clip" onclick="goToProductLink(event,3)">Poop Bag Clip</a></li><li><a href="/product/led-dog-collar" onclick="goToProductLink(event,6)">LED Dog Collar</a></li><li><a href="/product/led-flashlight-retractable-dog-leash" onclick="goToProductLink(event,10)">LED Flashlight Leash</a></li><li><a href="/product/anti-drop-leash-wrist-strap" onclick="goToProductLink(event,9)">Anti-Drop Wrist Strap</a></li></ul></div>
       <div class="footer-col"><h4>Help</h4><ul><li><a href="/contact" onclick="goTo(event,'contact')">Contact Us</a></li></ul></div>
       <div class="footer-col"><h4>Company</h4><ul><li><a href="/about" onclick="goTo(event,'about')">Our Story</a></li><li><a href="/blog" onclick="goTo(event,'blog')">Blog</a></li></ul></div>
     </div>
@@ -1300,8 +1350,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
   <!-- Blog post data. Must precede app.js (which renders it) and is separate
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
-  <script src="/blog.js?v=9"></script>
-  <script src="/products.js?v=91"></script>
+  <script src="/blog.js?v=10"></script>
+  <script src="/products.js?v=92"></script>
   <script src="/app.js?v=76"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above

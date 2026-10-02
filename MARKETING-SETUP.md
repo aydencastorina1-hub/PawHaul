@@ -281,19 +281,27 @@ lot of phone scanners.
 
 ## 10. Bundle discounts — 5 minutes
 
-**Unlocks:** the 20% bundle prices shown on the site's Bundles page, product
+**Unlocks:** the bundle prices shown on the site's Bundles page, product
 pages and cart actually being charged at checkout. The site only *shows* the
-saving; Shopify applies it. Until these exist, customers see 20% off and pay
-full price.
+saving; Shopify applies it. Until these exist, customers see a discount and
+pay full price.
 
 Shopify admin → **Discounts** → **Create discount** → **Amount off products**
-→ **Automatic discount** (not a code). Make three:
+→ **Automatic discount** (not a code). Make four:
 
 | Title | % off | Specific products | Minimum quantity of items |
 |---|---|---|---|
 | LED Bundle | 20% | LED Dog Collar, LED Flashlight Retractable Dog Leash | 2 |
-| Walk Essentials Bundle | 20% | 2-in-1 Dog Water Bottle, Poop Bag Clip | 2 |
+| Walk Essentials Bundle | 20% | 2-in-1 Portable Dog Water Bottle, Poop Bag Clip | 2 |
+| Hydration Bundle | 15% | 2-in-1 Portable Dog Water Bottle, Foldable Dog Water Bowl | 2 |
 | Visibility Duo | 20% | LED Flashlight Retractable Dog Leash, Anti-Drop Leash Wrist Strap | 2 |
+
+The 2-in-1 Portable Dog Water Bottle and the Foldable Dog Water Bowl are
+brand-new products (task 127) with no real Shopify listing yet — this row
+can't actually be created until both exist there with real variant GIDs
+wired into `products.js` (see that file's comments on product ids 1 and 2).
+Until then, "Add to Cart" for either one works locally but does not reach a
+real Shopify cart, and this discount cannot be set up for real.
 
 Under **Combinations**, tick **Product discounts** (and nothing else), no end
 date. That lets two bundles with different products apply in the same order

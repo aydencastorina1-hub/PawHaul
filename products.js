@@ -1,85 +1,90 @@
 ﻿// ==================== DATA ====================
 var products = [
   {
-    id: 1, name: "2-in-1 Dog Water Bottle", emoji: "🧴", image: "",
-    badge: "Best Seller", badgeClass: "",
-    // Real, verified stats from the AliExpress listing this product is
-    // sourced from — read off the live listing, not estimated. They are
-    // the SUPPLIER's numbers, never PawHaul's, and every surface that
-    // renders them says so. See supplierRatingHtml().
-    supplier: { rating: 4.8, ratings: 322 },
-    // Paragraphs separated by a blank line (\n\n) — rendered as <p>s on the
-    // product page. Facts only from the supplier listing images and this file.
-    desc: "This is the one you carry while you're moving. It holds water and a snack in one bottle you can hold in one hand: about 350ml of water in the regular size (550ml in the large) and about 180ml of kibble in the clear food section on top. The carry strap goes round your wrist, so it comes along without taking up a pocket.\n\nIt's built for drinks on the go. Press the button on the side, water fills the built-in trough, your dog drinks, and you keep walking, with no bowl to put down, fill and pack away. A downward lock on the button stops water leaking in your bag, and a sealing gasket keeps the food dry.\n\nIt's made for quick drinks between blocks, keeping one hand free for the leash the rest of the way.",
-    tagline: "Water and food in one leak-proof bottle — never cut a walk short again.",
-
-    // Variant options (Shopify-ready). Size drives the price; color does not.
-    sizes: ["350ml", "550ml"],
-    colors: ["Pink", "White", "Blue"],
-
-    // Real product photos, hosted in this repo (see images/products/) rather
-    // than pulled from Shopify's CDN — one per color, so the card image, the
-    // detail hero and gallery slide 1 always match the selected color.
+    // task 127: the old "2-in-1 Dog Water Bottle" (Pink/White/Blue,
+    // $16.99/$21.99, flip-out trough + food compartment) is retired and
+    // replaced in this same id/slot by a different product with a different
+    // mechanism (a foldable silicone bowl cap, no food compartment at all) —
+    // same removal standard as task 108's product swaps. The old product's
+    // slug keeps resolving here via RENAMED_SLUGS below.
     //
-    // RE-CHECKED against Shopify (task 99): the re-uploaded pool there is
-    // these same 7 files, pixel for pixel, and Shopify's own variant_ids
-    // assign them to the same colours this map does. Shopify was brought in
-    // line with these photos, not the other way round, so they stay local —
-    // same image, but served as webp at the width the slot actually needs
-    // (see LOCAL_PHOTO_WIDTHS) instead of a full-size CDN fetch.
-    images: {
-      "Pink": "/images/products/water-bottle-pink-main.jpg",
-      "White": "/images/products/water-bottle-white-main.jpg",
-      "Blue": "/images/products/water-bottle-blue-main.jpg"
-    },
+    // NO REAL PRODUCT PHOTOS YET: `images`/`extraImages` are intentionally
+    // empty below. This is a brand-new product with no prior listing to
+    // recover real Shopify photos from (unlike the Poop Bag Clip swap) — a
+    // fabricated Shopify CDN URL would just 404, so every surface falls back
+    // to the emoji placeholder (see productImageFor()) until real photos are
+    // supplied. Same for `shopifyVariants`: there is no real Shopify product
+    // for this yet, so it's omitted entirely — "Add to Cart" works for the
+    // local cart/display, but checkout will not sync this item to a real
+    // Shopify cart until a real product + variant GIDs exist there.
+    id: 1, name: "2-in-1 Portable Dog Water Bottle", emoji: "🍼", image: "",
+    badge: "Best Seller", badgeClass: "",
+    // PLACEHOLDER stats carried over from the old product pending real
+    // AliExpress/Shopify listing data for the new one.
+    supplier: { rating: 4.8, ratings: 322 },
+    desc: "A stainless steel water bottle with a foldable silicone bowl built right in — unfold it, pour, and your dog has a stable spot to drink or eat on the go. Compact enough to toss in a bag or clip to a leash, built for walks, hikes, and travel. Rust-resistant construction holds up to daily outdoor use.",
+    tagline: "A bottle and a bowl in one — unfold, pour, done.",
 
-    // Extra detail-page gallery slides — the shared, non-color-specific shots
-    // shown after slide 1 for every color, in this order: the 350ml/550ml
-    // size comparison, the feature-callout panel, the gasket/leak-proof
-    // cutaway and the "reduce storage space" in-hand shot. All four are shot
-    // in the blue colorway (that is the only set that exists), which is why
-    // they live in the shared pool and never in the per-color map above —
-    // slide 1 is the only slide that claims to show the chosen color.
-    extraImages: [
-      "/images/products/water-bottle-size-comparison.jpg",
-      "/images/products/water-bottle-lifestyle-1.jpg",
-      "/images/products/water-bottle-lifestyle-2.jpg",
-      "/images/products/water-bottle-lifestyle-3.jpg"
-    ],
+    // Three material tiers drive the price, same mechanism `sizes` already
+    // gives every other product — `sizeLabel` below swaps the detail page's
+    // "Size" heading for "Material" since these aren't physical sizes.
+    sizeLabel: "Material",
+    sizes: ["Plastic", "Stainless Steel", "Stainless Steel Deluxe"],
+    colors: ["Blue", "Pink"],
 
-    // Per-size variant pricing — maps each size option to its price.
-    // `price`/`was` below mirror the default (first) size so every other part
-    // of the app (shop cards, search) keeps working.
+    // No real photos yet — see the note above the id field.
+    images: {},
+    extraImages: [],
+
     sizePrices: {
-      "350ml": { price: 16.99, was: 24.99 },
-      "550ml": { price: 21.99, was: 29.99 }
+      "Plastic": { price: 9.99, was: 14.99 },
+      "Stainless Steel": { price: 12.99, was: 18.99 },
+      "Stainless Steel Deluxe": { price: 14.99, was: 21.99 }
     },
-    price: 16.99, was: 24.99,
-
-    // Real Shopify variant GIDs (Storefront API) for checkout. Keyed
-    // "size|color" to exactly match this product's own size/color labels.
-    shopifyVariants: { productGid: "gid://shopify/Product/9527350657280", byVariant: {
-        "350ml|Pink": "gid://shopify/ProductVariant/48957400285440",
-        "550ml|Pink": "gid://shopify/ProductVariant/48957400219904",
-        "350ml|White": "gid://shopify/ProductVariant/48957400350976",
-        "550ml|White": "gid://shopify/ProductVariant/48957400252672",
-        "350ml|Blue": "gid://shopify/ProductVariant/48957400383744",
-        "550ml|Blue": "gid://shopify/ProductVariant/48957400318208"
-      } },
+    price: 9.99, was: 14.99,
 
     features: [
-      "Made for drinks on the move — no bowl to set down",
-      "About 180ml of food on top, water below",
-      "350ml or 550ml water size",
-      "Press-button water release with a downward lock",
-      "Built-in sealing gasket keeps food dry",
-      "Detachable food container",
-      "Carry strap",
-      "BPA-free materials",
-      "Pink, White or Blue"
+      "Foldable silicone bowl built into the cap",
+      "Unfold, pour, your dog drinks — no separate bowl to carry",
+      "Stainless steel body, rust-resistant",
+      "Compact enough for a bag or a leash clip",
+      "Plastic, Stainless Steel or Stainless Steel Deluxe",
+      "Blue or Pink"
     ],
-    material: "BPA-free plastic body and food container · Leak-proof sealing gasket · Carry strap",
-    whatsInBox: "1× 2-in-1 Dog Water Bottle (bottle, detachable food container, carry strap)"
+    material: "Stainless steel body (Plastic tier: BPA-free plastic) · Foldable silicone bowl cap",
+    whatsInBox: "1× 2-in-1 Portable Dog Water Bottle"
+  },
+  {
+    // task 127: brand-new product, no prior listing — see the note on id 1
+    // above for why `images`/`extraImages` are empty and `shopifyVariants`
+    // is omitted. PRICING IS A PLACEHOLDER pending real cost data from
+    // Shopify (explicitly "TBD" in the task); update before this goes live.
+    id: 2, name: "Foldable Dog Water Bowl", emoji: "🥤", image: "",
+    badge: "New", badgeClass: "badge-new",
+    // PLACEHOLDER stats pending a real sourced listing.
+    supplier: { rating: 4.9, ratings: 123 },
+    desc: "A foldable silicone cap that turns any standard water bottle into an instant dog water bowl. No dedicated bottle needed — just screw it onto a bottle you already have, unfold, and pour. Leak-proof and ultra-packable, perfect for spontaneous walks when you didn't plan ahead.",
+    tagline: "Turns any bottle you're already carrying into a dog bowl.",
+    sizes: ["Universal — fits standard bottle necks"],
+    colors: ["Pink", "Green"],
+
+    images: {},
+    extraImages: [],
+
+    // PLACEHOLDER price — not sourced yet (task says "TBD... I'll confirm
+    // once sourced in Shopify with real cost data").
+    price: 7.99, was: 11.99,
+
+    features: [
+      "Screws onto any standard water bottle",
+      "Unfolds into a stable drinking bowl",
+      "Leak-proof seal",
+      "Folds flat for the pocket or a bag",
+      "No dedicated bottle required",
+      "Pink or Green"
+    ],
+    material: "Food-grade silicone",
+    whatsInBox: "1× Foldable Dog Water Bowl (cap only — fits your own bottle)"
   },
   {
     // The Collapsible Dog Bowl occupied this id (and the 1/3/6/9/10 numbering
@@ -661,7 +666,8 @@ function slugify(name) {
 // MIRRORED in api/_seo.js — the server needs the same map to serve the right
 // meta (and a canonical pointing at the new URL) for a crawler on an old link.
 var RENAMED_SLUGS = {
-  'light-up-dog-collar': 6   // -> "LED Dog Collar" (task 95)
+  'light-up-dog-collar': 6,        // -> "LED Dog Collar" (task 95)
+  '2-in-1-dog-water-bottle': 1     // -> "2-in-1 Portable Dog Water Bottle" (task 127, different product in the same slot)
 };
 
 function pageToPath(page) {
@@ -857,7 +863,7 @@ function showPage(page, opts) {
 // starts jumping on load again.
 // Order of the cards on the Shop page, by product id. Products missing from
 // this list still show, after these.
-var SHOP_ORDER = [1, 10, 6, 9, 3]; // Water Bottle, LED Leash, LED Collar, Wrist Strap, Poop Bag Clip
+var SHOP_ORDER = [1, 2, 10, 6, 9, 3]; // Water Bottle, Foldable Water Bowl, LED Leash, LED Collar, Wrist Strap, Poop Bag Clip
 
 function shopOrderedProducts() {
   var rank = function (p) { var i = SHOP_ORDER.indexOf(p.id); return i === -1 ? 999 : i; };
@@ -919,7 +925,7 @@ var BUNDLES = [
   {
     id: 'hydration',
     name: 'Walk Essentials Bundle',
-    blurb: 'Two different jobs. The bottle keeps your dog hydrated and fed on the move. The clip keeps your hands free for everything else, bag duty included.',
+    blurb: 'Two different jobs. The bottle keeps your dog hydrated on the move. The clip keeps your hands free for everything else, bag duty included.',
     tagline: 'Hydrated and hands-free',
     ids: [1, 3],
     // One line under each product saying what it is FOR, so the pair reads
@@ -928,6 +934,19 @@ var BUNDLES = [
     pct: 20,
     img: 'https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900',
     imgAlt: 'A Poop Bag Clip holding a tied-off bag on a leash',
+  },
+  {
+    // task 127: pairs the two new portable-hydration products. No real photo
+    // for either yet (see the note on products.js id 1) — `img` is left out
+    // entirely so the card just shows each line item's emoji fallback
+    // instead of a fabricated photo.
+    id: 'portable-hydration',
+    name: 'Hydration Bundle',
+    blurb: "One carries the water, the other turns any spare bottle into a bowl. Bring the 2-in-1 for the walk, keep the Foldable Bowl on hand for whatever bottle you've already got.",
+    tagline: 'A bottle and a backup bowl',
+    ids: [1, 2],
+    roles: { 1: 'Your everyday walk bottle, bowl built in', 2: 'A spare bowl for any other bottle' },
+    pct: 15
   },
   {
     id: 'visibility',
@@ -989,7 +1008,7 @@ function bundleTotals(b) {
 
 function bundleOptionSelect(b, p, field, options, current) {
   if (!options || options.length < 2) return '';
-  var label = field === 'size' ? 'Size' : 'Colour';
+  var label = field === 'size' ? (p.sizeLabel || 'Size') : 'Colour';
   return '<select class="bundle-select" aria-label="' + esc(p.name) + ' ' + label.toLowerCase() + '"' +
     ' onchange="bundlePickChange(\'' + b.id + '\',' + p.id + ',\'' + field + '\',this.value)">' +
     options.map(function (o) {
@@ -1701,6 +1720,13 @@ function showProduct(id, opts) {
   renderDetailShopPay();
   renderDetailBundle();
   initShareControl();
+
+  // Most products use "sizes" for an actual physical size; the 2-in-1
+  // Portable Bottle (task 127) uses it for material tiers instead, so its
+  // data carries a `sizeLabel` override for this heading ("Material" instead
+  // of "Size"). Every other product has no `sizeLabel` and keeps "Size".
+  var sizeLabelEl = document.getElementById('detailSizeLabel');
+  if (sizeLabelEl) sizeLabelEl.textContent = currentProduct.sizeLabel || 'Size';
 
   document.getElementById('detailSizes').innerHTML = currentProduct.sizes.map((s, i) =>
     `<button class="option-btn ${i===defSizeIdx?'active':''}" onclick="selectSize(this)">${s}</button>`).join('');

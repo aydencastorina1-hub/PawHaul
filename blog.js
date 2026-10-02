@@ -162,7 +162,7 @@ var blogPosts = [
 </ul>
 
 <h2>The gear people forget in winter</h2>
-<p>Night walks in winter are also cold walks, and cold weather quietly changes what your dog needs. Dogs still dehydrate in the cold — they just do not look like they are panting for it, so owners skip water. On longer evening walks, carry it. A <a href="/product/2-in-1-dog-water-bottle">bottle with a flip-out spout</a> takes ten seconds to use and removes any reason to cut a walk short.</p>
+<p>Night walks in winter are also cold walks, and cold weather quietly changes what your dog needs. Dogs still dehydrate in the cold — they just do not look like they are panting for it, so owners skip water. On longer evening walks, carry it. A <a href="/product/2-in-1-portable-dog-water-bottle">bottle with a fold-out bowl built into the cap</a> takes ten seconds to use and removes any reason to cut a walk short.</p>
 
 <h2>A quick pre-walk check</h2>
 <p>It takes fifteen seconds and it catches almost everything:</p>
@@ -208,7 +208,7 @@ var blogPosts = [
 <h2>Walks over 30 minutes: add water</h2>
 <p>Thirty minutes is roughly the line where water stops being optional, and it moves a lot earlier in heat — over about 24°C, take water on any walk at all.</p>
 <p>Dogs cool themselves by panting, which means they lose water much faster than we do while showing far fewer obvious signs. By the time a dog is visibly struggling, it has been dehydrated for a while.</p>
-<p>The sensible option is an <strong>all-in-one bottle</strong> with a flip-out drinking trough. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> also seals a dry food compartment into the same body, which covers the longer outings where a meal lands mid-walk.</p>
+<p>The sensible option is an <strong>all-in-one bottle</strong> with a fold-out bowl built into the cap. Best for street and park walks — one item, one hand, nothing to assemble. The <a href="/product/2-in-1-portable-dog-water-bottle">2-in-1 Portable Dog Water Bottle</a> unfolds a real bowl in seconds, so your dog gets a proper drink instead of a few sips from a cupped hand.</p>
 
 <h2>Evening and early-morning walks: add light</h2>
 <p>From autumn onward most weekday walks happen in the dark at one end or the other. The rule is that reflective strips are a supplement and an active light is the actual safety item — reflective material only works when a headlight is aimed at it, which is exactly not the case at junctions and turns.</p>
@@ -305,7 +305,12 @@ var blogPosts = [
 
 <h2>Carrying it without the hassle</h2>
 <p>The reason dogs go without water on walks is almost never that owners do not care. It is that the setup is annoying — a human bottle you have to cup your hand under, or a bowl at the bottom of a bag, and the walk is short so you skip it.</p>
-<p>The setup that removes that friction is <strong>an integrated bottle</strong> with a flip-out trough. One hand, no assembly, nothing to hold. The <a href="/product/2-in-1-dog-water-bottle">2-in-1 Dog Water Bottle</a> comes in 350ml and 550ml — use the formula above to pick. A 20kg dog on hour-long summer walks wants the 550ml; a small dog on 30-minute walks is well covered by the 350ml. It also seals a dry food compartment in the same body, which matters on longer outings.</p>
+<p>Two setups remove that friction:</p>
+<ul>
+  <li><strong>An integrated bottle</strong> with a fold-out bowl built into the cap. One hand, no assembly, nothing to hold. Unfold the <a href="/product/2-in-1-portable-dog-water-bottle">2-in-1 Portable Dog Water Bottle</a>'s bowl, pour, and your dog gets a proper drink — use the formula above to judge how much to offer, then fold it flat again once they're done.</li>
+  <li><strong>A bowl that fits the bottle you already carry.</strong> Best if you are bringing your own water anyway and would rather not switch bottles. The <a href="/product/foldable-dog-water-bowl">Foldable Dog Water Bowl</a> screws onto a standard bottle neck and unfolds the same way.</li>
+</ul>
+<p>Either way, the formula above still tells you how much to offer — the gear just decides how easy it is to actually do it.</p>
 
 <h2>Puddles, streams, and other people's bowls</h2>
 <p>Standing water is worth avoiding where you reasonably can. Puddles, ponds and communal bowls carry giardia, leptospirosis and blue-green algae — the last of which is genuinely lethal and blooms in warm, still water in summer. Rivers and fast-moving streams are lower risk but not zero.</p>

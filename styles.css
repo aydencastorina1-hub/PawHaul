@@ -917,6 +917,36 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
   background: none;
   animation: none;
 }
+/* task 127: stand-in for the real cutout shot until the new 2-in-1 Portable
+   Bottle has one — a dashed-border card with an emoji and an explicit "Photo
+   coming soon" tag, not a silent blank box, so the gap is obvious on the live
+   site and not just in a code comment. Remove this class (keep `.bp-image`
+   as a real <img>, same as the old cutout markup) once a real photo exists. */
+.bp-image-placeholder {
+  width: 260px;
+  height: 320px;
+  max-width: 70vw;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 2px dashed rgba(255, 255, 255, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+.bp-image-placeholder-emoji { font-size: 96px; line-height: 1; }
+.bp-image-placeholder-tag {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(13, 13, 26, 0.3);
+  padding: 6px 12px;
+  border-radius: 50px;
+}
 
 .bp-content { max-width: 520px; color: white; }
 .bp-title {
@@ -1398,6 +1428,72 @@ img.reviewer-av {
 .verified { margin-left: auto; font-size: 11px; color: var(--green); font-weight: 700; }
 
 /* FAQ */
+/* MEET OUR PORTABLE BOTTLES (task 126) — comparison section for the two
+   hydration products added in task 127. Same section rhythm as .faq-section
+   just below (white background, 140px vertical padding, centered header). */
+.bottle-compare-section { padding: 140px 5%; background: white; }
+.bottle-compare-header { text-align: center; margin-bottom: 56px; }
+.bottle-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  max-width: 940px;
+  margin: 0 auto;
+}
+.bottle-compare-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px 28px 36px;
+  border: 2px solid var(--line-soft);
+  border-radius: var(--radius-sm);
+}
+/* Placeholder media — no real product photo for either item yet (see the
+   HTML comment above this section). Same idea as .bp-image-placeholder on
+   the homepage hero, restyled for a white background instead of orange. */
+.bottle-compare-media {
+  width: 100%;
+  max-width: 220px;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  background: var(--light-gray);
+  border: 2px dashed #D8D2C8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.bottle-compare-emoji { font-size: 72px; line-height: 1; }
+.bottle-compare-soon {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--gray);
+  background: white;
+  padding: 5px 10px;
+  border-radius: 50px;
+}
+.bottle-compare-name { font-family: var(--font-display); font-size: 21px; color: var(--navy); margin-bottom: 6px; }
+.bottle-compare-price { font-weight: 800; color: var(--orange); font-size: 15px; margin-bottom: 14px; }
+.bottle-compare-desc { font-size: 14px; color: var(--gray); line-height: 1.6; font-weight: 600; margin-bottom: 14px; }
+.bottle-compare-best-for { font-size: 13.5px; color: var(--navy); margin-bottom: 20px; }
+.bottle-compare-bundle-note {
+  text-align: center;
+  margin-top: 40px;
+  font-weight: 700;
+  color: var(--gray);
+}
+.bottle-compare-bundle-note a { color: var(--orange); font-weight: 800; }
+@media (max-width: 760px) {
+  .bottle-compare-grid { grid-template-columns: 1fr; }
+  .bottle-compare-section { padding: 60px 5%; }
+}
+
 .faq-section { padding: 140px 5%; background: white; }
 .faq-header { text-align: center; margin-bottom: 56px; }
 .faq-wrap { max-width: 700px; margin: 0 auto; }
