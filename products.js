@@ -102,7 +102,13 @@ var products = [
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
     tagline: "Hands-free carrying for used bags, every walk.",
     sizes: ["Universal — fits all leashes"],
-    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
+    // "Light Blue" and "Dark Blue" are new (not part of the original
+    // Shopify catalogue recovered below) — there is no real photo or
+    // Shopify variant GID for either yet, so they fall back to the first
+    // color's photo (imageForColor() in this file) and won't check out via
+    // Shopify until real images/variant GIDs are added to `images` and
+    // `shopifyVariants.byColor` below.
+    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Light Blue", "Dark Blue"],
 
     // RE-SYNCED from Shopify (task 99), recovered from before this product
     // was discontinued. Six colours, six variant-assigned photos.
@@ -145,7 +151,7 @@ var products = [
       "Keeps both hands free while walking your dog",
       "Lightweight and compact design",
       "Quick, hygienic cleanup every time",
-      "6 colors to choose from"
+      "8 colors to choose from"
     ],
     material: "Durable silicone clip · Secure metal hook attachment",
     whatsInBox: "1× Poop Bag Clip"
@@ -1232,7 +1238,9 @@ var SWATCH_COLORS = {
   // have rendered as a grey circle sitting next to the strap's real Gray.
   // ("White" is still missing and still falls back for the Water Bottle —
   // left alone, out of scope here.)
-  brown: '#8B5E3C', purple: '#7C3AED'
+  brown: '#8B5E3C', purple: '#7C3AED',
+  // Added for the Poop Bag Clip's new Light Blue / Dark Blue colourway.
+  'light blue': '#7EC8E3', 'dark blue': '#1E3A8A'
 };
 
 // "Teal/Blue" style dual names render as a split circle.

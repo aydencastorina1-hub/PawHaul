@@ -294,7 +294,7 @@ const PRODUCT_COPY = {
   },
   3: {
     title: 'Poop Bag Clip — Hands-Free Waste Bag Carrier',
-    description: 'Hands-free silicone clip that holds a used poop bag securely on your leash or belt. Six colours. $6.99 with free shipping.'
+    description: 'Hands-free silicone clip that holds a used poop bag securely on your leash or belt. Eight colours. $6.99 with free shipping.'
   },
   10: {
     title: 'LED Flashlight Retractable Dog Leash — Light Up Night Lead',
