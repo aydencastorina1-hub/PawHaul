@@ -4545,23 +4545,28 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
 @media (max-width: 900px) {
   /* ---------- panel shell ---------- */
+  /* task 125: full-page takeover, not a right-side drawer — left:0 on top of
+     the base rule's top/right/bottom:0 is what makes this cover the whole
+     viewport (that base rule never declared `left`, which is exactly how the
+     drawer got its width: an implicit left edge at `100% - width`). No more
+     border-radius/box-shadow: those read as a floating card, which a
+     full-bleed page is not. */
   .mob-menu {
-    width: min(330px, 88vw);
+    left: 0;
+    width: auto;
     background: #fff;
-    box-shadow: -24px 0 60px -20px rgba(13, 13, 26, 0.45), -2px 0 0 rgba(13, 13, 26, 0.06);
-    /* Softened left edge — the panel reads as a card laid over the page
-       rather than a slab cut out of the viewport. */
-    border-radius: 20px 0 0 20px;
+    box-shadow: none;
+    border-radius: 0;
 
     /* THE PANEL FADES IN; it does not slide across. The base .mob-menu rule
        higher up this file parks it at translateX(100%) — a full panel-width
-       slide — and this overrides that with a fade plus a 14px drift, which is
-       just enough movement to give the fade a direction without turning it
-       back into a slide. Set the translate to 0 for a completely still fade.
+       slide — and this overrides that with a fade plus a gentle scale, which
+       reads as an arrival without a drawer's sense of direction (there is no
+       "from the right" any more — the panel covers the whole screen).
        (The base rule is left alone: it is what a browser that never reaches
         this block still gets, and off-screen is the safe closed state.) */
     opacity: 0;
-    transform: translateX(14px);
+    transform: scale(0.98);
     /* CLOSING timing — shorter, and accelerating away. A panel leaving on the
        same long quint-out it arrived on is what made the old menu feel
        sluggish: the tail of that curve creeps on after the motion looks over. */
@@ -4579,7 +4584,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      into view, but still gets out of the way promptly when dismissed. */
   .mob-menu.open {
     opacity: 1;
-    transform: translateX(0);
+    transform: scale(1);
     transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
   }
 
@@ -4598,6 +4603,8 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     border-bottom: none;
     flex-shrink: 0;
   }
+  /* Now a <button> (tapping it goes home — see index.html) rather than a
+     plain div, so it needs the usual button reset on top of its layout. */
   .mob-menu-brand {
     display: flex;
     flex-direction: row;
@@ -4605,7 +4612,13 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     justify-content: flex-start;
     gap: 11px;
     padding: 0;
+    border: none;
     border-bottom: none;
+    background: none;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .mob-menu-brand-icon {
     width: 38px;
@@ -4641,7 +4654,91 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   }
   .mob-menu-close:active { background: rgba(255, 255, 255, 0.24); transform: rotate(90deg); }
 
-  /* ---------- grouped link list ---------- */
+  /* ---------- task 125: full-page image-grid menu ---------- */
+  /* The scrollable middle of the panel — header and footer stay put, this is
+     the part that grows past one screen on a short phone (a 2x2 image grid
+     plus the Blog/Contact rows is taller than the old plain link list was).
+     flex:1 + overflow-y:auto is what makes that scroll instead of overflowing
+     the fixed-height panel or getting clipped. */
+  .mob-menu-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .mob-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 16px 16px 6px;
+  }
+  /* `.mob-menu a.mob-grid-tile`, not bare `.mob-grid-tile`: the base
+     `.mob-menu a` rule (class+tag, far above this file) sets display:block
+     and padding:18px 20px, and beats a single-class selector on specificity
+     regardless of source order — the exact trap `.mob-menu a.mob-link`
+     elsewhere in this file exists to dodge. Skipping it here silently broke
+     the flex layout (tiles rendered as blocks with the link-row padding,
+     pushing the label to the top-left instead of flex-end at the bottom). */
+  .mob-menu a.mob-grid-tile {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    aspect-ratio: 1 / 1.05;
+    padding: 0;
+    border-bottom: none;
+    border-radius: 16px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--light-gray);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s var(--ease);
+  }
+  .mob-menu a.mob-grid-tile:active {
+    transform: scale(0.97);
+    color: #fff;
+    background-color: var(--light-gray);
+  }
+  /* Darkens the bottom half so the white label stays legible over any photo
+     (including a plain white product-studio shot, not just a dark lifestyle
+     one), without a flat tint over the whole tile. */
+  .mob-grid-tile-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(13, 13, 26, 0) 32%, rgba(13, 13, 26, 0.88) 100%);
+    pointer-events: none;
+  }
+  .mob-grid-tile-label {
+    position: relative;
+    z-index: 1;
+    padding: 14px;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 15px;
+    color: #fff;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  }
+  /* Wishlist: no lifestyle photo fits "saved favorites", so this tile is
+     navy/orange-gradient-and-icon instead of photo-and-caption.
+     `.mob-menu a.mob-grid-tile.mob-grid-tile--brand`, not bare
+     `.mob-grid-tile--brand`: align-items:center here would otherwise lose to
+     `.mob-menu a.mob-grid-tile`'s align-items:flex-end above on specificity,
+     the same trap documented on that rule. */
+  .mob-menu a.mob-grid-tile.mob-grid-tile--brand {
+    background-image: linear-gradient(145deg, var(--navy), #232340);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .mob-grid-tile--brand .mob-grid-tile-icon { color: var(--orange); }
+  .mob-grid-tile--brand .mob-grid-tile-label { padding: 0; }
+  /* Current page, same treatment as the .mob-link rows below. */
+  .mob-menu a.mob-grid-tile.is-active { box-shadow: inset 0 0 0 3px var(--orange); }
+
+  /* ---------- link list (Blog, Contact — everything else is a grid tile
+     above, "Home" is the header's own logo/brand button) ---------- */
   /* This is a real <nav> element, and the NAVBAR rule near the top of this
      file selects bare `nav` — so without resetting it here the menu's list
      inherits the site header's sticky positioning, navy background, flex-row
@@ -4668,12 +4765,10 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     box-shadow: none;
     z-index: auto;
     height: auto;
-    /* Fixed, not scrollable (per explicit request): natural block height,
-       no flex-grow, no overflow. The link list is short enough to always
-       fit a real phone screen, and the extra bottom padding here is the
-       deliberate breathing room before the footer below. */
     flex-shrink: 0;
+    margin-top: 10px;
     padding: 14px 12px 32px;
+    border-top: 1px solid var(--line-soft);
   }
   .mob-menu-group {
     font-family: var(--font-body);

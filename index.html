@@ -165,7 +165,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=157" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=158" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -342,60 +342,58 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
      only filled mark is the brand paw, as everywhere else. -->
 <div class="mob-menu" id="mobMenu" role="dialog" aria-modal="true" aria-label="Menu" aria-hidden="true" inert>
   <div class="mob-menu-header">
-    <div class="mob-menu-brand">
+    <button class="mob-menu-brand" type="button" onclick="goTo(event,'home');closeMobileMenu()">
       <img class="mob-menu-brand-icon" src="/images/brand/logo-circle.png" width="40" height="40" alt="" aria-hidden="true">
       <div class="mob-menu-brand-copy">
         <span class="mob-menu-title">Menu</span>
         <span class="mob-menu-brand-text">Paw<span>Haul</span></span>
       </div>
-    </div>
+    </button>
     <button class="mob-menu-close" onclick="closeMobileMenu()" aria-label="Close menu">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
 
-  <nav class="mob-menu-nav" aria-label="Site">
-    <p class="mob-menu-group">Browse</p>
-    <a class="mob-link" data-nav="home" href="/" onclick="goTo(event,'home');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-      <span class="mob-link-label">Home</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-    <a class="mob-link" data-nav="shop" href="/shop" onclick="goTo(event,'shop');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>
-      <span class="mob-link-label">Shop Walk Gear</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-    <a class="mob-link" data-nav="bundles" href="/bundles" onclick="goTo(event,'bundles');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span>
-      <span class="mob-link-label">Bundles</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-    <a class="mob-link" data-nav="about" href="/about" onclick="goTo(event,'about');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-      <span class="mob-link-label">Our Story</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-    <a class="mob-link" data-nav="blog" href="/blog" onclick="goTo(event,'blog');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
-      <span class="mob-link-label">Blog</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
+  <!-- task 125: full-page image-grid menu, replacing the old simple link
+       list (tasks 49/117/119). "Home" has no tile/row of its own any more —
+       tapping the brand/logo above goes home instead — matching the
+       requested remaining-items list (Blog, Contact) exactly. -->
+  <div class="mob-menu-body">
+    <div class="mob-menu-grid">
+      <a class="mob-grid-tile" data-nav="shop" href="/shop" onclick="goTo(event,'shop');closeMobileMenu()" style="background-image:url('/images/products/water-bottle-blue-main.jpg')">
+        <span class="mob-grid-tile-scrim" aria-hidden="true"></span>
+        <span class="mob-grid-tile-label">Shop All</span>
+      </a>
+      <a class="mob-grid-tile" data-nav="bundles" href="/bundles" onclick="goTo(event,'bundles');closeMobileMenu()" style="background-image:url('/images/products/collar-lifestyle-6.jpg')">
+        <span class="mob-grid-tile-scrim" aria-hidden="true"></span>
+        <span class="mob-grid-tile-label">Bundles</span>
+      </a>
+      <!-- No lifestyle photo represents "saved favorites" anywhere on the
+           site, so this tile is icon-based (navy/orange gradient + a heart)
+           rather than a photo with a caption that would not mean anything. -->
+      <a class="mob-grid-tile mob-grid-tile--brand" data-nav="wishlist" href="/wishlist" onclick="goTo(event,'wishlist');closeMobileMenu()">
+        <svg class="mob-grid-tile-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span class="mob-grid-tile-label">Wishlist</span>
+      </a>
+      <a class="mob-grid-tile" data-nav="about" href="/about" onclick="goTo(event,'about');closeMobileMenu()" style="background-image:url('https://images.unsplash.com/photo-1576201836106-db1758fd1c97?fm=jpg&amp;fit=crop&amp;q=75&amp;w=800')">
+        <span class="mob-grid-tile-scrim" aria-hidden="true"></span>
+        <span class="mob-grid-tile-label">Our Story</span>
+      </a>
+    </div>
 
-    <p class="mob-menu-group">Your stuff</p>
-    <a class="mob-link" data-nav="wishlist" href="/wishlist" onclick="goTo(event,'wishlist');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 1 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>
-      <span class="mob-link-label">Wishlist</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-
-    <p class="mob-menu-group">Help</p>
-    <a class="mob-link" data-nav="contact" href="/contact" onclick="goTo(event,'contact');closeMobileMenu()">
-      <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
-      <span class="mob-link-label">Contact</span>
-      <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
-    </a>
-  </nav>
+    <nav class="mob-menu-nav" aria-label="More">
+      <a class="mob-link" data-nav="blog" href="/blog" onclick="goTo(event,'blog');closeMobileMenu()">
+        <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+        <span class="mob-link-label">Blog</span>
+        <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <a class="mob-link" data-nav="contact" href="/contact" onclick="goTo(event,'contact');closeMobileMenu()">
+        <span class="mob-link-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+        <span class="mob-link-label">Contact</span>
+        <svg class="mob-link-chev" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+    </nav>
+  </div>
 
   <div class="mob-menu-footer">
     <div class="paw-divider paw-divider--on-light" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></div>
