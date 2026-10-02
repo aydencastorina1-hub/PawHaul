@@ -175,7 +175,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
   <link rel="preload" as="script" href="/products.js?v=89">
-  <link rel="preload" as="script" href="/app.js?v=74">
+  <link rel="preload" as="script" href="/app.js?v=75">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1248,7 +1248,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     <div id="chatMessages" style="height:220px;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:#f8f6f2;">
       <div style="display:flex;gap:8px;align-items:flex-start;">
         <div style="width:30px;height:30px;border-radius:50%;background:#E8630A;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">&#128062;</div>
-        <div style="background:#1a1a2e;border-radius:14px 14px 14px 4px;padding:10px 13px;max-width:220px;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:13px;font-weight:600;color:white;line-height:1.5;">
+        <div style="background:white;border:1px solid #ECE7E0;border-radius:14px 14px 14px 4px;padding:10px 13px;max-width:220px;box-shadow:0 2px 8px rgba(0,0,0,0.06);font-size:13px;font-weight:600;color:#1a1a2e;line-height:1.5;">
           Hey! I'm your PawHaul guide. Ask me about our walk gear, shipping, returns or anything else!
         </div>
       </div>
@@ -1296,7 +1296,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
   <script src="/products.js?v=89"></script>
-  <script src="/app.js?v=74"></script>
+  <script src="/app.js?v=75"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
