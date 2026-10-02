@@ -5925,6 +5925,45 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 #chatWindow.chat-closing { animation: chatWinOut 0.18s var(--ease-exit) forwards; pointer-events: none; }
 #chatMessages { overscroll-behavior: contain; }
 
+/* ── Chat window drag-handle: tap to expand to fullscreen ── */
+.chat-window-handle {
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 6px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.chat-window-handle-dash {
+  width: 36px;
+  height: 4px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.35);
+  transition: background-color 0.15s ease;
+}
+.chat-window-handle:hover .chat-window-handle-dash,
+.chat-window-handle:active .chat-window-handle-dash { background: rgba(255,255,255,0.6); }
+
+#chatWindow.chat-fullscreen {
+  /* #chatWindow carries an inline style (width/max-width/max-height/margin/
+     border-radius), which beats a class selector on specificity alone —
+     !important is the only way to override it from here. */
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  z-index: 10000;
+  animation: none;
+  transform: none;
+}
+#chatWindow.chat-fullscreen #chatMessages { flex: 1; height: auto; }
+#chatWindow.chat-fullscreen .chat-window-handle-dash { background: rgba(255,255,255,0.5); }
+
 /* ── Policy modal (shipping/returns/privacy): fade + gentle rise ── */
 @keyframes policyFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes policyFadeOut { from { opacity: 1; } to { opacity: 0; } }

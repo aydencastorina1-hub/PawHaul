@@ -175,7 +175,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=8">
   <link rel="preload" as="script" href="/products.js?v=89">
-  <link rel="preload" as="script" href="/app.js?v=75">
+  <link rel="preload" as="script" href="/app.js?v=76">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1233,7 +1233,11 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
     </div>
   </div>
 
-  <div id="chatWindow" style="display:none;width:100%;max-width:320px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:12px;overflow:hidden;max-height:70vh;">
+  <div id="chatWindow" style="display:none;flex-direction:column;width:100%;max-width:320px;background:white;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.18);margin-bottom:12px;overflow:hidden;max-height:70vh;">
+
+    <!-- Drag-handle dash: tap to expand the chat to fullscreen, tap again to
+         shrink back down. Same navy as the header so it reads as part of it. -->
+    <div class="chat-window-handle" onclick="toggleChatFullscreen(event)" role="button" tabindex="0" aria-label="Expand chat to fullscreen" onkeydown="if(event.key==='Enter'){toggleChatFullscreen(event);}"><span class="chat-window-handle-dash"></span></div>
 
     <div style="background:#1a1a2e;padding:14px 16px;display:flex;align-items:center;gap:10px;">
       <img src="/images/brand/logo-circle.png" width="36" height="36" alt="" style="border-radius:50%;object-fit:cover;flex-shrink:0;display:block;">
@@ -1296,7 +1300,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=8"></script>
   <script src="/products.js?v=89"></script>
-  <script src="/app.js?v=75"></script>
+  <script src="/app.js?v=76"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

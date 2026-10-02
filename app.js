@@ -9,13 +9,24 @@ function toggleChat() {
   clearTimeout(toggleChat._t);
   win.classList.remove('chat-closing');
   if (chatOpen) {
-    win.style.display = 'block';
+    win.style.display = 'flex';
   } else {
     win.classList.add('chat-closing');
     toggleChat._t = setTimeout(function () {
       win.classList.remove('chat-closing');
       win.style.display = 'none';
     }, 180);
+    // Closing the chat always drops it out of fullscreen too, so it
+    // reopens at its normal floating size next time.
+    if (win.classList.contains('chat-fullscreen')) {
+      win.classList.remove('chat-fullscreen');
+      document.body.style.overflow = '';
+      var msgs = document.getElementById('chatMessages');
+      if (msgs) {
+        msgs.style.height = msgs.dataset.origHeight || '220px';
+        msgs.style.flex = '';
+      }
+    }
   }
   // Closed-state icon: a chat bubble (task 117), not the paw. Keep this SVG
   // in sync with the one inlined on #chatToggle in index.html.
@@ -24,6 +35,29 @@ function toggleChat() {
   // bubble has done its job.
   if (typeof dismissChatGreeting === 'function') dismissChatGreeting();
   // input focus removed to prevent keyboard covering chat on mobile
+}
+
+// Drag-handle dash at the top of the chat window: tap to expand it to fill
+// the screen, tap again to shrink back to the normal floating card.
+function toggleChatFullscreen(e) {
+  if (e) e.stopPropagation();
+  var win = document.getElementById('chatWindow');
+  var msgs = document.getElementById('chatMessages');
+  if (!win) return;
+  var full = win.classList.toggle('chat-fullscreen');
+  document.body.style.overflow = full ? 'hidden' : '';
+  // #chatMessages has an inline height:220px (set in index.html), which beats
+  // the chat-fullscreen CSS class on specificity alone — swap it in JS instead.
+  if (msgs) {
+    if (full) {
+      if (!msgs.dataset.origHeight) msgs.dataset.origHeight = msgs.style.height;
+      msgs.style.height = 'auto';
+      msgs.style.flex = '1';
+    } else {
+      msgs.style.height = msgs.dataset.origHeight || '220px';
+      msgs.style.flex = '';
+    }
+  }
 }
 
 function askQuick(question) {
