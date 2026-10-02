@@ -3346,6 +3346,18 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
     z-index: 900;
     flex-wrap: nowrap;
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    /* task 124: was the desktop base rule's justify-content:space-between,
+       inherited unchanged. That only ever worked here by accident, back
+       when .logo was still a real flex item splitting the row into even
+       gaps — now that .logo is taken out of flow and centred absolutely
+       (below), space-between would spread the 3 remaining items (hamburger,
+       search, cart) evenly across the FULL width instead of keeping
+       hamburger+search grouped together on the left, which visually
+       collides with the now-centred logo. flex-start + nav-right's own
+       margin-left:auto (below) keeps the left pair grouped and pins cart to
+       the right edge instead. */
+    justify-content: flex-start;
+    gap: 10px;
   }
   /* Paw badge/logo sized to fit the --mob-nav-h bar (task 120: bumped up from
      36px/21px to sit closer to the reference's scale). */
@@ -3370,9 +3382,33 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
      desktop order (search, cart, hamburger) even inside this ≤900px block. */
   nav > .hamburger { order: 1; }
   nav > .nav-search-btn { order: 2; }
-  nav > .logo { order: 3; flex: 1; justify-content: center; }
+  /* task 124: true centering, not flex:1-within-its-own-box centering. The
+     left group (hamburger+search, two icons) and right group (cart alone,
+     one icon) are different widths, so giving .logo flex:1 and centering
+     its OWN content only centers it within the leftover space AFTER those
+     two groups — which is itself off-center, since one side group is wider
+     than the other. Measured: the logo sat visibly left of true centre,
+     more empty space on the right (toward cart) than the left (toward
+     search), exactly as reported.
+     Fix: take .logo out of the flex flow entirely and centre it on nav's
+     own box directly (nav is position:sticky, which — like relative/fixed/
+     absolute — establishes the containing block absolute positioning needs,
+     so no extra wrapper is required). left:50% + translateX(-50%) centres
+     on nav's actual width regardless of what either side group's combined
+     width is, so this holds at any viewport width or icon-count asymmetry,
+     not just the one size it was eyeballed against. */
+  nav > .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
   .nav-center { display: none; }
-  nav > .nav-right { order: 4; }
+  /* margin-left:auto consumes all the free space left of nav-right, pinning
+     it to the right edge while hamburger+search stay grouped at the start
+     (flex-start, above) — the classic flex trick for "two groups, opposite
+     ends" without space-between's even-spread-everything behaviour. */
+  nav > .nav-right { order: 4; margin-left: auto; }
   /* Logo itself (task 123): wordmark first, paw icon after — reversed from
      desktop's icon-then-wordmark. Still one flex row (.logo, unchanged),
      just re-ordering its two existing children rather than touching the DOM,
@@ -3703,6 +3739,21 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   .mission-section { padding: 36px 5%; }
   .stat-num { font-size: 28px; }
   .about-hero { padding: 56px 5%; }
+}
+
+/* task 124: the header's centered logo group (absolutely centered on nav —
+   see the nav > .logo rule in the ≤900px block) is a FIXED width regardless
+   of viewport, while the space available to its left (between it and the
+   search icon) shrinks as the viewport narrows. Measured exactly where that
+   runs out: clear down to ~340px, a few px of overlap below that. Only
+   really hits old/small phones (iPhone SE 1st-gen class, 320px) — nothing
+   in the regular modern range (375px+) — but shrinking the logo slightly
+   below that width removes the overlap with room to spare rather than
+   leaving it merely untested. */
+@media (max-width: 360px) {
+  .logo-text { font-size: 17px; }
+  .logo-circle { width: 32px; height: 32px; }
+  .logo { gap: 6px; }
 }
 
 /* Disable hover transform effects on touch devices */
