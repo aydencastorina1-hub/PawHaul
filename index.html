@@ -118,31 +118,51 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 <!-- Nothing ever replaces the skeletons without JS, so don't leave a permanently
      "loading" grid sitting there for a no-JS visitor or a crawler. -->
 <noscript><style>.skel-card { display: none !important; }</style></noscript>
-<!-- HERO POSTER PRELOAD (task 121) — the hero is now a single looping video
-     (app.js decides whether it ever plays; see the hero <video> markup and
-     the HERO VIDEO block in app.js), so there's no per-slide randomization to
-     resolve anymore: just get the poster frame — the thing that actually
-     paints first, video or not — fetching at the highest priority as early as
-     possible. This is the direct replacement for the old random-slide-pick
-     preload and protects the same "no black/blank flash" property (tasks 17,
-     28, 31, 91, 96) the photo version did. Still gated on home-only: a direct
-     load of e.g. /product/<name> shouldn't have its own LCP image competing
-     with a poster for a section it isn't even showing.
-
-     TEMPORARY: the real clip (Pexels, trimmed/compressed) and its extracted
-     poster frame are still pending — this sandbox's network policy blocks
-     every outbound host, including Pexels, so the download has to happen
-     outside this session. Until then this URL — and the <video poster> below
-     — point at one of the old hero photos instead of a nonexistent local
-     file. Both <source>s below 404 harmlessly with nothing to play, so the
-     video element just shows this poster forever: visually a static photo
-     hero, not a broken one. Swap both this URL and the <video poster> to the
-     real local files (and the <source>s, if their paths change) together the
-     moment the clip is in. -->
+<!-- HERO SLIDESHOW restored — the task-121 video never got a real clip (this
+     sandbox has no outbound network access) and was just showing one of these
+     same photos as a permanent poster the whole time anyway, so the rotating
+     4-photo crossfade is back instead of a video that never actually played.
+     The hero slideshow starts on a random slide (app.js), so the LCP image
+     isn't known until we've picked one — decide it here (as early as possible)
+     and preload THAT exact image at highest priority, instead of always
+     preloading slide 1 regardless of which one actually shows first. Gated on
+     home-only: a direct load of e.g. /product/<name> shouldn't have its own
+     LCP image competing with a hero photo for a section it isn't even
+     showing. -->
 <script>
 (function () {
   if (!window.__isHomeInitial) return;
-  document.write('<link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" fetchpriority="high">');
+  // Was q=100 w=2400 flat (1.4-4.7MB per photo, no responsive sizing) — every
+  // visitor downloaded a 4K-quality file regardless of device, which on real
+  // mobile networks left the hero photo-less (dark overlay over bare
+  // placeholder) for long enough to be a visible "black flash". q=75 + real
+  // width buckets cut the typical mobile fetch from ~4.7MB to ~250-350KB.
+  // Deliberately kept as plain JPEG (fm=jpg), NOT auto=format/AVIF: measured
+  // side-by-side under a throttled connection and AVIF, despite being smaller
+  // in total bytes, made the flash WORSE — Chromium can't paint any partial
+  // AVIF frame, so nothing appears until 100% of the file arrives, whereas a
+  // JPEG paints progressively (a blurry top-down partial image) well before
+  // it's fully downloaded. Time-to-first-visible-pixels matters more here
+  // than final byte count once we're already this small. Buckets MUST match
+  // the <img srcset> ones below exactly, or this preload fetches a different
+  // URL than the browser ultimately picks and we just paid for two downloads
+  // instead of one.
+  var HERO_W = [640, 828, 1080, 1440, 1920, 2560];
+  var heroBases = [
+    'https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4',
+    'https://images.unsplash.com/photo-1518056914555-de1d7f0b3967',
+    'https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd',
+    'https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f'
+  ];
+  function heroUrl(base, w) { return base + '?fm=jpg&fit=crop&q=75&w=' + w; }
+  var idx = Math.floor(Math.random() * heroBases.length);
+  window.__heroStartIdx = idx;
+  // Mirror the browser's own srcset resolution (smallest bucket >= viewport*DPR)
+  // so the preloaded URL is byte-identical to what the <img> will request.
+  var target = Math.round((window.innerWidth || 800) * (window.devicePixelRatio || 1));
+  var w = HERO_W[HERO_W.length - 1];
+  for (var i = 0; i < HERO_W.length; i++) { if (HERO_W[i] >= target) { w = HERO_W[i]; break; } }
+  document.write('<link rel="preload" as="image" href="' + heroUrl(heroBases[idx], w) + '" fetchpriority="high">');
 })();
 </script>
 <noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" fetchpriority="high"></noscript>
@@ -165,7 +185,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=159" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=160" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -175,7 +195,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=10">
   <link rel="preload" as="script" href="/products.js?v=92">
-  <link rel="preload" as="script" href="/app.js?v=76">
+  <link rel="preload" as="script" href="/app.js?v=77">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -409,31 +429,33 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
 
   <!-- HERO -->
   <section id="heroSection" style="position:relative;width:100%;height:520px;overflow:hidden;background:#f0ede6;">
-    <!-- HERO VIDEO (task 121) — replaces the old 4-photo crossfade with a single
-         looping, muted, autoplaying background clip (Pexels, "A Family Walking
-         With Their Dog Outdoors", free for commercial use). No `autoplay` or
-         `preload` attribute here on purpose: app.js decides whether to ever
-         start fetching/playing the file, based on prefers-reduced-motion (task
-         116) — a reduced-motion visitor downloads zero video bytes and just
-         keeps this poster frame forever, rather than the video starting and
-         then being stopped. The poster is what prevents the old "black/blank
-         flash before the photo decodes" problem this hero has been fixed for
-         several times (tasks 17, 28, 31, 91, 96): it paints instantly from the
-         high-priority <link rel=preload> in <head>, same as the photo did.
-
-         TEMPORARY: poster is still one of the old hero photos, not the real
-         extracted frame — see the matching comment on the preload link in
-         <head> for why (network access to Pexels is blocked from this
-         sandbox) and what to swap once the real clip is downloaded. Both
-         <source>s below point at files that don't exist yet and will just
-         404 silently; with no source resolving, the video never has
-         anything to play, so it shows this poster permanently instead of
-         going blank — a static photo hero today, a real video the moment
-         the files land, no markup change needed beyond swapping the URLs. -->
-    <video class="hero-media" id="heroVideo" poster="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" muted loop playsinline preload="none" aria-hidden="true">
-      <source src="/videos/hero-walk.webm" type="video/webm">
-      <source src="/videos/hero-walk.mp4" type="video/mp4">
-    </video>
+    <!-- Crossfading slideshow — 4 images, 5s per image, 1.5s fade (initHeroSlideshow in app.js).
+         Restored: the task-121 <video> never got a real clip (this sandbox has no
+         outbound network access, Pexels included) and both its <source>s 404'd
+         silently the whole time, so it was just showing one of these same 4
+         photos as a permanent poster — a video in name only. Back to the real
+         rotating slideshow instead.
+         All 4 are eager+high-priority since the starting slide is randomized (head script) and
+         we want whichever one is chosen to already be loading, not just slide 1. Slide 1 keeps a
+         hardcoded "active" as the safe fallback if JS is disabled; the inline script right below
+         corrects this to the real random pick the instant it can (before any image data can have
+         arrived, so there's no visible swap).
+         srcset/sizes: responsive widths + q=75 (plain JPEG — see the preload script in <head> for
+         why AVIF was tried and rejected) cut the typical mobile download to ~250-400KB, shrinking
+         the window where the dark contrast overlay below is sitting on bare placeholder instead of
+         the actual photo. #heroSection also has an INLINE background (styles.css) so that window
+         is never literally transparent/white before styles.css itself has even loaded. -->
+    <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog out on a walk" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog on a leash walk" loading="eager" fetchpriority="high">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Happy dog outside" loading="eager" fetchpriority="high">
+    <script>
+    (function () {
+      var slides = document.querySelectorAll('#heroSection .hero-slide');
+      var idx = window.__heroStartIdx || 0;
+      slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+    })();
+    </script>
     <!-- Dark overlay -->
     <div class="hero-overlay" style="position:absolute;inset:0;background:linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.0) 100%);"></div>
     <!-- Text overlay — trimmed to headline + one line + up to 2 CTAs (task 117).
@@ -1352,7 +1374,7 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=10"></script>
   <script src="/products.js?v=92"></script>
-  <script src="/app.js?v=76"></script>
+  <script src="/app.js?v=77"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

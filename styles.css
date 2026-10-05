@@ -231,21 +231,26 @@ body {
    floor survives their higher specificity. */
 input, textarea, select { font-size: 16px; }
 
-/* HERO VIDEO (task 121) — single looping background video, replacing the old
-   4-photo crossfade. Light placeholder fallback so a slow-loading poster
-   never flashes black/navy before it decodes. No shimmer animation here
-   (unlike the universal `img` rule at the top of this file): the poster
-   attribute itself already shows instantly, and a <video> isn't an <img> so
-   it never picked up that rule in the first place. */
+/* HERO SLIDESHOW — 4 stacked slides crossfade (5s per image, 1.5s fade,
+   rotation driven from app.js). Every slide stays centered on its subject.
+   Light placeholder fallback so a slow-loading image never flashes black/navy
+   before it decodes — the individual .hero-slide <img>s also carry the
+   universal shimmer (see top of file) while their own bytes are in flight.
+   Restored in place of the task-121 <video>, which never got a real clip
+   (this sandbox has no outbound network access) and was just showing one of
+   these same 4 photos as a permanent poster the whole time. */
 #heroSection { background: var(--img-placeholder); }
-#heroSection .hero-media {
+#heroSection .hero-slide {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
 }
+#heroSection .hero-slide.active { opacity: 1; }
 
 /* CUSTOM CURSOR */
 .cursor { display: none; }
@@ -3557,7 +3562,7 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* -44px per direct feedback: "a little shorter" than the full remaining
      viewport height. */
   #heroSection { height: calc(100svh - var(--mob-announce-h) - var(--mob-nav-h) - 44px) !important; min-height: 420px; }
-  #heroSection .hero-media { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
+  #heroSection .hero-slide { object-position: center center !important; width: 100% !important; height: 100% !important; object-fit: cover !important; }
   .hero-copy {
     align-items: center !important;
     text-align: center !important;

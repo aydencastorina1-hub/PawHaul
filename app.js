@@ -475,35 +475,29 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   }
 })();
 
-// ── HERO VIDEO (task 121) ────────────────────────────────────────────
-// Replaces the old 4-photo crossfade with a single looping muted background
-// video. The <video> in index.html deliberately carries no `autoplay` or
-// `preload` attribute — this decides whether the file is ever fetched or
-// played at all, based on prefers-reduced-motion (task 116's convention:
-// respect reduced motion by never starting the motion in the first place,
-// not by starting it and immediately stopping it). A reduced-motion visitor
-// downloads zero video bytes and keeps the static poster frame forever,
-// which also happens to be the required fallback behaviour.
+// ── HERO SLIDESHOW ────────────────────────────────────────────
+// Crossfades the 4 hero slides: 5s per image, 1.5s fade (CSS transition),
+// looping forever. All 4 are loaded eagerly at high priority (index.html)
+// since the starting slide is randomized — the actual random pick and the
+// matching preload link + initial .active class are decided as early as
+// possible in <head>/inline (see index.html); this just continues the
+// rotation from whichever slide that was.
+// Restored in place of the task-121 hero <video>, which never got a real
+// clip (this sandbox has no outbound network access) and was just showing
+// one of these same 4 photos as a permanent poster the whole time — a video
+// in name only. Skips entirely under prefers-reduced-motion (the video
+// attempt's own convention, worth keeping even in the restored slideshow).
 (function () {
-  var video = document.getElementById('heroVideo');
-  if (!video) return;
+  var slides = document.querySelectorAll('#heroSection .hero-slide');
+  if (slides.length < 2) return;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce) return;
-  video.preload = 'auto';
-  video.autoplay = true;
-  var playPromise = video.play();
-  // Autoplay can still be rejected in rare cases even when muted+playsinline
-  // (e.g. a very aggressive power-saving mode) — the poster frame just stays
-  // up in that case, same as a reduced-motion visitor sees, so there's
-  // nothing else to handle here.
-  if (playPromise && playPromise.catch) playPromise.catch(function () {});
-  // Pause in background tabs (same reasoning the old interval-based
-  // crossfade had: no point decoding/painting frames nobody can see) and
-  // resume on return.
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) video.pause();
-    else video.play().catch(function () {});
-  });
+  var idx = window.__heroStartIdx || 0;
+  setInterval(function () {
+    if (document.hidden) return; // pause in background tabs
+    idx = (idx + 1) % slides.length;
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+  }, 5000);
 })();
 
 // ── ANNOUNCE BAR ROTATOR (task 122, mobile only) ──────────────────────
