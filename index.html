@@ -192,7 +192,7 @@ html.route-cart #chatWidget { display: none !important; }
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=160" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=161" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -497,46 +497,49 @@ html.route-cart #chatWidget { display: none !important; }
     <div class="trust-item"><span style="color:var(--orange);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span> Easy Payments</div>
   </div>
 
-  <!-- BEST PRODUCT — first section below the fold on the homepage (task 115,
-       updated task 127). Spotlights the 2-in-1 Portable Dog Water Bottle (our
-       best-selling product, now a different product in the same slot — see
-       products.js id 1's comment) with sales copy on why hydration gear is a
-       must-carry rather than a nice-to-have, a primary "Shop Now" CTA straight
-       to the product page, and a secondary "Read More" CTA to the blog (the
-       hydration-focused posts in blog.js) for people who want the reasoning
-       before they buy.
+  <!-- WATER ON THE GO (task 128) — replaces the old BEST PRODUCT spotlight
+       (task 115/127) entirely: that section only ever featured one product;
+       this one features the two new hydration products together. Same big,
+       bold orange spotlight feel/layout as the section it replaces (image
+       area + headline + one button), just with two product tiles side by
+       side instead of one hero cutout.
 
-       NO REAL PHOTO YET for the new product — the old cutout shot
-       (images/products/water-bottle-cutout*) was the OLD bottle and does not
-       match this one, so it's replaced with a clearly-labeled placeholder
-       (.bp-image-placeholder, styles.css) instead of a real product image.
-       Swap the whole .bp-image-wrap back to an <img class="bp-image"> (same
-       markup the old cutout used) once a real cutout/photo exists. -->
-  <section class="best-product-section">
-    <div class="bp-image-wrap">
-      <div class="bp-image bp-image-placeholder" onclick="goToProductLink(event,1)" style="cursor:pointer;" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
-        <span class="bp-image-placeholder-emoji" aria-hidden="true">🍼</span>
-        <span class="bp-image-placeholder-tag">Photo coming soon</span>
+       NO REAL PHOTOS YET for either product — both tiles use the same
+       "Photo coming soon" placeholder treatment already established for
+       these two products elsewhere on the site (the comparison section
+       below, the product pages themselves). Swap each
+       .water-spot-tile-media for a real <img> once real photos exist. -->
+  <section class="water-spotlight-section">
+    <div class="water-spot-media">
+      <div class="water-spot-tile" onclick="goToProductLink(event,1)" style="cursor:pointer;" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
+        <span class="water-spot-tile-emoji" aria-hidden="true">🍼</span>
+        <span class="water-spot-tile-soon">Photo coming soon</span>
+      </div>
+      <div class="water-spot-tile" onclick="goToProductLink(event,2)" style="cursor:pointer;" role="img" aria-label="Foldable Dog Water Bowl — product photo coming soon">
+        <span class="water-spot-tile-emoji" aria-hidden="true">🥤</span>
+        <span class="water-spot-tile-soon">Photo coming soon</span>
       </div>
     </div>
-    <div class="bp-content">
-      <div class="section-tag" style="background:rgba(255,255,255,0.18);color:white;">Our Best Product</div>
-      <h2 class="bp-title">The Bottle That Ends<br>"We Forgot Water."</h2>
-      <p class="bp-desc">Dogs dehydrate on walks whether or not it's obvious — and a bowl at the bottom of your bag or a bottle you have to cup your hand under means water gets skipped. The 2-in-1 Portable Dog Water Bottle fixes that with a foldable silicone bowl built into the cap: unfold it, pour, and your dog has a real bowl to drink from, so there's never a reason to cut a walk short again.</p>
-      <div class="bp-actions">
-        <a class="btn-white" href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">Shop Now →</a>
-        <a class="btn-outline-white" href="/blog" onclick="goTo(event,'blog')">Read More</a>
+    <div class="water-spot-content">
+      <div class="section-tag" style="background:rgba(255,255,255,0.18);color:white;">Hydration, Covered</div>
+      <h2 class="water-spot-title">Water on the Go</h2>
+      <ul class="water-spot-benefits">
+        <li><strong>2-in-1 Portable Dog Water Bottle</strong> — a bottle with a foldable bowl built in.</li>
+        <li><strong>Foldable Dog Water Bowl</strong> — a foldable cap that turns any standard water bottle into a dog bowl.</li>
+      </ul>
+      <div class="water-spot-actions">
+        <a class="btn-white" href="/shop" onclick="goTo(event,'shop')">Shop Water Gear →</a>
       </div>
     </div>
   </section>
 
-  <!-- MEET OUR PORTABLE BOTTLES (task 126, built alongside task 127) — helps a
-       visitor pick between the two new hydration products: the 2-in-1
-       Portable Bottle (a complete bottle+bowl, for someone starting from
-       scratch) and the Foldable Water Bowl (just the bowl, for someone who
-       already carries their own bottle). Neither has a real photo yet — both
-       cards use the same placeholder treatment as the BEST PRODUCT section
-       above, just restyled for this section's white background. -->
+  <!-- MEET OUR PORTABLE BOTTLES (task 126, built task 127, CTA added task 128)
+       — helps a visitor pick between the two new hydration products: the
+       2-in-1 Portable Bottle (a complete bottle+bowl, for someone starting
+       from scratch) and the Foldable Water Bowl (just the bowl, for someone
+       who already carries their own bottle). Neither has a real photo yet —
+       both cards use the same placeholder treatment as Water on the Go
+       above. -->
   <section class="bottle-compare-section">
     <div class="bottle-compare-header">
       <div class="section-tag">Pick Your Hydration Setup</div>
@@ -552,7 +555,7 @@ html.route-cart #chatWidget { display: none !important; }
         <h3 class="bottle-compare-name">2-in-1 Portable Dog Water Bottle</h3>
         <p class="bottle-compare-price">From $9.99</p>
         <p class="bottle-compare-desc">A stainless steel water bottle with a foldable silicone bowl built right in — unfold it, pour, and your dog has a stable spot to drink or eat on the go. Compact enough to toss in a bag or clip to a leash, built for walks, hikes, and travel. Rust-resistant construction holds up to daily outdoor use.</p>
-        <p class="bottle-compare-best-for"><strong>Best for:</strong> starting from scratch with one all-in-one bottle.</p>
+        <p class="bottle-compare-best-for"><strong>Choose this if:</strong> you want an all-in-one bottle made for dog hydration.</p>
         <a class="btn-black" href="/product/2-in-1-portable-dog-water-bottle" onclick="goToProductLink(event,1)">Shop the Bottle →</a>
       </article>
       <article class="bottle-compare-card">
@@ -563,11 +566,43 @@ html.route-cart #chatWidget { display: none !important; }
         <h3 class="bottle-compare-name">Foldable Dog Water Bowl</h3>
         <p class="bottle-compare-price">From $7.99</p>
         <p class="bottle-compare-desc">A foldable silicone cap that turns any standard water bottle into an instant dog water bowl. No dedicated bottle needed — just screw it onto a bottle you already have, unfold, and pour. Leak-proof and ultra-packable, perfect for spontaneous walks when you didn't plan ahead.</p>
-        <p class="bottle-compare-best-for"><strong>Best for:</strong> you already carry your own bottle and just need a bowl.</p>
+        <p class="bottle-compare-best-for"><strong>Choose this if:</strong> you want something ultra packable that works with any bottle you already own.</p>
         <a class="btn-black" href="/product/foldable-dog-water-bowl" onclick="goToProductLink(event,2)">Shop the Bowl →</a>
       </article>
     </div>
-    <p class="bottle-compare-bundle-note">Want both? They come together in the <a href="/bundles#bundle-portable-hydration" onclick="goToBundle(event,'portable-hydration')">Hydration Bundle</a>, 15% off.</p>
+    <div class="bottle-compare-bundle-note">
+      <p>Want both? They come together in the <a href="/bundles#bundle-portable-hydration" onclick="goToBundle(event,'portable-hydration')">Hydration Bundle</a>, 15% off.</p>
+      <button class="btn-black" type="button" onclick="addBundleToCart('portable-hydration')">Get Both &amp; Save →</button>
+    </div>
+  </section>
+
+  <!-- SEE AND BE SEEN (task 128) — compact LED spotlight, same rhythm as Water
+       on the Go above but for the two night-safety products. Both images are
+       real (not placeholders): collar-lifestyle-6.jpg and led-leash-
+       lifestyle-5.jpg already exist and are already used for exactly this
+       pairing on the Bundles page (the LED Bundle card) and the Visibility
+       Duo card — reused here rather than placeholder tiles since real photos
+       already exist for both products. -->
+  <section class="led-spotlight-section">
+    <div class="led-spot-header">
+      <div class="section-tag" style="background:rgba(232,99,10,0.2);color:var(--orange-light)">Night Walks</div>
+      <h2 class="led-spot-title">See And Be Seen</h2>
+    </div>
+    <div class="led-spot-grid">
+      <div class="led-spot-card" onclick="goToProductLink(event,6)" style="cursor:pointer;">
+        <img class="led-spot-img" src="/images/products/collar-lifestyle-6.jpg" alt="A dog walking at night in a glowing LED Dog Collar" loading="lazy" decoding="async">
+        <h3 class="led-spot-name">LED Dog Collar</h3>
+        <p class="led-spot-desc">USB rechargeable, three light modes — puts the light right on your dog.</p>
+      </div>
+      <div class="led-spot-card" onclick="goToProductLink(event,10)" style="cursor:pointer;">
+        <img class="led-spot-img" src="/images/products/led-leash-lifestyle-5.jpg" alt="Three LED Flashlight Retractable Dog Leashes glowing in the dark" loading="lazy" decoding="async">
+        <h3 class="led-spot-name">LED Flashlight Retractable Dog Leash</h3>
+        <p class="led-spot-desc">A light ring plus a built-in flashlight — lights the path ahead too.</p>
+      </div>
+    </div>
+    <div class="led-spot-actions">
+      <a class="btn-primary" href="/bundles#bundle-led" onclick="goToBundle(event,'led')">Shop the LED Bundle →</a>
+    </div>
   </section>
 
 
