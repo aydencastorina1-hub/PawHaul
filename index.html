@@ -114,6 +114,13 @@ html.route-blog #page-home, html.route-blog-post #page-home, html.route-bundles 
 html.route-shop #page-shop, html.route-contact #page-contact, html.route-about #page-about,
 html.route-wishlist #page-wishlist, html.route-cart #page-cart, html.route-product #page-product,
 html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bundles #page-bundles { display: block !important; }
+/* The chat bubble/window never appears on the Cart page (the step right
+   before Shopify-hosted checkout) — hidden everywhere else. This is the
+   pre-paint half for a direct /cart load, same two-part pattern as the rest
+   of this block: showPage() (products.js) does the equivalent toggle once
+   real client-side navigation takes over and this bootstrap class is
+   stripped. */
+html.route-cart #chatWidget { display: none !important; }
 </style>
 <!-- Nothing ever replaces the skeletons without JS, so don't leave a permanently
      "loading" grid sitting there for a no-JS visitor or a crawler. -->
@@ -194,8 +201,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=10">
-  <link rel="preload" as="script" href="/products.js?v=92">
-  <link rel="preload" as="script" href="/app.js?v=77">
+  <link rel="preload" as="script" href="/products.js?v=93">
+  <link rel="preload" as="script" href="/app.js?v=78">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1373,8 +1380,8 @@ html.route-blog #page-blog, html.route-blog-post #page-blog-post, html.route-bun
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=10"></script>
-  <script src="/products.js?v=92"></script>
-  <script src="/app.js?v=77"></script>
+  <script src="/products.js?v=93"></script>
+  <script src="/app.js?v=78"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at

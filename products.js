@@ -816,6 +816,19 @@ function showPage(page, opts) {
   document.documentElement.classList.remove.apply(document.documentElement.classList, ROUTE_BOOTSTRAP_CLASSES);
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active', 'page-transition'));
   document.getElementById('page-' + page).classList.add('active', 'page-transition');
+
+  // The chat bubble/window never shows on the Cart page (the step right
+  // before Shopify-hosted checkout) — visible on every other page. The
+  // inline <head> bootstrap rule (index.html) covers a direct /cart load;
+  // this is the other half, for every navigation once client JS has taken
+  // over (which is every call to showPage(), including showProduct()'s —
+  // see its own comment on sync:true above).
+  var chatWidgetEl = document.getElementById('chatWidget');
+  // 'flex', not '' — #chatWidget's own display:flex is itself an inline
+  // style (index.html), not a stylesheet rule, so clearing the property
+  // instead of restoring it explicitly would fall back to the div default
+  // (block) and break its layout the moment a visitor leaves the Cart page.
+  if (chatWidgetEl) chatWidgetEl.style.display = (page === 'cart') ? 'none' : 'flex';
   // Use instant so smooth-scroll CSS doesn't animate page transitions. The
   // actual scrollTo(0,0) is deliberately NOT called synchronously here (it
   // used to be) — on iOS Safari, changing scrollY synchronously inside the

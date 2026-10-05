@@ -1764,8 +1764,16 @@ function dismissChatGreeting() {
   var SCROLL_THRESHOLD = 150;
   var shownThisVisit = false;
 
+  // The greeting only ever appears on the homepage — checked by the actual
+  // page state (not location.pathname), since this is an SPA and the
+  // visitor can reach another page without a real navigation/reload.
+  function onHome() {
+    var el = document.getElementById('page-home');
+    return !!el && el.classList.contains('active');
+  }
+
   function reveal() {
-    if (chatOpen || shownThisVisit) return;
+    if (chatOpen || shownThisVisit || !onHome()) return;
     // Don't stack on top of the email popup if it happens to be up at the
     // same moment — try again shortly rather than cluttering the screen.
     var offerOverlay = document.getElementById('offerOverlay');
@@ -1782,6 +1790,11 @@ function dismissChatGreeting() {
   }
   function onScroll() {
     if (window.scrollY < SCROLL_THRESHOLD) return;
+    // Only consume this visit's one-shot trigger on the homepage — scrolling
+    // past the threshold on another page first (entirely possible: a direct
+    // /shop load, for instance) must not permanently use it up before the
+    // visitor ever reaches Home.
+    if (!onHome()) return;
     window.removeEventListener('scroll', onScroll);
     reveal();
   }
