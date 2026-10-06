@@ -38,8 +38,8 @@ const crypto = require('crypto');
 // request Host header: preview deployments must not emit canonicals/OG URLs
 // pointing at themselves (that is how a preview build ends up competing with
 // production in the index). isProductionHost() below noindexes them instead.
-const ORIGIN = 'https://pawhaul.vercel.app';
-const PROD_HOST = 'pawhaul.vercel.app';
+const ORIGIN = 'https://pawhaulstore.com';
+const PROD_HOST = 'pawhaulstore.com';
 const BRAND = 'PawHaul';
 const SUPPORT_EMAIL = 'pawhaulsupport@gmail.com';
 const DEFAULT_OG = ORIGIN + '/images/og/pawhaul-og.jpg';

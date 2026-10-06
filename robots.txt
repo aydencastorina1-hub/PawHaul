@@ -1,4 +1,4 @@
-# PawHaul — https://pawhaul.vercel.app
+# PawHaul — https://pawhaulstore.com
 # Static file: paths containing a dot are excluded from the SPA catch-all
 # rewrite in vercel.json, so this is served as-is.
 
@@ -35,4 +35,4 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-Sitemap: https://pawhaul.vercel.app/sitemap.xml
+Sitemap: https://pawhaulstore.com/sitemap.xml

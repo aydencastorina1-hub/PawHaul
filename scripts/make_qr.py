@@ -36,7 +36,7 @@ from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.svg import SvgPathImage
 from PIL import Image, ImageDraw
 
-URL = "https://pawhaul.vercel.app"
+URL = "https://pawhaulstore.com"
 NAVY = "#1a1a2e"
 ORANGE = "#E8630A"
 WHITE = "#FFFFFF"

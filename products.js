@@ -498,7 +498,7 @@ var DISCOUNT_CODE = 'WELCOME10';   // Your 10% off code (change this anytime) â€
 //                  static badge would be a lie on most of the traffic.
 //   - Venmo/Google Pay: real, but they push the row past the point where it
 //                  reads as reassurance instead of clutter.
-// Re-check with `curl https://pawhaul.vercel.app/api/shop` if payment
+// Re-check with `curl https://pawhaulstore.com/api/shop` if payment
 // providers change in the Shopify admin.
 var STORE_URL = 'https://pawhaul.myshopify.com';
 
@@ -2576,9 +2576,10 @@ function goToFaq(itemId) {
 //
 // The origin is pinned to production rather than read from location.origin,
 // mirroring the same decision in api/_seo.js: a link shared out of a preview
-// deployment (or off a future custom domain alias) has to point somewhere a
-// stranger can actually open, and preview hosts sit behind Vercel Auth.
-var SHARE_ORIGIN = 'https://pawhaul.vercel.app';
+// deployment has to point somewhere a stranger can actually open, and
+// preview hosts sit behind Vercel Auth. task 130: pinned to the live custom
+// domain now that it's connected, not the *.vercel.app address.
+var SHARE_ORIGIN = 'https://pawhaulstore.com';
 
 function productShareUrl(p) {
   return SHARE_ORIGIN + '/product/' + slugify(p.name);

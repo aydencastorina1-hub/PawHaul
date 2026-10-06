@@ -24,7 +24,7 @@
  *     Meta's servers fetch themselves.
  *   The simplest zero-cost way to satisfy Instagram is to commit the file to
  *   marketing/video/ and deploy — Vercel then serves it at
- *   https://pawhaul.vercel.app/marketing/video/<name>.mp4, which is a perfectly
+ *   https://pawhaulstore.com/marketing/video/<name>.mp4, which is a perfectly
  *   good public URL. Pass that with --video-url.
  *
  * REEL SPEC (enforced by Meta, not by this script):
@@ -34,7 +34,7 @@
  * USAGE
  *   node scripts/social/meta-reel.js --check
  *   node scripts/social/meta-reel.js --video ./marketing/video/walk.mp4 \
- *        --video-url https://pawhaul.vercel.app/marketing/video/walk.mp4 \
+ *        --video-url https://pawhaulstore.com/marketing/video/walk.mp4 \
  *        --caption "Every walk essential in one kit 🐾" --both
  *   ...add --live to actually publish. Default is a dry run.
  *
@@ -70,7 +70,7 @@ function opt(n, d) { const i = argv.indexOf('--' + n); return i !== -1 && argv[i
 const LIVE = flag('live');
 const VIDEO = opt('video', null);
 const VIDEO_URL = opt('video-url', null);
-const CAPTION = opt('caption', 'New walk gear from PawHaul 🐾 pawhaul.vercel.app');
+const CAPTION = opt('caption', 'New walk gear from PawHaul 🐾 pawhaulstore.com');
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 

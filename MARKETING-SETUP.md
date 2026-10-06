@@ -73,14 +73,14 @@ here, which pages Google has actually indexed, and any indexing problems. This
 is the single most useful account on the list.
 
 1. [search.google.com/search-console](https://search.google.com/search-console)
-   → **Add property** → **URL prefix** → `https://pawhaul.vercel.app`
+   → **Add property** → **URL prefix** → `https://pawhaulstore.com`
 2. Choose the **HTML tag** verification method. Copy the value out of
    `content="..."`.
 3. Paste it into `SITE_VERIFICATION.google` in `api/_seo.js`, push, wait for
    the deploy.
 4. Back in Search Console → **Verify**.
 5. Left sidebar → **Sitemaps** → enter `sitemap.xml` → **Submit**.
-6. Left sidebar → **URL inspection** → paste `https://pawhaul.vercel.app/` →
+6. Left sidebar → **URL inspection** → paste `https://pawhaulstore.com/` →
    **Request indexing**. Repeat for `/shop` and each blog post. This is the
    fastest way to get first crawled.
 
@@ -117,7 +117,7 @@ one unless you decide to spend money.
 
 1. [merchants.google.com](https://merchants.google.com) → create an account for
    PawHaul.
-2. **Business info** → website `https://pawhaul.vercel.app`. It should verify
+2. **Business info** → website `https://pawhaulstore.com`. It should verify
    instantly via the Search Console property from item 2 — another reason to do
    that one first.
 3. **Shipping**: add a US shipping service at **$0.00**. This must match the
@@ -125,7 +125,7 @@ one unless you decide to spend money.
    a mismatch.
 4. **Returns**: 30 days, return by mail — matching the published policy.
 5. **Products** → **Add product source** → **Scheduled fetch**:
-   * Feed URL: `https://pawhaul.vercel.app/feed.xml`
+   * Feed URL: `https://pawhaulstore.com/feed.xml`
    * Country: United States · Language: English · Frequency: daily
 6. Fetch it once manually and read the results.
 
@@ -181,7 +181,7 @@ Skip it if item 1 is enough for you; it does add a cookie banner obligation in
 some jurisdictions, which Vercel Analytics does not.
 
 1. [analytics.google.com](https://analytics.google.com) → create a property →
-   **Admin** → **Data Streams** → **Web** → `https://pawhaul.vercel.app`.
+   **Admin** → **Data Streams** → **Web** → `https://pawhaulstore.com`.
 2. Copy the **Measurement ID** (`G-XXXXXXXXXX`).
 3. Paste into `window.GA4_ID = ''` in `index.html`, push.
 
@@ -269,7 +269,7 @@ come back to this only if Reels turn out to be a channel that works for you.
 
 `marketing/pawhaul-qr.png` (plain), `pawhaul-qr-logo.png` (paw badge in the
 centre), `pawhaul-qr.svg` (vector — this is the one to hand a printer). All
-point at `https://pawhaul.vercel.app`.
+point at `https://pawhaulstore.com`.
 
 Regenerate any time with `python scripts/make_qr.py`.
 

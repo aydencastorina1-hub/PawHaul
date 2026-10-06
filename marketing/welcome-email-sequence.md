@@ -48,7 +48,7 @@ condition is a step you add in the automation editor, not something in the copy.
 > that don't leak in a bag, collars you can actually see from down the street.
 > No dog beds, no toys, no filler.
 
-**Button:** Shop walk gear → `https://pawhaul.vercel.app/shop`
+**Button:** Shop walk gear → `https://pawhaulstore.com/shop`
 
 **Footer line:** Questions about an order? Just reply, or email
 pawhaulsupport@gmail.com — we answer within 24 hours.
@@ -81,11 +81,11 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 >
 > Want two? The LED collar and LED leash, the water bottle and poop bag clip,
 > the water bottle and the foldable bowl, or the LED leash and wrist strap
-> come together as bundles: `https://pawhaul.vercel.app/bundles`
+> come together as bundles: `https://pawhaulstore.com/bundles`
 >
 > **WELCOME10** still works — 10% off, free shipping.
 
-**Button:** See all five → `https://pawhaul.vercel.app/shop`
+**Button:** See all five → `https://pawhaulstore.com/shop`
 
 ---
 
@@ -101,15 +101,15 @@ pawhaulsupport@gmail.com — we answer within 24 hours.
 > We wrote this because we kept answering it: here's what's actually worth
 > carrying on a walk, sorted by how long you're going out for.
 >
-> **[Read: What to Bring on a Dog Walk →](https://pawhaul.vercel.app/blog/what-to-bring-on-a-dog-walk-checklist)**
+> **[Read: What to Bring on a Dog Walk →](https://pawhaulstore.com/blog/what-to-bring-on-a-dog-walk-checklist)**
 >
 > Two more that answer the questions we get most:
-> • [How much water does a dog need on a walk?](https://pawhaul.vercel.app/blog/how-much-water-does-a-dog-need-on-a-walk)
-> • [How to stop a dog pulling on the leash](https://pawhaul.vercel.app/blog/how-to-stop-a-dog-pulling-on-the-leash)
+> • [How much water does a dog need on a walk?](https://pawhaulstore.com/blog/how-much-water-does-a-dog-need-on-a-walk)
+> • [How to stop a dog pulling on the leash](https://pawhaulstore.com/blog/how-to-stop-a-dog-pulling-on-the-leash)
 >
 > And if you still want it: **WELCOME10** takes 10% off anything in the shop.
 
-**Button:** Shop walk gear → `https://pawhaul.vercel.app/shop`
+**Button:** Shop walk gear → `https://pawhaulstore.com/shop`
 
 ---
 

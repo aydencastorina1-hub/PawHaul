@@ -30,7 +30,7 @@
  *   git add marketing/video && git commit && git push     (Vercel auto-deploys)
  *   node scripts/social/meta-reel.js \
  *     --video ./marketing/video/<name>.mp4 \
- *     --video-url https://pawhaul.vercel.app/marketing/video/<name>.mp4 \
+ *     --video-url https://pawhaulstore.com/marketing/video/<name>.mp4 \
  *     --caption "..." --both --live
  */
 
@@ -98,5 +98,5 @@ console.log('  1. Check it is 9:16 and 5-90s, or it will not land in the Reels t
 console.log('  2. git add marketing/video && git commit -m "reel: ' + name + '" && git push');
 console.log('  3. node scripts/social/meta-reel.js \\');
 console.log('       --video ./marketing/video/' + name + '.mp4 \\');
-console.log('       --video-url https://pawhaul.vercel.app/marketing/video/' + name + '.mp4 \\');
+console.log('       --video-url https://pawhaulstore.com/marketing/video/' + name + '.mp4 \\');
 console.log('       --caption "your caption" --both --live');
