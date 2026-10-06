@@ -3159,7 +3159,20 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    announce bar's offer slide, not just the mobile rotator's. */
 html.offer-claimed .announce-slide--offer { display: none; }
 /* ==================== MOBILE (≤900px) ==================== */
-@media (max-width: 900px) {
+/* task 132: this first sub-block (through .mob-menu{display:flex} below) is
+   split out from the rest of the historical ≤900px block on purpose, and ITS
+   condition alone is widened to also match iPad — (min-width:700px) and
+   (max-width:1366px) and (hover:none) and (pointer:coarse), the same
+   touch+width signal task 113 already uses to tell an iPad apart from a
+   same-width laptop. Everything in here is the announce bar + header/nav +
+   hamburger-visibility rules (items 1 & 2 of the iPad audit): real
+   structure, not phone-only polish, so it's correct at iPad widths too.
+   The REST of the original block (hero sizing, page padding, scrollbar
+   cosmetics) stays phone-only below in its own re-opened ≤900px block,
+   unchanged — task 132 was not asked to touch the hero on tablets, and
+   forcing its mobile height formula onto a 1024-1366px-wide iPad would be an
+   unreviewed layout change nobody asked for. */
+@media (max-width: 900px), (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
 
   /* ── SMOOTH SCROLLING & GPU ACCELERATION ──────────────── */
   html { scroll-behavior: smooth; }
@@ -3538,6 +3551,14 @@ html.offer-claimed .announce-slide--offer { display: none; }
   .nav-right { gap: 6px; }
   .hamburger { display: flex; }
   .mob-menu { display: flex; }
+}
+
+/* task 132: everything below (hero sizing, page padding, scrollbar/overscroll
+   cosmetics) stays on the ORIGINAL phone-only condition — re-opened here
+   rather than widened, since none of it is one of the 4 iPad items and the
+   hero in particular should keep running its real-desktop layout on iPad,
+   not the phone's svh-based formula. */
+@media (max-width: 900px) {
 
   /* ── PAGE SYSTEM ──────────────────────────────────────── */
   /* No padding-top needed anymore: the announce bar is normal static flow
@@ -3837,6 +3858,25 @@ html.offer-claimed .announce-slide--offer { display: none; }
   .carousel-btn.disabled { opacity: 0.3; cursor: default; }
   #backToTop { display: none !important; }
 
+}
+
+/* ==================== iPad (task 132) ====================
+   Same touch+width signal as the block above and as task 113's shop grid —
+   this is what actually tells an iPad apart from a same-width laptop.
+   Layered AFTER the widened mobile block above (same specificity, later
+   source wins) purely to bump a handful of sizes up from phone scale to
+   something closer to the bigger reference proportions — "scale sensibly",
+   not stretch the phone layout 1:1. Nothing structural lives here; the
+   structure (what's visible, what order, what's centered) already came from
+   the widened block above. */
+@media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  :root { --mob-nav-h: 76px; }
+  .announce-bar-inner { height: 50px; font-size: 13px; gap: 10px; }
+  .announce-rotator { height: 18px; }
+  .logo-circle { width: 46px; height: 46px; }
+  .logo-text { font-size: 26px; }
+  .cart-btn { font-size: 25px; padding: 10px; }
+  .nav-right { gap: 10px; }
 }
 
 /* ==================== EXTRA SMALL (≤480px / iPhone 14) ==================== */
@@ -4658,7 +4698,12 @@ html.offer-claimed .announce-slide--offer { display: none; }
   transition: opacity 0.42s var(--ease);
 }
 
-@media (max-width: 900px) {
+/* task 132: widened the same way as the header/announce-bar block above —
+   this entire block is the full-page tile menu's structure (item 4 of the
+   iPad audit), so it needs to be correct at iPad widths, not just ≤900px.
+   A separate sizing-only block right after bumps tile/row scale up for the
+   iPad range specifically. */
+@media (max-width: 900px), (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
   /* ---------- panel shell ---------- */
   /* task 125: full-page takeover, not a right-side drawer — left:0 on top of
      the base rule's top/right/bottom:0 is what makes this cover the whole
@@ -5012,6 +5057,33 @@ html.offer-claimed .announce-slide--offer { display: none; }
     pointer-events: none;
     transition: opacity 0.25s var(--ease);
   }
+}
+
+/* ==================== iPad (task 132) — tile menu scale-up ====================
+   Same reasoning as the header/announce-bar iPad block: layered after the
+   widened block above so these win on cascade, bumping the 4-tile grid and
+   link rows up from phone scale rather than just stretching a 2-column grid
+   edge to edge on a much wider panel. Capped width + auto margins keeps the
+   grid from turning into 2 oversized squares on iPad landscape (up to
+   1366px wide) — centered and roomier instead of just bigger. */
+@media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .mob-menu-header { padding: 26px 28px 24px; padding-top: calc(26px + env(safe-area-inset-top)); }
+  .mob-menu-brand-icon { width: 46px; height: 46px; }
+  .mob-menu-brand-text { font-size: 23px; }
+  .mob-menu-close { width: 44px; height: 44px; }
+  .mob-menu-grid {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+    gap: 20px;
+    padding: 28px 28px 8px;
+    box-sizing: border-box;
+  }
+  .mob-grid-tile-label { font-size: 19px; padding: 18px; }
+  .mob-grid-tile-icon { width: 40px; height: 40px; }
+  .mob-menu-nav { max-width: 680px; width: 100%; margin: 10px auto 0; padding: 18px 16px 36px; }
+  .mob-menu a.mob-link { min-height: 68px; font-size: 17px; padding: 12px 14px; }
+  .mob-link-icon { width: 44px; height: 44px; }
 }
 
 /* Reduced motion still gets the panel — just without the fade, the drift and
