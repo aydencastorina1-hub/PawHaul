@@ -1295,7 +1295,7 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
   transition: transform 0.3s var(--ease);
   animation: offerTabPulse 6s ease-in-out infinite;
 }
-.offer-side-tab.show { transform: translateY(-50%) translateX(0); }
+.offer-side-tab.show { display: flex; transform: translateY(-50%) translateX(0); }
 @keyframes offerTabPulse {
   0%, 60%, 100% { box-shadow: 4px 0 24px rgba(232,99,10,0.45); }
   80% { box-shadow: 4px 0 30px 6px rgba(232,99,10,0.75); }
@@ -1345,9 +1345,6 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
 }
 .offer-side-tab-close:hover { background: rgba(255,255,255,0.38); }
 
-@media (max-width: 900px) {
-  .offer-side-tab.show { display: flex; }
-}
 @media (prefers-reduced-motion: reduce) {
   .offer-side-tab { animation: none; }
 }
@@ -3155,6 +3152,12 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    scroll (see sync() in app.js). Every per-carousel block below re-declares
    `display: flex`, so this needs !important to actually win. */
 .carousel-btn[hidden] { display: none !important; }
+/* Permanent once an email's been submitted (html.offer-claimed — set
+   pre-paint from localStorage and live by markOfferClaimed()): this slide
+   is simply never a candidate again, on this device, ever. Unconditional
+   (not inside the mobile media query) so it also hides the desktop
+   announce bar's offer slide, not just the mobile rotator's. */
+html.offer-claimed .announce-slide--offer { display: none; }
 /* ==================== MOBILE (≤900px) ==================== */
 @media (max-width: 900px) {
 
@@ -3436,10 +3439,6 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   /* The one slide that's a real link (not just text) gets an underline so it
      reads as tappable, same as any other inline text link on the site. */
   .announce-slide--offer { text-decoration: underline; text-underline-offset: 2px; }
-  /* Permanent once an email's been submitted (html.offer-claimed — set
-     pre-paint from localStorage and live by markOfferClaimed()): this slide
-     is simply never a candidate again, on this device, ever. */
-  html.offer-claimed .announce-slide--offer { display: none; }
 
   /* ── NAV: the ONLY thing that stays pinned while scrolling ─────────
      position:sticky, not fixed — per direct feedback, the announce bar above
