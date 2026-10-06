@@ -487,6 +487,10 @@ document.addEventListener('touchstart', function () {}, { passive: true });
 // one of these same 4 photos as a permanent poster the whole time — a video
 // in name only. Skips entirely under prefers-reduced-motion (the video
 // attempt's own convention, worth keeping even in the restored slideshow).
+// Skips any slide index.html's heroSlideError() marked data-heroFailed — a
+// hotlinked photo that 404s partway through the visit (or was already dead
+// on load) drops out of the rotation instead of the crossfade landing on a
+// blank frame every time it comes back around.
 (function () {
   var slides = document.querySelectorAll('#heroSection .hero-slide');
   if (slides.length < 2) return;
@@ -495,7 +499,17 @@ document.addEventListener('touchstart', function () {}, { passive: true });
   var idx = window.__heroStartIdx || 0;
   setInterval(function () {
     if (document.hidden) return; // pause in background tabs
-    idx = (idx + 1) % slides.length;
+    // Find the next slide that hasn't failed, starting right after idx and
+    // wrapping at most once all the way around. If every slide has failed,
+    // there's nothing left to switch to — leave whatever's currently shown
+    // (even a failed one keeps its last-good frame, never reverts to blank).
+    var next = -1;
+    for (var step = 1; step <= slides.length; step++) {
+      var candidate = (idx + step) % slides.length;
+      if (slides[candidate].dataset.heroFailed !== '1') { next = candidate; break; }
+    }
+    if (next === -1) return;
+    idx = next;
     slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
   }, 5000);
 })();

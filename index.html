@@ -169,10 +169,50 @@ html.route-cart #chatWidget { display: none !important; }
   var target = Math.round((window.innerWidth || 800) * (window.devicePixelRatio || 1));
   var w = HERO_W[HERO_W.length - 1];
   for (var i = 0; i < HERO_W.length; i++) { if (HERO_W[i] >= target) { w = HERO_W[i]; break; } }
-  document.write('<link rel="preload" as="image" href="' + heroUrl(heroBases[idx], w) + '" fetchpriority="high">');
+  // document.head.appendChild, NOT document.write: Chrome actively throttles
+  // or drops resources injected via document.write on a slow/2G connection
+  // (its own "Intervention" behavior, logged to the console) — exactly the
+  // condition under which this preload matters most. appendChild has no such
+  // restriction and still runs synchronously here, before the parser reaches
+  // the <img> tags below.
+  var preload = document.createElement('link');
+  preload.rel = 'preload';
+  preload.as = 'image';
+  preload.href = heroUrl(heroBases[idx], w);
+  preload.fetchPriority = 'high';
+  document.head.appendChild(preload);
 })();
 </script>
 <noscript><link rel="preload" as="image" href="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" fetchpriority="high"></noscript>
+<!-- HERO SLIDE ERROR RECOVERY — defined here, before the <img class="hero-slide">
+     tags further down, so it exists the instant any of them could fire its
+     onerror (a hotlinked third-party photo 404ing, a network blip, a CDN
+     outage). Without this, a dead URL for the one slide currently .active
+     left the hero showing nothing but the bare #heroSection background
+     (--img-placeholder, a cream colour that reads as flat grey once the dark
+     .hero-overlay sits on top of it with no photo behind it) — indefinitely,
+     since nothing else was watching for that failure. Marks the slide failed
+     (skipped by app.js's rotation from then on) and, if it was the one
+     actually on screen, immediately promotes the next slide that hasn't
+     failed instead of waiting for the next 5s tick. -->
+<script>
+function heroSlideError(img) {
+  img.dataset.heroFailed = '1';
+  if (!img.classList.contains('active')) return;
+  var slides = Array.prototype.slice.call(document.querySelectorAll('#heroSection .hero-slide'));
+  var idx = slides.indexOf(img);
+  for (var i = 1; i <= slides.length; i++) {
+    var next = slides[(idx + i) % slides.length];
+    if (next.dataset.heroFailed !== '1') {
+      next.classList.add('active');
+      img.classList.remove('active');
+      return;
+    }
+  }
+  // Every slide failed — nothing left to promote. app.js's rotation already
+  // bails out in this case too (see its own all-failed guard).
+}
+</script>
 <!-- BRAND FONTS. These used to come from fonts.googleapis.com, which meant
      the browser could not start fetching a font until a stylesheet from a
      third party had arrived — so the fonts were always late and the page
@@ -202,7 +242,7 @@ html.route-cart #chatWidget { display: none !important; }
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=10">
   <link rel="preload" as="script" href="/products.js?v=93">
-  <link rel="preload" as="script" href="/app.js?v=78">
+  <link rel="preload" as="script" href="/app.js?v=79">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -452,10 +492,10 @@ html.route-cart #chatWidget { display: none !important; }
          the window where the dark contrast overlay below is sitting on bare placeholder instead of
          the actual photo. #heroSection also has an INLINE background (styles.css) so that window
          is never literally transparent/white before styles.css itself has even loaded. -->
-    <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog out on a walk" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog on a leash walk" loading="eager" fetchpriority="high">
-    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Happy dog outside" loading="eager" fetchpriority="high">
+    <img class="hero-slide active" src="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1648304887391-a6c2cf2228e4?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog out on a walk" loading="eager" fetchpriority="high" onerror="heroSlideError(this)">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1518056914555-de1d7f0b3967?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog enjoying the outdoors" loading="eager" fetchpriority="high" onerror="heroSlideError(this)">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1597330223703-9b11c4dba2bd?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Dog on a leash walk" loading="eager" fetchpriority="high" onerror="heroSlideError(this)">
+    <img class="hero-slide" src="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440" srcset="https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=640 640w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=828 828w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1080 1080w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1440 1440w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=1920 1920w, https://images.unsplash.com/photo-1618946019619-9d7b7d86b48f?fm=jpg&fit=crop&q=75&w=2560 2560w" sizes="100vw" alt="Happy dog outside" loading="eager" fetchpriority="high" onerror="heroSlideError(this)">
     <script>
     (function () {
       var slides = document.querySelectorAll('#heroSection .hero-slide');
@@ -1416,7 +1456,7 @@ html.route-cart #chatWidget { display: none !important; }
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=10"></script>
   <script src="/products.js?v=93"></script>
-  <script src="/app.js?v=78"></script>
+  <script src="/app.js?v=79"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
