@@ -3447,6 +3447,13 @@ html.offer-claimed .announce-slide--offer { display: none; }
     text-decoration: none;
     transition: opacity 0.5s ease-in-out;
     pointer-events: none;
+    /* Confirmed via measurement: the slide box itself IS centered in the bar,
+       but Nunito's default line-height (~1.65x font-size here) is taller than
+       the box, so flexbox centers the inflated LINE box rather than the
+       glyph ink — the text sat visibly high. line-height:1 removes that
+       half-leading so the centering math lines up with what's actually
+       drawn. */
+    line-height: 1;
   }
   .announce-slide.active { opacity: 1; pointer-events: auto; }
   /* The one slide that's a real link (not just text) gets an underline so it
@@ -3880,7 +3887,7 @@ html.offer-claimed .announce-slide--offer { display: none; }
      Right padding is untouched; cart still sits at the same distance from
      the right edge, just drawn bigger below. */
   nav { padding-left: 2.5%; }
-  .cart-btn { font-size: 29px; padding: 12px; }
+  .cart-btn { font-size: 33px; padding: 13px; }
   .nav-right { gap: 10px; }
 }
 
