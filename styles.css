@@ -3875,7 +3875,12 @@ html.offer-claimed .announce-slide--offer { display: none; }
   .announce-rotator { height: 18px; }
   .logo-circle { width: 46px; height: 46px; }
   .logo-text { font-size: 26px; }
-  .cart-btn { font-size: 25px; padding: 10px; }
+  /* Per direct feedback: hamburger+search sat too close to the centered logo
+     — pull them closer to the left edge instead of the phone's 4% inset.
+     Right padding is untouched; cart still sits at the same distance from
+     the right edge, just drawn bigger below. */
+  nav { padding-left: 2.5%; }
+  .cart-btn { font-size: 29px; padding: 12px; }
   .nav-right { gap: 10px; }
 }
 
