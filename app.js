@@ -1258,6 +1258,24 @@ function initCarousel(trackId, prevId, nextId) {
   bindCarousel(track, prev, next, null, ac.signal);
 }
 
+// Same as initCarousel() above, but also wires a dots row — used by the
+// task-133 product-education carousels (Portable Bottles, Wrist Strap, LED
+// Gear), which need dots alongside the arrows per the task-88 standard.
+function initPcCarousel(trackId, prevId, nextId, dotsId) {
+  var track = document.getElementById(trackId);
+  var prev = document.getElementById(prevId);
+  var next = document.getElementById(nextId);
+  var dotsWrap = document.getElementById(dotsId);
+  if (!track || !prev || !next) return;
+
+  if (track._carouselAbort) track._carouselAbort.abort();
+  var ac = new AbortController();
+  track._carouselAbort = ac;
+
+  var dots = dotsWrap ? dotsWrap.querySelectorAll('.pc-dot') : null;
+  bindCarousel(track, prev, next, dots, ac.signal);
+}
+
 // ==================== DETAIL IMAGE CAROUSEL ====================
 // Only rendered when a product has more than one gallery slide for the
 // selected color (see renderDetailGallery in products.js) — a single-photo
@@ -1328,7 +1346,36 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(revealAll, 1200);
 
   initCarousel('revCarousel', 'revCarouselPrev', 'revCarouselNext');
+
+  // Task 133: the five product-education carousels (Portable Bottles,
+  // Wrist Strap, LED Gear). No-ops wherever a given id isn't on the current
+  // page — initPcCarousel() itself checks for that.
+  initPcCarousel('pcBottleTrack', 'pcBottlePrev', 'pcBottleNext', 'pcBottleDots');
+  initPcCarousel('pcBowlTrack', 'pcBowlPrev', 'pcBowlNext', 'pcBowlDots');
+  initPcCarousel('pcStrapTrack', 'pcStrapPrev', 'pcStrapNext', 'pcStrapDots');
+  initPcCarousel('pcCollarTrack', 'pcCollarPrev', 'pcCollarNext', 'pcCollarDots');
+  initPcCarousel('pcLeashTrack', 'pcLeashPrev', 'pcLeashNext', 'pcLeashDots');
+  renderHomeBundleNotes();
 });
+
+// Task 133: live bundle pricing for the "want both?" blocks under the
+// Portable Bottles and LED Gear carousels — reads the same bundleTotals()
+// every other bundle price on the site uses, so these numbers can never
+// drift from the Bundles page or the product-detail "comes in a bundle" box.
+function renderHomeBundleNotes() {
+  var notes = [
+    { bundleId: 'portable-hydration', elId: 'pbottlesBundlePrice' },
+    { bundleId: 'led', elId: 'ledBundlePrice' }
+  ];
+  notes.forEach(function (n) {
+    var el = document.getElementById(n.elId);
+    if (!el) return;
+    var b = BUNDLES.find(function (x) { return x.id === n.bundleId; });
+    if (!b) return;
+    var t = bundleTotals(b);
+    el.innerHTML = 'Bought separately $' + t.separately.toFixed(2) + ' — bundled <strong>$' + t.bundle.toFixed(2) + '</strong>, you save $' + t.save.toFixed(2) + ' (' + b.pct + '% off).';
+  });
+}
 
 // ==================== LIFESTYLE IMAGE FADE-IN ====================
 // Marks each large lifestyle/background photo (see .lifestyle-img in
