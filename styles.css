@@ -3889,7 +3889,9 @@ html.offer-claimed .announce-slide--offer { display: none; }
   /* Keep in lockstep with .announce-rotator's height right above — see the
      long comment on .announce-slide's line-height for why this needs to
      exactly match the box rather than use line-height:1. */
-  .announce-slide { line-height: 18px; }
+  /* Per direct feedback on the real device: nudge up a couple px on top of
+     the box-matched line-height above — iPad only, phone untouched. */
+  .announce-slide { line-height: 18px; transform: translateY(-2px); }
   .logo-circle { width: 46px; height: 46px; }
   .logo-text { font-size: 26px; }
   /* Per direct feedback: hamburger+search sat too close to the centered logo
