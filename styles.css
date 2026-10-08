@@ -3447,13 +3447,19 @@ html.offer-claimed .announce-slide--offer { display: none; }
     text-decoration: none;
     transition: opacity 0.5s ease-in-out;
     pointer-events: none;
-    /* Confirmed via measurement: the slide box itself IS centered in the bar,
-       but Nunito's default line-height (~1.65x font-size here) is taller than
-       the box, so flexbox centers the inflated LINE box rather than the
-       glyph ink — the text sat visibly high. line-height:1 removes that
-       half-leading so the centering math lines up with what's actually
-       drawn. */
-    line-height: 1;
+    /* Vertical centering here does NOT lean on align-items:center matching
+       the glyph ink — confirmed in Chromium that's close but WebKit is
+       reported (real iPad screenshot) to center the font's internal
+       ascent/descent box instead, well off from the visible letters, and
+       line-height:1 alone didn't fix that because it still derives from the
+       font's own metrics rather than this box. Setting line-height to this
+       box's OWN fixed height (matching .announce-rotator's `height` above)
+       instead forces the single-line box to exactly fill the container, a
+       browser-independent centering method that does not depend on any
+       font's internal metrics at all. Must be kept equal to
+       .announce-rotator's height here AND in the iPad override below
+       (18px there vs 16px here) or this drifts out of sync again. */
+    line-height: 16px;
   }
   .announce-slide.active { opacity: 1; pointer-events: auto; }
   /* The one slide that's a real link (not just text) gets an underline so it
@@ -3880,6 +3886,10 @@ html.offer-claimed .announce-slide--offer { display: none; }
   :root { --mob-nav-h: 76px; }
   .announce-bar-inner { height: 50px; font-size: 13px; gap: 10px; }
   .announce-rotator { height: 18px; }
+  /* Keep in lockstep with .announce-rotator's height right above — see the
+     long comment on .announce-slide's line-height for why this needs to
+     exactly match the box rather than use line-height:1. */
+  .announce-slide { line-height: 18px; }
   .logo-circle { width: 46px; height: 46px; }
   .logo-text { font-size: 26px; }
   /* Per direct feedback: hamburger+search sat too close to the centered logo
