@@ -4730,6 +4730,21 @@ html.offer-claimed .announce-slide--offer { display: none; }
   .mob-menu {
     left: 0;
     width: auto;
+    /* task 134: explicit 100dvh, not just top:0/bottom:0 (which resolves
+       against whichever viewport Safari happens to be showing at that
+       instant — the LARGE one with the address bar collapsed). dvh tracks
+       the box the browser is ACTUALLY drawing right now, so the panel is
+       never taller than what's visible (bottom content lost under a
+       still-expanded toolbar) nor shorter (a gap at the bottom). This is
+       the opposite call from the hero's 100svh (see that rule's own
+       comment) on purpose: the hero's problem was the toolbar collapsing
+       live WHILE the page scrolls past it, which made a dvh hero visibly
+       grow mid-scroll. This panel has the page scroll LOCKED behind it the
+       entire time it's open (see toggleMobileMenu/closeMobileMenu in
+       app.js) — nothing is scrolling to make dvh move once the panel is
+       open, so there's no equivalent jump to avoid, only the mismatch dvh
+       actually fixes. */
+    height: 100dvh;
     background: #fff;
     box-shadow: none;
     border-radius: 0;
@@ -4752,6 +4767,10 @@ html.offer-claimed .announce-slide--offer { display: none; }
     visibility: visible;
     transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit);
     overscroll-behavior: contain;
+    /* task 134: nothing inside this panel scrolls any more (see
+       .mob-menu-body below) — this is a second, belt-and-braces guard
+       directly on the panel itself. */
+    overflow: hidden;
     /* See the scrim's note above for why there is no will-change /
        backface-visibility here. */
   }
@@ -4830,24 +4849,36 @@ html.offer-claimed .announce-slide--offer { display: none; }
   }
   .mob-menu-close:active { background: rgba(255, 255, 255, 0.24); transform: rotate(90deg); }
 
-  /* ---------- task 125: full-page image-grid menu ---------- */
-  /* The scrollable middle of the panel — header and footer stay put, this is
-     the part that grows past one screen on a short phone (a 2x2 image grid
-     plus the Blog/Contact rows is taller than the old plain link list was).
-     flex:1 + overflow-y:auto is what makes that scroll instead of overflowing
-     the fixed-height panel or getting clipped. */
+  /* ---------- task 125/134: full-page image-grid menu, everything fitted to
+     one screen ---------- */
+  /* task 134: no longer "the scrollable middle" — header and footer still
+     stay put, but this now SHARES the remaining height with its own two
+     children (the grid and the Blog/Contact nav) via flex, rather than
+     growing past one screen and scrolling. overflow:hidden is a second
+     guard on top of .mob-menu's own (belt and braces, not load-bearing on
+     its own): if anything below ever miscalculates, this still refuses to
+     scroll rather than silently reintroducing it. */
   .mob-menu-body {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
+  /* flex:1 + min-height:0 is what lets the grid SHRINK below its content's
+     natural size on a short screen instead of forcing the panel to scroll —
+     the grid gets whatever's left after the header, the nav row below and
+     the footer, full stop. grid-template-rows:1fr 1fr (not the old implicit
+     auto-sized rows) is what makes that remaining height actually split
+     evenly between the two rows of tiles. */
   .mob-menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 10px;
-    padding: 16px 16px 6px;
+    padding: 14px 16px;
+    flex: 1;
+    min-height: 0;
   }
   /* `.mob-menu a.mob-grid-tile`, not bare `.mob-grid-tile`: the base
      `.mob-menu a` rule (class+tag, far above this file) sets display:block
@@ -4860,7 +4891,14 @@ html.offer-claimed .announce-slide--offer { display: none; }
     position: relative;
     display: flex;
     align-items: flex-end;
-    aspect-ratio: 1 / 1.05;
+    /* task 134: NO aspect-ratio any more — a fixed shape is exactly what
+       forced the old grid to grow past the screen on a short phone. Each
+       tile now just fills its grid cell (height:100% of a 1fr row), so it
+       gets shorter on a short screen and taller on a tall one along with
+       the row itself, same as the task's own "tiles should get shorter
+       rather than the menu scrolling" instruction. */
+    width: 100%;
+    height: 100%;
     padding: 0;
     border-bottom: none;
     border-radius: 16px;
@@ -4943,7 +4981,11 @@ html.offer-claimed .announce-slide--offer { display: none; }
     height: auto;
     flex-shrink: 0;
     margin-top: 10px;
-    padding: 14px 12px 32px;
+    /* task 134: bottom padding trimmed from 32px to 14px — the footer right
+       below already carries its own top padding plus the task-119 safe-area
+       floor, so the old 32px was spacing being paid for twice. Freed-up
+       height goes to the grid above via its flex:1. */
+    padding: 14px 12px 14px;
     border-top: 1px solid var(--line-soft);
   }
   .mob-menu-group {
@@ -5100,6 +5142,62 @@ html.offer-claimed .announce-slide--offer { display: none; }
   .mob-menu-nav { max-width: 680px; width: 100%; margin: 10px auto 0; padding: 18px 16px 36px; }
   .mob-menu a.mob-link { min-height: 68px; font-size: 17px; padding: 12px 14px; }
   .mob-link-icon { width: 44px; height: 44px; }
+}
+
+/* ==================== PHONE LANDSCAPE (task 134) ====================
+   The flex:1 grid above already makes the tiles shrink on any short screen,
+   but a real phone turned sideways (390-430px of HEIGHT, not width) runs out
+   of room no matter how thin the tiles get — 4 tiles stacked 2-high plus a
+   2-row Blog/Contact list plus header and footer just doesn't fit in ~390px
+   without something becoming unreadable. The actual fix is the one the
+   landscape orientation itself offers: width is now the abundant dimension,
+   so the tiles go 4-across in a single row instead of 2x2, and Blog/Contact
+   sit side by side instead of stacked.
+
+   Two comma-separated conditions, same shape as task 132's own split,
+   because width alone can't catch this: a large phone (iPhone Pro Max
+   class) is ~930px wide in landscape, past the plain max-width:900px
+   branch, so that width also needs the touch+pointer branch up to 1366px.
+
+   Placed AFTER the iPad scale-up block above, not before — that block's
+   condition (700-1366px, touch, no height limit) and this one's both match
+   a touch phone at, say, 844x390 landscape at the same time, equal
+   specificity throughout, so whichever comes LAST in the file wins. The
+   first version of this rule sat before the iPad block and silently lost
+   every property to it on exactly that phone (same symptom as the original
+   max-width:900px gap: full desktop/iPad-scale header crammed into a
+   390px-tall panel). iPad itself is excluded from the outcome regardless of
+   order — its shortest landscape height (744px) never matches
+   max-height:500px, so it keeps the iPad grid above at every width task 132
+   covers. */
+@media (max-width: 900px) and (max-height: 500px) and (orientation: landscape),
+       (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) and (max-height: 500px) and (orientation: landscape) {
+  .mob-menu-header { padding: 8px 16px; padding-top: calc(8px + env(safe-area-inset-top)); }
+  .mob-menu-brand-icon { width: 30px; height: 30px; }
+  .mob-menu-title { font-size: 9px; }
+  .mob-menu-brand-text { font-size: 16px; }
+  .mob-menu-close { width: 32px; height: 32px; }
+  .mob-menu-grid {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+  .mob-grid-tile-label { font-size: 11.5px; padding: 8px; }
+  .mob-grid-tile-icon { width: 24px; height: 24px; }
+  /* Blog + Contact side by side instead of stacked — the one change that
+     buys back a whole row of height in exchange for width landscape has
+     plenty of. Still a real 44px+ tap target each, just wide-and-short
+     instead of narrow-and-tall. */
+  .mob-menu-nav { display: flex; gap: 8px; margin-top: 4px; padding: 6px 12px; }
+  .mob-menu a.mob-link { flex: 1; min-height: 44px; padding: 8px 10px; gap: 8px; font-size: 13px; }
+  .mob-link-icon { width: 28px; height: 28px; }
+  .mob-link-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mob-menu-footer { padding: 6px 16px max(10px, calc(6px + env(safe-area-inset-bottom))); gap: 2px; }
+  /* The paw divider is the one purely decorative line in the footer — first
+     thing to go when every pixel of height is spoken for. */
+  .mob-menu-footer .paw-divider { display: none; }
+  .mob-menu-tagline { font-size: 9px; }
 }
 
 /* Reduced motion still gets the panel — just without the fade, the drift and

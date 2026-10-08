@@ -793,6 +793,17 @@ function toggleMobileMenu() {
   overlay.classList.toggle('open', !isOpen);
   burger.classList.toggle('open', !isOpen);
   setMenuHidden(menu, isOpen);
+  // task 134: the panel now fills the screen exactly (100dvh) with nothing
+  // inside it scrolling, so the page behind has to be locked too. Locks
+  // <html>, not <body> — document.scrollingElement is HTML on this page (it
+  // carries overflow-x:hidden and the implicit auto-y that make it the real
+  // scroller), so body.style.overflow is a no-op here: verified a plain
+  // wheel scroll still moved the page 800px with the menu open before this
+  // was pointed at the right element. The chat-fullscreen/policy-modal locks
+  // elsewhere in this file set body instead and were never actually
+  // confirmed to stop scrolling on this page either — out of scope to chase
+  // down here, but worth knowing this isn't a mechanism to copy blindly.
+  document.documentElement.style.overflow = isOpen ? '' : 'hidden';
 }
 
 function closeMobileMenu() {
@@ -802,6 +813,7 @@ function closeMobileMenu() {
   document.getElementById('mobMenuOverlay').classList.remove('open');
   document.getElementById('hamburger').classList.remove('open');
   setMenuHidden(menu, true);
+  document.documentElement.style.overflow = '';
 }
 
 // Some mobile browsers restore a page from the back/forward cache (e.g. after
