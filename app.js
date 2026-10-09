@@ -958,12 +958,21 @@ var searchScrollY = 0;
 // own). Opting out of automatic restoration site-wide is the only reliable
 // fix — we restore the exact spot ourselves instead.
 try { history.scrollRestoration = 'manual'; } catch (e) {}
+// Whether the task-136 body lock below is currently applied — closeSearch()
+// is called defensively from many places regardless of whether search was
+// ever open (see its own comment), so it needs to know whether there's
+// actually anything to unlock before touching body.style or scrolling.
+var searchBodyLocked = false;
 
 function openSearch() {
   var bar = document.getElementById('navSearchBar');
   var scrim = document.getElementById('searchScrim');
   if (!bar) return;
   closeMobileMenu();
+  // "any popup" (task 136) includes this one — it sits at z-index 1001,
+  // above the search view's 905, and nothing before this would otherwise
+  // close it if a visitor opened search while it happened to be up.
+  if (offerIsOpen()) dismissOffer();
   searchScrollY = window.scrollY;
   bar.classList.add('open');
   if (scrim) scrim.classList.add('open');
@@ -972,6 +981,19 @@ function openSearch() {
   // scrolling element is <html> (confirmed while building the task-134
   // menu lock), so body.style.overflow is a no-op here.
   document.documentElement.style.overflow = 'hidden';
+  // task 136: overflow:hidden on <html> alone doesn't stop iOS Safari from
+  // scrolling the page out from under a focused input once the keyboard
+  // rises — position:fixed on body, offset by the scroll position just
+  // saved above, is what actually holds firm there. Kept alongside (not
+  // instead of) the documentElement lock above: menus/overlays with no text
+  // input on this site have never needed it, but search is the one view
+  // that hands the keyboard a focused field to push against.
+  document.body.style.position = 'fixed';
+  document.body.style.top = -searchScrollY + 'px';
+  document.body.style.left = '0';
+  document.body.style.right = '0';
+  document.body.style.width = '100%';
+  searchBodyLocked = true;
   syncSearchViewportHeight();
   if (!searchHistoryPushed) {
     history.pushState({ searchOpen: true }, '', location.href);
@@ -998,6 +1020,24 @@ function closeSearch() {
   var scrim = document.getElementById('searchScrim');
   if (scrim) scrim.classList.remove('open');
   document.documentElement.style.overflow = '';
+  if (searchBodyLocked) {
+    searchBodyLocked = false;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    // Removing position:fixed drops the page back at scrollY 0 — restore
+    // the saved spot ourselves, and do it with scroll-behavior forced to
+    // 'auto' first: this site's html has scroll-behavior:smooth, which
+    // would otherwise animate the jump back into a visible slide/bounce —
+    // exactly the drop-and-snap tasks 31, 91 and 116 already had to fix
+    // once. Instant here is the "no jump" task 136 asks for.
+    var prevBehavior = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, searchScrollY);
+    document.documentElement.style.scrollBehavior = prevBehavior;
+  }
   syncOverlayChrome();
   var inp = document.getElementById('navSearchInput');
   if (inp) { inp.value = ''; inp.blur(); }
@@ -1030,14 +1070,14 @@ function dismissSearch() {
 window.addEventListener('popstate', function () {
   if (searchIsOpen()) {
     searchHistoryPushed = false;
+    // closeSearch() itself restores the scroll position now (task 136's
+    // body lock needs that on every close path, not just this one) — see
+    // its own comment. products.js's popstate listener (registered first,
+    // so it already ran by the time this fires) used to re-dispatch the
+    // current route and reset scroll to 0 on every popstate, including this
+    // state-only one; fixed there (see lastRouteHref) by skipping that
+    // re-dispatch when the href didn't actually change.
     closeSearch();
-    // Put the scroll position back where it was before search opened.
-    // products.js's own popstate listener (registered first, so it already
-    // ran by the time this fires) used to re-dispatch the current route
-    // and reset scroll to 0 on every popstate, including this state-only
-    // one — fixed there (see lastRouteHref) by skipping that re-dispatch
-    // when the href didn't actually change. One plain restore is enough now.
-    window.scrollTo(0, searchScrollY);
   }
 });
 
@@ -1049,19 +1089,32 @@ function clearSearchInput() {
   try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
 }
 
-// Keeps the view's real height pinned to what's actually visible once the
-// iOS keyboard opens — visualViewport shrinks when the keyboard does, but
-// the layout viewport (and dvh, which is derived from it) does not. Without
-// this, the keyboard would simply cover the bottom of the view instead of
-// the view shrinking to sit above it. Harmless no-op in browsers without
-// visualViewport — the CSS var() fallback (100dvh) covers them, and on
-// desktop the keyboard is never in play so the var is simply unused.
+// task 136: sizes ONLY the inner scrollable results area (.search-body) to
+// the space still visible above the iOS keyboard — the overlay itself
+// (.search-view) stays pinned to the full 100dvh layout viewport always
+// (see its own styles.css comment for why: shrinking the WHOLE view to
+// visualViewport used to leave the page behind it visible under the
+// keyboard). --search-kb-inset is the keyboard's own height: the layout
+// viewport's height minus what visualViewport still reports visible.
+// Harmless no-op in browsers without visualViewport (the var()'s 0px
+// fallback in styles.css covers them) and effectively a no-op on desktop,
+// where a keyboard never shrinks the viewport in the first place.
 function syncSearchViewportHeight() {
   if (!window.visualViewport || !searchIsOpen()) return;
-  document.documentElement.style.setProperty('--search-vvh', window.visualViewport.height + 'px');
+  var vv = window.visualViewport;
+  var inset = Math.max(0, document.documentElement.clientHeight - vv.height - vv.offsetTop);
+  document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
+  // The visual viewport shifting (keyboard opening/closing, or iOS nudging
+  // it to keep the focused input in view) is exactly what used to drag the
+  // whole page up/down behind the overlay. The body is already pinned via
+  // position:fixed (see openSearch), so window.scrollY has no business
+  // moving at all while search is open — if iOS moves it anyway, put it
+  // straight back so the overlay never visibly shifts.
+  if (searchBodyLocked && window.scrollY !== 0) window.scrollTo(0, 0);
 }
 if (window.visualViewport) {
   window.visualViewport.addEventListener('resize', syncSearchViewportHeight);
+  window.visualViewport.addEventListener('scroll', syncSearchViewportHeight);
 }
 
 // ---------- default-state content: product carousel + bundles row ----------

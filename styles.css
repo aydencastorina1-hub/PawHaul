@@ -2772,6 +2772,23 @@ footer {
 #chatWidget { transition: opacity 0.25s ease; }
 body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
+/* task 136: every other floating element that can ride on top of (or show
+   through under) the full-screen search view — the sticky Add to Cart bar
+   (z-index 900, close to the view's own 905) and the back-to-top button
+   (998, actually ABOVE it) would otherwise float visibly over an open
+   search view; the "Get 10% Off" side tab (480) already renders behind it
+   by z-index alone once the view covers the full viewport (task 136's
+   actual fix for that one), but is included here too as a second,
+   belt-and-braces guard in case it's ever restyled with a higher z-index.
+   Same overlay-up flag the chat widget above already uses — true whenever
+   search, the offer popup, or the offline screen is up. */
+body.overlay-up .sticky-atc,
+body.overlay-up #backToTop,
+body.overlay-up .offer-side-tab {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 /* Dim the page behind the open search view. Fixed, so the page itself never
    shifts, reflows or loses its scroll position. On phone/iPad the view is
    edge to edge (nothing shows past it, so this scrim is mostly invisible
@@ -2796,15 +2813,16 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
    tasks 132-134 already established for "phone layout up to iPad
    landscape" — same split point, not a new one.
 
-   --search-vvh (set by app.js from window.visualViewport) is what shrinks
-   the view when the iOS keyboard opens on phone/iPad — dvh alone does not
-   track the keyboard — so nothing under the keyboard is unreachable and
-   nothing jumps when it appears: the fixed search-bar-row stays put and
-   .search-body (flex:1 below) just gets less room, the same flex-sharing
-   idea the menu uses for its own fixed-header/flexible-body split. On
-   desktop the keyboard is never in play, so this var is simply unused
-   there (the fallback, 100dvh, never actually applies either — desktop's
-   own height rule below wins on specificity-tiebreak-by-source-order). */
+   task 136: --search-kb-inset (set by app.js from window.visualViewport) is
+   the iOS keyboard's own height, used ONLY to cap .search-body — the one
+   part of this view that scrolls — so its visible content never sits under
+   the keyboard. The view itself (.search-view) never resizes for the
+   keyboard; it always covers the full layout viewport. An earlier version
+   sized the whole view to visualViewport directly, which shrank the entire
+   overlay when the keyboard opened and left the page behind it visible
+   underneath — see the phone/iPad override block further down for the fix
+   and the full story. On desktop the keyboard is never in play, so the var
+   is simply unused there. */
 .search-view {
   position: fixed;
   top: 6vh;
@@ -3091,14 +3109,31 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
        edges, so width/height are the viewport's, full stop. */
     inset: 0;
     width: auto;
+    /* task 136: ALWAYS the full layout viewport — never visualViewport/the
+       keyboard-reduced height. This used to be `height: var(--search-vvh,
+       100dvh)`, which shrank the entire overlay the moment the iOS keyboard
+       opened, leaving the bottom of the layout viewport — the homepage hero
+       and the "Get 10% Off" side tab — visible below it. The overlay's job
+       is to cover the screen; only the scrollable content inside it (see
+       .search-body below) needs to know where the keyboard's edge is. */
     height: 100dvh;
-    height: var(--search-vvh, 100dvh);
     transform: none;
     border-radius: 0;
     box-shadow: none;
   }
   .search-view.open { transform: none; }
   .search-pc-card { flex-basis: 150px; }
+
+  /* task 136: shrink only the scrollable results area to the space still
+     visible above the keyboard — --search-kb-inset is the keyboard's own
+     height (layout viewport vs window.visualViewport), kept at 0px by the
+     var() fallback whenever there's no keyboard up (desktop never sets it;
+     phone/iPad before focus or after blur both resolve to 0 too). The bar
+     row above stays flex-shrink:0 at its natural height, so this is the
+     exact remaining visible height — the same flex-sharing split the
+     task-134 menu already uses for its own fixed-header/flexible-body
+     layout, just driven by visualViewport instead of a fixed clamp. */
+  .search-body { max-height: calc(100% - var(--search-kb-inset, 0px)); }
 }
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
