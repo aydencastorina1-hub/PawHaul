@@ -3198,82 +3198,132 @@ body.overlay-up .offer-side-tab {
    never matched here; iPad only, phone and desktop both untouched). */
 @media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
   /* ---------- search bar ---------- */
-  .search-bar-row { padding: 22px 32px; gap: 16px; }
-  .search-back-btn { width: 52px; height: 52px; }
-  .search-back-btn svg { width: 24px; height: 24px; }
-  .search-field { padding: 17px 22px; gap: 12px; }
-  .search-field-paw { width: 21px; height: 21px; }
+  .search-bar-row { padding: 16px 28px; gap: 16px; }
+  .search-back-btn { width: 48px; height: 48px; }
+  .search-back-btn svg { width: 22px; height: 22px; }
+  .search-field { padding: 14px 20px; gap: 12px; }
+  .search-field-paw { width: 20px; height: 20px; }
   /* Comfortably over task 40's 16px floor — this is a bigger screen, the
      bar itself is bigger, 16px flat would look undersized next to it. */
-  .search-input { font-size: 19px; }
+  .search-input { font-size: 18px; }
   .search-clear-btn { width: 32px; height: 32px; font-size: 14px; }
 
-  /* ---------- body spacing ---------- */
-  .search-body { padding: 28px 32px calc(36px + env(safe-area-inset-bottom) + var(--search-kb-inset, 0px)); }
-  .search-section-label { font-size: 14px; letter-spacing: 1.2px; margin-bottom: 16px; }
-  /* vh-based, not a flat px: scales with however tall the screen actually
-     is (portrait vs landscape) instead of guessing one number for both —
-     same idea as the media heights below. */
+  /* ---------- body: no scroll, ever (task 141) ---------- */
+  /* task 140 sized the carousel/bundle media off vh clamp()s — taller than
+     a short landscape iPad (especially with Safari's own chrome still
+     showing) had room for, so the body's old overflow-y:auto turned into
+     an actual scrollbar, with the bundles row partly cut off below the
+     fold. task 141 is specifically "never scroll" — overflow-y:hidden is
+     the backstop, but the real fix is below: .search-default stretches to
+     exactly fill this box (height:100%) and gives its two sections flex
+     fractions of THAT, so every size downstream is a share of whatever
+     height is actually available here, never a guess at what "tall
+     enough" looks like on any one device. */
+  .search-body { padding: 14px 24px calc(14px + env(safe-area-inset-bottom) + var(--search-kb-inset, 0px)); overflow-y: hidden; }
+  .search-section-label { font-size: 13px; letter-spacing: 1.1px; margin-bottom: 8px; }
   .search-default .search-section-label + .search-section-label,
   .search-bundles-row + .search-section-label {
-    margin-top: clamp(36px, 6vh, 64px);
+    margin-top: 12px;
   }
 
-  /* ---------- product carousel: bigger cards, full width, taller ---------- */
-  /* Wider AND taller cards, both viewport-relative (clamp, not a flat px)
-     so the carousel actually uses the available screen on both a tall
-     portrait iPad and a shorter landscape one, rather than one fixed size
-     that's cramped on one orientation or leaves a dead zone on the other —
-     confirmed needed: a first pass at a flat 220px media height left
-     roughly the bottom half of an 820x1180 portrait screen empty below the
-     bundles row, exactly the "big empty block" this task is about.
-     Everything about the TRACK itself (task-88 scroll-snap, native
-     momentum, the arrows) is unchanged — still the same .pc-track
-     contract, just bigger slides inside it. */
-  .search-pc-track { gap: 20px; padding: 4px 4px 10px; }
-  .search-pc-card { flex-basis: clamp(240px, 34vw, 380px); border-radius: 18px; }
-  .search-pc-media { height: clamp(240px, 32vh, 400px); }
-  .search-pc-emoji { font-size: 72px; }
-  .search-pc-name { font-size: 17px; padding: 18px 18px 4px; }
-  .search-pc-price { font-size: 19px; padding: 4px 18px 18px; }
-  /* Re-centers on the media box above via the SAME clamp() halved, so this
-     always matches whatever height that resolved to — the same
-     relationship the phone value (62px) has to its own fixed 124px media
-     height, just kept correct across a range instead of one fixed number.
-     Bigger arrow too: still a real touch target, now sized to match the
-     rest of this view instead of the phone's smaller one. */
-  .search-pc-wrap .pc-arrow { top: calc(clamp(240px, 32vh, 400px) / 2); width: 46px; height: 46px; font-size: 27px; }
+  /* .search-default fills the body exactly; its two sections split that
+     height by flex-grow instead of each sizing itself independently and
+     hoping the total fits. 7:5 favors the carousel slightly — it's the
+     primary content and reads better a little taller than the bundle
+     strip — without starving the bundles. */
+  .search-default {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+  /* Author CSS always beats the UA stylesheet's own [hidden]{display:none},
+     specificity aside — the plain `.search-default { display:flex }` above
+     was overriding it outright, so the hidden default view kept occupying
+     height (and rendering) even while results were showing. Confirmed
+     directly: .search-default read display:"flex" with its hidden
+     attribute still set, and .search-body's scrollHeight included its
+     full height on top of the results grid's, which is exactly what made
+     every results/no-results state measure as overflowing even with only
+     a few results on screen. */
+  .search-default[hidden] { display: none; }
+  .search-default .search-section-label { flex-shrink: 0; }
+  .search-pc-wrap { flex: 7; min-height: 0; display: flex; }
+  .search-bundles-row { flex: 5; min-height: 0; }
 
-  /* ---------- bundles: 3-column grid, bigger cards ---------- */
-  /* A grid, not the phone's wrapping flex row — task 140 explicitly calls
-     a 3-column grid out as fine on iPad, and with exactly 3 bundles shown
-     here it fills the width edge to edge instead of wrapping unevenly. */
-  .search-bundles-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  /* ---------- product carousel ---------- */
+  /* The TRACK's height now comes from .search-pc-wrap's flex-7 share above
+     (position:relative on .pc-wrap, set site-wide, keeps the arrows
+     absolutely positioned over it regardless) — no fixed or vh-derived
+     height on it or the cards. Width still scales with the viewport
+     (clamp against vw) since "use the full width" is a width statement;
+     only HEIGHT needed to stop being viewport-relative; it now flows from
+     the flex chain below instead. Everything about the TRACK's own
+     mechanics (task-88 scroll-snap, native momentum, the arrows) is
+     unchanged — still the same .pc-track contract, just flex-sized. */
+  .search-pc-track { flex: 1; min-height: 0; gap: 14px; padding: 4px 4px 8px; }
+  .search-pc-card {
+    flex: 0 0 clamp(170px, 26vw, 260px);
+    /* height:auto (the flex item default) would size the card to its
+       CONTENT instead of the track's resolved height — explicit 100% is
+       what makes it fill the track exactly, so the media box below has a
+       real height to flex within. */
+    height: 100%;
+    border-radius: 16px;
+  }
+  /* The actual no-fixed-height step: media is the one flexible part of the
+     card's own column layout (base rule: display:flex;flex-direction:
+     column), so it simply takes whatever's left after the name/price
+     text's own natural height — never a number this file has to guess. */
+  .search-pc-media { flex: 1; min-height: 0; height: auto; }
+  .search-pc-emoji { font-size: clamp(32px, 6vh, 54px); }
+  .search-pc-name { font-size: 14.5px; padding: 10px 12px 2px; }
+  .search-pc-price { font-size: 16px; padding: 2px 12px 10px; }
+  /* 50% + translateY(-50%) (the base .pc-arrow rule) already centers this
+     on whatever height .search-pc-wrap resolves to — no fixed/computed
+     top needed any more now that the wrap's own height isn't fixed either. */
+  .search-pc-wrap .pc-arrow { top: 50%; width: 40px; height: 40px; font-size: 24px; }
+
+  /* ---------- bundles: 3-column grid ---------- */
+  /* grid-template-rows:1fr is what makes the ROW stretch to the flex-5
+     share .search-bundles-row got above — a grid's implicit row otherwise
+     sizes to its tallest CONTENT, which is exactly the fixed-height
+     mistake this task is fixing. */
+  .search-bundles-row { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr; gap: 14px; }
   .search-bundle-card {
-    flex: unset; gap: 16px; border-radius: 18px;
-    /* Column, not the phone's row: a bigger square photo sitting above the
-       name/price reads as a real product card at this size, instead of a
-       thumbnail-and-text list row stretched three times wider. */
+    flex: unset; gap: 8px; border-radius: 16px;
+    /* Column, not the phone's row: a photo sitting above the name/price
+       reads as a real product card at this size, instead of a thumbnail-
+       and-text list row stretched three times wider. height:100% fills
+       the grid row (a grid cell's default stretch already does this, but
+       explicit here matches the same reasoning as the carousel card
+       above and keeps the chain easy to follow). */
     flex-direction: column; align-items: flex-start;
-    padding: 20px;
+    height: 100%; min-height: 0;
+    padding: 12px;
   }
-  .search-bundle-media {
-    width: 100%;
-    /* vh-based like the carousel media above, for the same reason —
-       scales with whatever the screen's actual height is. */
-    height: clamp(140px, 20vh, 220px);
-    border-radius: 14px; font-size: 40px;
-  }
-  .search-bundle-name { font-size: 17px; margin-top: 2px; }
-  .search-bundle-price { font-size: 17px; margin-top: 4px; }
+  /* Same "flex takes the leftover space" move as .search-pc-media above —
+     the name/price block keeps its natural text height, the image fills
+     whatever's left in the card. */
+  .search-bundle-media { width: 100%; flex: 1; min-height: 0; height: auto; border-radius: 12px; font-size: clamp(22px, 4vh, 34px); }
+  .search-bundle-name { font-size: 14px; margin-top: 2px; }
+  .search-bundle-price { font-size: 14px; margin-top: 2px; }
 
-  /* ---------- live results ---------- */
-  .search-result-item { padding: 14px 10px; gap: 16px; }
-  .search-result-thumb { width: 60px; height: 60px; border-radius: 14px; font-size: 32px; }
-  .search-result-name { font-size: 16px; }
-  .search-result-price { font-size: 16px; }
-  .search-no-results { padding: 72px 8px 32px; font-size: 16px; }
-  .search-no-results .snr-emoji { font-size: 44px; }
+  /* ---------- live results: a grid, same no-scroll reasoning ---------- */
+  /* The phone/desktop result list is a single scrolling column — exactly
+     what task 141 rules out here. Two columns roughly halves how many
+     ROWS a given result count needs, and shrinking the cards below (as
+     the task's own "shrink the cards or use a tighter grid" suggests)
+     keeps even a full ~10-result match (6 products + 4 bundles, the most
+     any one query can return) inside the available height without
+     scrolling — verified directly, not just estimated. */
+  .search-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; overflow: hidden; }
+  .search-result-item { padding: 8px; gap: 10px; border-bottom: none; border: 1.5px solid var(--line-soft); border-radius: 12px; }
+  .search-result-thumb { width: 44px; height: 44px; border-radius: 11px; font-size: 24px; }
+  .search-result-name { font-size: 13.5px; }
+  .search-result-price { font-size: 13.5px; }
+  .search-no-results { padding: 40px 8px 24px; font-size: 15px; grid-column: 1 / -1; }
+  .search-no-results .snr-emoji { font-size: 38px; }
 }
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
