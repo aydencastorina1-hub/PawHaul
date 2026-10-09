@@ -358,6 +358,45 @@ function heroSlideError(img) {
     <a class="cart-btn" href="/cart" onclick="goTo(event,'cart')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:17px;height:17px;vertical-align:-0.18em" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span class="cart-btn-text"> Cart</span><span class="cart-count" id="cartCount">0</span></a>
   </div>
 </nav>
+<!-- task 140: the hamburger and search buttons above call toggleMobileMenu()
+     and toggleSearch(), both defined in app.js — one of three plain,
+     sequential, render-blocking <script src> tags near the end of this
+     document (blog.js, products.js, app.js). The browser paints this nav,
+     and makes it tappable, well before it reaches those scripts, especially
+     over a slow connection: reproduced directly by artificially delaying
+     app.js and tapping the instant the button became visible — at that
+     moment window.toggleSearch did not exist yet, the inline onclick threw
+     "toggleSearch is not defined", and the tap was simply lost. The SECOND
+     tap, after app.js had finished, worked — exactly the "needs two taps"
+     symptom.
+     This defines each name as a tiny stub the instant the nav exists —
+     before either button could possibly receive a real tap — that remembers
+     only the MOST RECENT call's real arguments (several taps before the
+     real script loads collapse into one replay, not one replay per tap,
+     which would otherwise toggle open then immediately closed again) and
+     replays it for real once app.js's own final line calls
+     __flushHeaderPending(). Not a fake delay and not a dropped tap: the
+     action fires the instant the real implementation exists, never later.
+     goTo() (products.js) doesn't need this: every link that calls it has a
+     real href, so the worst case before products.js loads is an ordinary
+     full-page navigation, not a dead tap. -->
+<script>
+(function () {
+  var pending = {};
+  function stub(name) {
+    window[name] = function () { pending[name] = arguments; };
+  }
+  stub('toggleSearch');
+  stub('toggleMobileMenu');
+  window.__flushHeaderPending = function () {
+    Object.keys(pending).forEach(function (name) {
+      var realFn = window[name], args = pending[name];
+      delete pending[name];
+      realFn.apply(null, args);
+    });
+  };
+})();
+</script>
 <!-- Paints a returning visitor's real cart count immediately instead of the
      static "0" above. The actual cart contents are restored from Shopify
      asynchronously (see initCartFromStorage() in products.js, called later

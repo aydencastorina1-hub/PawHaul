@@ -750,10 +750,27 @@ function trackAddToCart(product, price, size, color) {
 
 // ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
+// task 140: the very FIRST call to showPage every page load is index.html's
+// own inline bootstrap script (right after this file loads) syncing the
+// already-rendered page to match the URL already in the address bar — not a
+// real navigation the visitor triggered. Closing the menu/search here
+// unconditionally used to also wipe out a LEGITIMATE early open: a visitor
+// fast enough to tap the search icon before that bootstrap call ran (now
+// possible — see the index.html stub/replay a few lines below) would see it
+// open, then watch this exact call yank it shut moments later. Confirmed
+// directly: even with no slow-network simulation at all, a tap landing
+// before document.readyState reached "complete" opened search for real,
+// only to have it closed again here. Every call after the first is a real
+// navigation — including a real Back/Forward between two different pages —
+// and keeps the original unconditional behavior.
+var _showPageCalledOnce = false;
 showPage = function(page, opts) {
   _origShowPage(page, opts);
-  closeMobileMenu();
-  closeSearch();
+  if (_showPageCalledOnce) {
+    closeMobileMenu();
+    closeSearch();
+  }
+  _showPageCalledOnce = true;
   if (SPA_PAGE_TITLES[page]) setSpaTitle(SPA_PAGE_TITLES[page]);
   // Leaving the product page: hide the sticky Add To Cart bar immediately
   // rather than waiting on the next IntersectionObserver callback.
@@ -821,9 +838,20 @@ function closeMobileMenu() {
 // menu, search overlay or offer popup happened to be in when the tab was last
 // backgrounded — and with whatever scroll position it had, since a bfcache
 // restore doesn't re-run the <head> script that resets scroll on a normal
-// load. Force everything closed and scrolled to top on every pageshow (fresh
-// loads too, where these are already correct, so this is a harmless no-op).
-window.addEventListener('pageshow', function () {
+// load. Force everything closed and scrolled to top on a bfcache restore.
+//
+// task 140: gated on e.persisted (true only for an actual bfcache restore)
+// — this used to run unconditionally, on every pageshow including the single
+// ordinary one every fresh load gets, on the assumption that a fresh load
+// could never have anything open yet anyway ("harmless no-op"). That stopped
+// being true the moment the header's icons became tappable before the page
+// is fully ready (see the stub/replay in index.html): a visitor who opened
+// search in that window would have it closed right back out from under them
+// the instant this otherwise-unconditional handler ran. A genuine bfcache
+// restore still gets the full reset; an ordinary fresh load no longer does,
+// since there is nothing stale to reset there in the first place.
+window.addEventListener('pageshow', function (e) {
+  if (!e.persisted) return;
   closeMobileMenu();
   closeSearch();
   dismissOffer();
@@ -2428,3 +2456,25 @@ if (typeof checkout === 'function') {
   // from disk cache).
   if (navigator.onLine === false) show();
 })();
+
+// task 140: the real toggleSearch/toggleMobileMenu above have now overwritten
+// the index.html stubs that held the fort until this script finished loading
+// — replay whatever the visitor actually tapped while that was still true.
+//
+// NOT flushed immediately here, even though this is the last line of this
+// file: index.html still has, after this script tag, its own inline routing
+// call (dispatchRoute -> showPage) for the page's initial route, and that
+// unconditionally calls closeSearch() defensively (showPage does, on every
+// call) as part of settling the first paint — confirmed directly: an
+// immediate flush here opened search for real, only for that routing call,
+// moments later, to close it right back again, and the pageshow handler
+// above (also unconditional) would do the same a second time after that.
+// Both are earlier in this file / the document than this point, so by
+// waiting for pageshow to fire again — AFTER the whole document, including
+// that routing script, has finished — this listener (registered after the
+// pageshow one above) runs after both defensive closes, not before them.
+// {once:true}: this is purely about replaying a tap from before the page
+// was ready; nothing should replay again on a later bfcache pageshow.
+window.addEventListener('pageshow', function () {
+  if (window.__flushHeaderPending) window.__flushHeaderPending();
+}, { once: true });

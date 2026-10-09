@@ -3185,6 +3185,97 @@ body.overlay-up .offer-side-tab {
   .search-pc-card { flex-basis: 150px; }
 }
 
+/* ==================== SEARCH — iPAD SCALE-UP (task 140) ====================
+   Layered AFTER the combined phone/iPad block above (same specificity,
+   later source wins) — same relationship task 132's own iPad block has to
+   the widened-mobile block it follows, and the same reason: the STRUCTURE
+   (full screen, edge to edge, no border-radius, the carousel/bundles/
+   results layout) already comes from that shared block, unchanged here.
+   This only scales individual pieces up from phone proportions to
+   something that actually uses an iPad's screen — bigger bar, bigger
+   cards, bigger images, a 3-column bundle grid — using the task-132 iPad-
+   only touch+width signal (no `max-width:900px` branch, so phones are
+   never matched here; iPad only, phone and desktop both untouched). */
+@media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  /* ---------- search bar ---------- */
+  .search-bar-row { padding: 22px 32px; gap: 16px; }
+  .search-back-btn { width: 52px; height: 52px; }
+  .search-back-btn svg { width: 24px; height: 24px; }
+  .search-field { padding: 17px 22px; gap: 12px; }
+  .search-field-paw { width: 21px; height: 21px; }
+  /* Comfortably over task 40's 16px floor — this is a bigger screen, the
+     bar itself is bigger, 16px flat would look undersized next to it. */
+  .search-input { font-size: 19px; }
+  .search-clear-btn { width: 32px; height: 32px; font-size: 14px; }
+
+  /* ---------- body spacing ---------- */
+  .search-body { padding: 28px 32px calc(36px + env(safe-area-inset-bottom) + var(--search-kb-inset, 0px)); }
+  .search-section-label { font-size: 14px; letter-spacing: 1.2px; margin-bottom: 16px; }
+  /* vh-based, not a flat px: scales with however tall the screen actually
+     is (portrait vs landscape) instead of guessing one number for both —
+     same idea as the media heights below. */
+  .search-default .search-section-label + .search-section-label,
+  .search-bundles-row + .search-section-label {
+    margin-top: clamp(36px, 6vh, 64px);
+  }
+
+  /* ---------- product carousel: bigger cards, full width, taller ---------- */
+  /* Wider AND taller cards, both viewport-relative (clamp, not a flat px)
+     so the carousel actually uses the available screen on both a tall
+     portrait iPad and a shorter landscape one, rather than one fixed size
+     that's cramped on one orientation or leaves a dead zone on the other —
+     confirmed needed: a first pass at a flat 220px media height left
+     roughly the bottom half of an 820x1180 portrait screen empty below the
+     bundles row, exactly the "big empty block" this task is about.
+     Everything about the TRACK itself (task-88 scroll-snap, native
+     momentum, the arrows) is unchanged — still the same .pc-track
+     contract, just bigger slides inside it. */
+  .search-pc-track { gap: 20px; padding: 4px 4px 10px; }
+  .search-pc-card { flex-basis: clamp(240px, 34vw, 380px); border-radius: 18px; }
+  .search-pc-media { height: clamp(240px, 32vh, 400px); }
+  .search-pc-emoji { font-size: 72px; }
+  .search-pc-name { font-size: 17px; padding: 18px 18px 4px; }
+  .search-pc-price { font-size: 19px; padding: 4px 18px 18px; }
+  /* Re-centers on the media box above via the SAME clamp() halved, so this
+     always matches whatever height that resolved to — the same
+     relationship the phone value (62px) has to its own fixed 124px media
+     height, just kept correct across a range instead of one fixed number.
+     Bigger arrow too: still a real touch target, now sized to match the
+     rest of this view instead of the phone's smaller one. */
+  .search-pc-wrap .pc-arrow { top: calc(clamp(240px, 32vh, 400px) / 2); width: 46px; height: 46px; font-size: 27px; }
+
+  /* ---------- bundles: 3-column grid, bigger cards ---------- */
+  /* A grid, not the phone's wrapping flex row — task 140 explicitly calls
+     a 3-column grid out as fine on iPad, and with exactly 3 bundles shown
+     here it fills the width edge to edge instead of wrapping unevenly. */
+  .search-bundles-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .search-bundle-card {
+    flex: unset; gap: 16px; border-radius: 18px;
+    /* Column, not the phone's row: a bigger square photo sitting above the
+       name/price reads as a real product card at this size, instead of a
+       thumbnail-and-text list row stretched three times wider. */
+    flex-direction: column; align-items: flex-start;
+    padding: 20px;
+  }
+  .search-bundle-media {
+    width: 100%;
+    /* vh-based like the carousel media above, for the same reason —
+       scales with whatever the screen's actual height is. */
+    height: clamp(140px, 20vh, 220px);
+    border-radius: 14px; font-size: 40px;
+  }
+  .search-bundle-name { font-size: 17px; margin-top: 2px; }
+  .search-bundle-price { font-size: 17px; margin-top: 4px; }
+
+  /* ---------- live results ---------- */
+  .search-result-item { padding: 14px 10px; gap: 16px; }
+  .search-result-thumb { width: 60px; height: 60px; border-radius: 14px; font-size: 32px; }
+  .search-result-name { font-size: 16px; }
+  .search-result-price { font-size: 16px; }
+  .search-no-results { padding: 72px 8px 32px; font-size: 16px; }
+  .search-no-results .snr-emoji { font-size: 44px; }
+}
+
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
 .hamburger {
   display: none;
