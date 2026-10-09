@@ -1215,10 +1215,27 @@ if (window.visualViewport) {
 // wanted here, named "Hydration Bundle").
 var SEARCH_BUNDLE_IDS = ['led', 'portable-hydration', 'visibility'];
 
+// task 138: a failed <img> load (a dead/renamed file, a blocked host, a
+// network hiccup) used to just leave the browser's own broken-image icon
+// sitting there — `src` resolving to SOMETHING is not the same as the photo
+// actually loading, and productImageFor()'s own fallback (used below) only
+// ever covers the first case, not the second. This is the second: `onerror`
+// swaps the failed <img> for the plain-text emoji the same card would have
+// shown had no photo URL existed in the first place, so a real network
+// failure degrades exactly like "no photo" always has — never a broken-
+// image glyph. The replacement text is plain (no nested element/attributes)
+// specifically so it needs no quote-escaping games inside the onerror
+// attribute itself: HTML entity-decodes `this.outerHTML='<emoji>'` before JS
+// ever sees it, so the only character that would be unsafe here is an
+// apostrophe, and no emoji in this catalogue's data contains one.
+function imgOnErrorToEmoji(emoji) {
+  return ' onerror="this.outerHTML=\'' + emoji + '\'"';
+}
+
 function searchProductCardHtml(p) {
   var img = productImageFor(p, p.colors && p.colors[0]);
   var media = img
-    ? '<img ' + photoAttrs(img, 'card') + ' alt="">'
+    ? '<img ' + photoAttrs(img, 'card') + ' alt=""' + imgOnErrorToEmoji(p.emoji) + '>'
     : '<span class="search-pc-emoji" aria-hidden="true">' + p.emoji + '</span>';
   return '<a class="search-pc-card" href="/product/' + slugify(p.name) + '" onclick="closeSearch();goToProductLink(event,' + p.id + ')">' +
     '<div class="search-pc-media">' + media + '</div>' +
@@ -1227,9 +1244,38 @@ function searchProductCardHtml(p) {
   '</a>';
 }
 
+// A bundle (BUNDLES in products.js) doesn't always carry its own `img` —
+// some, like the Hydration Bundle, deliberately leave it out because
+// neither of their two products has a real photo yet (see that bundle's own
+// comment). Falling back straight to a bare "%" character there read as a
+// broken placeholder, not a deliberate design choice, so this instead tries,
+// in order: the bundle's own photo, then each constituent product's own
+// photo (bundleProducts() preserves `ids` order, so "the first product's
+// image" per task 138 is whichever of the two actually has one), and only
+// once none of that exists falls back to the first constituent product's
+// emoji — the same real fallback chain searchProductCardHtml() above uses
+// for a single product, just extended across a bundle's line items.
+function bundleMediaUrl(b) {
+  if (b.img) return b.img;
+  var items = bundleProducts(b);
+  for (var i = 0; i < items.length; i++) {
+    var url = productImageFor(items[i], items[i].colors && items[i].colors[0]);
+    if (url) return url;
+  }
+  return null;
+}
+function bundleFallbackEmoji(b) {
+  var items = bundleProducts(b);
+  return (items[0] && items[0].emoji) || '🎁';
+}
+
 function searchBundleCardHtml(b) {
   var t = bundleTotals(b);
-  var media = b.img ? '<img src="' + b.img + '" alt="">' : '%';
+  var url = bundleMediaUrl(b);
+  var emoji = bundleFallbackEmoji(b);
+  var media = url
+    ? '<img src="' + url + '" alt=""' + imgOnErrorToEmoji(emoji) + '>'
+    : emoji;
   return '<a class="search-bundle-card" href="/bundles#bundle-' + b.id + '" onclick="closeSearch();goToBundle(event,\'' + b.id + '\')">' +
     '<div class="search-bundle-media">' + media + '</div>' +
     '<div class="search-bundle-info">' +
@@ -1261,7 +1307,7 @@ function renderSearchDefaults() {
 // ---------- active-state content: live results ----------
 function searchResultProductHtml(p, hl) {
   var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
-  var thumb = thumbUrl ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt="">' : p.emoji;
+  var thumb = thumbUrl ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt=""' + imgOnErrorToEmoji(p.emoji) + '>' : p.emoji;
   return '<a class="search-result-item" href="/product/' + slugify(p.name) + '" onclick="closeSearch();goToProductLink(event,' + p.id + ')">' +
     '<span class="search-result-thumb">' + thumb + '</span>' +
     '<div class="search-result-info">' +
@@ -1276,8 +1322,13 @@ function searchResultProductHtml(p, hl) {
 
 function searchResultBundleHtml(b, hl) {
   var t = bundleTotals(b);
+  var url = bundleMediaUrl(b);
+  var emoji = bundleFallbackEmoji(b);
+  var thumb = url
+    ? '<img ' + photoAttrs(url, 'thumb') + ' alt=""' + imgOnErrorToEmoji(emoji) + '>'
+    : emoji;
   return '<a class="search-result-item" href="/bundles#bundle-' + b.id + '" onclick="closeSearch();goToBundle(event,\'' + b.id + '\')">' +
-    '<span class="search-result-thumb search-result-thumb--bundle" aria-hidden="true">%</span>' +
+    '<span class="search-result-thumb search-result-thumb--bundle" aria-hidden="true">' + thumb + '</span>' +
     '<div class="search-result-info">' +
       '<div class="search-result-name">' + b.name.replace(hl, '<b>$1</b>') + '<span class="search-result-tag">Bundle</span></div>' +
       '<div class="search-result-meta"><span class="search-result-price">$' + t.bundle.toFixed(2) + '</span></div>' +
@@ -1359,6 +1410,26 @@ function doSearch(val) {
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && searchIsOpen()) dismissSearch();
   });
+  // task 138: dismissing the iOS keyboard WITHOUT closing search (the
+  // checkmark/Done key, tapping outside the input, or scrolling the results
+  // list) blurs the input but leaves search open — and that's exactly the
+  // case window.visualViewport's own resize event is unreliable for: it can
+  // fire late, fire before the keyboard's dismiss animation has actually
+  // finished, or not fire at all, leaving --search-kb-inset (and, before
+  // this task, the view's own height) stuck at its keyboard-open value.
+  // Blur is a signal of its own, so re-sync immediately on it AND again at
+  // 300ms/700ms to catch the keyboard animation settling after the event
+  // itself (or the event) was unreliable. A no-op padding value is the
+  // worst case if these all somehow still race — see .search-body's own
+  // comment for why that was made a deliberately cheap failure mode.
+  var inp = document.getElementById('navSearchInput');
+  if (inp) {
+    inp.addEventListener('blur', function () {
+      syncSearchViewportHeight();
+      setTimeout(syncSearchViewportHeight, 300);
+      setTimeout(syncSearchViewportHeight, 700);
+    });
+  }
 })();
 
 // ==================== CAROUSEL ====================

@@ -2958,7 +2958,19 @@ body.overlay-up .offer-side-tab {
   overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+  /* task 138: --search-kb-inset (the iOS keyboard's own height, set by
+     app.js from window.visualViewport) is ONLY ever extra bottom padding
+     here — never a height or max-height. flex:1 + min-height:0 above
+     already makes this fill the full overlay on their own; capping it to
+     "the space above the keyboard" via max-height (the task-136 approach)
+     is exactly what caused this task's bug, because the var that drove it
+     can get stuck at its keyboard-open value: iOS's visualViewport resize
+     event is unreliable once the keyboard finishes CLOSING, so the cap
+     this rule mustn't repeat sometimes never relaxed back to 0. Padding
+     has no such failure mode — if the var ever is stale, the only cost is
+     a little extra blank space at the bottom of a correctly-full-height
+     box, not a broken layout. */
+  padding: 18px 16px calc(24px + env(safe-area-inset-bottom) + var(--search-kb-inset, 0px));
   /* task 137: the one surface allowed to scroll, and only vertically — this
      is what overrides .search-view's touch-action:none for touches that
      start here. When the content is shorter than the box, overflow-y:auto
@@ -3146,25 +3158,31 @@ body.overlay-up .offer-side-tab {
        opened, leaving the bottom of the layout viewport — the homepage hero
        and the "Get 10% Off" side tab — visible below it. The overlay's job
        is to cover the screen; only the scrollable content inside it (see
-       .search-body below) needs to know where the keyboard's edge is. */
-    height: 100dvh;
+       .search-body below) needs to know where the keyboard's edge is.
+       task 138: this was then `height: 100dvh` — still an explicit height,
+       which ALWAYS wins over the top+bottom sizing inset:0 implies for a
+       position:fixed box, whatever the explicit value. dvh doesn't reliably
+       re-resolve the instant the iOS keyboard finishes CLOSING (the resize
+       that's supposed to drive it can fire late, fire before the dismiss
+       animation actually finishes, or not fire at all), so the view stayed
+       stuck at its keyboard-open dvh value — a blank gap below the content,
+       down to wherever dvh last settled.
+       `height: auto` is the actual fix, not just dropping the line: with no
+       explicit height at all, the base (desktop) rule's own `height: min(
+       680px, 88vh)` is still sitting there in the cascade and would
+       otherwise keep winning over inset's top/bottom — confirmed getting
+       exactly that 680px, unchanged, measured on a 390x844 phone viewport,
+       immediately on open with no keyboard involved yet at all. `auto`
+       here is what hands height back to top:0/bottom:0, which the browser
+       recomputes from plain box geometry on every layout — no dvh unit,
+       no JS, nothing to go stale. */
+    height: auto;
     transform: none;
     border-radius: 0;
     box-shadow: none;
   }
   .search-view.open { transform: none; }
   .search-pc-card { flex-basis: 150px; }
-
-  /* task 136: shrink only the scrollable results area to the space still
-     visible above the keyboard — --search-kb-inset is the keyboard's own
-     height (layout viewport vs window.visualViewport), kept at 0px by the
-     var() fallback whenever there's no keyboard up (desktop never sets it;
-     phone/iPad before focus or after blur both resolve to 0 too). The bar
-     row above stays flex-shrink:0 at its natural height, so this is the
-     exact remaining visible height — the same flex-sharing split the
-     task-134 menu already uses for its own fixed-header/flexible-body
-     layout, just driven by visualViewport instead of a fixed clamp. */
-  .search-body { max-height: calc(100% - var(--search-kb-inset, 0px)); }
 }
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
