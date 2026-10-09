@@ -3003,11 +3003,24 @@ body.overlay-up .offer-side-tab {
    overrides the arrow's vertical position to match THIS carousel's card
    height, since task 133's own cards are a different (taller, full-width)
    shape. */
-/* touch-action: pan-x — overrides .search-body's own pan-y for touches that
-   start on the carousel track, so the horizontal swipe (task 88's
-   scroll-snap contract, which .search-pc-track already joins) keeps
-   working under task 137's new touch-action:none on the overlay shell. */
-.search-pc-track { gap: 12px; padding: 2px 2px 6px; touch-action: pan-x; }
+/* task 142: `pan-x` alone here (task 137's original) was the actual cause
+   of "the carousel doesn't scroll by touch until I tap an arrow once" —
+   confirmed against this file's own established convention for a carousel
+   that sits inside a vertically-scrollable ancestor (.det-carousel, further
+   down this file, already uses `pan-x pan-y pinch-zoom` for exactly this
+   reason). .search-body (the ancestor here) is itself pan-y; a touch
+   starting on a descendant that only grants pan-x, with no pan-y of its
+   own, does not reliably keep BOTH axes usable in every engine the way
+   two restrictive-but-different single-axis values from ancestor and
+   descendant might suggest — pan-x pan-y on both this wrap and the track
+   below grants the same two axes at every level of the chain, which is
+   what the rest of this file already does for the identical situation.
+   Also set on .search-pc-wrap, not just the track: "everything inside it"
+   per the task, so no intermediate element between .search-body and the
+   track is left as the one link still silently restricting a horizontal
+   touch. */
+.search-pc-wrap { touch-action: pan-x pan-y; }
+.search-pc-track { gap: 12px; padding: 2px 2px 6px; touch-action: pan-x pan-y; }
 .search-pc-wrap .pc-arrow { top: 62px; }
 .search-pc-card {
   flex: 0 0 148px;
@@ -3021,6 +3034,10 @@ body.overlay-up .offer-side-tab {
   transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
   text-decoration: none;
   color: inherit;
+  /* The card itself is the actual touch target a swipe starts on — same
+     "everything inside it" reasoning as .search-pc-wrap/.search-pc-track
+     above, so this link in the chain isn't the one left restricting it. */
+  touch-action: pan-x pan-y;
 }
 .search-pc-card:active { transform: scale(0.97); }
 .search-pc-media {
@@ -3219,7 +3236,11 @@ body.overlay-up .offer-side-tab {
      fractions of THAT, so every size downstream is a share of whatever
      height is actually available here, never a guess at what "tall
      enough" looks like on any one device. */
-  .search-body { padding: 14px 24px calc(14px + env(safe-area-inset-bottom) + var(--search-kb-inset, 0px)); overflow-y: hidden; }
+  /* task 142: no --search-kb-inset term here any more — see the long
+     comment above .search-default's two flex children below for why
+     letting the keyboard shrink this box's content area was the actual
+     cause of cards collapsing into thin strips when it opened. */
+  .search-body { padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); overflow-y: hidden; }
   .search-section-label { font-size: 13px; letter-spacing: 1.1px; margin-bottom: 8px; }
   .search-default .search-section-label + .search-section-label,
   .search-bundles-row + .search-section-label {
@@ -3227,10 +3248,10 @@ body.overlay-up .offer-side-tab {
   }
 
   /* .search-default fills the body exactly; its two sections split that
-     height by flex-grow instead of each sizing itself independently and
-     hoping the total fits. 7:5 favors the carousel slightly — it's the
-     primary content and reads better a little taller than the bundle
-     strip — without starving the bundles. */
+     height EQUALLY (task 142 — was a 7:5 carousel-favoring split in task
+     141). flex:1 on both, not just a bare flex-grow number: the shorthand
+     sets flex-basis:0 too, which is what makes the split a pure 1:1 ratio
+     of the free space regardless of either section's own content. */
   .search-default {
     display: flex;
     flex-direction: column;
@@ -3248,11 +3269,33 @@ body.overlay-up .offer-side-tab {
      a few results on screen. */
   .search-default[hidden] { display: none; }
   .search-default .search-section-label { flex-shrink: 0; }
-  .search-pc-wrap { flex: 7; min-height: 0; display: flex; }
-  .search-bundles-row { flex: 5; min-height: 0; }
+  .search-pc-wrap { flex: 1; min-height: 0; display: flex; }
+  .search-bundles-row { flex: 1; min-height: 0; }
+
+  /* task 142: the iPad keyboard opening used to shrink .search-body's own
+     content box (via --search-kb-inset added to its bottom padding above
+     task 141), which these two flex:1 sections then split in half as
+     always — so BOTH collapsed into thin strips the instant the keyboard
+     appeared, images included, on top of whatever the keyboard was
+     already covering. Confirmed directly against the task's own worst
+     case, iPad landscape (keyboard > half the screen there): .search-
+     pc-media measured under 20px tall with the keyboard open, before this
+     fix. The keyboard inset no longer touches sizing anywhere (removed
+     from .search-body's padding above) — cards are always sized from the
+     FULL .search-body height, keyboard or not; syncSearchViewportHeight()
+     (app.js) instead toggles html.search-kb-open, and the two rules below
+     hide the bundles section outright while that's set, so the carousel
+     (now the only flex:1 child left) takes 100% of .search-default on its
+     own instead of splitting it with a section mostly hidden under the
+     keyboard anyway. Bundles return the instant the class clears — on
+     blur, same as every other --search-kb-inset consumer. */
+  html.search-kb-open .search-bundles-row,
+  html.search-kb-open .search-bundles-row + .search-section-label {
+    display: none;
+  }
 
   /* ---------- product carousel ---------- */
-  /* The TRACK's height now comes from .search-pc-wrap's flex-7 share above
+  /* The TRACK's height now comes from .search-pc-wrap's flex-1 share above
      (position:relative on .pc-wrap, set site-wide, keeps the arrows
      absolutely positioned over it regardless) — no fixed or vh-derived
      height on it or the cards. Width still scales with the viewport
@@ -3267,46 +3310,79 @@ body.overlay-up .offer-side-tab {
     /* height:auto (the flex item default) would size the card to its
        CONTENT instead of the track's resolved height — explicit 100% is
        what makes it fill the track exactly, so the media box below has a
-       real height to flex within. */
-    height: 100%;
-    border-radius: 16px;
+       real height to flex within. min-height: task 142's "cards never
+       collapse" floor — only ever bites in a genuinely extreme squeeze
+       (overflow:hidden on .search-body simply clips past this, never
+       scrolls), since the equal-halves/keyboard-hide rules above are what
+       actually keep this from being needed in the cases this task tests. */
+    height: 100%; min-height: 140px;
+    border-radius: 18px;
   }
   /* The actual no-fixed-height step: media is the one flexible part of the
      card's own column layout (base rule: display:flex;flex-direction:
      column), so it simply takes whatever's left after the name/price
      text's own natural height — never a number this file has to guess. */
-  .search-pc-media { flex: 1; min-height: 0; height: auto; }
+  .search-pc-media { flex: 1; min-height: 90px; height: auto; }
+  /* task 142: contain, not cover — "show the image large, never cropped or
+     squished". cover (the phone/desktop default) fills the box by cropping
+     whatever doesn't fit the aspect ratio; contain fits the whole image
+     inside it, since this box has real room to show it uncropped now. */
+  .search-pc-media img { object-fit: contain; }
   .search-pc-emoji { font-size: clamp(32px, 6vh, 54px); }
-  .search-pc-name { font-size: 14.5px; padding: 10px 12px 2px; }
-  .search-pc-price { font-size: 16px; padding: 2px 12px 10px; }
+  /* task 142: matches .search-bundle-name/.search-bundle-price below
+     exactly (size, weight inherited from the shared base rule) — "look
+     like they belong to the same design" means the same numbers, not just
+     a similar scale. */
+  .search-pc-name { font-size: 14px; padding: 12px 14px 2px; }
+  .search-pc-price { font-size: 14px; padding: 2px 14px 12px; }
   /* 50% + translateY(-50%) (the base .pc-arrow rule) already centers this
      on whatever height .search-pc-wrap resolves to — no fixed/computed
      top needed any more now that the wrap's own height isn't fixed either. */
   .search-pc-wrap .pc-arrow { top: 50%; width: 40px; height: 40px; font-size: 24px; }
 
   /* ---------- bundles: 3-column grid ---------- */
-  /* grid-template-rows:1fr is what makes the ROW stretch to the flex-5
+  /* grid-template-rows:1fr is what makes the ROW stretch to the flex-1
      share .search-bundles-row got above — a grid's implicit row otherwise
      sizes to its tallest CONTENT, which is exactly the fixed-height
      mistake this task is fixing. */
   .search-bundles-row { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr; gap: 14px; }
   .search-bundle-card {
-    flex: unset; gap: 8px; border-radius: 16px;
+    /* task 142: matches .search-pc-card's structure, not just its numbers —
+       NO padding on the card itself any more (the phone layout's own
+       padding:10px, centered row). Image goes edge to edge, clipped by the
+       card's own border-radius, exactly like .search-pc-media does; the
+       name/price get their own inset padding below instead of inheriting
+       it from the card. A card-level padding that insets the image too
+       was the actual structural mismatch behind "look like they belong to
+       the same design" — matching corner radius and font size alone still
+       left the bundle photo visibly inset within its card while the
+       product photo ran flush to the edges. */
+    flex: unset; gap: 0; border-radius: 18px; padding: 0; overflow: hidden;
     /* Column, not the phone's row: a photo sitting above the name/price
        reads as a real product card at this size, instead of a thumbnail-
        and-text list row stretched three times wider. height:100% fills
        the grid row (a grid cell's default stretch already does this, but
        explicit here matches the same reasoning as the carousel card
-       above and keeps the chain easy to follow). */
-    flex-direction: column; align-items: flex-start;
-    height: 100%; min-height: 0;
-    padding: 12px;
+       above and keeps the chain easy to follow). min-height: same
+       collapse floor as .search-pc-card. */
+    flex-direction: column; align-items: stretch;
+    height: 100%; min-height: 140px;
   }
   /* Same "flex takes the leftover space" move as .search-pc-media above —
      the name/price block keeps its natural text height, the image fills
-     whatever's left in the card. */
-  .search-bundle-media { width: 100%; flex: 1; min-height: 0; height: auto; border-radius: 12px; font-size: clamp(22px, 4vh, 34px); }
-  .search-bundle-name { font-size: 14px; margin-top: 2px; }
+     whatever's left in the card. No border-radius override needed here:
+     .search-bundle-card's own overflow:hidden + border-radius above
+     clips this exactly like .search-pc-card clips .search-pc-media. */
+  .search-bundle-media {
+    width: 100%; flex: 1; min-height: 70px; height: auto;
+    border-radius: 0; font-size: clamp(22px, 4vh, 34px);
+  }
+  /* task 142: contain here too, same reasoning as .search-pc-media img. */
+  .search-bundle-media img { object-fit: contain; }
+  /* Same padding box as .search-pc-name/.search-pc-price — the structural
+     match, not just the font-size one. */
+  .search-bundle-info { padding: 12px 14px; }
+  .search-bundle-name { font-size: 14px; }
   .search-bundle-price { font-size: 14px; margin-top: 2px; }
 
   /* ---------- live results: a grid, same no-scroll reasoning ---------- */

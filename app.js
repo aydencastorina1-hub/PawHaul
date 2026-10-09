@@ -1050,6 +1050,28 @@ function openSearch() {
   if (inp) {
     try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
   }
+  // task 142: the carousel's own measure()/sync() (bindCarousel, called once
+  // from renderSearchDefaults() at page load) can run while this view is
+  // still `display:none` under html.no-flash (removed on the stylesheet's
+  // own load, or a 300ms fallback — race-dependent, not guaranteed to have
+  // happened by the time DOMContentLoaded's render call fires) — at that
+  // point track.scrollWidth/clientWidth both read 0, so the cached "how far
+  // can this scroll" state it computed is wrong, with nothing to naturally
+  // correct it afterward (the carousel's own 'resize'/'load' listeners don't
+  // fire again just because the OVERLAY becomes visible — the window itself
+  // never resizes). That is what left a touch swipe doing nothing until an
+  // arrow tap's own goTo() call forced a real scrollTo and, incidentally,
+  // fixed the cached state as a side effect. requestAnimationFrame here
+  // guarantees a real layout has happened on the now-visible, correctly
+  // sized view before re-measuring — plain synchronous geometry reads at
+  // this point already reflect the post-open layout in every engine tested,
+  // but the rAF costs nothing and removes any doubt.
+  if (searchCarouselCtrl) {
+    requestAnimationFrame(function () {
+      searchCarouselCtrl.measure();
+      searchCarouselCtrl.sync();
+    });
+  }
 }
 
 // Shared by closeSearch() and closeSearchAnimated() below: the actual
@@ -1057,6 +1079,11 @@ function openSearch() {
 // running it without duplicating it.
 function unlockAfterSearchClose() {
   document.documentElement.style.overflow = '';
+  // Stale otherwise if search closes while the keyboard happened to still
+  // be reported open (e.g. a fast X-tap right after focusing the input) —
+  // next open starts clean rather than inheriting the previous session's
+  // bundles-hidden state for a moment.
+  document.documentElement.classList.remove('search-kb-open');
   if (searchBodyLocked) {
     searchBodyLocked = false;
     document.body.style.position = '';
@@ -1223,6 +1250,15 @@ function syncSearchViewportHeight() {
   var vv = window.visualViewport;
   var inset = Math.max(0, document.documentElement.clientHeight - vv.height - vv.offsetTop);
   document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
+  // task 142: html.search-kb-open — NOT used for sizing anything (see
+  // .search-body's own comment in styles.css for why letting the keyboard
+  // shrink the layout was the actual collapsing-cards bug); this only
+  // drives the iPad rule that hides the Bundles row while the keyboard is
+  // up, so the carousel can use the full default-state height alone. A
+  // small nonzero inset can show up from ordinary viewport jitter (Safari's
+  // own toolbar) that isn't a real keyboard, hence the threshold rather
+  // than any inset > 0.
+  document.documentElement.classList.toggle('search-kb-open', inset > 60);
   // The visual viewport shifting (keyboard opening/closing, or iOS nudging
   // it to keep the focused input in view) is exactly what used to drag the
   // whole page up/down behind the overlay. The body is already pinned via
@@ -1316,6 +1352,12 @@ function searchBundleCardHtml(b) {
 // Called once at page load (DOMContentLoaded block further down), not on
 // every openSearch() — rebuilding/rebinding the carousel on every open
 // would also reset its scroll position every time.
+// task 142: the controller bindCarousel() returns, kept so openSearch() can
+// force a fresh measure()+sync() every time the view actually opens — see
+// its own comment there for why the one taken here, at page load, isn't
+// reliable enough on its own.
+var searchCarouselCtrl = null;
+
 function renderSearchDefaults() {
   var track = document.getElementById('searchCarTrack');
   if (track) {
@@ -1329,7 +1371,7 @@ function renderSearchDefaults() {
     }).filter(Boolean);
     bundlesRow.innerHTML = bundles.map(searchBundleCardHtml).join('');
   }
-  initPcCarousel('searchCarTrack', 'searchCarPrev', 'searchCarNext', null);
+  searchCarouselCtrl = initPcCarousel('searchCarTrack', 'searchCarPrev', 'searchCarNext', null);
 }
 
 // ---------- active-state content: live results ----------
@@ -1651,7 +1693,12 @@ function initPcCarousel(trackId, prevId, nextId, dotsId) {
   track._carouselAbort = ac;
 
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.pc-dot') : null;
-  bindCarousel(track, prev, next, dots, ac.signal);
+  // task 142: propagate bindCarousel()'s controller so a caller that needs
+  // to force a re-measure later (search re-measures on every open — see
+  // searchCarouselCtrl) can get at it. Every other existing caller already
+  // ignored this return value, so adding it is additive, not a behavior
+  // change for them.
+  return bindCarousel(track, prev, next, dots, ac.signal);
 }
 
 // ==================== DETAIL IMAGE CAROUSEL ====================
