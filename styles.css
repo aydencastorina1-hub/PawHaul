@@ -2842,7 +2842,18 @@ body.overlay-up .offer-side-tab {
   pointer-events: none;
   transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit),
               visibility 0s linear 0.24s;
-  overscroll-behavior: contain;
+  /* task 137: the overlay itself must never move — not a slide, not a drag,
+     not an iOS rubber-band at its own edges. overscroll-behavior alone
+     (the task-135 original `contain`) only stops a scroll from CHAINING to
+     whatever is behind it; it does nothing about the view's own fixed box
+     being draggable in the first place. touch-action:none is the part that
+     actually disables panning/dragging a touch starting on the shell, the
+     header, or any other non-scrolling area. The one legitimate scroll
+     surface (.search-body) and the carousel track inside it opt back in
+     with their own touch-action further down — an element's own
+     touch-action always wins over an ancestor's for touches starting on it. */
+  touch-action: none;
+  overscroll-behavior: none;
 }
 /* Same arrival/exit asymmetry as the task-134/116 menu: slow decelerating
    arrival, short accelerating exit — the two views should feel like the
@@ -2863,6 +2874,10 @@ body.overlay-up .offer-side-tab {
   padding: 14px 16px;
   padding-top: calc(14px + env(safe-area-inset-top));
   background: var(--navy);
+  /* Not a scroll surface — inherits the "nothing here should pan or drag"
+     intent from .search-view. The input itself opts back into normal touch
+     handling below (it needs it for text selection/caret placement). */
+  touch-action: none;
 }
 .search-back-btn {
   display: flex;
@@ -2905,6 +2920,12 @@ body.overlay-up .offer-side-tab {
   font-weight: 600;
   color: var(--black);
   outline: none;
+  /* Opts back into normal touch handling despite .search-bar-row's own
+     touch-action:none above — needed for text selection and caret
+     placement by touch. manipulation (not auto) still suppresses the
+     double-tap-to-zoom gesture, consistent with the rest of this view
+     never zooming or panning. */
+  touch-action: manipulation;
 }
 .search-input::placeholder { color: #aaa; }
 .search-clear-btn {
@@ -2938,6 +2959,12 @@ body.overlay-up .offer-side-tab {
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
+  /* task 137: the one surface allowed to scroll, and only vertically — this
+     is what overrides .search-view's touch-action:none for touches that
+     start here. When the content is shorter than the box, overflow-y:auto
+     simply has nothing to scroll (the spec's own behaviour, not something
+     this rule needs to special-case) so there's nothing to drag either. */
+  touch-action: pan-y;
 }
 .search-body::-webkit-scrollbar { display: none; }
 
@@ -2964,7 +2991,11 @@ body.overlay-up .offer-side-tab {
    overrides the arrow's vertical position to match THIS carousel's card
    height, since task 133's own cards are a different (taller, full-width)
    shape. */
-.search-pc-track { gap: 12px; padding: 2px 2px 6px; }
+/* touch-action: pan-x — overrides .search-body's own pan-y for touches that
+   start on the carousel track, so the horizontal swipe (task 88's
+   scroll-snap contract, which .search-pc-track already joins) keeps
+   working under task 137's new touch-action:none on the overlay shell. */
+.search-pc-track { gap: 12px; padding: 2px 2px 6px; touch-action: pan-x; }
 .search-pc-wrap .pc-arrow { top: 62px; }
 .search-pc-card {
   flex: 0 0 148px;

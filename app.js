@@ -963,6 +963,15 @@ try { history.scrollRestoration = 'manual'; } catch (e) {}
 // ever open (see its own comment), so it needs to know whether there's
 // actually anything to unlock before touching body.style or scrolling.
 var searchBodyLocked = false;
+// task 137: set by closeSearchAnimated() while its deferred unlock is
+// still pending (fade-out in progress) — a canceller openSearch() calls if
+// the view is reopened before that unlock ran. Without this, a quick
+// reopen during the ~300ms close window would read window.scrollY as 0
+// (the body is still position:fixed from the close that hasn't finished
+// yet) and stamp that 0 over the still-correct saved offset, so the
+// EVENTUAL close would restore to the top of the page instead of where the
+// visitor actually was — caught via a rapid open/close/open/close test.
+var searchPendingCloseCancel = null;
 
 function openSearch() {
   var bar = document.getElementById('navSearchBar');
@@ -973,7 +982,7 @@ function openSearch() {
   // above the search view's 905, and nothing before this would otherwise
   // close it if a visitor opened search while it happened to be up.
   if (offerIsOpen()) dismissOffer();
-  searchScrollY = window.scrollY;
+  if (searchPendingCloseCancel) { searchPendingCloseCancel(); searchPendingCloseCancel = null; }
   bar.classList.add('open');
   if (scrim) scrim.classList.add('open');
   syncOverlayChrome();
@@ -988,12 +997,20 @@ function openSearch() {
   // instead of) the documentElement lock above: menus/overlays with no text
   // input on this site have never needed it, but search is the one view
   // that hands the keyboard a focused field to push against.
-  document.body.style.position = 'fixed';
-  document.body.style.top = -searchScrollY + 'px';
-  document.body.style.left = '0';
-  document.body.style.right = '0';
-  document.body.style.width = '100%';
-  searchBodyLocked = true;
+  //
+  // Only capture + apply the lock if it isn't ALREADY applied (the
+  // cancelled pending close above can leave it in place) — see
+  // searchPendingCloseCancel's own comment for why re-reading
+  // window.scrollY here would be wrong in that case.
+  if (!searchBodyLocked) {
+    searchScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = -searchScrollY + 'px';
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    searchBodyLocked = true;
+  }
   syncSearchViewportHeight();
   if (!searchHistoryPushed) {
     history.pushState({ searchOpen: true }, '', location.href);
@@ -1007,18 +1024,10 @@ function openSearch() {
   }
 }
 
-// Pure UI close — safe to call from anywhere, any time, regardless of order
-// relative to some OTHER navigation happening in the same click (several
-// places in this file call it defensively, e.g. goTo()'s own
-// "closeMobileMenu();closeSearch()"). Deliberately never touches history:
-// see dismissSearch() below for the one path that does, and why it has to
-// stay separate from this one.
-function closeSearch() {
-  var bar = document.getElementById('navSearchBar');
-  if (!bar) return;
-  bar.classList.remove('open');
-  var scrim = document.getElementById('searchScrim');
-  if (scrim) scrim.classList.remove('open');
+// Shared by closeSearch() and closeSearchAnimated() below: the actual
+// page-unlock + scroll-restore, factored out so the animated path can defer
+// running it without duplicating it.
+function unlockAfterSearchClose() {
   document.documentElement.style.overflow = '';
   if (searchBodyLocked) {
     searchBodyLocked = false;
@@ -1039,9 +1048,94 @@ function closeSearch() {
     document.documentElement.style.scrollBehavior = prevBehavior;
   }
   syncOverlayChrome();
+}
+
+// Pure UI close — safe to call from anywhere, any time, regardless of order
+// relative to some OTHER navigation happening in the same click (several
+// places in this file call it defensively, e.g. goTo()'s own
+// "closeMobileMenu();closeSearch()", and every product/bundle card inside
+// search itself, which is ON ITS WAY to a different page the instant this
+// returns). Deliberately never touches history: see dismissSearch() below
+// for the one path that does, and why it has to stay separate from this
+// one. Immediate and synchronous throughout — correct for a navigation
+// (there's no "white gap" to race there, the page is being replaced right
+// away) but NOT what the bar's own close button/Escape/Back use any more;
+// see closeSearchAnimated() for why those need to wait.
+function closeSearch() {
+  var bar = document.getElementById('navSearchBar');
+  if (!bar) return;
+  // A closeSearchAnimated() from a moment ago may still be waiting on its
+  // transition before it unlocks the page — this function is about to do
+  // that right now instead, so cancel the pending one rather than leave it
+  // to redundantly fire its own finish() later.
+  if (searchPendingCloseCancel) { searchPendingCloseCancel(); searchPendingCloseCancel = null; }
+  bar.classList.remove('open');
+  var scrim = document.getElementById('searchScrim');
+  if (scrim) scrim.classList.remove('open');
+  unlockAfterSearchClose();
   var inp = document.getElementById('navSearchInput');
   if (inp) { inp.value = ''; inp.blur(); }
   doSearch(''); // resets to the default (carousel + bundles) view
+}
+
+// task 137: the user explicitly closing search while STAYING on this page
+// (the bar's own close button, Escape, the desktop scrim click, or a real
+// hardware Back press — see the popstate listener below) used to run
+// through plain closeSearch(), which unlocks the page and snaps its scroll
+// back to the saved position in the same instant the fade-out starts. With
+// the keyboard up, that raced its own ~250ms dismiss animation: the page
+// would already be unlocked and resting at its true scroll position while
+// the overlay was still visibly fading out and the keyboard was still
+// mid-collapse, and neither geometry had settled yet — that gap is what
+// showed as a white bar across the bottom for about a second.
+//
+// This path blurs first (so the keyboard starts closing immediately,
+// rather than only once the unlock below gets around to calling it), lets
+// the fade-out transition actually finish, and only then unlocks the page
+// and restores scroll. searchIsOpen() (and so syncSearchViewportHeight's
+// own guard) already goes false the moment the 'open' class comes off
+// below — synchronously, before this function even returns — so nothing
+// needs to separately suppress the visualViewport listener during the
+// wait: it's already a no-op for the whole ~300ms this takes.
+function closeSearchAnimated() {
+  var bar = document.getElementById('navSearchBar');
+  if (!bar || !bar.classList.contains('open')) { closeSearch(); return; }
+  var inp = document.getElementById('navSearchInput');
+  if (inp) inp.blur();
+  bar.classList.remove('open');
+  var scrim = document.getElementById('searchScrim');
+  if (scrim) scrim.classList.remove('open');
+  var done = false;
+  var timer;
+  function finish() {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    bar.removeEventListener('transitionend', onEnd);
+    if (searchPendingCloseCancel === cancel) searchPendingCloseCancel = null;
+    unlockAfterSearchClose();
+    if (inp) inp.value = '';
+    doSearch('');
+  }
+  // Reopening search before finish() runs (a quick re-tap) must NOT let
+  // this unlock the page out from under the new open — see
+  // searchPendingCloseCancel's own comment. Cancelling just stops this
+  // close from completing; it leaves the lock exactly as it already is,
+  // which openSearch() then reuses rather than re-establishes.
+  function cancel() {
+    if (done) return;
+    done = true;
+    clearTimeout(timer);
+    bar.removeEventListener('transitionend', onEnd);
+  }
+  function onEnd(e) { if (e.target === bar) finish(); }
+  bar.addEventListener('transitionend', onEnd);
+  // Safety net, not the primary signal: covers prefers-reduced-motion's
+  // shorter transition, a transitionend that never fires (interrupted by a
+  // second rapid open/close), and the iOS keyboard's own dismiss animation
+  // outlasting the view's 0.24s fade.
+  timer = setTimeout(finish, 360);
+  searchPendingCloseCancel = cancel;
 }
 
 // The actual user-facing "close" affordance (the bar's back button, the
@@ -1050,12 +1144,9 @@ function closeSearch() {
 // real Back button, pressed afterwards, land one step further back than it
 // otherwise would. That's the "closes search and returns to the exact
 // spot" behaviour the task asks for, done the same way for both triggers.
-// Kept OUT of closeSearch() itself: that function is also called
-// defensively mid-navigation from several other places in this file, and
-// popping history there would undo whatever THAT navigation just did.
 function dismissSearch() {
   var hadHistory = searchHistoryPushed;
-  closeSearch();
+  closeSearchAnimated();
   if (hadHistory) {
     searchHistoryPushed = false;
     history.back();
@@ -1063,21 +1154,21 @@ function dismissSearch() {
 }
 
 // A real Back press has already popped the entry by the time this fires —
-// closeSearch() alone (no history.back(), which would pop a SECOND, unrelated
-// entry) is the correct, idempotent response. Harmless no-op whenever search
-// isn't open — ordinary page-to-page Back navigation is products.js's own
-// popstate listener's job, not this one's.
+// no history.back() here (that would pop a SECOND, unrelated entry).
+// Harmless no-op whenever search isn't open — ordinary page-to-page Back
+// navigation is products.js's own popstate listener's job, not this one's.
 window.addEventListener('popstate', function () {
   if (searchIsOpen()) {
     searchHistoryPushed = false;
-    // closeSearch() itself restores the scroll position now (task 136's
-    // body lock needs that on every close path, not just this one) — see
-    // its own comment. products.js's popstate listener (registered first,
-    // so it already ran by the time this fires) used to re-dispatch the
-    // current route and reset scroll to 0 on every popstate, including this
+    // closeSearchAnimated() (not closeSearch()) — a real hardware Back
+    // press can land here with the keyboard still up, same as pressing the
+    // X button, and needs the same wait-for-the-fade handling; see its own
+    // comment. products.js's popstate listener (registered first, so it
+    // already ran by the time this fires) used to re-dispatch the current
+    // route and reset scroll to 0 on every popstate, including this
     // state-only one; fixed there (see lastRouteHref) by skipping that
     // re-dispatch when the href didn't actually change.
-    closeSearch();
+    closeSearchAnimated();
   }
 });
 
