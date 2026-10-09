@@ -905,31 +905,21 @@ window.addEventListener('pageshow', function () {
   document.addEventListener('visibilitychange', function () { if (!document.hidden) check(); });
 })();
 
-// ==================== SEARCH ====================
-// In-place overlay search: a fixed scrim + fixed panel, so opening/closing
-// never reflows the page or moves the scroll position. Desktop/tablet gets a
-// dropdown pinned right under the nav; mobile (≤900px, CSS) goes full-screen.
-
-function searchIsMobile() {
-  return window.matchMedia('(max-width: 900px)').matches;
-}
-
-// Pin the desktop dropdown to the nav's live bottom edge (the nav is sticky,
-// so its viewport position depends on whether the announce bar has scrolled
-// away). Mobile is full-screen via CSS (!important), so skip it there.
-function positionSearchBar() {
-  var bar = document.getElementById('navSearchBar');
-  var nav = document.getElementById('mainNav');
-  if (!bar || !nav || searchIsMobile()) return;
-  bar.style.top = Math.max(0, Math.round(nav.getBoundingClientRect().bottom)) + 'px';
-}
+// ==================== SEARCH (task 135) ====================
+// Full-screen view (a large centered overlay on desktop — see styles.css).
+// Default state: all products + 3 named bundles, rendered ONCE by
+// renderSearchDefaults() (called from the DOMContentLoaded block further
+// down) and toggled via the `hidden` attribute rather than rebuilt per
+// keystroke, so the carousel's scroll position and bound listeners survive
+// typing and clearing. Active state: live results, rebuilt by doSearch() on
+// every keystroke.
 
 function searchIsOpen() {
   var bar = document.getElementById('navSearchBar');
   return !!(bar && bar.classList.contains('open'));
 }
 
-// Hide the floating chat paw while the search overlay or offer popup is up
+// Hide the floating chat paw while the search view or offer popup is up
 // (it sits at z-index 9999 and would float on top of them).
 function syncOverlayChrome() {
   document.body.classList.toggle('overlay-up', searchIsOpen() || offerIsOpen() || offlineIsUp());
@@ -942,156 +932,289 @@ function offlineIsUp() {
   return !!(s && s.classList.contains('active'));
 }
 
-// Rotating placeholder: cycles example searches while the input is empty
-// (pauses automatically once the user types — the overlay hides via the
-// input listener below, and we skip advancing while there's text).
-var SEARCH_PLACEHOLDERS = ['Search leashes...', 'Search collars...', 'Search water bottles...', 'Search bowls...'];
-var searchPhTimer = null;
-var searchPhIdx = 0;
-
-function startSearchPhCycle() {
-  stopSearchPhCycle();
-  var ph = document.getElementById('navSearchPh');
-  if (!ph) return;
-  searchPhTimer = setInterval(function() {
-    var inp = document.getElementById('navSearchInput');
-    if (inp && inp.value) return; // user is typing — hold the current phrase
-    ph.classList.add('is-fading');
-    setTimeout(function() {
-      searchPhIdx = (searchPhIdx + 1) % SEARCH_PLACEHOLDERS.length;
-      ph.textContent = SEARCH_PLACEHOLDERS[searchPhIdx];
-      ph.classList.remove('is-fading');
-    }, 240); // matches the CSS fade duration
-  }, 2600);
-}
-
-function stopSearchPhCycle() {
-  if (searchPhTimer) { clearInterval(searchPhTimer); searchPhTimer = null; }
-}
-
 function toggleSearch() {
-  if (searchIsOpen()) { closeSearch(); } else { openSearch(); }
+  if (searchIsOpen()) { dismissSearch(); } else { openSearch(); }
 }
+
+// Pushed once per open so the browser's own Back button closes search
+// instead of leaving the page (see the popstate listener below). Cleared
+// the moment that entry is consumed — either by dismissSearch() popping it,
+// or by a real Back press, where the popstate listener clears it instead
+// since the browser has already done the popping itself.
+var searchHistoryPushed = false;
+// The scroll position to restore once search closes — captured on open,
+// restored in the popstate listener below. Needed because this file ALSO
+// has a pre-existing, unconditional `window.scrollTo(0, 0)` on every
+// `pageshow` (see that listener further down — it exists to reset bfcache
+// restores for ordinary page navigation), and a same-document Back press
+// triggers pageshow too, even though nothing actually navigated. Without
+// this, "returns to the exact spot" was losing to that reset: measured
+// scrollY go 166 -> 0 across a real Back press before this was added.
+var searchScrollY = 0;
+// Chrome restores scroll position asynchronously AFTER popstate listeners
+// run, which clobbers the manual window.scrollTo() below regardless of
+// timing tricks (confirmed: scrollY lands on the browser's own restored
+// value immediately after popstate, then snaps to 0 moments later on its
+// own). Opting out of automatic restoration site-wide is the only reliable
+// fix — we restore the exact spot ourselves instead.
+try { history.scrollRestoration = 'manual'; } catch (e) {}
 
 function openSearch() {
   var bar = document.getElementById('navSearchBar');
   var scrim = document.getElementById('searchScrim');
   if (!bar) return;
   closeMobileMenu();
-  positionSearchBar();
+  searchScrollY = window.scrollY;
   bar.classList.add('open');
   if (scrim) scrim.classList.add('open');
   syncOverlayChrome();
+  // task 134-style lock: documentElement, not body — this page's real
+  // scrolling element is <html> (confirmed while building the task-134
+  // menu lock), so body.style.overflow is a no-op here.
+  document.documentElement.style.overflow = 'hidden';
+  syncSearchViewportHeight();
+  if (!searchHistoryPushed) {
+    history.pushState({ searchOpen: true }, '', location.href);
+    searchHistoryPushed = true;
+  }
   // Focus synchronously (still inside the tap gesture) so iOS opens the
   // keyboard; preventScroll so focusing the fixed input can't nudge the page.
   var inp = document.getElementById('navSearchInput');
   if (inp) {
     try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
   }
-  startSearchPhCycle();
 }
 
+// Pure UI close — safe to call from anywhere, any time, regardless of order
+// relative to some OTHER navigation happening in the same click (several
+// places in this file call it defensively, e.g. goTo()'s own
+// "closeMobileMenu();closeSearch()"). Deliberately never touches history:
+// see dismissSearch() below for the one path that does, and why it has to
+// stay separate from this one.
 function closeSearch() {
   var bar = document.getElementById('navSearchBar');
-  var scrim = document.getElementById('searchScrim');
   if (!bar) return;
   bar.classList.remove('open');
+  var scrim = document.getElementById('searchScrim');
   if (scrim) scrim.classList.remove('open');
+  document.documentElement.style.overflow = '';
   syncOverlayChrome();
-  stopSearchPhCycle();
   var inp = document.getElementById('navSearchInput');
   if (inp) { inp.value = ''; inp.blur(); }
-  var ph = document.getElementById('navSearchPh');
-  if (ph) ph.classList.remove('ph-hidden', 'is-fading');
-  var res = document.getElementById('searchResults');
-  if (res) res.innerHTML = '';
+  doSearch(''); // resets to the default (carousel + bundles) view
 }
 
+// The actual user-facing "close" affordance (the bar's back button, the
+// desktop scrim click, Escape). Unlike closeSearch() this ALSO pops the
+// history entry openSearch() pushed — which is what makes the browser's
+// real Back button, pressed afterwards, land one step further back than it
+// otherwise would. That's the "closes search and returns to the exact
+// spot" behaviour the task asks for, done the same way for both triggers.
+// Kept OUT of closeSearch() itself: that function is also called
+// defensively mid-navigation from several other places in this file, and
+// popping history there would undo whatever THAT navigation just did.
+function dismissSearch() {
+  var hadHistory = searchHistoryPushed;
+  closeSearch();
+  if (hadHistory) {
+    searchHistoryPushed = false;
+    history.back();
+  }
+}
+
+// A real Back press has already popped the entry by the time this fires —
+// closeSearch() alone (no history.back(), which would pop a SECOND, unrelated
+// entry) is the correct, idempotent response. Harmless no-op whenever search
+// isn't open — ordinary page-to-page Back navigation is products.js's own
+// popstate listener's job, not this one's.
+window.addEventListener('popstate', function () {
+  if (searchIsOpen()) {
+    searchHistoryPushed = false;
+    closeSearch();
+    // Put the scroll position back where it was before search opened.
+    // products.js's own popstate listener (registered first, so it already
+    // ran by the time this fires) used to re-dispatch the current route
+    // and reset scroll to 0 on every popstate, including this state-only
+    // one — fixed there (see lastRouteHref) by skipping that re-dispatch
+    // when the href didn't actually change. One plain restore is enough now.
+    window.scrollTo(0, searchScrollY);
+  }
+});
+
+function clearSearchInput() {
+  var inp = document.getElementById('navSearchInput');
+  if (!inp) return;
+  inp.value = '';
+  doSearch('');
+  try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
+}
+
+// Keeps the view's real height pinned to what's actually visible once the
+// iOS keyboard opens — visualViewport shrinks when the keyboard does, but
+// the layout viewport (and dvh, which is derived from it) does not. Without
+// this, the keyboard would simply cover the bottom of the view instead of
+// the view shrinking to sit above it. Harmless no-op in browsers without
+// visualViewport — the CSS var() fallback (100dvh) covers them, and on
+// desktop the keyboard is never in play so the var is simply unused.
+function syncSearchViewportHeight() {
+  if (!window.visualViewport || !searchIsOpen()) return;
+  document.documentElement.style.setProperty('--search-vvh', window.visualViewport.height + 'px');
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', syncSearchViewportHeight);
+}
+
+// ---------- default-state content: product carousel + bundles row ----------
+// Exactly the 3 bundles task 135 names — NOT the full BUNDLES array, which
+// also has the separate Walk Essentials Bundle (bottle + poop clip, id
+// 'hydration' — confusingly close to 'portable-hydration', the one actually
+// wanted here, named "Hydration Bundle").
+var SEARCH_BUNDLE_IDS = ['led', 'portable-hydration', 'visibility'];
+
+function searchProductCardHtml(p) {
+  var img = productImageFor(p, p.colors && p.colors[0]);
+  var media = img
+    ? '<img ' + photoAttrs(img, 'card') + ' alt="">'
+    : '<span class="search-pc-emoji" aria-hidden="true">' + p.emoji + '</span>';
+  return '<a class="search-pc-card" href="/product/' + slugify(p.name) + '" onclick="closeSearch();goToProductLink(event,' + p.id + ')">' +
+    '<div class="search-pc-media">' + media + '</div>' +
+    '<div class="search-pc-name">' + esc(p.name) + '</div>' +
+    '<div class="search-pc-price">$' + lowestVariant(p).price.toFixed(2) + '</div>' +
+  '</a>';
+}
+
+function searchBundleCardHtml(b) {
+  var t = bundleTotals(b);
+  var media = b.img ? '<img src="' + b.img + '" alt="">' : '%';
+  return '<a class="search-bundle-card" href="/bundles#bundle-' + b.id + '" onclick="closeSearch();goToBundle(event,\'' + b.id + '\')">' +
+    '<div class="search-bundle-media">' + media + '</div>' +
+    '<div class="search-bundle-info">' +
+      '<div class="search-bundle-name">' + esc(b.name) + '</div>' +
+      '<div class="search-bundle-price">$' + t.bundle.toFixed(2) + '</div>' +
+    '</div>' +
+  '</a>';
+}
+
+// Called once at page load (DOMContentLoaded block further down), not on
+// every openSearch() — rebuilding/rebinding the carousel on every open
+// would also reset its scroll position every time.
+function renderSearchDefaults() {
+  var track = document.getElementById('searchCarTrack');
+  if (track) {
+    var list = (typeof products !== 'undefined') ? products : [];
+    track.innerHTML = list.map(searchProductCardHtml).join('');
+  }
+  var bundlesRow = document.getElementById('searchBundlesRow');
+  if (bundlesRow && typeof BUNDLES !== 'undefined') {
+    var bundles = SEARCH_BUNDLE_IDS.map(function (id) {
+      return BUNDLES.find(function (b) { return b.id === id; });
+    }).filter(Boolean);
+    bundlesRow.innerHTML = bundles.map(searchBundleCardHtml).join('');
+  }
+  initPcCarousel('searchCarTrack', 'searchCarPrev', 'searchCarNext', null);
+}
+
+// ---------- active-state content: live results ----------
+function searchResultProductHtml(p, hl) {
+  var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
+  var thumb = thumbUrl ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt="">' : p.emoji;
+  return '<a class="search-result-item" href="/product/' + slugify(p.name) + '" onclick="closeSearch();goToProductLink(event,' + p.id + ')">' +
+    '<span class="search-result-thumb">' + thumb + '</span>' +
+    '<div class="search-result-info">' +
+      '<div class="search-result-name">' + p.name.replace(hl, '<b>$1</b>') + '</div>' +
+      '<div class="search-result-meta">' +
+        '<span class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</span>' +
+        supplierRatingCompactHtml(p) +
+      '</div>' +
+    '</div>' +
+  '</a>';
+}
+
+function searchResultBundleHtml(b, hl) {
+  var t = bundleTotals(b);
+  return '<a class="search-result-item" href="/bundles#bundle-' + b.id + '" onclick="closeSearch();goToBundle(event,\'' + b.id + '\')">' +
+    '<span class="search-result-thumb search-result-thumb--bundle" aria-hidden="true">%</span>' +
+    '<div class="search-result-info">' +
+      '<div class="search-result-name">' + b.name.replace(hl, '<b>$1</b>') + '<span class="search-result-tag">Bundle</span></div>' +
+      '<div class="search-result-meta"><span class="search-result-price">$' + t.bundle.toFixed(2) + '</span></div>' +
+    '</div>' +
+  '</a>';
+}
+
+// Matches product/bundle NAMES plus each product's desc/tags, all
+// case-insensitive substring — which, for what it's worth, already covers
+// every example keyword task 135 lists ("led", "water", "bowl", "leash",
+// "collar", "strap") for free: every one of them is literally a substring
+// of a real product name ("LED Dog Collar", "...Water Bottle", "...Water
+// Bowl", "...Leash", "Anti-Drop Leash Wrist Strap"). "bundle" is handled
+// separately below since it's not naturally part of any bundle's name.
 function doSearch(val) {
-  var res = document.getElementById('searchResults');
-  if (!res) return;
+  var defaultEl = document.getElementById('searchDefault');
+  var resultsEl = document.getElementById('searchResults');
+  var clearBtn = document.getElementById('searchClearBtn');
+  if (!resultsEl) return;
   var q = (val || '').trim().toLowerCase();
-  if (!q) { res.innerHTML = ''; return; }
+  if (clearBtn) clearBtn.hidden = !q;
+
+  if (!q) {
+    if (defaultEl) defaultEl.hidden = false;
+    resultsEl.hidden = true;
+    resultsEl.innerHTML = '';
+    return;
+  }
+  if (defaultEl) defaultEl.hidden = true;
+  resultsEl.hidden = false;
+
   var list = (typeof products !== 'undefined') ? products : [];
   // Name matches rank first, then description/tag matches below them.
   var nameHits = [], otherHits = [];
-  list.forEach(function(p) {
+  list.forEach(function (p) {
     if (p.name.toLowerCase().indexOf(q) !== -1) { nameHits.push(p); return; }
     var haystack = ((p.desc || '') + ' ' + (p.tags ? p.tags.join(' ') : '')).toLowerCase();
     if (haystack.indexOf(q) !== -1) otherHits.push(p);
   });
-  var matches = nameHits.concat(otherHits);
-  // "bundle", "deal", "save"... also offer the Bundles page, above any products.
-  var bundleRow = /bundl|deal|discount|sav|offer|set|kit|combo/.test(q)
-    ? '<div class="search-result-item" onclick="closeSearch();showPage(\'bundles\')">' +
-        '<span class="search-result-thumb search-result-thumb--bundle" aria-hidden="true">%</span>' +
-        '<div class="search-result-info"><div class="search-result-name">Bundles</div>' +
-        '<div class="search-result-meta"><span class="search-result-price">20% off two products together</span></div></div>' +
-      '</div>'
-    : '';
-  if (matches.length === 0 && bundleRow) { res.innerHTML = bundleRow; return; }
-  if (matches.length === 0) {
-    res.innerHTML = '<div class="search-no-results">' +
+  var prodMatches = nameHits.concat(otherHits);
+
+  var bundleList = (typeof BUNDLES !== 'undefined') ? BUNDLES : [];
+  var bundleMatches = bundleList.filter(function (b) {
+    // ' bundle' appended so the literal query "bundle" matches every one of
+    // them, same as the old "bundl|deal|.../" regex did for the Bundles
+    // page link it used to show — this version offers the actual bundles
+    // instead of a generic page link.
+    var haystack = (b.name + ' ' + (b.blurb || '') + ' ' + (b.tagline || '') + ' bundle').toLowerCase();
+    return haystack.indexOf(q) !== -1;
+  });
+
+  if (!prodMatches.length && !bundleMatches.length) {
+    resultsEl.innerHTML = '<div class="search-no-results">' +
       '<span class="snr-emoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="#C9C2B8" style="width:34px;height:34px;display:inline-block" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg></span>' +
-      'No products found' +
-      '<span class="snr-hint">Try "leash", "bottle", "collar"...</span>' +
+      'No results' +
+      '<span class="snr-hint"><a href="/shop" onclick="closeSearch();goTo(event,\'shop\')">Browse the full shop →</a></span>' +
     '</div>';
     return;
   }
-  // Bold the matched part of the name. Product names are plain text and the
-  // query is regex-escaped, so this stays injection-safe.
+
+  // Bold the matched part of the name. Product/bundle names are plain text
+  // and the query is regex-escaped, so this stays injection-safe.
   var safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   var hl = new RegExp('(' + safe + ')', 'ig');
-  res.innerHTML = bundleRow + matches.map(function(p) {
-    var thumbUrl = productImageFor(p, p.colors && p.colors[0]);
-    var thumb = thumbUrl
-      ? '<img ' + photoAttrs(thumbUrl, 'thumb') + ' alt="">'
-      : p.emoji;
-    return '<div class="search-result-item" onclick="goToProduct(' + p.id + ')">' +
-      '<span class="search-result-thumb">' + thumb + '</span>' +
-      '<div class="search-result-info">' +
-        '<div class="search-result-name">' + p.name.replace(hl, '<b>$1</b>') + '</div>' +
-        '<div class="search-result-meta">' +
-          '<span class="search-result-price">$' + lowestVariant(p).price.toFixed(2) + '</span>' +
-          supplierRatingCompactHtml(p) +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }).join('');
+  resultsEl.innerHTML =
+    prodMatches.map(function (p) { return searchResultProductHtml(p, hl); }).join('') +
+    bundleMatches.map(function (b) { return searchResultBundleHtml(b, hl); }).join('');
 }
 
-// One-time wiring for scroll/keyboard behavior around the overlay.
-(function() {
-  var bar = document.getElementById('navSearchBar');
+// One-time wiring. The scrim only ever matters on desktop (phone/iPad is
+// edge to edge — there's no "outside" to tap), but it swallows wheel/touch
+// unconditionally so whatever's behind it holds still regardless of width.
+(function () {
   var scrim = document.getElementById('searchScrim');
-
-  // Keep the desktop dropdown glued to the nav if the viewport changes or the
-  // page scrolls (scrollbar drag still works while the scrim is up).
-  window.addEventListener('resize', function() { if (searchIsOpen()) positionSearchBar(); });
-  window.addEventListener('scroll', function() { if (searchIsOpen()) positionSearchBar(); }, { passive: true });
-
-  // The scrim swallows wheel/touch so the page behind holds perfectly still.
   if (scrim) {
-    scrim.addEventListener('wheel', function(e) { e.preventDefault(); }, { passive: false });
-    scrim.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+    scrim.addEventListener('wheel', function (e) { e.preventDefault(); }, { passive: false });
+    scrim.addEventListener('touchmove', function (e) { e.preventDefault(); }, { passive: false });
   }
-  // On the panel itself only the results list may scroll — anywhere else a
-  // touch-drag would rubber-band the page behind it (iOS).
-  if (bar) {
-    bar.addEventListener('touchmove', function(e) {
-      if (!e.target.closest('.search-results')) e.preventDefault();
-    }, { passive: false });
-  }
-
-  // The rotating placeholder is a real element over the input (native
-  // placeholders can't fade) — hide it the instant there's any text.
-  var inp = document.getElementById('navSearchInput');
-  var ph = document.getElementById('navSearchPh');
-  if (inp && ph) {
-    inp.addEventListener('input', function() {
-      ph.classList.toggle('ph-hidden', !!inp.value);
-    });
-  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && searchIsOpen()) dismissSearch();
+  });
 })();
 
 // ==================== CAROUSEL ====================
@@ -1368,6 +1491,10 @@ document.addEventListener('DOMContentLoaded', function() {
   initPcCarousel('pcCollarTrack', 'pcCollarPrev', 'pcCollarNext', 'pcCollarDots');
   initPcCarousel('pcLeashTrack', 'pcLeashPrev', 'pcLeashNext', 'pcLeashDots');
   renderHomeBundleNotes();
+  // Task 135: search's default-state carousel + bundles row — rendered
+  // once here (not per open) and present on every page, same as the
+  // search view itself.
+  renderSearchDefaults();
 });
 
 // Task 133: live bundle pricing for the "want both?" blocks under the

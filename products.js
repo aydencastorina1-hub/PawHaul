@@ -721,6 +721,14 @@ function markActiveNav(path) {
   }
 }
 
+// The href the router itself last settled on — compared against
+// location.href in the popstate listener below so a history entry some
+// OTHER piece of code pushed without routing through here (e.g. task 135's
+// full-screen search, which pushes a state-only entry on the current URL
+// so the Back button can close it) doesn't trigger a needless re-dispatch
+// when its own pop brings us right back to this same href.
+var lastRouteHref = location.href;
+
 function navigateUrl(path, opts) {
   opts = opts || {};
   if (!path) return;
@@ -729,11 +737,13 @@ function navigateUrl(path, opts) {
   markActiveNav(path);
   if (opts.sync) {
     if (location.pathname !== path) history.replaceState({ p: 1 }, '', path);
+    lastRouteHref = location.href;
     return;
   }
-  if (location.pathname === path) return; // already there — don't clutter history
+  if (location.pathname === path) { lastRouteHref = location.href; return; } // already there — don't clutter history
   if (opts.replace) history.replaceState({ p: 1 }, '', path);
   else history.pushState({ p: 1 }, '', path);
+  lastRouteHref = location.href;
 }
 
 // Shared by the initial-load bootstrap script (index.html, after app.js
@@ -769,6 +779,14 @@ function dispatchRoute(route, opts) {
 }
 
 window.addEventListener('popstate', function () {
+  // Nothing actually changed pages — this pop landed back on the exact href
+  // the router last settled on, so it must be an overlay's own state-only
+  // entry (see lastRouteHref's comment above) unwinding, not a real Back/
+  // Forward between two different pages. Re-dispatching here would re-render
+  // the current page and reset its scroll for no reason, fighting whatever
+  // that overlay is doing to restore the user's position.
+  if (location.href === lastRouteHref) return;
+  lastRouteHref = location.href;
   dispatchRoute(window.parseRoute(location.pathname), { sync: true });
 });
 

@@ -227,7 +227,7 @@ body {
    This element-level rule catches any field that has no class of its own
    (or a future one whose class forgets to set a size); the per-component
    rules below (.email-input, .form-input/.form-textarea/.form-select,
-   .offer-input, .nav-search-input, .chat-input) each restate 16px so the
+   .offer-input, .search-input, .chat-input) each restate 16px so the
    floor survives their higher specificity. */
 input, textarea, select { font-size: 16px; }
 
@@ -2772,8 +2772,12 @@ footer {
 #chatWidget { transition: opacity 0.25s ease; }
 body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 
-/* Dim the page behind the open search panel. Fixed, so the page itself
-   never shifts, reflows or loses its scroll position. */
+/* Dim the page behind the open search view. Fixed, so the page itself never
+   shifts, reflows or loses its scroll position. On phone/iPad the view is
+   edge to edge (nothing shows past it, so this scrim is mostly invisible
+   real estate) — it earns its keep on desktop, where the view is a centered
+   overlay and this is what dims everything around it, plus click-outside
+   to close (dismissSearch()). */
 .search-scrim {
   position: fixed; inset: 0; background: rgba(13,13,26,0.45);
   z-index: 895; opacity: 0; pointer-events: none;
@@ -2782,135 +2786,245 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
 }
 .search-scrim.open { opacity: 1; pointer-events: auto; }
 
-/* Search panel. Desktop/tablet: dropdown pinned below the nav (JS sets the
-   exact top). Mobile (≤900px block further down): full-screen overlay.
-   Always in the layer tree (visibility, not display) so it can transition. */
-.nav-search-bar {
+/* ============================================================
+   SEARCH (task 135) — full-screen view, not a dropdown.
+   ============================================================
+   Base rule here is the DESKTOP shape — a large centered overlay, per the
+   task's own "on desktop it can be a large centered overlay instead of edge
+   to edge". The phone/iPad override (genuinely edge to edge, 100dvh) lives
+   in its own block further down, gated on the exact touch+width condition
+   tasks 132-134 already established for "phone layout up to iPad
+   landscape" — same split point, not a new one.
+
+   --search-vvh (set by app.js from window.visualViewport) is what shrinks
+   the view when the iOS keyboard opens on phone/iPad — dvh alone does not
+   track the keyboard — so nothing under the keyboard is unreachable and
+   nothing jumps when it appears: the fixed search-bar-row stays put and
+   .search-body (flex:1 below) just gets less room, the same flex-sharing
+   idea the menu uses for its own fixed-header/flexible-body split. On
+   desktop the keyboard is never in play, so this var is simply unused
+   there (the fallback, 100dvh, never actually applies either — desktop's
+   own height rule below wins on specificity-tiebreak-by-source-order). */
+.search-view {
   position: fixed;
-  top: 60px; left: 0; right: 0;
-  background: white;
+  top: 6vh;
+  left: 50%;
+  transform: translateX(-50%) scale(0.98);
+  width: min(640px, 92vw);
+  height: min(680px, 88vh);
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 24px 64px -16px rgba(13, 13, 26, 0.4);
   z-index: 905;
-  padding: 16px 5% 10px;
-  box-shadow: 0 24px 48px -16px rgba(13,13,26,0.28);
   display: flex;
   flex-direction: column;
-  gap: 0;
+  overflow: hidden;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transform: translateY(-14px);
-  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease),
-              visibility 0s linear 0.28s;
+  transition: opacity 0.24s var(--ease-exit), transform 0.24s var(--ease-exit),
+              visibility 0s linear 0.24s;
   overscroll-behavior: contain;
 }
-.nav-search-bar.open {
+/* Same arrival/exit asymmetry as the task-134/116 menu: slow decelerating
+   arrival, short accelerating exit — the two views should feel like the
+   same piece of UI. */
+.search-view.open {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transform: none;
-  transition: opacity 0.28s var(--ease), transform 0.28s var(--ease);
+  transform: translateX(-50%) scale(1);
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
 }
 
-.nav-search-inner {
+.search-bar-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--light-gray);
-  border: 1.5px solid #E7E3DD;
-  border-radius: 50px;
-  padding: 11px 18px;
-  width: 100%;
-  max-width: 680px;
-  margin: 0 auto;
-  box-sizing: border-box;
-  /* Closed state: the pill sits collapsed; opening the panel expands it
-     (see .open below). Origin near the nav's search icon so it feels like
-     it grows out of the tap. */
-  transform: scaleX(0.55);
-  transform-origin: 88% 50%;
-  opacity: 0;
-  transition: transform 0.3s var(--ease), opacity 0.24s ease,
-              border-color 0.25s ease, box-shadow 0.25s ease;
-}
-.nav-search-bar.open .nav-search-inner {
-  transform: scaleX(1);
-  opacity: 1;
-}
-/* Soft orange glow while the input is active */
-.nav-search-inner:focus-within {
-  border-color: var(--orange);
-  box-shadow: 0 0 0 4px rgba(232, 99, 10, 0.14);
-  background: #fff;
-}
-.nav-search-paw {
   flex-shrink: 0;
-  color: #B9B2A9;
-  transition: color 0.25s ease;
+  padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  background: var(--navy);
 }
-.nav-search-inner:focus-within .nav-search-paw { color: var(--orange); }
+.search-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s var(--ease);
+}
+.search-back-btn:active { background: rgba(255, 255, 255, 0.24); }
 
-.nav-search-field {
+.search-field {
   position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff;
+  border-radius: 50px;
+  padding: 10px 14px;
 }
-.nav-search-input {
+.search-field-paw { flex-shrink: 0; color: #B9B2A9; }
+.search-field:focus-within .search-field-paw { color: var(--orange); }
+.search-input {
   flex: 1;
   min-width: 0;
   border: none;
   background: none;
   font-family: var(--font-body);
-  font-size: 16px; /* ≥16px so iOS never auto-zooms (zooming = the page "jumps") */
+  font-size: 16px; /* task 40: >=16px so iOS never auto-zooms (zooming is itself a "jump") */
   font-weight: 600;
   color: var(--black);
   outline: none;
 }
-/* Rotating placeholder: a real element (native placeholders can't fade).
-   Sits over the input, ignores pointer events, fades between phrases. */
-.nav-search-ph {
-  position: absolute;
-  inset: 0;
+.search-input::placeholder { color: #aaa; }
+.search-clear-btn {
   display: flex;
   align-items: center;
-  font-family: var(--font-body);
-  font-size: 16px;
-  font-weight: 600;
-  color: #aaa;
-  pointer-events: none;
-  white-space: nowrap;
-  overflow: hidden;
-  transition: opacity 0.24s ease;
-}
-.nav-search-ph.is-fading { opacity: 0; }
-.nav-search-ph.ph-hidden { opacity: 0; transition: none; }
-.nav-search-close {
-  background: none;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  padding: 0;
   border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: var(--gray);
-  padding: 6px 8px;
   border-radius: 50%;
+  background: var(--light-gray);
+  color: var(--gray);
+  font-size: 12px;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.15s;
 }
-.nav-search-close:hover { color: var(--black); }
+.search-clear-btn[hidden] { display: none; }
 
-.search-results {
-  border-top: 1px solid transparent;
-  margin-top: 0;
-  width: 100%;
-  max-width: 680px;
-  margin-left: auto;
-  margin-right: auto;
+/* The only part of the view that may ever scroll — everything above it
+   (the bar row) is flex-shrink:0 and stays put. Native momentum + the
+   site's existing scrollbar-hiding convention, same as every other
+   internally-scrolling panel on the site. */
+.search-body {
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  max-height: min(430px, calc(100vh - 220px));
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
 }
-.search-results:not(:empty) { margin-top: 10px; border-top-color: var(--line-soft); }
+.search-body::-webkit-scrollbar { display: none; }
 
+.search-section-label {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin: 0 2px 10px;
+}
+.search-default .search-section-label + .search-section-label,
+.search-bundles-row + .search-section-label {
+  margin-top: 28px;
+}
+
+/* ---------- default state: product carousel ---------- */
+/* .pc-wrap/.pc-track/.pc-arrow are the task-133 carousel chrome (own,
+   always-visible arrows — not .carousel-btn, which is wired phone-only
+   elsewhere on the site). .pc-track already joins the task-88 scroll-snap
+   contract (#revCarousel/.det-track/.pc-track, further down this file), so
+   native swipe + momentum + snap come for free; .search-pc-wrap below only
+   overrides the arrow's vertical position to match THIS carousel's card
+   height, since task 133's own cards are a different (taller, full-width)
+   shape. */
+.search-pc-track { gap: 12px; padding: 2px 2px 6px; }
+.search-pc-wrap .pc-arrow { top: 62px; }
+.search-pc-card {
+  flex: 0 0 148px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1.5px solid var(--line-soft);
+  border-radius: 14px;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
+  text-decoration: none;
+  color: inherit;
+}
+.search-pc-card:active { transform: scale(0.97); }
+.search-pc-media {
+  width: 100%;
+  height: 124px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--orange-pale);
+  overflow: hidden;
+}
+.search-pc-media img { width: 100%; height: 100%; object-fit: cover; }
+.search-pc-emoji { font-size: 42px; line-height: 1; }
+.search-pc-name {
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 12.5px;
+  color: var(--navy);
+  line-height: 1.3;
+  padding: 10px 10px 2px;
+  /* Two lines max, so every card in the row stays the same height
+     regardless of name length — a 3rd line would push the price down on
+     just the longer-named cards. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.search-pc-price { font-family: var(--font-display); font-size: 14px; color: var(--orange); padding: 2px 10px 10px; }
+
+/* ---------- default state: bundles row ---------- */
+/* Only 3 cards, so a wrapping flex row (not another carousel) — task 135
+   names exactly LED Bundle, Hydration Bundle and Visibility Duo, rendered
+   by renderSearchDefaults() (app.js) from BUNDLES filtered to those 3 ids,
+   not the full BUNDLES array (which also has the separate Walk Essentials
+   Bundle — a real 4th bundle this row deliberately leaves out). */
+.search-bundles-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.search-bundle-card {
+  flex: 1 1 148px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1.5px solid var(--line-soft);
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s var(--ease);
+  text-decoration: none;
+  color: inherit;
+}
+.search-bundle-card:active { transform: scale(0.97); }
+.search-bundle-media {
+  width: 52px; height: 52px; border-radius: 10px; flex-shrink: 0;
+  background: var(--navy); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--orange); font-size: 22px;
+}
+.search-bundle-media img { width: 100%; height: 100%; object-fit: cover; }
+.search-bundle-info { min-width: 0; }
+.search-bundle-name { font-family: var(--font-body); font-weight: 800; font-size: 13px; color: var(--navy); }
+.search-bundle-price { font-family: var(--font-display); font-size: 13.5px; color: var(--orange); margin-top: 2px; }
+
+/* ---------- active state: live results ---------- */
+.search-results[hidden] { display: none; }
 .search-result-item {
   display: flex;
   align-items: center;
@@ -2921,6 +3035,11 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   -webkit-tap-highlight-color: transparent;
   transition: background 0.15s;
   border-radius: 12px;
+  /* A real <a href> now (for middle-click/ctrl-click, same as the rest of
+     the site's nav links), not a bare clickable <div> — needs the usual
+     anchor reset or it picks up the browser default underline/link color. */
+  text-decoration: none;
+  color: inherit;
 }
 .search-result-item:last-child { border-bottom: none; }
 .search-result-item:hover, .search-result-item:active { background: var(--orange-pale); }
@@ -2931,33 +3050,55 @@ body.overlay-up #chatWidget { opacity: 0; pointer-events: none; }
   font-size: 26px; flex-shrink: 0; overflow: hidden;
 }
 .search-result-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.search-result-thumb--bundle { background: var(--navy); color: var(--orange); font-weight: 800; }
 .search-result-info { flex: 1; min-width: 0; }
 .search-result-name { font-family: var(--font-body); font-weight: 800; font-size: 14px; color: var(--black); }
 .search-result-name b { color: var(--orange); font-weight: 900; }
+.search-result-meta { display: flex; align-items: center; gap: 8px; }
 .search-result-price { font-family: var(--font-display); font-size: 14px; color: var(--orange); margin-top: 2px; }
+.search-result-tag {
+  font-family: var(--font-body); font-weight: 800; font-size: 9.5px; letter-spacing: 0.3px;
+  text-transform: uppercase; color: var(--orange); background: var(--orange-pale);
+  padding: 2px 7px; border-radius: 50px; margin-top: 2px;
+}
 .search-no-results {
-  padding: 30px 8px 24px;
+  padding: 48px 8px 24px;
   font-family: var(--font-body);
   font-size: 14px; font-weight: 700; color: var(--gray);
   text-align: center;
 }
 .search-no-results .snr-emoji { display: block; font-size: 34px; margin-bottom: 8px; }
-.search-no-results .snr-hint { display: block; margin-top: 4px; font-size: 12.5px; font-weight: 600; color: #aaa; }
+.search-no-results .snr-hint { display: block; margin-top: 10px; }
+.search-no-results a { color: var(--orange); font-weight: 800; }
 
-
-/* Mobile: the search panel drops from the very top of the screen (its own
-   close X), still position:fixed so the page behind keeps its exact scroll
-   position. It is only as tall as what it holds — just the input until there
-   are results — so an idle panel never paints a blank white screen; the
-   results list scrolls inside a viewport-high cap. */
-@media (max-width: 900px) {
-  .nav-search-bar {
-    top: 0 !important; /* JS positions desktop only */
-    padding: 14px 5% 10px;
-    transform: translateY(-18px);
+/* ==================== SEARCH — PHONE/iPAD (task 135) ====================
+   Genuinely full screen here, not a centered card — same touch+width
+   condition as the task-132/134 header/menu blocks (phone widths, OR a
+   touch device up to 1366px wide), because width alone can't tell a large
+   phone/iPad apart from a same-width laptop. inset:0 + explicit height
+   (not top:0/bottom:0) is the same dvh-mismatch fix the menu uses: never
+   taller than what's actually visible, never shorter either. */
+@media (max-width: 900px), (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .search-view {
+    /* inset:0, not top:0/left:0 alone — a position:fixed box with only
+       top/left set and width:auto shrink-wraps to its CONTENT width
+       instead of spanning the viewport (there's no right edge pinning it).
+       That's exactly what happened the first time this was written as
+       top:0;left:0;width:auto without right:0: the carousel's un-clipped
+       row of cards (964px of them) became the view's own width, so
+       overflow-x:auto on the track never had a boundary to clip against
+       and the arrows/swipe had nothing to scroll. inset:0 pins all four
+       edges, so width/height are the viewport's, full stop. */
+    inset: 0;
+    width: auto;
+    height: 100dvh;
+    height: var(--search-vvh, 100dvh);
+    transform: none;
+    border-radius: 0;
+    box-shadow: none;
   }
-  .nav-search-bar.open { transform: none; }
-  .search-results { flex: 0 1 auto; max-height: calc(100dvh - 110px); }
+  .search-view.open { transform: none; }
+  .search-pc-card { flex-basis: 150px; }
 }
 
 /* ==================== HAMBURGER & MOBILE MENU ==================== */
@@ -3469,8 +3610,7 @@ html.offer-claimed .announce-slide--offer { display: none; }
      need to be told its horizontal bounds the way a fixed one did — sticky
      keeps the width/position it already has from normal flow. z-index kept
      as-is (still matters for sticky, same as any positioned element — e.g.
-     .nav-search-bar's dropdown is explicitly z-index:905 to render above
-     this). */
+     .search-view is explicitly z-index:905 to render above this). */
   nav {
     position: sticky;
     top: 0;
@@ -4000,10 +4140,15 @@ html.offer-claimed .announce-slide--offer { display: none; }
     transform: none;
   }
   .reveal { transition: opacity 0.2s ease; transform: none; }
-  /* Search panel + offer popup: fade only, no slide/scale */
-  .nav-search-bar { transform: none; transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
-  .nav-search-bar.open { transition: opacity 0.2s ease; }
-  .nav-search-inner { transform: none; transition: opacity 0.2s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
+  /* Search view + offer popup: fade only, no scale animation. transform
+     itself is deliberately left alone (not forced to `none`) — on desktop
+     it's doing double duty as both the open/close scale AND the
+     translateX(-50%) that horizontally centers the view at all; killing it
+     here would also kill the centering. The open/close scale (0.98 -> 1)
+     is subtle enough as a static value with no transition that dropping
+     just the animation (this rule's real job) is enough. */
+  .search-view { transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
+  .search-view.open { transition: opacity 0.2s ease; }
   .offer-popup { transform: translate(-50%, -50%); transition: opacity 0.2s ease, visibility 0s linear 0.2s; }
   .offer-popup.active { transform: translate(-50%, -50%); transition: opacity 0.2s ease; }
   .search-scrim, .offer-overlay { transition: opacity 0.2s ease; }

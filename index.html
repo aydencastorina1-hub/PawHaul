@@ -384,20 +384,46 @@ function heroSlideError(img) {
 })();
 </script>
 
-<!-- SEARCH OVERLAY — scrim dims the page; the panel drops in below the nav
-     (full-screen on mobile). Everything is position:fixed so opening/closing
-     never shifts the page or loses the scroll position. -->
-<div class="search-scrim" id="searchScrim" onclick="closeSearch()"></div>
-<div class="nav-search-bar" id="navSearchBar" role="dialog" aria-modal="true" aria-label="Search products">
-  <div class="nav-search-inner">
-    <svg class="nav-search-paw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="19" height="19" fill="currentColor" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg>
-    <div class="nav-search-field">
-      <input type="text" id="navSearchInput" class="nav-search-input" oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false" aria-label="Search products">
-      <span class="nav-search-ph" id="navSearchPh" aria-hidden="true">Search leashes...</span>
+<!-- SEARCH (task 135) — full-screen view, not a dropdown panel. Scrim stays
+     for desktop's centered-overlay mode (click-outside-to-close); on phone/
+     iPad the view fills the whole screen so there's no "outside" to tap.
+     Everything is position:fixed/fixed-height so opening/closing never
+     shifts the page or loses its scroll position — same contract the old
+     panel had, just applied to a full view instead of a dropdown. -->
+<div class="search-scrim" id="searchScrim" onclick="dismissSearch()"></div>
+<div class="search-view" id="navSearchBar" role="dialog" aria-modal="true" aria-label="Search products">
+  <div class="search-bar-row">
+    <button class="search-back-btn" onclick="dismissSearch()" aria-label="Close search">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    </button>
+    <div class="search-field">
+      <svg class="search-field-paw" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="17" height="17" fill="currentColor" aria-hidden="true"><ellipse cx="50" cy="67" rx="20" ry="16"/><ellipse cx="27" cy="47" rx="9" ry="12"/><ellipse cx="42" cy="35" rx="9" ry="12"/><ellipse cx="58" cy="35" rx="9" ry="12"/><ellipse cx="73" cy="47" rx="9" ry="12"/></svg>
+      <input type="text" id="navSearchInput" class="search-input" oninput="doSearch(this.value)" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Search leashes, collars, bowls..." aria-label="Search products">
+      <button class="search-clear-btn" id="searchClearBtn" onclick="clearSearchInput()" aria-label="Clear search" hidden>&#10005;</button>
     </div>
-    <button class="nav-search-close" onclick="closeSearch()" aria-label="Close search">&#10005;</button>
   </div>
-  <div class="search-results" id="searchResults"></div>
+
+  <div class="search-body" id="searchBody">
+    <!-- Default state: all products + the 3 named bundles. Rendered once by
+         renderSearchDefaults() (app.js) at page load, not re-rendered per
+         keystroke — only shown/hidden via the `hidden` attribute so the
+         carousel's own scroll position and bound listeners survive typing
+         and clearing. -->
+    <div class="search-default" id="searchDefault">
+      <div class="search-section-label">All Products</div>
+      <div class="pc-wrap search-pc-wrap">
+        <button class="pc-arrow pc-prev disabled" id="searchCarPrev" aria-label="Previous">&#8249;</button>
+        <div class="pc-track search-pc-track" id="searchCarTrack"></div>
+        <button class="pc-arrow pc-next" id="searchCarNext" aria-label="Next">&#8250;</button>
+      </div>
+      <div class="search-section-label">Bundles</div>
+      <div class="search-bundles-row" id="searchBundlesRow"></div>
+    </div>
+
+    <!-- Active state: live results, rebuilt on every keystroke by doSearch()
+         (app.js). Hidden whenever the input is empty. -->
+    <div class="search-results" id="searchResults" hidden></div>
+  </div>
 </div>
 
 <!-- MOBILE MENU (slides from right)
