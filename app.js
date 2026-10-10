@@ -1072,6 +1072,12 @@ function openSearch() {
       searchCarouselCtrl.sync();
     });
   }
+  if (searchBlogCarouselCtrl) {
+    requestAnimationFrame(function () {
+      searchBlogCarouselCtrl.measure();
+      searchBlogCarouselCtrl.sync();
+    });
+  }
 }
 
 // Shared by closeSearch() and closeSearchAnimated() below: the actual
@@ -1267,9 +1273,28 @@ function syncSearchViewportHeight() {
   // straight back so the overlay never visibly shifts.
   if (searchBodyLocked && window.scrollY !== 0) window.scrollTo(0, 0);
 }
+// task 143: coalesced to at most once per animation frame — visualViewport
+// can fire 'resize'/'scroll' many times in quick succession (through the
+// keyboard's own open/close animation, and on some engines while the user
+// is actively finger-scrolling .search-body with the keyboard up), and
+// syncSearchViewportHeight()'s style.setProperty()/classList.toggle() each
+// force a style recalculation. Running that on every single event instead
+// of once per frame is exactly the kind of main-thread work that competes
+// with native touch-scroll handling and reads as janky, choppy scrolling —
+// the framing here costs nothing when events are already sparse (one call
+// either way) and only matters when they're not.
+var _searchVVSyncQueued = false;
+function syncSearchViewportHeightThrottled() {
+  if (_searchVVSyncQueued) return;
+  _searchVVSyncQueued = true;
+  requestAnimationFrame(function () {
+    _searchVVSyncQueued = false;
+    syncSearchViewportHeight();
+  });
+}
 if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', syncSearchViewportHeight);
-  window.visualViewport.addEventListener('scroll', syncSearchViewportHeight);
+  window.visualViewport.addEventListener('resize', syncSearchViewportHeightThrottled);
+  window.visualViewport.addEventListener('scroll', syncSearchViewportHeightThrottled);
 }
 
 // ---------- default-state content: product carousel + bundles row ----------
@@ -1358,6 +1383,23 @@ function searchBundleCardHtml(b) {
 // reliable enough on its own.
 var searchCarouselCtrl = null;
 
+// task 143: a compact carousel card for a real blog post — same
+// image-then-text shape as .search-pc-card, sized for a swipeable row
+// rather than the full .blog-card grid tile. Reuses blogEsc/blogFmtDate
+// (above) and goToPost (this file) so it's the exact same navigation and
+// escaping every other blog link on the site already uses.
+function searchBlogCardHtml(p) {
+  return '<a class="search-blog-card" href="/blog/' + blogEsc(p.slug) + '" onclick="closeSearch();goToPost(event,\'' + blogEsc(p.slug) + '\')">' +
+    '<div class="search-blog-media"><img src="' + blogEsc(p.image) + '" alt="" loading="lazy" onerror="this.outerHTML=\'📰\'"></div>' +
+    '<div class="search-blog-title">' + blogEsc(p.title) + '</div>' +
+    '<div class="search-blog-meta">' + blogEsc(p.readMins) + ' min read</div>' +
+  '</a>';
+}
+
+// task 142's own controller, same reasoning: openSearch() force-re-measures
+// this on every open too (see there), not just the product carousel.
+var searchBlogCarouselCtrl = null;
+
 function renderSearchDefaults() {
   var track = document.getElementById('searchCarTrack');
   if (track) {
@@ -1372,6 +1414,12 @@ function renderSearchDefaults() {
     bundlesRow.innerHTML = bundles.map(searchBundleCardHtml).join('');
   }
   searchCarouselCtrl = initPcCarousel('searchCarTrack', 'searchCarPrev', 'searchCarNext', null);
+
+  var blogTrack = document.getElementById('searchBlogTrack');
+  if (blogTrack && typeof blogPosts !== 'undefined') {
+    blogTrack.innerHTML = blogPosts.map(searchBlogCardHtml).join('');
+  }
+  searchBlogCarouselCtrl = initPcCarousel('searchBlogTrack', 'searchBlogPrev', 'searchBlogNext', null);
 }
 
 // ---------- active-state content: live results ----------

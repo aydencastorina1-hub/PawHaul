@@ -457,6 +457,21 @@ function heroSlideError(img) {
       </div>
       <div class="search-section-label">Bundles</div>
       <div class="search-bundles-row" id="searchBundlesRow"></div>
+
+      <!-- Fills the empty space below the bundles row on phone (the default
+           state otherwise ends well short of the bottom of the screen) —
+           real blog posts, not placeholder content, same pc-wrap/pc-track
+           carousel pattern as the product row above so it gets the same
+           task-88 swipe+arrow behavior for free. Hidden on iPad (see
+           styles.css): the iPad layout is a deliberately exact 50/50 split
+           between products and bundles with no spare height to give a
+           third section without breaking that fit. -->
+      <div class="search-section-label search-blog-label">From the Blog</div>
+      <div class="pc-wrap search-blog-wrap">
+        <button class="pc-arrow pc-prev disabled" id="searchBlogPrev" aria-label="Previous">&#8249;</button>
+        <div class="pc-track search-blog-track" id="searchBlogTrack"></div>
+        <button class="pc-arrow pc-next" id="searchBlogNext" aria-label="Next">&#8250;</button>
+      </div>
     </div>
 
     <!-- Active state: live results, rebuilt on every keystroke by doSearch()
