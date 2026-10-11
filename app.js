@@ -1137,8 +1137,10 @@ function searchTouchMove(e) {
       can = dir > 0 ? b.scrollTop > 2 : b.scrollTop < max - 2;
     }
   }
-  if (!can && e.cancelable) e.preventDefault();
+  if (!can && e.cancelable) { e.preventDefault(); _searchGuardStats.blocked++; }
+  else _searchGuardStats.allowed++;
 }
+var _searchGuardStats = { blocked: 0, allowed: 0 };
 // Backstop: if iOS slid the visible area anyway (e.g. a scroll that ran
 // into the edge mid-gesture, when touchmove is no longer cancelable), put
 // it back the instant the finger lifts instead of letting iOS ease it back.
@@ -1210,7 +1212,11 @@ function searchDebugHud() {
   }
   var bodyTop = body ? body.scrollTop : NaN;
   var lines = [
-    'BUILD 148f   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'BUILD 148g   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'content room=' + (body ? r(body.scrollHeight - body.clientHeight) : 'n/a') +
+      '  kbInset=' + getComputedStyle(document.documentElement).getPropertyValue('--search-kb-inset').trim() +
+      '  clientH=' + document.documentElement.clientHeight,
+    'swipes blocked=' + _searchGuardStats.blocked + '  allowed=' + _searchGuardStats.allowed,
     'window.scrollY=' + r(window.scrollY) + track('winY', window.scrollY),
     'scrollingEl.scrollTop=' + r(se.scrollTop) + track('se', se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
@@ -1229,6 +1235,7 @@ function searchDebugStart() {
   if (!searchDebugEnabled()) return;
   _searchDebugT0 = Date.now();
   _searchDebugMax = {};
+  _searchGuardStats = { blocked: 0, allowed: 0 };
   if (_searchDebugTimer) clearInterval(_searchDebugTimer);
   // Sampled on a plain timer, not just on visualViewport/scroll events —
   // the whole point is to see whether the position moves even when nothing
