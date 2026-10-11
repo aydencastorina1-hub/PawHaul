@@ -1081,6 +1081,7 @@ function openSearch() {
     });
   }
   searchResetScroll();
+  searchFitContent();
   searchTouchGuard(true);
 }
 
@@ -1139,6 +1140,52 @@ function searchResetScroll() {
   var b = document.getElementById('searchBody');
   if (b) b.scrollTop = 0;
 }
+// Keyboard closed, everything fits: on a phone, if the default view is
+// taller than the space Safari actually leaves (its toolbars can take
+// ~160px), shrink the product and blog photo areas — and only those — just
+// enough that it fits, so there's nothing to scroll. Measured WITHOUT the
+// keyboard's inset padding, so the layout never changes when the keyboard
+// opens; with it up, that inset is exactly the scroll room, as before.
+var SEARCH_PC_MEDIA = 124, SEARCH_BLOG_MEDIA = 104;      // styles.css defaults
+var SEARCH_PC_MEDIA_MIN = 64, SEARCH_BLOG_MEDIA_MIN = 56;
+function searchFitContent() {
+  var root = document.documentElement;
+  root.style.removeProperty('--search-pc-media-h');
+  root.style.removeProperty('--search-blog-media-h');
+  root.classList.remove('search-compact');
+  if (!searchPhoneMode()) return;
+  var b = document.getElementById('searchBody');
+  var def = document.getElementById('searchDefault');
+  if (!b || !def || def.hidden) return;
+  function overflow() {
+    var cs = getComputedStyle(b);
+    var kb = parseFloat(getComputedStyle(root).getPropertyValue('--search-kb-inset')) || 0;
+    var inner = b.clientHeight - parseFloat(cs.paddingTop) - (parseFloat(cs.paddingBottom) - kb);
+    return def.offsetHeight - inner;
+  }
+  var over = overflow();
+  if (over <= 0) return;
+  // 1) tighter spacing (styles.css html.search-compact), then re-measure
+  root.classList.add('search-compact');
+  over = overflow();
+  if (over <= 0) return;
+  var room = (SEARCH_PC_MEDIA - SEARCH_PC_MEDIA_MIN) + (SEARCH_BLOG_MEDIA - SEARCH_BLOG_MEDIA_MIN);
+  var k = Math.min(1, over / room);                      // share of the shrinkable room used
+  var pc = Math.floor(SEARCH_PC_MEDIA - (SEARCH_PC_MEDIA - SEARCH_PC_MEDIA_MIN) * k);
+  var blog = Math.floor(SEARCH_BLOG_MEDIA - (SEARCH_BLOG_MEDIA - SEARCH_BLOG_MEDIA_MIN) * k);
+  root.style.setProperty('--search-pc-media-h', pc + 'px');
+  root.style.setProperty('--search-blog-media-h', blog + 'px');
+}
+
+// Re-fit on rotation — keyed on WIDTH, which the keyboard never changes, so
+// opening/closing it can't trigger a re-layout.
+var _searchFitW = window.innerWidth;
+window.addEventListener('resize', function () {
+  if (window.innerWidth === _searchFitW) return;
+  _searchFitW = window.innerWidth;
+  if (searchIsOpen()) { searchFitContent(); searchResetScroll(); }
+}, { passive: true });
+
 // iOS's rubber-band: resistance grows the further past the edge you pull.
 function searchRubber(over, dim) {
   return (1 - 1 / (over * 0.55 / dim + 1)) * dim;
@@ -1151,7 +1198,10 @@ function searchTouchStart(e) {
   var inBody = !!(b && tg && tg.closest && tg.closest('#searchBody'));
   var mode = null;
   if (inBody) {
-    if (searchPhoneMode()) mode = 'transform';
+    // Nothing to scroll (keyboard closed, everything fits): the content
+    // stays completely still — no rubber-band either. The vertical drag is
+    // still cancelled below so iOS can't slide the screen.
+    if (searchPhoneMode()) mode = searchMaxY() >= 1 ? 'transform' : null;
     else if (getComputedStyle(b).overflowY !== 'hidden') mode = 'scrollTop';
   }
   // A touch during a coast or spring catches it where it is.
@@ -1471,6 +1521,13 @@ function syncSearchViewportHeight() {
   // which then handed every further swipe to iOS's slide.
   var inset = Math.max(0, document.documentElement.clientHeight - vv.height);
   document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
+  // task 148: the phone scroller's offset is ours, so when the keyboard
+  // closes (less room) the browser won't clamp it for us — glide it back
+  // inside the new range instead of leaving a gap at the bottom.
+  if (searchPhoneMode() && !_searchTouch && !_searchAnim) {
+    var maxY = searchMaxY();
+    if (_searchY > maxY + 0.5) searchSpringTo(maxY);
+  }
   // task 142: html.search-kb-open — NOT used for sizing anything (see
   // .search-body's own comment in styles.css for why letting the keyboard
   // shrink the layout was the actual collapsing-cards bug); this only
