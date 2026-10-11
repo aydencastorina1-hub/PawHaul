@@ -1080,35 +1080,69 @@ function openSearch() {
       searchBlogCarouselCtrl.sync();
     });
   }
-  searchBindEdgeNudge();
-  requestAnimationFrame(searchEdgeNudge);
+  searchTouchGuard(true);
   searchDebugStart();
 }
 
-// task 148: keep .search-body 1px away from both of its scroll edges.
-// iOS hands a vertical swipe to the PAGE (which, with the keyboard up, can
-// pan by the keyboard's height, dragging the whole overlay with it) whenever
-// the inner scroller can't move in the swipe's direction — at scrollTop 0 a
-// downward drag, at the bottom an upward one, and in both directions when
-// the content has no scroll room at all (the first-open case on a phone).
-// Sitting 1px inside both edges means it can always scroll both ways, so
-// iOS always gives the gesture to it. CSS guarantees >= 2px of room (see
-// .search-default/.search-results min-height). Passive and only touches
-// scrollTop, so carousel swipes and taps are unaffected. Not used on iPad,
-// where .search-body never scrolls (max < 2 there, so this is a no-op).
-function searchEdgeNudge() {
-  var b = document.getElementById('searchBody');
-  if (!b || !searchIsOpen()) return;
-  var max = b.scrollHeight - b.clientHeight;
-  if (max < 2) return;
-  if (b.scrollTop <= 0) b.scrollTop = 1;
-  else if (b.scrollTop >= max) b.scrollTop = max - 1;
+// task 148: stop iOS panning the visual viewport behind the open search.
+// Measured on-device (?searchdebug): window.scrollY and the page's own
+// scrollTop stay 0 the whole time — the page lock holds — but
+// visualViewport.offsetTop goes 0..290. With the keyboard up the layout
+// viewport is ~300px taller than the visible area, and iOS lets a finger
+// pan the visible area inside it whenever the gesture has nothing else to
+// scroll: content already at its edge in the swipe's direction, or a drag
+// starting on the search bar. Every position:fixed element (the whole
+// overlay, search bar included) moves with that pan, and iOS then eases it
+// back — the "screen moves, then slowly drifts back". overscroll-behavior,
+// touch-action and a 1px edge nudge all failed to stop it on-device; the
+// only reliable stop is cancelling the touchmove. So, for a VERTICAL drag
+// only: cancel it when .search-body can't scroll that way (or it didn't
+// start inside .search-body). Sideways drags (carousels) are never touched,
+// the axis is decided once per gesture after a few px (inside iOS's own
+// slop, before it starts any scroll), and a drag that CAN scroll the
+// content is left fully native.
+var _searchTouch = null;
+function searchTouchStart(e) {
+  if (!searchIsOpen() || e.touches.length !== 1) { _searchTouch = null; return; }
+  var t = e.touches[0], tg = e.target;
+  // The search input is NOT exempt: it's one line (touch-action:
+  // manipulation), so a vertical drag on it has nothing to do except pan the
+  // visual viewport. Sideways drags there (caret) are never touched.
+  _searchTouch = {
+    x: t.clientX, y: t.clientY, lastY: t.clientY, axis: null,
+    inBody: !!(tg && tg.closest && tg.closest('#searchBody')),
+  };
 }
-function searchBindEdgeNudge() {
-  var b = document.getElementById('searchBody');
-  if (!b || b._edgeNudgeBound) return;
-  b._edgeNudgeBound = true;
-  b.addEventListener('touchstart', searchEdgeNudge, { passive: true });
+function searchTouchMove(e) {
+  var g = _searchTouch;
+  if (!g || !searchIsOpen() || e.touches.length !== 1) return;
+  var t = e.touches[0];
+  var dx = t.clientX - g.x, dy = t.clientY - g.y;
+  if (!g.axis) {
+    if (Math.abs(dx) + Math.abs(dy) < 3) return;
+    g.axis = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x';
+  }
+  if (g.axis !== 'y') return;
+  var step = t.clientY - g.lastY;
+  g.lastY = t.clientY;
+  var dir = step || dy;            // >0 finger moving down (content toward top)
+  var can = false;
+  if (g.inBody) {
+    var b = document.getElementById('searchBody');
+    if (b && getComputedStyle(b).overflowY !== 'hidden') {
+      var max = b.scrollHeight - b.clientHeight;
+      can = dir > 0 ? b.scrollTop > 0.5 : b.scrollTop < max - 0.5;
+    }
+  }
+  if (!can && e.cancelable) e.preventDefault();
+}
+// Attached only while search is open — a non-passive document touchmove
+// listener would otherwise make every scroll on the site wait on it.
+function searchTouchGuard(on) {
+  var fn = on ? 'addEventListener' : 'removeEventListener';
+  document[fn]('touchstart', searchTouchStart, { passive: true });
+  document[fn]('touchmove', searchTouchMove, { passive: false });
+  if (!on) _searchTouch = null;
 }
 
 // TEMPORARY DIAGNOSTIC (tasks 146/148) — on-device verification of the
@@ -1154,7 +1188,7 @@ function searchDebugHud() {
   }
   var bodyTop = body ? body.scrollTop : NaN;
   var lines = [
-    'BUILD 148d   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'BUILD 148e   t=' + (Date.now() - _searchDebugT0) + 'ms',
     'window.scrollY=' + r(window.scrollY) + track('winY', window.scrollY),
     'scrollingEl.scrollTop=' + r(se.scrollTop) + track('se', se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
@@ -1196,6 +1230,7 @@ function searchDebugStart() {
 // page-unlock + scroll-restore, factored out so the animated path can defer
 // running it without duplicating it.
 function unlockAfterSearchClose() {
+  searchTouchGuard(false);
   document.documentElement.style.overflow = '';
   // Stale otherwise if search closes while the keyboard happened to still
   // be reported open (e.g. a fast X-tap right after focusing the input) —
@@ -2367,6 +2402,9 @@ function markOfferClaimed() {
 
   function reveal() {
     if (shownThisVisit || offerAlreadyClaimed()) return;
+    // task 148: never pop over an open search view (it sits above it, with
+    // the keyboard up) — try again shortly, until search is closed.
+    if (searchIsOpen()) { clearTimeout(timer); timer = setTimeout(reveal, 2000); return; }
 
     // This runs from a timer / an exit-intent event, so the popup markup
     // (which sits BELOW app.js's own <script> tag in index.html) is always

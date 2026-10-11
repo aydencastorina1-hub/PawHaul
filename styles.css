@@ -2996,10 +2996,9 @@ body.overlay-up .offer-side-tab {
 }
 .search-body::-webkit-scrollbar { display: none; }
 
-/* task 148: always at least 2px taller than the box, so .search-body is a
-   real scroll container from the very first touch, with room for app.js's
-   touchstart nudge to keep it 1px off either edge (so it can always scroll
-   both ways and iOS never hands the swipe to the page). On a phone the default
+/* task 148: always a little taller than the box, so .search-body is a
+   real scroll container from the very first touch (app.js's touchmove
+   guard handles the edges). On a phone the default
    view fits the screen exactly with the keyboard closed, so on first open
    (before any --search-kb-inset padding exists) a vertical swipe found
    nothing to scroll here and iOS handed it to the page instead — which,
