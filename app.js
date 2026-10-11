@@ -1081,27 +1081,28 @@ function openSearch() {
     });
   }
   searchTouchGuard(true);
-  searchDebugStart();
 }
 
 // task 148: vertical scrolling of the open search view is done HERE, not
-// natively. Measured on-device (?searchdebug, BUILD 148g) with the keyboard
-// up: the content had 397px of scroll room and the old guard let all 337
-// vertical touchmoves through, yet content.scrollTop never left 0 — every
-// swipe went to iOS sliding the visible area instead (vv.offsetTop and
-// scrollY 0..310), dragging the whole overlay, search bar included. iOS
-// simply doesn't hand those swipes to the inner scroller there, so no CSS
-// (overscroll-behavior, touch-action, scroll room) can fix it.
-// So while search is open, every VERTICAL drag is cancelled (iOS gets
-// nothing to slide) and .search-body is scrolled by the finger's own
-// movement, with a decaying glide after release. Sideways drags (carousels,
-// caret in the input) are never touched — the axis is decided once per
-// gesture after 3px, inside iOS's own slop, before it starts anything.
-// Drags that start outside .search-body (search bar, input, back button)
-// are cancelled and scroll nothing.
+// natively. Measured on-device with the keyboard up: the content had room
+// to scroll and nothing blocked the swipes, yet its scrollTop never moved —
+// iOS gives those swipes to sliding the whole visible area instead (the
+// overlay, search bar included, moved by up to the keyboard height). So
+// while search is open, every VERTICAL drag is cancelled (iOS gets nothing
+// to slide) and .search-body is scrolled from the finger's own movement,
+// then coasts after release. Sideways drags (carousels, caret in the input)
+// stay native — the axis is decided once per gesture after 3px, inside
+// iOS's own slop. Drags starting outside .search-body scroll nothing.
+//
+// Smoothness: geometry is read once per gesture (no layout work per touch
+// event), the scroll position is written at most once per animation frame,
+// release velocity is a smoothed estimate, and the coast uses UIScrollView's
+// own normal deceleration rate (0.998 per ms), so it eases out like iOS.
 var _searchTouch = null;
 var _searchGlide = 0;
-var _searchGuardStats = { blocked: 0, allowed: 0 };
+var _searchWrite = 0;
+var SEARCH_DECEL = 0.998;      // per ms, iOS UIScrollView "normal"
+var SEARCH_MAX_V = 6;          // px/ms cap on a release fling
 function searchScrollBody() {
   var b = document.getElementById('searchBody');
   if (!b || getComputedStyle(b).overflowY === 'hidden') return null;   // iPad: never scrolls
@@ -1114,11 +1115,19 @@ function searchTouchStart(e) {
   searchStopGlide();
   if (!searchIsOpen() || e.touches.length !== 1) { _searchTouch = null; return; }
   var t = e.touches[0], tg = e.target;
+  var inBody = !!(tg && tg.closest && tg.closest('#searchBody'));
+  var b = inBody ? searchScrollBody() : null;
   _searchTouch = {
-    x: t.clientX, y: t.clientY, lastY: t.clientY, axis: null,
-    inBody: !!(tg && tg.closest && tg.closest('#searchBody')),
-    samples: [],
+    x: t.clientX, y: t.clientY, lastY: t.clientY, lastT: e.timeStamp,
+    axis: null, b: b, v: 0,
+    pos: b ? b.scrollTop : 0,
+    max: b ? b.scrollHeight - b.clientHeight : 0,
   };
+}
+function searchFlushWrite() {
+  _searchWrite = 0;
+  var g = _searchTouch;
+  if (g && g.b) g.b.scrollTop = g.pos;
 }
 function searchTouchMove(e) {
   var g = _searchTouch;
@@ -1130,37 +1139,32 @@ function searchTouchMove(e) {
     g.axis = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x';
   }
   if (g.axis !== 'y') return;
-  if (e.cancelable) { e.preventDefault(); _searchGuardStats.blocked++; }
-  else _searchGuardStats.allowed++;
+  if (e.cancelable) e.preventDefault();
+  if (!g.b) return;
   var step = t.clientY - g.lastY;
+  var dt = Math.max(1, e.timeStamp - g.lastT);
   g.lastY = t.clientY;
-  var b = g.inBody && searchScrollBody();
-  if (!b) return;
-  if (g.pos == null) g.pos = b.scrollTop;   // fractional, like the glide
-  g.pos = Math.max(0, Math.min(b.scrollHeight - b.clientHeight, g.pos - step));
-  b.scrollTop = g.pos;
-  var now = performance.now();
-  g.samples.push({ t: now, y: t.clientY });
-  while (g.samples.length > 2 && now - g.samples[0].t > 100) g.samples.shift();
+  g.lastT = e.timeStamp;
+  g.pos = Math.max(0, Math.min(g.max, g.pos - step));
+  // smoothed velocity (px/ms, + = finger moving down)
+  g.v = 0.8 * (step / dt) + 0.2 * g.v;
+  if (!_searchWrite) _searchWrite = requestAnimationFrame(searchFlushWrite);
 }
-// Release: continue with the finger's last ~100ms velocity, decaying —
-// the same feel as a native fling, stopped by the next touch or an edge.
 function searchGlide(g) {
-  var b = g && g.axis === 'y' && g.inBody && searchScrollBody();
-  if (!b || g.samples.length < 2) return;
-  var a = g.samples[0], z = g.samples[g.samples.length - 1];
-  if (performance.now() - z.t > 80) return;           // finger had stopped
-  var v = (z.y - a.y) / Math.max(1, z.t - a.t);        // px/ms, + = finger down
-  if (Math.abs(v) < 0.05) return;
+  if (!g || g.axis !== 'y' || !g.b) return;
+  var b = g.b, max = g.max, pos = g.pos;
+  b.scrollTop = pos;
+  // g.idle: finger held still before lifting, so no coast
+  var v = Math.max(-SEARCH_MAX_V, Math.min(SEARCH_MAX_V, g.v));
+  if (g.idle || Math.abs(v) < 0.08) return;
   var last = performance.now();
-  var pos = g.pos != null ? g.pos : b.scrollTop;   // fractional: scrollTop rounds to whole px
   function frame(now) {
     var dt = Math.min(32, Math.max(1, now - last)); last = now;
-    var max = b.scrollHeight - b.clientHeight;
-    pos = Math.max(0, Math.min(max, pos - v * dt));
+    pos -= v * dt;
+    v *= Math.pow(SEARCH_DECEL, dt);
+    if (pos <= 0 || pos >= max) { b.scrollTop = Math.max(0, Math.min(max, pos)); _searchGlide = 0; return; }
     b.scrollTop = pos;
-    v *= Math.pow(0.95, dt / 16);
-    if (Math.abs(v) < 0.02 || pos <= 0 || pos >= max) { _searchGlide = 0; return; }
+    if (Math.abs(v) < 0.01) { _searchGlide = 0; return; }
     _searchGlide = requestAnimationFrame(frame);
   }
   _searchGlide = requestAnimationFrame(frame);
@@ -1169,7 +1173,13 @@ function searchTouchEnd(e) {
   if (e.touches.length) return;
   var g = _searchTouch;
   _searchTouch = null;
-  if (e.type === 'touchend') searchGlide(g);
+  if (_searchWrite) { cancelAnimationFrame(_searchWrite); _searchWrite = 0; }
+  if (g && e.type === 'touchend') {
+    g.idle = e.timeStamp - g.lastT > 100;  // finger had stopped before lifting
+    searchGlide(g);
+  } else if (g && g.b) {
+    g.b.scrollTop = g.pos;
+  }
   searchSnapViewport();
 }
 // Backstop: if iOS slid the visible area anyway, put it back instantly
@@ -1192,92 +1202,6 @@ function searchTouchGuard(on) {
   document[fn]('touchend', searchTouchEnd, { passive: true });
   document[fn]('touchcancel', searchTouchEnd, { passive: true });
   if (!on) { _searchTouch = null; searchStopGlide(); }
-}
-
-// TEMPORARY DIAGNOSTIC (tasks 146/148) — on-device verification of the
-// task-148 visual-viewport pin. Shows the values task 148 asked to trace,
-// read straight off a phone screen with no Mac/Web Inspector. The line that
-// matters is "header ON SCREEN": 0 means the search bar is exactly at the
-// top of what's visible; its "max" column catches a drift even after it
-// has settled. Only active with ?searchdebug on the URL; inert otherwise.
-// Remove this whole block once the pin is confirmed on a real iPhone/iPad.
-function searchDebugEnabled() {
-  try { return /(?:^|[?&])searchdebug(?:&|=|$)/.test(location.search); } catch (e) { return false; }
-}
-var _searchDebugEl = null;
-var _searchDebugT0 = 0;
-var _searchDebugTimer = null;
-function searchDebugHud() {
-  if (!_searchDebugEl) {
-    _searchDebugEl = document.createElement('div');
-    _searchDebugEl.style.cssText = 'position:fixed;left:6px;top:calc(env(safe-area-inset-top) + 74px);z-index:999999;' +
-      'background:rgba(0,0,0,0.78);color:#0f0;font:11px/1.4 monospace;' +
-      'padding:6px 8px;border-radius:6px;white-space:pre;pointer-events:none;';
-    document.body.appendChild(_searchDebugEl);
-  }
-  var body = document.getElementById('searchBody');
-  var view = document.getElementById('navSearchBar');
-  var head = view && view.querySelector('.search-bar-row');
-  var vv = window.visualViewport;
-  var se = document.scrollingElement || document.documentElement;
-  // task 148: exactly the values that task asks to trace, each with the
-  // lowest/highest value seen since open so one screenshot after the glitch
-  // shows how far things went. Rects are in layout-viewport coords, so
-  // "where the bar is on SCREEN" is headerTop - vv.offsetTop: 0 = in place,
-  // negative = moved up, positive = moved down.
-  var r = function (n) { return Math.round(n * 10) / 10; };
-  var headTop = head ? head.getBoundingClientRect().top : NaN;
-  var vvTop = vv ? vv.offsetTop : 0;
-  var onScreen = headTop - vvTop;
-  function track(k, v) {
-    if (!isFinite(v)) return '';
-    var m = _searchDebugMax[k] || (_searchDebugMax[k] = { lo: v, hi: v });
-    m.lo = Math.min(m.lo, v); m.hi = Math.max(m.hi, v);
-    return '  [' + r(m.lo) + '..' + r(m.hi) + ']';
-  }
-  var bodyTop = body ? body.scrollTop : NaN;
-  var lines = [
-    'BUILD 148h   t=' + (Date.now() - _searchDebugT0) + 'ms',
-    'content room=' + (body ? r(body.scrollHeight - body.clientHeight) : 'n/a') +
-      '  kbInset=' + getComputedStyle(document.documentElement).getPropertyValue('--search-kb-inset').trim() +
-      '  clientH=' + document.documentElement.clientHeight,
-    'swipes blocked=' + _searchGuardStats.blocked + '  allowed=' + _searchGuardStats.allowed,
-    'window.scrollY=' + r(window.scrollY) + track('winY', window.scrollY),
-    'scrollingEl.scrollTop=' + r(se.scrollTop) + track('se', se.scrollTop),
-    'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
-    'header.top=' + r(headTop),
-    'header ON SCREEN=' + r(onScreen) + track('onScreen', onScreen),
-    'content.scrollTop=' + r(bodyTop) + track('body', bodyTop),
-    'vv.offsetTop=' + r(vvTop) + track('vvTop', vvTop),
-    'vv.pageTop=' + (vv ? r(vv.pageTop) : 'n/a') + (vv ? track('pageTop', vv.pageTop) : ''),
-    'vv.height=' + (vv ? r(vv.height) : 'n/a'),
-    'body.position=' + (document.body.style.position || '(none)') + '  top=' + (document.body.style.top || '0'),
-  ];
-  _searchDebugEl.textContent = lines.join('\n');
-}
-var _searchDebugMax = {};
-function searchDebugStart() {
-  if (!searchDebugEnabled()) return;
-  _searchDebugT0 = Date.now();
-  _searchDebugMax = {};
-  _searchGuardStats = { blocked: 0, allowed: 0 };
-  if (_searchDebugTimer) clearInterval(_searchDebugTimer);
-  // Sampled on a plain timer, not just on visualViewport/scroll events —
-  // the whole point is to see whether the position moves even when nothing
-  // we already listen to fires, which a purely event-driven trace would
-  // silently miss. Stopped automatically after 8s so it can't run forever
-  // if someone forgets to close search.
-  _searchDebugTimer = setInterval(searchDebugHud, 100);
-  setTimeout(function () { if (_searchDebugTimer) { clearInterval(_searchDebugTimer); _searchDebugTimer = null; } }, 8000);
-  searchDebugHud();
-  // Catch .search-body's own scroll events directly too, not just the
-  // timer/visualViewport paths above — fires on every native scroll tick,
-  // including ones nothing else here listens for.
-  var body = document.getElementById('searchBody');
-  if (body && !body._searchDebugBound) {
-    body._searchDebugBound = true;
-    body.addEventListener('scroll', function () { if (searchDebugEnabled()) searchDebugHud(); }, { passive: true });
-  }
 }
 
 // Shared by closeSearch() and closeSearchAnimated() below: the actual
@@ -1487,7 +1411,6 @@ function syncSearchViewportHeight() {
   // which leaves scrollY at 0) — but never while a finger is down, so it
   // can't fight a scroll in progress; searchTouchEnd() runs it on lift.
   searchSnapViewport();
-  if (searchDebugEnabled()) searchDebugHud();
 }
 // task 143: coalesced to at most once per animation frame — visualViewport
 // can fire 'resize'/'scroll' many times in quick succession (through the
