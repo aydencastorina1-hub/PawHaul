@@ -2996,8 +2996,10 @@ body.overlay-up .offer-side-tab {
 }
 .search-body::-webkit-scrollbar { display: none; }
 
-/* task 148: always at least 1px taller than the box, so .search-body is a
-   real scroll container from the very first touch. On a phone the default
+/* task 148: always at least 2px taller than the box, so .search-body is a
+   real scroll container from the very first touch, with room for app.js's
+   touchstart nudge to keep it 1px off either edge (so it can always scroll
+   both ways and iOS never hands the swipe to the page). On a phone the default
    view fits the screen exactly with the keyboard closed, so on first open
    (before any --search-kb-inset padding exists) a vertical swipe found
    nothing to scroll here and iOS handed it to the page instead — which,
@@ -3008,7 +3010,7 @@ body.overlay-up .offer-side-tab {
    this overflow. The iPad block resets .search-default to min-height:0
    (its no-scroll fit from tasks 141/142). */
 .search-default,
-.search-results { min-height: calc(100% + 1px); }
+.search-results { min-height: calc(100% + 2px); }
 
 .search-section-label {
   font-family: var(--font-body);
@@ -3347,7 +3349,12 @@ body.overlay-up .offer-side-tab {
      comment above .search-default's two flex children below for why
      letting the keyboard shrink this box's content area was the actual
      cause of cards collapsing into thin strips when it opened. */
-  .search-body { padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); overflow-y: hidden; }
+  /* task 148: pan-x, not pan-y — nothing in here ever scrolls vertically on
+     iPad (task 141), so a vertical drag has nothing legitimate to move and
+     would otherwise go to the page/visual viewport behind the overlay (the
+     whole-screen drag with the keyboard up). Carousels keep their sideways
+     swipe: their own pan-x pan-y intersected with this is pan-x. */
+  .search-body { padding: 14px 24px calc(14px + env(safe-area-inset-bottom)); overflow-y: hidden; touch-action: pan-x; }
   .search-section-label { font-size: 13px; letter-spacing: 1.1px; margin-bottom: 8px; }
   .search-default .search-section-label + .search-section-label,
   .search-bundles-row + .search-section-label {
@@ -3500,7 +3507,7 @@ body.overlay-up .offer-side-tab {
      keeps even a full ~10-result match (6 products + 4 bundles, the most
      any one query can return) inside the available height without
      scrolling — verified directly, not just estimated. */
-  .search-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; overflow: hidden; }
+  .search-results { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; overflow: hidden; min-height: 0; }
   .search-result-item { padding: 8px; gap: 10px; border-bottom: none; border: 1.5px solid var(--line-soft); border-radius: 12px; }
   .search-result-thumb { width: 44px; height: 44px; border-radius: 11px; font-size: 24px; }
   .search-result-name { font-size: 13.5px; }

@@ -1080,7 +1080,35 @@ function openSearch() {
       searchBlogCarouselCtrl.sync();
     });
   }
+  searchBindEdgeNudge();
+  requestAnimationFrame(searchEdgeNudge);
   searchDebugStart();
+}
+
+// task 148: keep .search-body 1px away from both of its scroll edges.
+// iOS hands a vertical swipe to the PAGE (which, with the keyboard up, can
+// pan by the keyboard's height, dragging the whole overlay with it) whenever
+// the inner scroller can't move in the swipe's direction — at scrollTop 0 a
+// downward drag, at the bottom an upward one, and in both directions when
+// the content has no scroll room at all (the first-open case on a phone).
+// Sitting 1px inside both edges means it can always scroll both ways, so
+// iOS always gives the gesture to it. CSS guarantees >= 2px of room (see
+// .search-default/.search-results min-height). Passive and only touches
+// scrollTop, so carousel swipes and taps are unaffected. Not used on iPad,
+// where .search-body never scrolls (max < 2 there, so this is a no-op).
+function searchEdgeNudge() {
+  var b = document.getElementById('searchBody');
+  if (!b || !searchIsOpen()) return;
+  var max = b.scrollHeight - b.clientHeight;
+  if (max < 2) return;
+  if (b.scrollTop <= 0) b.scrollTop = 1;
+  else if (b.scrollTop >= max) b.scrollTop = max - 1;
+}
+function searchBindEdgeNudge() {
+  var b = document.getElementById('searchBody');
+  if (!b || b._edgeNudgeBound) return;
+  b._edgeNudgeBound = true;
+  b.addEventListener('touchstart', searchEdgeNudge, { passive: true });
 }
 
 // TEMPORARY DIAGNOSTIC (tasks 146/148) — on-device verification of the
@@ -1120,7 +1148,7 @@ function searchDebugHud() {
   _searchDebugMax.vvTop = Math.max(_searchDebugMax.vvTop, vvTop);
   _searchDebugMax.winY = Math.max(_searchDebugMax.winY, Math.abs(window.scrollY));
   var lines = [
-    'BUILD 148b   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'BUILD 148c   t=' + (Date.now() - _searchDebugT0) + 'ms',
     'window.scrollY='+ r(window.scrollY) + '  (max ' + r(_searchDebugMax.winY) + ')',
     'scrollingEl.scrollTop=' + r(se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
