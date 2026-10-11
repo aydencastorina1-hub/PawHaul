@@ -1080,6 +1080,7 @@ function openSearch() {
       searchBlogCarouselCtrl.sync();
     });
   }
+  searchResetScroll();
   searchTouchGuard(true);
 }
 
@@ -1089,45 +1090,85 @@ function openSearch() {
 // iOS gives those swipes to sliding the whole visible area instead (the
 // overlay, search bar included, moved by up to the keyboard height). So
 // while search is open, every VERTICAL drag is cancelled (iOS gets nothing
-// to slide) and .search-body is scrolled from the finger's own movement,
-// then coasts after release. Sideways drags (carousels, caret in the input)
-// stay native — the axis is decided once per gesture after 3px, inside
-// iOS's own slop. Drags starting outside .search-body scroll nothing.
+// to slide) and the content is moved from the finger's own movement.
+// Sideways drags (carousels, caret in the input) stay native — the axis is
+// decided once per gesture after 3px, inside iOS's own slop. Drags starting
+// outside .search-body (search bar, input, back button) move nothing.
 //
-// Smoothness: geometry is read once per gesture (no layout work per touch
-// event), the scroll position is written at most once per animation frame,
-// release velocity is a smoothed estimate, and the coast uses UIScrollView's
-// own normal deceleration rate (0.998 per ms), so it eases out like iOS.
-var _searchTouch = null;
-var _searchGlide = 0;
-var _searchWrite = 0;
+// On a phone the content moves as a GPU transform on #searchScroller
+// (.search-body doesn't scroll there — styles.css), written immediately on
+// every touchmove: compositor-only, no repaint, no frame of delay — which
+// is what setting scrollTop (main-thread scroll + repaint) couldn't give.
+// Past either edge it rubber-bands with iOS's own resistance curve and
+// springs back on release; a fling coasts at UIScrollView's normal
+// deceleration (0.998/ms). Anywhere else touch-driven (no phone layout)
+// it falls back to scrollTop; iPad's content never scrolls (task 141).
+var SEARCH_PHONE_MQ = '(max-width: 699px) and (hover: none) and (pointer: coarse)';
 var SEARCH_DECEL = 0.998;      // per ms, iOS UIScrollView "normal"
 var SEARCH_MAX_V = 6;          // px/ms cap on a release fling
-function searchScrollBody() {
+var _searchTouch = null;
+var _searchAnim = 0;
+var _searchY = 0;              // phone: current content offset (0 = top)
+
+function searchPhoneMode() {
+  return !!(window.matchMedia && window.matchMedia(SEARCH_PHONE_MQ).matches);
+}
+function searchStopAnim() {
+  if (_searchAnim) { cancelAnimationFrame(_searchAnim); _searchAnim = 0; }
+}
+function searchApplyY(y) {
+  var sc = document.getElementById('searchScroller');
+  if (sc) sc.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
+}
+// How far the content can move: its height minus the box's content area
+// (which already shrinks by the keyboard inset padding when it's up).
+function searchMaxY() {
   var b = document.getElementById('searchBody');
-  if (!b || getComputedStyle(b).overflowY === 'hidden') return null;   // iPad: never scrolls
-  return b;
+  var sc = document.getElementById('searchScroller');
+  if (!b || !sc) return 0;
+  var cs = getComputedStyle(b);
+  var inner = b.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  return Math.max(0, sc.offsetHeight - inner);
 }
-function searchStopGlide() {
-  if (_searchGlide) { cancelAnimationFrame(_searchGlide); _searchGlide = 0; }
+// Back to the top — on open, and whenever the content is swapped (typing).
+function searchResetScroll() {
+  searchStopAnim();
+  _searchY = 0;
+  searchApplyY(0);
+  var b = document.getElementById('searchBody');
+  if (b) b.scrollTop = 0;
 }
+// iOS's rubber-band: resistance grows the further past the edge you pull.
+function searchRubber(over, dim) {
+  return (1 - 1 / (over * 0.55 / dim + 1)) * dim;
+}
+
 function searchTouchStart(e) {
-  searchStopGlide();
   if (!searchIsOpen() || e.touches.length !== 1) { _searchTouch = null; return; }
   var t = e.touches[0], tg = e.target;
-  var inBody = !!(tg && tg.closest && tg.closest('#searchBody'));
-  var b = inBody ? searchScrollBody() : null;
+  var b = document.getElementById('searchBody');
+  var inBody = !!(b && tg && tg.closest && tg.closest('#searchBody'));
+  var mode = null;
+  if (inBody) {
+    if (searchPhoneMode()) mode = 'transform';
+    else if (getComputedStyle(b).overflowY !== 'hidden') mode = 'scrollTop';
+  }
+  // A touch during a coast or spring catches it where it is.
+  searchStopAnim();
+  if (mode === 'transform') {
+    var max0 = searchMaxY();
+    _searchY = Math.max(0, Math.min(max0, _searchY));
+    searchApplyY(_searchY);
+  }
   _searchTouch = {
     x: t.clientX, y: t.clientY, lastY: t.clientY, lastT: e.timeStamp,
-    axis: null, b: b, v: 0,
-    pos: b ? b.scrollTop : 0,
-    max: b ? b.scrollHeight - b.clientHeight : 0,
+    axis: null, mode: mode, b: b, v: 0,
+    start: mode === 'transform' ? _searchY : (b ? b.scrollTop : 0),
+    max: mode === 'transform' ? searchMaxY() : (b ? b.scrollHeight - b.clientHeight : 0),
+    dim: b ? b.clientHeight : 1,
+    pos: 0,
   };
-}
-function searchFlushWrite() {
-  _searchWrite = 0;
-  var g = _searchTouch;
-  if (g && g.b) g.b.scrollTop = g.pos;
+  _searchTouch.pos = _searchTouch.start;
 }
 function searchTouchMove(e) {
   var g = _searchTouch;
@@ -1140,46 +1181,64 @@ function searchTouchMove(e) {
   }
   if (g.axis !== 'y') return;
   if (e.cancelable) e.preventDefault();
-  if (!g.b) return;
-  var step = t.clientY - g.lastY;
+  if (!g.mode) return;
   var dt = Math.max(1, e.timeStamp - g.lastT);
+  var step = t.clientY - g.lastY;
   g.lastY = t.clientY;
   g.lastT = e.timeStamp;
-  g.pos = Math.max(0, Math.min(g.max, g.pos - step));
-  // smoothed velocity (px/ms, + = finger moving down)
-  g.v = 0.8 * (step / dt) + 0.2 * g.v;
-  if (!_searchWrite) _searchWrite = requestAnimationFrame(searchFlushWrite);
+  g.v = 0.8 * (step / dt) + 0.2 * g.v;          // px/ms, + = finger down
+  var raw = g.start - dy;                       // where the content "wants" to be
+  if (g.mode === 'transform') {
+    var y = raw;
+    if (raw < 0) y = -searchRubber(-raw, g.dim);
+    else if (raw > g.max) y = g.max + searchRubber(raw - g.max, g.dim);
+    g.pos = y;
+    _searchY = y;
+    searchApplyY(y);                            // immediately, no rAF delay
+  } else {
+    g.pos = Math.max(0, Math.min(g.max, raw));
+    g.b.scrollTop = g.pos;
+  }
 }
-function searchGlide(g) {
-  if (!g || g.axis !== 'y' || !g.b) return;
-  var b = g.b, max = g.max, pos = g.pos;
-  b.scrollTop = pos;
-  // g.idle: finger held still before lifting, so no coast
-  var v = Math.max(-SEARCH_MAX_V, Math.min(SEARCH_MAX_V, g.v));
-  if (g.idle || Math.abs(v) < 0.08) return;
-  var last = performance.now();
+// Ease back from a rubber-banded overshoot to the edge (~300ms, ease-out).
+function searchSpringTo(target) {
+  var from = _searchY, t0 = performance.now(), dur = 320;
+  function frame(now) {
+    var k = Math.min(1, (now - t0) / dur);
+    var e = 1 - Math.pow(1 - k, 3);
+    _searchY = from + (target - from) * e;
+    searchApplyY(_searchY);
+    _searchAnim = k < 1 ? requestAnimationFrame(frame) : 0;
+  }
+  _searchAnim = requestAnimationFrame(frame);
+}
+function searchRelease(g, flung) {
+  if (!g || g.axis !== 'y' || !g.mode) return;
+  var v = flung ? Math.max(-SEARCH_MAX_V, Math.min(SEARCH_MAX_V, g.v)) : 0;
+  if (g.mode === 'transform') {
+    if (_searchY < 0) return searchSpringTo(0);
+    if (_searchY > g.max) return searchSpringTo(g.max);
+  }
+  if (Math.abs(v) < 0.08) return;
+  var pos = g.pos, max = g.max, last = performance.now();
   function frame(now) {
     var dt = Math.min(32, Math.max(1, now - last)); last = now;
     pos -= v * dt;
     v *= Math.pow(SEARCH_DECEL, dt);
-    if (pos <= 0 || pos >= max) { b.scrollTop = Math.max(0, Math.min(max, pos)); _searchGlide = 0; return; }
-    b.scrollTop = pos;
-    if (Math.abs(v) < 0.01) { _searchGlide = 0; return; }
-    _searchGlide = requestAnimationFrame(frame);
+    var hit = pos <= 0 || pos >= max;
+    pos = Math.max(0, Math.min(max, pos));
+    if (g.mode === 'transform') { _searchY = pos; searchApplyY(pos); }
+    else g.b.scrollTop = pos;
+    _searchAnim = (hit || Math.abs(v) < 0.01) ? 0 : requestAnimationFrame(frame);
   }
-  _searchGlide = requestAnimationFrame(frame);
+  _searchAnim = requestAnimationFrame(frame);
 }
 function searchTouchEnd(e) {
   if (e.touches.length) return;
   var g = _searchTouch;
   _searchTouch = null;
-  if (_searchWrite) { cancelAnimationFrame(_searchWrite); _searchWrite = 0; }
-  if (g && e.type === 'touchend') {
-    g.idle = e.timeStamp - g.lastT > 100;  // finger had stopped before lifting
-    searchGlide(g);
-  } else if (g && g.b) {
-    g.b.scrollTop = g.pos;
-  }
+  // No coast if the finger was held still before lifting (or cancelled).
+  if (g) searchRelease(g, e.type === 'touchend' && e.timeStamp - g.lastT <= 100);
   searchSnapViewport();
 }
 // Backstop: if iOS slid the visible area anyway, put it back instantly
@@ -1201,7 +1260,7 @@ function searchTouchGuard(on) {
   document[fn]('touchmove', searchTouchMove, { passive: false });
   document[fn]('touchend', searchTouchEnd, { passive: true });
   document[fn]('touchcancel', searchTouchEnd, { passive: true });
-  if (!on) { _searchTouch = null; searchStopGlide(); }
+  if (!on) { _searchTouch = null; searchStopAnim(); }
 }
 
 // Shared by closeSearch() and closeSearchAnimated() below: the actual
@@ -1622,6 +1681,9 @@ function searchResultBundleHtml(b, hl) {
 // Bowl", "...Leash", "Anti-Drop Leash Wrist Strap"). "bundle" is handled
 // separately below since it's not naturally part of any bundle's name.
 function doSearch(val) {
+  // The content is about to change height — start it at the top (task 148:
+  // the phone scroller's offset is ours to reset, not the browser's).
+  searchResetScroll();
   var defaultEl = document.getElementById('searchDefault');
   var resultsEl = document.getElementById('searchResults');
   var clearBtn = document.getElementById('searchClearBtn');

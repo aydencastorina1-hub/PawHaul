@@ -2996,20 +2996,17 @@ body.overlay-up .offer-side-tab {
 }
 .search-body::-webkit-scrollbar { display: none; }
 
-/* task 148: always a little taller than the box, so .search-body is a
-   real scroll container from the very first touch (app.js's touchmove
-   guard handles the edges). On a phone the default
-   view fits the screen exactly with the keyboard closed, so on first open
-   (before any --search-kb-inset padding exists) a vertical swipe found
-   nothing to scroll here and iOS handed it to the page instead — which,
-   with the keyboard up, can pan by the keyboard's height, dragging the
-   whole overlay. Measured on-device: content scrollTop 0 throughout while
-   window.scrollY / visualViewport.offsetTop went to 148-232. Later opens
-   were fine only because the stale inset padding from the first open made
-   this overflow. The iPad block resets .search-default to min-height:0
-   (its no-scroll fit from tasks 141/142). */
-.search-default,
-.search-results { min-height: calc(100% + 2px); }
+/* task 148: on a phone the search content is scrolled by app.js moving
+   .search-scroller with a GPU transform (see searchTouchMove for why: with
+   the keyboard up iOS never scrolls this box natively, it slides the whole
+   screen instead). So the box itself doesn't scroll there, and the
+   scroller gets its own compositing layer so moving it never repaints the
+   cards. Same media condition app.js uses (SEARCH_PHONE_MQ); desktop keeps
+   native wheel scrolling, iPad never scrolls (task 141). */
+@media (max-width: 699px) and (hover: none) and (pointer: coarse) {
+  .search-body { overflow: hidden; }
+  .search-scroller { will-change: transform; transform: translate3d(0, 0, 0); }
+}
 
 .search-section-label {
   font-family: var(--font-body);
@@ -3355,6 +3352,9 @@ body.overlay-up .offer-side-tab {
      141). flex:1 on both, not just a bare flex-grow number: the shorthand
      sets flex-basis:0 too, which is what makes the split a pure 1:1 ratio
      of the free space regardless of either section's own content. */
+  /* task 148: .search-default's height:100% now resolves against this
+     wrapper, so it has to fill .search-body exactly too. */
+  .search-scroller { height: 100%; }
   .search-default {
     display: flex;
     flex-direction: column;
