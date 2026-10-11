@@ -83,12 +83,14 @@ var products = [
       "/images/products/bottle-feature-3.jpg"
     ],
 
-    // This product's gallery never pads itself out with the OTHER variants'
-    // main photos the way the rest of the catalogue does. With six variants
-    // that differ by body material, a steel bottle sitting in the Plastic
-    // Blue gallery reads as another angle of what you are about to buy.
-    // See renderDetailGallery().
-    galleryOmitsOtherVariants: true,
+    // TASK 150 replaced task 149's `galleryOmitsOtherVariants` here. 149 hid
+    // the other variants because a steel bottle sitting in the Plastic Blue
+    // gallery read as another angle of the thing you were about to buy. That
+    // objection is answered rather than avoided now: the gallery carries all
+    // six variant photos, and swiping ONTO one SELECTS it, so a slide is
+    // never a different variant from the one the page is offering. See
+    // detailGallerySlides().
+    galleryShowsAllVariants: true,
 
     // Selling prices match Shopify exactly. The `was` figures do NOT —
     // Shopify's compare-at is 12.99 / 14.99 / 17.99 against these 14.99 /
@@ -248,10 +250,10 @@ var products = [
       "/images/products/poop-bag-clip-lifestyle-2.jpg"
     ],
 
-    // Slide 1 is the only slide that claims to be the colour you picked, and
-    // with six near-identical fobs the other five read as alternate shots of
-    // the same item rather than as other colours. See renderDetailGallery().
-    galleryOmitsOtherVariants: true,
+    // TASK 150, as on product 1: all six colours are in the gallery, and
+    // swiping onto one selects it, so no slide ever shows a colour other
+    // than the one currently selected. See detailGallerySlides().
+    galleryShowsAllVariants: true,
 
     // Real Shopify variant GIDs (Storefront API) from the replacement
     // product 10185921069312.
@@ -1791,12 +1793,11 @@ function variantPhotoPool(p) {
 // screen, so tapping a colour or a tier swaps slide 1 from disk rather than
 // from the network.
 //
-// This used to happen by accident: renderDetailGallery appends every other
-// colour's main photo as a real (lazy) slide, which puts those URLs in the
-// DOM where the carousel's warm() can promote them. The two products that
-// now set `galleryOmitsOtherVariants` have no such slides, so without this
-// their first variant tap would show an empty box until the fetch landed —
-// the flash the task-149 brief rules out.
+// Still earning its place after task 150 put every variant into the gallery
+// as a real slide. The carousel's warm() only promotes a WINDOW around the
+// current slide, so a swatch tap that jumps from the first variant to the
+// last still lands on a slide the window never reached. This keeps that jump
+// instant; warm() keeps the swiping instant.
 //
 // Deliberately an off-DOM Image(): no layout, no second element that could
 // paint. The fetch is the point and the HTTP cache is where it lands. Run
@@ -1846,54 +1847,122 @@ function productCard(p, opts) {
 }
 
 // ==================== PRODUCT DETAIL ====================
-// Shopify gives exactly one real photo per color variant (no multi-angle
-// gallery data is available via the Storefront API for this catalog) — so
-// the "gallery" is just that one photo, swapped whenever the color changes.
-// No carousel controls are rendered since there's nothing to page between.
+// Builds the gallery's slide list for the product currently open.
+//
+// TWO MODES.
+//
+// The CLASSIC mode (everything without `galleryShowsAllVariants`) is the
+// task-26 rule and is unchanged: the selected colour's photo, then the shared
+// shots, then every other colour. It is rebuilt on each colour tap, so slide 1
+// is always the selected colour.
+//
+// The ALL-VARIANTS mode (task 150, products 1 and 3) puts EVERY usable photo
+// in one list: every variant's own photo in swatch order, then the shared
+// shots. The list is STABLE — it is built once per product open and is NOT
+// rebuilt when the selection changes, because the gallery and the swatches are
+// now two views of one selection: tapping a swatch scrolls the gallery to that
+// variant, and swiping onto a variant's photo selects it. Rebuilding on
+// selection would mean a swipe reordered the very track being swiped, which
+// yanks the slide out from under the finger.
+//
+// That stability is also why "the selected variant's photo is first" holds
+// without any rotation at the swatch level: a product page always opens on the
+// default variant (cheapest size x first colour), and the rotation below puts
+// exactly that variant at index 0. From then on the ORDER is fixed and the
+// SELECTION moves, which is what makes a swipe mean something.
+//
+// Each slide carries the variant it belongs to (or null for a shared shot), so
+// the carousel can map scroll position back to a real variant and so each
+// slide's alt text names the variant it actually shows.
+function detailGallerySlides(p) {
+  var slides = [];
+  var seen = {};
+  function add(url, size, color) {
+    if (!url || seen[url]) return;
+    seen[url] = 1;
+    slides.push({ url: url, size: size || null, color: color || null });
+  }
+
+  if (p.galleryShowsAllVariants) {
+    var sizes = (p.sizes && p.sizes.length) ? p.sizes : [null];
+    var colors = (p.colors && p.colors.length) ? p.colors : [null];
+    var variants = [];
+    for (var si = 0; si < sizes.length; si++) {
+      for (var ci = 0; ci < colors.length; ci++) {
+        // A combo Shopify does not sell has no photo worth showing and
+        // could not be selected by swiping onto it anyway.
+        if (variantUnavailable(p, sizes[si], colors[ci])) continue;
+        variants.push({ size: sizes[si], color: colors[ci] });
+      }
+    }
+    // Rotate so the variant the page opens on leads. For both of today's
+    // products the default already sits at index 0 and this is a no-op; it
+    // exists so the "selected photo first" guarantee does not quietly depend
+    // on the cheapest size happening to be the first one listed.
+    var def = lowestVariant(p);
+    var defSize = (def && def.size) || sizes[0];
+    var defColor = colors[0];
+    var at = -1;
+    for (var k = 0; k < variants.length; k++) {
+      if (variants[k].size === defSize && variants[k].color === defColor) { at = k; break; }
+    }
+    if (at > 0) variants = variants.slice(at).concat(variants.slice(0, at));
+
+    variants.forEach(function (v) {
+      // Read the variant map directly, never productImageFor(): its fallback
+      // to the default colour would re-add an earlier slide under a different
+      // variant's name, which is exactly the mislabelling this avoids.
+      var url = p.variantImages
+        ? p.variantImages[v.size + '|' + v.color]
+        : (p.images && p.images[v.color]);
+      add(url, v.size, v.color);
+    });
+    (p.extraImages || []).forEach(function (u) { add(u, null, null); });
+    return slides;
+  }
+
+  // ---- classic mode ----
+  // The slide is tagged with the COLOUR only, never the size, even though the
+  // size is passed to productImageFor: no classic-mode product keys its photo
+  // on the size axis (those buttons are collar lengths and leash lengths of an
+  // identically-photographed item), so naming the size in the alt would tell a
+  // screen reader this photo shows a size that it does not show. Only
+  // all-variants products, whose photo really does depend on both axes, carry
+  // a size on their slides.
+  var c = currentColor || (p.colors && p.colors[0]);
+  var s = currentSize || (p.sizes && p.sizes[0]);
+  add(productImageFor(p, c, s), null, c);
+  (p.extraImages || []).forEach(function (u) { add(u, null, null); });
+  (p.colors || []).forEach(function (other) {
+    if (other === c) return;
+    add(p.images && p.images[other], null, other);
+  });
+  return slides;
+}
+
+// Index of the slide showing a given variant, or -1. Used to point the
+// gallery at a variant when its swatch is tapped.
+function gallerySlideIndexFor(slides, size, color) {
+  for (var i = 0; i < slides.length; i++) {
+    if (!slides[i].color) continue;
+    if (slides[i].color !== color) continue;
+    if (slides[i].size && size && slides[i].size !== size) continue;
+    return i;
+  }
+  return -1;
+}
+
+// The slide list the OPEN gallery was built from. Held so that a swatch tap
+// and a swipe can both resolve between slide index and variant without
+// rebuilding anything.
+var _detailSlides = [];
+
 function renderDetailGallery(color, size) {
   var detailImg = document.getElementById('detailImg');
   if (!detailImg || !currentProduct) return;
-  var c = color || (currentProduct.colors && currentProduct.colors[0]);
-  // Tier/size reaches the photo only for a product with a variantImages
-  // map; productImageFor ignores it for everything else. Defaulting to
-  // currentSize (not sizes[0]) is what makes a tier tap repaint slide 1.
-  var s = size || currentSize || (currentProduct.sizes && currentProduct.sizes[0]);
-  var mainUrl = productImageFor(currentProduct, c, s);
 
-  // Slide order, rebuilt on every colour tap:
-  //   1. the selected colour's own photo,
-  //   2. the shared non-colour-specific shots (lifestyle, detail, size
-  //      comparison) from extraImages, in the order the product lists them,
-  //   3. every OTHER colour this product sells, in catalogue order.
-  // Group 3 means the whole range is browsable from the gallery without
-  // hunting the swatches, while slide 1 stays the only slide the page
-  // presents as "the" selected colour. Each slide carries its own alt, so a
-  // slide that does show a specific colour says which one — an unlabelled
-  // alt on another colour's photo is exactly the mismatch this ordering is
-  // designed to avoid.
-  var slides = [];
-  function addSlide(url, colorName) {
-    if (!url) return;
-    for (var j = 0; j < slides.length; j++) if (slides[j].url === url) return;
-    slides.push({ url: url, color: colorName || null });
-  }
-  addSlide(mainUrl, c);
-  (currentProduct.extraImages || []).forEach(function (u) { addSlide(u, null); });
-  // Group 3 is opt-OUT. `galleryOmitsOtherVariants` is set on the two
-  // products whose variants are near-identical silhouettes (the clip) or
-  // differ by body material rather than colour (the bottle): there, another
-  // variant's main photo in this gallery reads as another angle of the
-  // thing you are about to buy, not as a different variant. Those two
-  // galleries are slide 1 plus the shared pool and nothing else.
-  if (!currentProduct.galleryOmitsOtherVariants) {
-    // Read `images` directly rather than through productImageFor(): its
-    // fallback to the default colour would re-add slide 1 under someone
-    // else's name for any colour that has no photo of its own.
-    (currentProduct.colors || []).forEach(function (other) {
-      if (other === c) return;
-      addSlide(currentProduct.images && currentProduct.images[other], other);
-    });
-  }
+  var slides = detailGallerySlides(currentProduct);
+  _detailSlides = slides;
   var urls = slides.map(function (s) { return s.url; });
 
   if (!urls.length) {
@@ -1914,8 +1983,22 @@ function renderDetailGallery(color, size) {
   // fetching all of them on every product view is exactly the waste the
   // lazy-loading was added to avoid — most visitors never page past the
   // first shot.
+  // A variant slide says WHICH variant, so a screen reader hears the same
+  // thing the swatches say; a shared shot stays unlabelled rather than
+  // borrowing the selected variant's name.
+  function slideLabel(s) {
+    if (!s.color && !s.size) return '';
+    var bits = [];
+    // Only name the size when it is a real option axis (the clip's single
+    // "Universal - fits all leashes" is noise in an alt string).
+    if (s.size && currentProduct.sizes && currentProduct.sizes.length > 1) bits.push(s.size);
+    if (s.color) bits.push(s.color);
+    return bits.join(' ');
+  }
+
   var slidesHtml = slides.map(function (s, i) {
-    var alt = currentProduct.name + (s.color ? ' — ' + s.color : '');
+    var label = slideLabel(s);
+    var alt = currentProduct.name + (label ? ' — ' + label : '');
     var opts = i === 0 ? { priority: true } : (i === 1 ? { eager: true } : null);
     return '<div class="det-slide"><img ' +
       photoAttrs(s.url, 'detail', opts) +
@@ -1928,6 +2011,14 @@ function renderDetailGallery(color, size) {
     return;
   }
 
+  // DOTS OR A COUNTER, never both. A dot row only reads as a position once
+  // you can take it in at a glance; past about half a dozen it is a smear of
+  // identical circles that says nothing and eats width. These galleries now
+  // run to 8-13 slides, so anything longer than DOT_LIMIT gets "3 / 12"
+  // instead, which stays legible at any length.
+  var DOT_LIMIT = 6;
+  var useDots = urls.length <= DOT_LIMIT;
+
   // The dot row ships WITH its dots already in it (first one active), rather
   // than as an empty div for initDetailCarousel() to fill on its 30ms timer.
   // An empty .det-dots is exactly one dot shorter than a filled one (8px —
@@ -1935,9 +2026,36 @@ function renderDetailGallery(color, size) {
   // whole block shrink then re-grow, jolting the colour swatches, sizes,
   // price and Add To Cart button 8px up and back on every colour tap. That
   // was the "screen shakes when selecting a colour" bug. styles.css also
-  // carries a min-height on .det-dots as a structural backstop.
-  var dotsHtml = urls.map(function (_, i) {
+  // carries a min-height on .det-dots as a structural backstop. The counter
+  // ships filled in for the same reason.
+  var dotsHtml = useDots ? urls.map(function (_, i) {
     return '<span class="det-dot' + (i === 0 ? ' active' : '') + '"></span>';
+  }).join('') : '';
+
+  var counterHtml = useDots ? '' :
+    '<div class="det-counter" id="detCounter" aria-hidden="true">1 / ' + urls.length + '</div>';
+
+  // Thumbnail strip. CSS shows it only where there is room for it (>=768px —
+  // iPad and desktop); on a phone the swipe, the arrows and the counter are
+  // the navigation and the extra row would just push the price below the
+  // fold. Rendered regardless so a resize needs no re-render.
+  //
+  // Each thumb is a real <button> so it is tabbable and announces itself; the
+  // image inside is aria-hidden because the button's own label already says
+  // which slide it jumps to.
+  var thumbsHtml = slides.map(function (s, i) {
+    var label = slideLabel(s);
+    // The first six are the ones on screen before the strip scrolls, so they
+    // load eagerly — at `thumb` sizes that is a few KB each — and never
+    // shimmer in under the main photo. They stay fetchpriority LOW (that is
+    // what opts.eager means here) so they queue behind slide 1, which is the
+    // page's LCP. The rest stay lazy.
+    var opts = i < 6 ? { eager: true } : null;
+    return '<button type="button" class="det-thumb' + (i === 0 ? ' active' : '') + '" ' +
+      'data-i="' + i + '" aria-label="Show image ' + (i + 1) + ' of ' + urls.length +
+      (label ? ': ' + esc(label) : '') + '">' +
+      '<img ' + photoAttrs(s.url, 'thumb', opts) + ' alt="" aria-hidden="true"' +
+      imgOnErrorToEmoji(currentProduct.emoji) + '></button>';
   }).join('');
 
   detailImg.innerHTML =
@@ -1945,8 +2063,14 @@ function renderDetailGallery(color, size) {
       '<div class="det-track" id="detTrack">' + slidesHtml + '</div>' +
       '<button class="det-prev disabled" id="detPrev" aria-label="Previous">&#8249;</button>' +
       '<button class="det-next" id="detNext" aria-label="Next">&#8250;</button>' +
+      counterHtml +
     '</div>' +
-    '<div class="det-dots" id="detDots">' + dotsHtml + '</div>';
+    // In counter mode the dots row is omitted ENTIRELY rather than rendered
+    // empty: .det-dots carries a min-height backstop, so an empty one would
+    // reserve a blank 36px band under every long gallery. Which mode a
+    // product uses never changes between renders, so no layout can shift.
+    (useDots ? '<div class="det-dots" id="detDots">' + dotsHtml + '</div>' : '') +
+    '<div class="det-thumbs" id="detThumbs">' + thumbsHtml + '</div>';
   setTimeout(function () { if (typeof initDetailCarousel === 'function') initDetailCarousel(); }, 30);
 }
 
@@ -2055,6 +2179,75 @@ function selectOption(btn) {
   btn.classList.add('active');
 }
 
+// THE SINGLE PLACE that decides how the gallery follows a change of variant.
+//
+// Classic galleries are REBUILT, because slide 1 is defined as "the selected
+// colour" and the rest of the list hangs off that.
+//
+// All-variants galleries (task 150) are SCROLLED instead. Their slide list is
+// fixed for the life of the product view, every variant already has a slide in
+// it, and rebuilding would destroy the very track the visitor may be mid-swipe
+// on. `fromGallery` is set when the selection was itself caused by a swipe —
+// then the gallery is already in the right place and must not be told to move,
+// or it would fight the finger.
+// Set while a selection is being applied BECAUSE of a gallery swipe. Anything
+// that would normally push the gallery to follow the selection checks this
+// first, so a swipe can never cause a programmatic scroll back at the finger.
+// It is a flag rather than an argument because the push can come from deep
+// inside updateVariantAvailability(), which has no idea what started it.
+var _selectingFromGallery = false;
+
+function syncGalleryToSelection(fromGallery) {
+  if (!currentProduct) return;
+  if (_selectingFromGallery && !currentProduct.galleryShowsAllVariants) return;
+  if (!currentProduct.galleryShowsAllVariants) {
+    // Only products whose photo actually depends on the size axis need a
+    // rebuild on a size tap; for the rest the size buttons are lengths of an
+    // identically-photographed item and a rebuild would throw away the slide
+    // the visitor had paged to.
+    renderDetailGallery(currentColor, currentSize);
+    return;
+  }
+  if (fromGallery || _selectingFromGallery) return;
+  var i = gallerySlideIndexFor(_detailSlides, currentSize, currentColor);
+  if (i < 0) return;
+  if (typeof detailCarouselGoTo === 'function') detailCarouselGoTo(i);
+}
+
+// Called by the carousel when a SWIPE (or an arrow, or a thumbnail) brings a
+// new slide to rest. A slide that belongs to a variant selects that variant —
+// swatch, price, Add To Cart and Shop Pay all follow. A shared shot carries no
+// variant and deliberately leaves the selection exactly as it was.
+function selectVariantFromGallery(index) {
+  if (!currentProduct || !currentProduct.galleryShowsAllVariants) return;
+  var slide = _detailSlides[index];
+  if (!slide || !slide.color) return;
+  var size = slide.size || currentSize;
+  if (slide.color === currentColor && size === currentSize) return;
+
+  _selectingFromGallery = true;
+  currentColor = slide.color;
+  if (slide.size) currentSize = slide.size;
+
+  // Mirror the new selection onto the option rows without going through
+  // selectSize/selectColorOption, which would try to move the gallery back.
+  document.querySelectorAll('#detailColors .option-btn').forEach(function (b) {
+    b.classList.toggle('active', b.textContent.trim() === currentColor);
+  });
+  document.querySelectorAll('#detailSizes .option-btn').forEach(function (b) {
+    b.classList.toggle('active', b.textContent.trim() === currentSize);
+  });
+
+  var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
+  currentVariantPrice = variant ? variant.price : currentProduct.price;
+  setDetailPrice(currentVariantPrice);
+  updateVariantAvailability();
+  // Updates the existing <shop-pay-button> in place (see renderDetailShopPay)
+  // — no element is replaced, so this cannot flash while swiping.
+  renderDetailShopPay();
+  _selectingFromGallery = false;
+}
+
 // Color buttons use this instead of selectOption directly: it also tracks
 // currentColor and re-checks size availability (some size+color combos are
 // marked out of stock — see variantUnavailable()).
@@ -2062,7 +2255,7 @@ function selectColorOption(btn) {
   selectOption(btn);
   currentColor = btn.textContent.trim();
   updateVariantAvailability();
-  renderDetailGallery(currentColor, currentSize);
+  syncGalleryToSelection();
   renderDetailShopPay();
 }
 
@@ -2095,7 +2288,7 @@ function updateVariantAvailability() {
   setDetailPrice(currentVariantPrice);
   // Jumping to a different size here can change the photo as well as the
   // price, on a product whose photo is keyed to both axes.
-  if (currentProduct.variantImages) renderDetailGallery(currentColor, currentSize);
+  if (currentProduct.variantImages || currentProduct.galleryShowsAllVariants) syncGalleryToSelection();
 }
 
 // Writes the selling price on the detail page (main price block AND the sticky
@@ -2129,12 +2322,10 @@ function selectSize(btn) {
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
   setDetailPrice(currentVariantPrice);
-  // A size tap repaints the gallery ONLY where size actually changes the
-  // photograph. For every other product the size buttons are lengths or
-  // capacities of an identically-photographed item, and rebuilding the
-  // carousel would throw away the slide the visitor had paged to for no
-  // visible gain.
-  if (currentProduct.variantImages) renderDetailGallery(currentColor, currentSize);
+  // A material/size tap moves the gallery only where the photo actually
+  // depends on that axis. For the rest the size buttons are lengths of an
+  // identically-photographed item.
+  if (currentProduct.variantImages || currentProduct.galleryShowsAllVariants) syncGalleryToSelection();
   renderDetailShopPay();
 }
 

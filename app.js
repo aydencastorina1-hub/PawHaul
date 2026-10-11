@@ -1864,7 +1864,11 @@ function doSearch(val) {
 
 // Shared engine for every carousel on the site. `dots` is optional (only the
 // product gallery has them); pass null for the rest.
-function bindCarousel(track, prev, next, dots, signal) {
+// `onChange` (optional) is called with the resting slide index, and ONLY when
+// that index actually changes — sync() runs on every animation frame of a
+// scroll, and a callback that re-selected a product variant sixty times a
+// second would be both wasteful and jumpy.
+function bindCarousel(track, prev, next, dots, signal, onChange) {
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function maxScroll() { return Math.max(0, track.scrollWidth - track.clientWidth); }
@@ -1916,6 +1920,7 @@ function bindCarousel(track, prev, next, dots, signal) {
   // Arrow disabled state is driven by the SCROLL POSITION, not by a counted
   // index — that is what stops the next arrow staying enabled with nothing
   // left to reveal once several cards share a view.
+  var lastIndex = -1;
   function sync() {
     var atStart = track.scrollLeft <= 1;
     var atEnd = track.scrollLeft >= maxScroll() - 1;
@@ -1933,6 +1938,10 @@ function bindCarousel(track, prev, next, dots, signal) {
       for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('active', i === c);
     }
     warm(c);
+    if (c !== lastIndex) {
+      lastIndex = c;
+      if (onChange) onChange(c);
+    }
   }
 
   // Pull the slides on either side of the current one out of the lazy queue
@@ -2044,12 +2053,19 @@ function initPcCarousel(trackId, prevId, nextId, dotsId) {
 // product never calls this. renderDetailGallery rebuilds this whole subtree
 // on every colour tap, so the track is a fresh element each time and the
 // listeners bound here go with the old one.
+// Lets products.js point the open gallery at a slide (a swatch tap) without
+// knowing anything about the carousel. Rebound on every gallery render; null
+// when no multi-slide gallery is on screen.
+var detailCarouselGoTo = null;
+
 function initDetailCarousel() {
   var track = document.getElementById('detTrack');
   var prev = document.getElementById('detPrev');
   var next = document.getElementById('detNext');
   var dotsWrap = document.getElementById('detDots');
-  if (!track || !prev || !next) return;
+  var thumbsWrap = document.getElementById('detThumbs');
+  var counter = document.getElementById('detCounter');
+  if (!track || !prev || !next) { detailCarouselGoTo = null; return; }
 
   var total = track.children.length;
   // renderDetailGallery() already ships the dots in the markup so the row is
@@ -2057,16 +2073,50 @@ function initDetailCarousel() {
   // Only build them here if this ran against markup that lacks them, and
   // never rebuild a row that already has the right number — replacing them
   // for nothing would reintroduce the same shrink/re-grow.
+  //
+  // A long gallery has no dots row at all (it uses the counter instead), so
+  // the absence of #detDots is normal and must not be "repaired" into one.
   if (dotsWrap && dotsWrap.children.length !== total) {
     dotsWrap.innerHTML = Array.from({ length: total }, function () { return '<span class="det-dot"></span>'; }).join('');
   }
   var dots = dotsWrap ? dotsWrap.querySelectorAll('.det-dot') : [];
+  var thumbs = thumbsWrap ? thumbsWrap.querySelectorAll('.det-thumb') : [];
 
   if (track._carouselAbort) track._carouselAbort.abort();
   var ac = new AbortController();
   track._carouselAbort = ac;
 
-  var api = bindCarousel(track, prev, next, dots, ac.signal);
+  // Keeps the thumb strip's own scroll position on the active thumb, so the
+  // one matching the big image is always reachable without hunting. Only
+  // scrolls the STRIP (nearest/inline), never the page.
+  function markThumb(c) {
+    for (var i = 0; i < thumbs.length; i++) thumbs[i].classList.toggle('active', i === c);
+    var el = thumbs[c];
+    if (el && thumbsWrap && thumbsWrap.scrollWidth > thumbsWrap.clientWidth + 1) {
+      var l = el.offsetLeft, r = l + el.offsetWidth;
+      if (l < thumbsWrap.scrollLeft || r > thumbsWrap.scrollLeft + thumbsWrap.clientWidth) {
+        thumbsWrap.scrollTo({ left: l - (thumbsWrap.clientWidth - el.offsetWidth) / 2, behavior: 'smooth' });
+      }
+    }
+  }
+
+  function onChange(c) {
+    if (counter) counter.textContent = (c + 1) + ' / ' + total;
+    markThumb(c);
+    // Swiping onto a variant's photo selects that variant — price, swatches,
+    // Add To Cart and Shop Pay follow the gallery. Shared shots carry no
+    // variant and leave the selection alone. products.js owns that rule.
+    if (typeof selectVariantFromGallery === 'function') selectVariantFromGallery(c);
+  }
+
+  var api = bindCarousel(track, prev, next, dots, ac.signal, onChange);
+  detailCarouselGoTo = function (i) { api.goTo(i); };
+
+  for (var t = 0; t < thumbs.length; t++) {
+    (function (i) {
+      thumbs[i].addEventListener('click', function () { api.goTo(i); }, { signal: ac.signal });
+    })(t);
+  }
   // A rebuilt gallery always opens on slide 1 (the selected colour's photo) —
   // but only actually scroll if it is not already there. renderDetailGallery
   // replaces this whole subtree, so the fresh track is at 0 already and this

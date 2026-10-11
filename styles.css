@@ -1769,6 +1769,88 @@ img.reviewer-av {
 .det-dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; border: 1.5px solid #aaa; transition: background 0.2s; }
 .det-dot.active { background: var(--orange); border-color: var(--orange); }
 
+/* ── GALLERY COUNTER (task 150) ──
+   Replaces the dot row once a gallery runs past six slides, where dots stop
+   reading as a position and become a smear of identical circles. Sits INSIDE
+   .det-carousel as an overlay so it costs no layout height at all — which is
+   also why swapping dots for a counter cannot shift the page.
+   `font-variant-numeric: tabular-nums` keeps "1 / 10" and "9 / 10" exactly
+   the same width, so the pill never twitches as you swipe. */
+.det-counter {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 5;
+  padding: 4px 10px;
+  border-radius: 50px;
+  background: rgba(26, 26, 46, 0.72);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+/* ── GALLERY THUMBNAIL STRIP (task 150) ──
+   Hidden by default: on a phone the swipe, the arrows and the counter are the
+   navigation, and this row would push the price and Add To Cart below the
+   fold. It appears from 768px up ("if there is room" — iPad and desktop).
+   Because the default is `display: none`, a phone never downloads layout for
+   it and a resize needs no re-render. */
+.det-thumbs { display: none; }
+
+@media (min-width: 768px) {
+  .det-thumbs {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Same contract as the task-88 tracks above: keep a horizontal fling
+       inside the strip, and grant BOTH axes so a finger landing on a thumb
+       can still scroll the page vertically (tasks 100/101). */
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y pinch-zoom;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .det-thumbs::-webkit-scrollbar { display: none; }
+  /* Fixed box, stated on the button rather than left to the image, so the row
+     reserves its exact height before a single thumb has decoded — nothing
+     shifts as they arrive. */
+  .det-thumb {
+    flex: 0 0 auto;
+    width: 62px;
+    height: 62px;
+    padding: 3px;
+    border-radius: 10px;
+    border: 2px solid var(--line-soft, #e8e2d9);
+    background: #fff;
+    cursor: pointer;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.15s var(--ease), opacity 0.15s var(--ease);
+    opacity: 0.72;
+  }
+  .det-thumb:hover { opacity: 1; }
+  .det-thumb.active { border-color: var(--orange); opacity: 1; }
+  /* SELECTOR: `.det-thumbs` is in there to out-specify `.main-img img`
+     further down this file (equal specificity but later, so it would win and
+     put every thumb on `cover` with an inherited radius). Same trap, and the
+     same fix, as `.det-carousel .det-slide img` above. */
+  .det-thumbs .det-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    background: none;
+    animation: none;
+    border-radius: 0;
+  }
+}
+
 .product-detail-info {
   padding: 24px 5%;
 }
