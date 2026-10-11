@@ -1078,6 +1078,70 @@ function openSearch() {
       searchBlogCarouselCtrl.sync();
     });
   }
+  searchDebugStart();
+}
+
+// task 146 TEMPORARY DIAGNOSTIC — not a fix, a trace. Task 146 reports the
+// search content "slowly scrolls itself back up" after the keyboard opens,
+// on the first open of a page load only. A full static read of this file
+// found no code anywhere that ever writes .search-body's scrollTop, and
+// every candidate the task names (scroll-behavior, focus()'s preventScroll,
+// a stale window.scrollTo) is already either absent or already fixed in an
+// earlier task — so whatever is moving it is either something this trace
+// hasn't surfaced yet, or native iOS behavior outside this file's control.
+// Rather than guess at a fix with no device to verify it against (a wrong
+// guess here risks making a live, production overlay worse), this renders
+// a tiny on-screen readout — no Mac/Web Inspector needed — so numbers can
+// be read straight off the phone screen (or a screen recording) during the
+// drift. Only active with ?searchdebug on the URL; inert otherwise. Remove
+// this whole block once task 146 is actually diagnosed and fixed.
+function searchDebugEnabled() {
+  try { return /(?:^|[?&])searchdebug(?:&|=|$)/.test(location.search); } catch (e) { return false; }
+}
+var _searchDebugEl = null;
+var _searchDebugT0 = 0;
+var _searchDebugTimer = null;
+function searchDebugHud() {
+  if (!_searchDebugEl) {
+    _searchDebugEl = document.createElement('div');
+    _searchDebugEl.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:999999;' +
+      'background:rgba(0,0,0,0.78);color:#0f0;font:11px/1.4 monospace;' +
+      'padding:6px 8px;border-radius:6px;white-space:pre;pointer-events:none;';
+    document.body.appendChild(_searchDebugEl);
+  }
+  var body = document.getElementById('searchBody');
+  var vv = window.visualViewport;
+  var lines = [
+    't=' + (Date.now() - _searchDebugT0) + 'ms',
+    'winScrollY=' + window.scrollY,
+    'vv.offsetTop=' + (vv ? Math.round(vv.offsetTop) : 'n/a'),
+    'vv.height=' + (vv ? Math.round(vv.height) : 'n/a'),
+    'kbInset=' + getComputedStyle(document.documentElement).getPropertyValue('--search-kb-inset'),
+    'bodyScrollTop=' + (body ? body.scrollTop : 'n/a'),
+    'bodyMaxScroll=' + (body ? (body.scrollHeight - body.clientHeight) : 'n/a'),
+  ];
+  _searchDebugEl.textContent = lines.join('\n');
+}
+function searchDebugStart() {
+  if (!searchDebugEnabled()) return;
+  _searchDebugT0 = Date.now();
+  if (_searchDebugTimer) clearInterval(_searchDebugTimer);
+  // Sampled on a plain timer, not just on visualViewport/scroll events —
+  // the whole point is to see whether the position moves even when nothing
+  // we already listen to fires, which a purely event-driven trace would
+  // silently miss. Stopped automatically after 8s so it can't run forever
+  // if someone forgets to close search.
+  _searchDebugTimer = setInterval(searchDebugHud, 100);
+  setTimeout(function () { if (_searchDebugTimer) { clearInterval(_searchDebugTimer); _searchDebugTimer = null; } }, 8000);
+  searchDebugHud();
+  // Catch .search-body's own scroll events directly too, not just the
+  // timer/visualViewport paths above — fires on every native scroll tick,
+  // including ones nothing else here listens for.
+  var body = document.getElementById('searchBody');
+  if (body && !body._searchDebugBound) {
+    body._searchDebugBound = true;
+    body.addEventListener('scroll', function () { if (searchDebugEnabled()) searchDebugHud(); }, { passive: true });
+  }
 }
 
 // Shared by closeSearch() and closeSearchAnimated() below: the actual
@@ -1272,6 +1336,7 @@ function syncSearchViewportHeight() {
   // moving at all while search is open — if iOS moves it anyway, put it
   // straight back so the overlay never visibly shifts.
   if (searchBodyLocked && window.scrollY !== 0) window.scrollTo(0, 0);
+  if (searchDebugEnabled()) searchDebugHud();
 }
 // task 143: coalesced to at most once per animation frame — visualViewport
 // can fire 'resize'/'scroll' many times in quick succession (through the
