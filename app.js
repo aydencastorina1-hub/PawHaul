@@ -1084,33 +1084,40 @@ function openSearch() {
   searchDebugStart();
 }
 
-// task 148: stop iOS panning the visual viewport behind the open search.
-// Measured on-device (?searchdebug): window.scrollY and the page's own
-// scrollTop stay 0 the whole time — the page lock holds — but
-// visualViewport.offsetTop goes 0..290. With the keyboard up the layout
-// viewport is ~300px taller than the visible area, and iOS lets a finger
-// pan the visible area inside it whenever the gesture has nothing else to
-// scroll: content already at its edge in the swipe's direction, or a drag
-// starting on the search bar. Every position:fixed element (the whole
-// overlay, search bar included) moves with that pan, and iOS then eases it
-// back — the "screen moves, then slowly drifts back". overscroll-behavior,
-// touch-action and a 1px edge nudge all failed to stop it on-device; the
-// only reliable stop is cancelling the touchmove. So, for a VERTICAL drag
-// only: cancel it when .search-body can't scroll that way (or it didn't
-// start inside .search-body). Sideways drags (carousels) are never touched,
-// the axis is decided once per gesture after a few px (inside iOS's own
-// slop, before it starts any scroll), and a drag that CAN scroll the
-// content is left fully native.
+// task 148: vertical scrolling of the open search view is done HERE, not
+// natively. Measured on-device (?searchdebug, BUILD 148g) with the keyboard
+// up: the content had 397px of scroll room and the old guard let all 337
+// vertical touchmoves through, yet content.scrollTop never left 0 — every
+// swipe went to iOS sliding the visible area instead (vv.offsetTop and
+// scrollY 0..310), dragging the whole overlay, search bar included. iOS
+// simply doesn't hand those swipes to the inner scroller there, so no CSS
+// (overscroll-behavior, touch-action, scroll room) can fix it.
+// So while search is open, every VERTICAL drag is cancelled (iOS gets
+// nothing to slide) and .search-body is scrolled by the finger's own
+// movement, with a decaying glide after release. Sideways drags (carousels,
+// caret in the input) are never touched — the axis is decided once per
+// gesture after 3px, inside iOS's own slop, before it starts anything.
+// Drags that start outside .search-body (search bar, input, back button)
+// are cancelled and scroll nothing.
 var _searchTouch = null;
+var _searchGlide = 0;
+var _searchGuardStats = { blocked: 0, allowed: 0 };
+function searchScrollBody() {
+  var b = document.getElementById('searchBody');
+  if (!b || getComputedStyle(b).overflowY === 'hidden') return null;   // iPad: never scrolls
+  return b;
+}
+function searchStopGlide() {
+  if (_searchGlide) { cancelAnimationFrame(_searchGlide); _searchGlide = 0; }
+}
 function searchTouchStart(e) {
+  searchStopGlide();
   if (!searchIsOpen() || e.touches.length !== 1) { _searchTouch = null; return; }
   var t = e.touches[0], tg = e.target;
-  // The search input is NOT exempt: it's one line (touch-action:
-  // manipulation), so a vertical drag on it has nothing to do except pan the
-  // visual viewport. Sideways drags there (caret) are never touched.
   _searchTouch = {
     x: t.clientX, y: t.clientY, lastY: t.clientY, axis: null,
     inBody: !!(tg && tg.closest && tg.closest('#searchBody')),
+    samples: [],
   };
 }
 function searchTouchMove(e) {
@@ -1123,32 +1130,50 @@ function searchTouchMove(e) {
     g.axis = Math.abs(dy) > Math.abs(dx) ? 'y' : 'x';
   }
   if (g.axis !== 'y') return;
+  if (e.cancelable) { e.preventDefault(); _searchGuardStats.blocked++; }
+  else _searchGuardStats.allowed++;
   var step = t.clientY - g.lastY;
   g.lastY = t.clientY;
-  var dir = step || dy;            // >0 finger moving down (content toward top)
-  var can = false;
-  if (g.inBody) {
-    var b = document.getElementById('searchBody');
-    if (b && getComputedStyle(b).overflowY !== 'hidden') {
-      var max = b.scrollHeight - b.clientHeight;
-      // 2px, not 0.5: on-device the content sat at 86 of 87 — iOS rounds
-      // scroll positions, so "1px left" was really "at the edge", and
-      // letting that gesture through is exactly when iOS slid the screen.
-      can = dir > 0 ? b.scrollTop > 2 : b.scrollTop < max - 2;
-    }
-  }
-  if (!can && e.cancelable) { e.preventDefault(); _searchGuardStats.blocked++; }
-  else _searchGuardStats.allowed++;
+  var b = g.inBody && searchScrollBody();
+  if (!b) return;
+  if (g.pos == null) g.pos = b.scrollTop;   // fractional, like the glide
+  g.pos = Math.max(0, Math.min(b.scrollHeight - b.clientHeight, g.pos - step));
+  b.scrollTop = g.pos;
+  var now = performance.now();
+  g.samples.push({ t: now, y: t.clientY });
+  while (g.samples.length > 2 && now - g.samples[0].t > 100) g.samples.shift();
 }
-var _searchGuardStats = { blocked: 0, allowed: 0 };
-// Backstop: if iOS slid the visible area anyway (e.g. a scroll that ran
-// into the edge mid-gesture, when touchmove is no longer cancelable), put
-// it back the instant the finger lifts instead of letting iOS ease it back.
+// Release: continue with the finger's last ~100ms velocity, decaying —
+// the same feel as a native fling, stopped by the next touch or an edge.
+function searchGlide(g) {
+  var b = g && g.axis === 'y' && g.inBody && searchScrollBody();
+  if (!b || g.samples.length < 2) return;
+  var a = g.samples[0], z = g.samples[g.samples.length - 1];
+  if (performance.now() - z.t > 80) return;           // finger had stopped
+  var v = (z.y - a.y) / Math.max(1, z.t - a.t);        // px/ms, + = finger down
+  if (Math.abs(v) < 0.05) return;
+  var last = performance.now();
+  var pos = g.pos != null ? g.pos : b.scrollTop;   // fractional: scrollTop rounds to whole px
+  function frame(now) {
+    var dt = Math.min(32, Math.max(1, now - last)); last = now;
+    var max = b.scrollHeight - b.clientHeight;
+    pos = Math.max(0, Math.min(max, pos - v * dt));
+    b.scrollTop = pos;
+    v *= Math.pow(0.95, dt / 16);
+    if (Math.abs(v) < 0.02 || pos <= 0 || pos >= max) { _searchGlide = 0; return; }
+    _searchGlide = requestAnimationFrame(frame);
+  }
+  _searchGlide = requestAnimationFrame(frame);
+}
 function searchTouchEnd(e) {
   if (e.touches.length) return;
+  var g = _searchTouch;
   _searchTouch = null;
+  if (e.type === 'touchend') searchGlide(g);
   searchSnapViewport();
 }
+// Backstop: if iOS slid the visible area anyway, put it back instantly
+// (never while a finger is down, so it can't fight a drag).
 function searchSnapViewport() {
   if (!searchBodyLocked || _searchTouch) return;
   var vv = window.visualViewport;
@@ -1166,7 +1191,7 @@ function searchTouchGuard(on) {
   document[fn]('touchmove', searchTouchMove, { passive: false });
   document[fn]('touchend', searchTouchEnd, { passive: true });
   document[fn]('touchcancel', searchTouchEnd, { passive: true });
-  if (!on) _searchTouch = null;
+  if (!on) { _searchTouch = null; searchStopGlide(); }
 }
 
 // TEMPORARY DIAGNOSTIC (tasks 146/148) — on-device verification of the
@@ -1212,7 +1237,7 @@ function searchDebugHud() {
   }
   var bodyTop = body ? body.scrollTop : NaN;
   var lines = [
-    'BUILD 148g   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'BUILD 148h   t=' + (Date.now() - _searchDebugT0) + 'ms',
     'content room=' + (body ? r(body.scrollHeight - body.clientHeight) : 'n/a') +
       '  kbInset=' + getComputedStyle(document.documentElement).getPropertyValue('--search-kb-inset').trim() +
       '  clientH=' + document.documentElement.clientHeight,
