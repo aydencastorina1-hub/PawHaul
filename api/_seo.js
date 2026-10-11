@@ -263,7 +263,11 @@ function absolute(url) {
 // content-negotiates the format, so it serves JPEG to crawlers that do not
 // advertise webp support (verified) — no separate OG asset needed per product.
 function ogImageFor(product) {
-  const pool = [].concat(Object.values(product.images || {}), product.extraImages || []);
+  const pool = [].concat(
+    Object.values(product.images || {}),
+    Object.values(product.variantImages || {}),
+    product.extraImages || []
+  );
   const shopify = pool.find(function (u) { return typeof u === 'string' && u.indexOf('cdn.shopify.com') !== -1; });
   if (shopify) return shopify.replace(/([?&])width=\d+/, '$1width=1200');
   return pool.length ? absolute(pool[0]) : DEFAULT_OG;
@@ -302,7 +306,7 @@ const PRODUCT_COPY = {
   },
   3: {
     title: 'Poop Bag Clip — Hands-Free Waste Bag Carrier',
-    description: 'Hands-free silicone clip that holds a used poop bag securely on your leash or belt. Eight colours. $6.99 with free shipping.'
+    description: 'Hands-free silicone clip that holds a used poop bag securely on your leash or belt. Six colours. $6.99 with free shipping.'
   },
   10: {
     title: 'LED Flashlight Retractable Dog Leash — Light Up Night Lead',
@@ -401,7 +405,15 @@ function breadcrumbSchema(trail) {
 function productSchema(p) {
   const url = ORIGIN + '/product/' + slugify(p.name);
   const range = priceRange(p);
-  const images = [].concat(Object.values(p.images || {}), p.extraImages || [])
+  // variantImages included so a product whose photo is keyed to two axes
+  // (product 1 - material tier x colour) offers Google every real variant
+  // shot, not just the two colour-keyed defaults.
+  const images = [].concat(
+    Object.values(p.images || {}),
+    Object.values(p.variantImages || {}),
+    p.extraImages || []
+  )
+    .filter(function (u, i, a) { return a.indexOf(u) === i; })
     .filter(Boolean)
     .map(function (u) { return u.indexOf('cdn.shopify.com') !== -1 ? u.replace(/([?&])width=\d+/, '$1width=1200') : absolute(u); })
     .slice(0, 8);

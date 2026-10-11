@@ -1582,22 +1582,9 @@ if (window.visualViewport) {
 // wanted here, named "Hydration Bundle").
 var SEARCH_BUNDLE_IDS = ['led', 'portable-hydration', 'visibility'];
 
-// task 138: a failed <img> load (a dead/renamed file, a blocked host, a
-// network hiccup) used to just leave the browser's own broken-image icon
-// sitting there — `src` resolving to SOMETHING is not the same as the photo
-// actually loading, and productImageFor()'s own fallback (used below) only
-// ever covers the first case, not the second. This is the second: `onerror`
-// swaps the failed <img> for the plain-text emoji the same card would have
-// shown had no photo URL existed in the first place, so a real network
-// failure degrades exactly like "no photo" always has — never a broken-
-// image glyph. The replacement text is plain (no nested element/attributes)
-// specifically so it needs no quote-escaping games inside the onerror
-// attribute itself: HTML entity-decodes `this.outerHTML='<emoji>'` before JS
-// ever sees it, so the only character that would be unsafe here is an
-// apostrophe, and no emoji in this catalogue's data contains one.
-function imgOnErrorToEmoji(emoji) {
-  return ' onerror="this.outerHTML=\'' + emoji + '\'"';
-}
+// imgOnErrorToEmoji moved to products.js in task 149 — it now guards every
+// product photo on the site, not just the search carousel's, so it belongs
+// beside photoAttrs() rather than here. Still called from this file.
 
 function searchProductCardHtml(p) {
   var img = productImageFor(p, p.colors && p.colors[0]);

@@ -8,19 +8,21 @@ var products = [
     // same removal standard as task 108's product swaps. The old product's
     // slug keeps resolving here via RENAMED_SLUGS below.
     //
-    // NO REAL PRODUCT PHOTOS YET: `images`/`extraImages` are intentionally
-    // empty below. This is a brand-new product with no prior listing to
-    // recover real Shopify photos from (unlike the Poop Bag Clip swap) — a
-    // fabricated Shopify CDN URL would just 404, so every surface falls back
-    // to the emoji placeholder (see productImageFor()) until real photos are
-    // supplied. Same for `shopifyVariants`: there is no real Shopify product
-    // for this yet, so it's omitted entirely — "Add to Cart" works for the
-    // local cart/display, but checkout will not sync this item to a real
-    // Shopify cart until a real product + variant GIDs exist there.
-    id: 1, name: "2-in-1 Portable Dog Water Bottle", emoji: "🍼", image: "",
+    // TASK 149 filled in what task 127 left open. The real Shopify product
+    // now exists — 10183410254080, "2-1 Portable Dog Water Bottle" — so the
+    // photos below are its own pool, re-hosted locally, and the variant GIDs
+    // are real and confirmed with a live cartCreate. The emoji placeholder
+    // this product used to fall back to everywhere (a baby bottle) is gone
+    // from every surface as a result; `emoji` survives only as the onerror
+    // fallback, and is no longer a baby bottle either.
+    id: 1, name: "2-in-1 Portable Dog Water Bottle", emoji: "💧", image: "",
     badge: "Best Seller", badgeClass: "",
-    // PLACEHOLDER stats carried over from the old product pending real
-    // AliExpress/Shopify listing data for the new one.
+    // STILL A PLACEHOLDER, and now the only one left on this product: 4.8 /
+    // 322 was carried over from the OLD bottle that used to hold this id,
+    // and it is not this listing's number. Task 149 left it rather than
+    // silently inventing a replacement, but it should either be re-read off
+    // the real source listing or deleted — supplierRatingHtml() renders
+    // nothing at all when `supplier` is absent, so deleting it is safe.
     supplier: { rating: 4.8, ratings: 322 },
     desc: "A stainless steel water bottle with a foldable silicone bowl built right in — unfold it, pour, and your dog has a stable spot to drink or eat on the go. Compact enough to toss in a bag or clip to a leash, built for walks, hikes, and travel. Rust-resistant construction holds up to daily outdoor use.",
     tagline: "A bottle and a bowl in one — unfold, pour, done.",
@@ -32,16 +34,85 @@ var products = [
     sizes: ["Plastic", "Stainless Steel", "Stainless Steel Deluxe"],
     colors: ["Blue", "Pink"],
 
-    // No real photos yet — see the note above the id field.
-    images: {},
-    extraImages: [],
+    // CARD / SEARCH / WISHLIST / BUNDLE photo, keyed by COLOUR alone — the
+    // cheapest tier of each colour, which is the tier the "from $9.99" on
+    // those surfaces is quoting. The detail page and the cart do better
+    // than this: see variantImages.
+    images: {
+      "Blue": "/images/products/bottle-plastic-blue-main.jpg",
+      "Pink": "/images/products/bottle-plastic-pink-main.jpg"
+    },
 
+    // THE REAL VARIANT MAP, keyed "tier|colour" to match sizes x colors.
+    // Colour alone does NOT decide the photo for this product: Plastic Blue
+    // is a clear body, Stainless Steel Blue is a plain steel one and
+    // Stainless Steel Deluxe Blue is the bow-patterned steel one — and all
+    // three wear the same teal sleeve. productImageFor() reads this first
+    // and only falls back to `images` above, so every surface that knows
+    // which tier is selected shows that tier's own photograph.
+    //
+    // All six are positions 1-6 of Shopify product 10183410254080's pool,
+    // re-hosted locally and checked by eye against the variant name: body
+    // material AND sleeve colour both confirmed, one photo per variant.
+    // Shopify itself assigns NONE of them (image_id is null on all six
+    // variants), so position order was the only hint and it was verified
+    // against the actual pixels rather than trusted.
+    variantImages: {
+      "Plastic|Blue": "/images/products/bottle-plastic-blue-main.jpg",
+      "Plastic|Pink": "/images/products/bottle-plastic-pink-main.jpg",
+      "Stainless Steel|Blue": "/images/products/bottle-steel-blue-main.jpg",
+      "Stainless Steel|Pink": "/images/products/bottle-steel-pink-main.jpg",
+      "Stainless Steel Deluxe|Blue": "/images/products/bottle-deluxe-blue-main.jpg",
+      "Stainless Steel Deluxe|Pink": "/images/products/bottle-deluxe-pink-main.jpg"
+    },
+
+    // Shared gallery slides, shown after slide 1 for every variant: the
+    // corgi drinking from the opened bowl, then the three PawHaul-branded
+    // feature panels (the 2-in-1 overview, the stainless-steel panel and
+    // the foldable-bowl panel). None is any variant's main photo, and none
+    // is presented as the selected colour.
+    //
+    // REJECTED from the pool, deliberately: position 11, the dimension
+    // drawing with its 3.35in / 3.54in / 285ML callouts. Measurement
+    // diagrams are off the gallery by the task-149 quality bar; the numbers
+    // it carried live in `material` instead, as text.
+    extraImages: [
+      "/images/products/bottle-lifestyle-1.jpg",
+      "/images/products/bottle-feature-1.jpg",
+      "/images/products/bottle-feature-2.jpg",
+      "/images/products/bottle-feature-3.jpg"
+    ],
+
+    // This product's gallery never pads itself out with the OTHER variants'
+    // main photos the way the rest of the catalogue does. With six variants
+    // that differ by body material, a steel bottle sitting in the Plastic
+    // Blue gallery reads as another angle of what you are about to buy.
+    // See renderDetailGallery().
+    galleryOmitsOtherVariants: true,
+
+    // Selling prices match Shopify exactly. The `was` figures do NOT —
+    // Shopify's compare-at is 12.99 / 14.99 / 17.99 against these 14.99 /
+    // 18.99 / 21.99. They are task 127's placeholders and task 149 left
+    // them alone (the brief said not to touch prices), but the struck-through
+    // anchor a visitor sees is currently higher than the store's own.
     sizePrices: {
       "Plastic": { price: 9.99, was: 14.99 },
       "Stainless Steel": { price: 12.99, was: 18.99 },
       "Stainless Steel Deluxe": { price: 14.99, was: 21.99 }
     },
     price: 9.99, was: 14.99,
+
+    // Real Shopify variant GIDs (Storefront API) for checkout. All six were
+    // confirmed against the live /api/cart endpoint with a real cartCreate —
+    // this product IS published to the Paw Haul Headless channel.
+    shopifyVariants: { productGid: "gid://shopify/Product/10183410254080", byVariant: {
+        "Plastic|Blue": "gid://shopify/ProductVariant/50460383576320",
+        "Plastic|Pink": "gid://shopify/ProductVariant/50460383609088",
+        "Stainless Steel|Blue": "gid://shopify/ProductVariant/50460383510784",
+        "Stainless Steel|Pink": "gid://shopify/ProductVariant/50460383543552",
+        "Stainless Steel Deluxe|Blue": "gid://shopify/ProductVariant/50460383412480",
+        "Stainless Steel Deluxe|Pink": "gid://shopify/ProductVariant/50460383379712"
+      } },
 
     features: [
       "Foldable silicone bowl built into the cap",
@@ -51,7 +122,10 @@ var products = [
       "Plastic, Stainless Steel or Stainless Steel Deluxe",
       "Blue or Pink"
     ],
-    material: "Stainless steel body (Plastic tier: BPA-free plastic) · Foldable silicone bowl cap",
+    // Capacity and width are the two numbers off the Shopify pool's
+    // dimension drawing, which task 149 kept OUT of the gallery — they are
+    // carried here as text instead of as a diagram slide.
+    material: "Stainless steel body (Plastic tier: BPA-free plastic) · Foldable silicone bowl cap · 285ml, 3.35 in wide",
     whatsInBox: "1× 2-in-1 Portable Dog Water Bottle"
   },
   {
@@ -107,47 +181,96 @@ var products = [
     desc: "Never fumble with a bag of waste on your walk again. This hands-free clip holds used poop bags securely so you can keep both hands free while walking your dog. Lightweight and compact, it clips easily onto any leash or belt for a quick, hygienic cleanup every time.",
     tagline: "Hands-free carrying for used bags, every walk.",
     sizes: ["Universal — fits all leashes"],
-    // "Light Blue" and "Dark Blue" are new (not part of the original
-    // Shopify catalogue recovered below) — there is no real photo or
-    // Shopify variant GID for either yet, so they fall back to the first
-    // color's photo (imageForColor() in this file) and won't check out via
-    // Shopify until real images/variant GIDs are added to `images` and
-    // `shopifyVariants.byColor` below.
-    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink", "Light Blue", "Dark Blue"],
+    // SIX colours. "Light Blue" and "Dark Blue" were added speculatively and
+    // are removed again in task 149: neither exists in Shopify (the product
+    // there sells Orange, Purple, Red, Black, Blue, Pink and Green), neither
+    // ever had a photo or a variant GID, and both fell back to Orange's
+    // photo — a swatch that showed the wrong colour and could not be bought.
+    // Shopify's own description for this product says "six colors" too.
+    //
+    // The single "Blue" that DOES exist in Shopify stays off the site: it
+    // was retired in task 98 and the brief for 149 confirms it. That variant
+    // should be deleted in Shopify as well, so the two agree.
+    colors: ["Orange", "Purple", "Red", "Black", "Green", "Pink"],
 
-    // RE-SYNCED from Shopify (task 99), recovered from before this product
-    // was discontinued. Six colours, six variant-assigned photos.
+    // RE-PULLED FROM SHOPIFY IN TASK 149, from a DIFFERENT product than the
+    // one this entry used to read. The note above the id field turned out to
+    // be right: the old Poop Bag Clip (9518276509952) was DELETED, not
+    // archived. All eleven of its cdn.shopify.com URLs now 404 and all six
+    // of its variant GIDs fail cartCreate — so until this task the live site
+    // showed the browser's broken-image icon on every clip surface and could
+    // not sell one at all. These photos and GIDs come from its replacement,
+    // Shopify product 10185921069312.
+    //
+    // Re-hosted locally rather than hot-linked, which is now the rule here
+    // and not just a performance choice: deleting a Shopify product takes
+    // its CDN files with it, and that is exactly what broke this entry. A
+    // local master cannot 404 out from under the site.
+    //
+    // EVERY COLOUR WAS CHECKED AGAINST THE PIXELS, NOT TAKEN ON TRUST —
+    // Shopify assigns no image to any variant of this product (image_id is
+    // null on all seven), so position order was the only hint. Measured
+    // hues: orange 15°, purple 305°, red 356°, black 0% saturation,
+    // pink 341°.
+    //
+    // GREEN IS THE ONE EXCEPTION AND IT IS DELIBERATE. Shopify's seventh
+    // studio shot — the one position order puts against Green — is a
+    // mint/teal fob (hue 179°), a colourway this store does not sell. The
+    // only genuinely green clip anywhere in the pool is the lifestyle shot
+    // used here (hue 98°). It is framed differently from the other five
+    // because it is the honest photo, not the tidy one; a true green studio
+    // shot needs adding to Shopify to fix that properly.
     images: {
-      "Orange": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/05311962-98DD-48BE-9B18-AA26717C4EA5.png?v=1790043744&width=900",
-      "Purple": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/921F2642-8033-42DC-8934-66A11F537D1E.png?v=1790043784&width=900",
-      "Red": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/D950C3DF-9AF0-4416-8427-D1F38304E8FE.png?v=1790043835&width=900",
-      "Black": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/9B99CB59-87DD-42C0-998C-737EDDAE99B1.png?v=1790043817&width=900",
-      "Green": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E9F331FB-A50C-4DB7-B66A-56CBA5DC191D.png?v=1790043893&width=900",
-      "Pink": "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/E3A0D367-24B5-486D-81F4-1AD31FAD9E89.png?v=1790043866&width=900"
+      "Orange": "/images/products/poop-bag-clip-orange-main.jpg",
+      "Purple": "/images/products/poop-bag-clip-purple-main.jpg",
+      "Red": "/images/products/poop-bag-clip-red-main.jpg",
+      "Black": "/images/products/poop-bag-clip-black-main.jpg",
+      "Green": "/images/products/poop-bag-clip-green-main.jpg",
+      "Pink": "/images/products/poop-bag-clip-pink-main.jpg"
     },
 
-    // Extra detail-page gallery slides — a hand holding a knotted bag by the
-    // clip, a close-up of the same, the clip riding on a leash, and one
-    // clipped to a bag. All show the product doing the job the description
-    // claims (carrying a USED bag), which a studio shot alone cannot.
+    // Shared detail-page slides: a hand holding a knotted bag by the clip,
+    // and the close-up of the same. Both show the product doing the job the
+    // description claims — carrying a USED bag — which a studio shot alone
+    // cannot. Both are shot in the red colourway (the only lifestyle set
+    // that exists), which is why they live in the shared pool and never in
+    // the per-colour map above.
+    //
+    // REJECTED from the pool, deliberately, by the task-149 quality bar:
+    //   · position 1 — the royal-blue fob. Blue is retired from this product
+    //     and must not reappear anywhere on the site.
+    //   · position 7 — the mint/teal fob, a colourway this store does not
+    //     sell. See the Green note above.
+    //   · position 8 — four black clips lined up. It reads as a four-pack of
+    //     something sold one at a time.
     extraImages: [
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FBB272E1-1FAC-473A-93AF-7BDDF7356226.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/65E99535-F7CD-4A0F-B319-487A9C9DBF01.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/FCA197B8-16F8-48B5-9E1E-BF7750AE80F1.png?v=1790044578&width=900",
-      "https://cdn.shopify.com/s/files/1/0812/3259/3152/files/BE4DE668-334E-4929-A1EE-CCFEDC2631C5.png?v=1790044578&width=900"
+      "/images/products/poop-bag-clip-lifestyle-1.jpg",
+      "/images/products/poop-bag-clip-lifestyle-2.jpg"
     ],
 
-    // Real Shopify variant GIDs (Storefront API) for checkout, carried over
-    // from before this product was discontinued — see the note above the id
-    // field about why these may need re-creating in Shopify.
-    shopifyVariants: { productGid: "gid://shopify/Product/9518276509952", byColor: {
-        "Orange": "gid://shopify/ProductVariant/48945264296192",
-        "Purple": "gid://shopify/ProductVariant/48945264328960",
-        "Red": "gid://shopify/ProductVariant/48945264361728",
-        "Black": "gid://shopify/ProductVariant/48945264394496",
-        "Green": "gid://shopify/ProductVariant/48945264656640",
-        "Pink": "gid://shopify/ProductVariant/48945264623872"
+    // Slide 1 is the only slide that claims to be the colour you picked, and
+    // with six near-identical fobs the other five read as alternate shots of
+    // the same item rather than as other colours. See renderDetailGallery().
+    galleryOmitsOtherVariants: true,
+
+    // Real Shopify variant GIDs (Storefront API) from the replacement
+    // product 10185921069312.
+    //
+    // NOT YET PURCHASABLE: every one of these six currently fails cartCreate
+    // with "not available", because the replacement product has not been
+    // published to the Paw Haul Headless sales channel. The GIDs themselves
+    // are correct — publishing the product in Shopify is all that is
+    // missing, and checkout starts working the moment that happens, with no
+    // further code change. (Its sibling 10183410254080 IS published, and all
+    // six of THAT product's variants were confirmed with a real cartCreate,
+    // which is how this was isolated to the channel rather than the GIDs.)
+    shopifyVariants: { productGid: "gid://shopify/Product/10185921069312", byColor: {
+        "Orange": "gid://shopify/ProductVariant/50471584727296",
+        "Purple": "gid://shopify/ProductVariant/50471584760064",
+        "Red": "gid://shopify/ProductVariant/50471584792832",
+        "Black": "gid://shopify/ProductVariant/50471584825600",
+        "Green": "gid://shopify/ProductVariant/50471585087744",
+        "Pink": "gid://shopify/ProductVariant/50471585054976"
       } },
 
     features: [
@@ -156,7 +279,7 @@ var products = [
       "Keeps both hands free while walking your dog",
       "Lightweight and compact design",
       "Quick, hygienic cleanup every time",
-      "8 colors to choose from"
+      "6 colors to choose from"
     ],
     material: "Durable silicone clip · Secure metal hook attachment",
     whatsInBox: "1× Poop Bag Clip"
@@ -963,21 +1086,30 @@ var BUNDLES = [
     // as two jobs rather than two ways of doing the same thing.
     roles: { 1: 'On the move: quick drinks without stopping', 3: 'Keeps your hands free for bag duty' },
     pct: 20,
-    img: 'https://cdn.shopify.com/s/files/1/0812/3259/3152/files/2947C98B-2E97-439D-87FD-CD8B65B93DE0.png?v=1790044578&width=900',
+    // Was a cdn.shopify.com URL from the OLD Poop Bag Clip product. That
+    // product was deleted in Shopify, which took its CDN files with it, so
+    // this card's hero photo had been 404ing on the live site. Repointed at
+    // the same shot re-hosted locally from the replacement product's pool.
+    img: '/images/products/poop-bag-clip-lifestyle-2.jpg',
     imgAlt: 'A Poop Bag Clip holding a tied-off bag on a leash',
   },
   {
-    // task 127: pairs the two new portable-hydration products. No real photo
-    // for either yet (see the note on products.js id 1) — `img` is left out
-    // entirely so the card just shows each line item's emoji fallback
-    // instead of a fabricated photo.
+    // task 127 paired the two new portable-hydration products and left `img`
+    // out, because neither had a real photo yet — which is why this card
+    // showed the bottle's baby-bottle emoji where the other bundles show a
+    // lifestyle shot. Task 149 brought in the bottle's real Shopify pool, so
+    // the card now leads with its genuine lifestyle photo. The Foldable Dog
+    // Water Bowl (id 2) still has no photos of its own and still falls back
+    // to its emoji in the item row below.
     id: 'portable-hydration',
     name: 'Hydration Bundle',
     blurb: "One carries the water, the other turns any spare bottle into a bowl. Bring the 2-in-1 for the walk, keep the Foldable Bowl on hand for whatever bottle you've already got.",
     tagline: 'A bottle and a backup bowl',
     ids: [1, 2],
     roles: { 1: 'Your everyday walk bottle, bowl built in', 2: 'A spare bowl for any other bottle' },
-    pct: 15
+    pct: 15,
+    img: '/images/products/bottle-lifestyle-1.jpg',
+    imgAlt: 'A dog drinking from the built-in bowl of the 2-in-1 Portable Dog Water Bottle'
   },
   {
     id: 'visibility',
@@ -1065,10 +1197,10 @@ function bundleCardHtml(b) {
     '<p class="bundle-blurb">' + esc(b.blurb) + '</p>' +
     '<ul class="bundle-items">' + items.map(function (p) {
       var pick = bundlePick(b, p);
-      var img = productImageFor(p, pick.color);
+      var img = productImageFor(p, pick.color, pick.size);
       return '<li class="bundle-item">' +
         '<a class="bundle-thumb" href="/product/' + slugify(p.name) + '" onclick="goToProductLink(event,' + p.id + ')">' +
-          (img ? '<img ' + photoAttrs(img, 'thumb') + ' alt="' + esc(p.name) + '">' : p.emoji) +
+          (img ? '<img ' + photoAttrs(img, 'thumb') + ' alt="' + esc(p.name) + '"' + imgOnErrorToEmoji(p.emoji) + '>' : p.emoji) +
         '</a>' +
         '<div class="bundle-item-info">' +
           '<span class="bundle-item-name">' + esc(p.name) + '</span>' +
@@ -1286,11 +1418,10 @@ var SWATCH_COLORS = {
   // Added for the Anti-Drop Leash Wrist Strap's colourway. Without these,
   // "Brown" and "Purple" fell through to the #CCCCCC fallback — Brown would
   // have rendered as a grey circle sitting next to the strap's real Gray.
-  // ("White" is still missing and still falls back for the Water Bottle —
-  // left alone, out of scope here.)
-  brown: '#8B5E3C', purple: '#7C3AED',
-  // Added for the Poop Bag Clip's new Light Blue / Dark Blue colourway.
-  'light blue': '#7EC8E3', 'dark blue': '#1E3A8A'
+  brown: '#8B5E3C', purple: '#7C3AED'
+  // 'light blue' / 'dark blue' used to live here for the Poop Bag Clip.
+  // Task 149 removed both colours (neither exists in Shopify), so the
+  // swatches went with them.
 };
 
 // "Teal/Blue" style dual names render as a split circle.
@@ -1431,6 +1562,16 @@ function clearBtnBusy(btn, prevHtml) {
 // The immutable is safe because a changed photo means a changed filename:
 // re-run the generator and the width suffix / -v2 style name moves with it.
 var LOCAL_PHOTO_WIDTHS = {
+  'bottle-deluxe-blue-main': [400, 800, 1200, 1254],
+  'bottle-deluxe-pink-main': [400, 800, 1200, 1254],
+  'bottle-feature-1': [400, 800, 1200, 1254],
+  'bottle-feature-2': [400, 800, 1200, 1254],
+  'bottle-feature-3': [400, 800, 1200, 1254],
+  'bottle-lifestyle-1': [400, 800, 1200, 1402],
+  'bottle-plastic-blue-main': [400, 800, 1200, 1254],
+  'bottle-plastic-pink-main': [400, 800, 1200, 1254],
+  'bottle-steel-blue-main': [400, 800, 1200, 1287],
+  'bottle-steel-pink-main': [400, 800, 1200, 1287],
   'bowl-black': [400, 675],
   'bowl-blue': [400, 675],
   'bowl-green': [400, 675],
@@ -1464,6 +1605,14 @@ var LOCAL_PHOTO_WIDTHS = {
   'led-leash-lifestyle-5': [400, 800, 1200, 1254],
   'led-leash-orange-main': [400, 800, 1200, 1536],
   'led-leash-purple-main': [400, 800, 1200, 1536],
+  'poop-bag-clip-black-main': [400, 800, 1200, 1254],
+  'poop-bag-clip-green-main': [400, 800, 1200, 1254],
+  'poop-bag-clip-lifestyle-1': [400, 800, 1200, 1254],
+  'poop-bag-clip-lifestyle-2': [400, 800, 1200, 1254],
+  'poop-bag-clip-orange-main': [400, 800, 1200, 1254],
+  'poop-bag-clip-pink-main': [400, 800, 1200, 1254],
+  'poop-bag-clip-purple-main': [400, 800, 1200, 1254],
+  'poop-bag-clip-red-main': [400, 800, 1200, 1254],
   'water-bottle-blue-main': [400, 800, 1200],
   'water-bottle-lifestyle-1': [400, 800, 953],
   'water-bottle-lifestyle-2': [400, 800, 1000],
@@ -1558,6 +1707,30 @@ function photoSrcset(url) {
   return '';
 }
 
+// task 138, extended in task 149 to cover EVERY product photo on the site.
+// A failed <img> load (a dead/renamed file, a deleted Shopify product, a
+// blocked host, a network hiccup) otherwise just leaves the browser's own
+// broken-image icon sitting there — `src` resolving to SOMETHING is not the
+// same as the photo actually loading, and productImageFor()'s own fallback
+// only ever covers the first case, not the second. This is the second:
+// `onerror` swaps the failed <img> for the plain-text emoji the same slot
+// would have shown had no photo URL existed at all, so a real failure
+// degrades exactly like "no photo" always has, never to a torn-page glyph.
+//
+// This is not hypothetical. Task 149 found that deleting a product in
+// Shopify takes its CDN files with it: all eleven of the old Poop Bag Clip's
+// photos 404ed, and every clip surface on the live site was rendering the
+// broken-image icon. Local hosting fixes that case; this covers the rest.
+//
+// The replacement text is plain (no nested element or attributes)
+// specifically so it needs no quote-escaping games inside the onerror
+// attribute: HTML entity-decodes `this.outerHTML='<emoji>'` before JS ever
+// sees it, so the only character that would be unsafe is an apostrophe, and
+// no emoji in this catalogue's data contains one.
+function imgOnErrorToEmoji(emoji) {
+  return ' onerror="this.outerHTML=\'' + emoji + '\'"';
+}
+
 // Every attribute an <img> needs except alt/class. `slot` keys PHOTO_SIZES.
 //
 // opts.eager: the photo is on screen at first paint, so lazy-loading it only
@@ -1576,12 +1749,74 @@ function photoAttrs(url, slot, opts) {
   return out + ' decoding="async"';
 }
 
-// Resolves the photo for one color of a product, falling back to the
+// Resolves the photo for one variant of a product, falling back to the
 // default (first) color's photo, then the emoji when there are no real
 // photos at all (e.g. a future product added before its images are set up).
-function productImageFor(p, color) {
+//
+// `size` is optional and only does anything for a product carrying a
+// `variantImages` map (product 1). For that product colour alone is NOT
+// enough to pick a photo: Plastic Blue, Stainless Steel Blue and Stainless
+// Steel Deluxe Blue are three visibly different bottles wearing the same
+// teal sleeve. Callers that know which tier is selected pass it; callers
+// showing a product rather than a variant (shop cards, search, wishlist,
+// bundle rows) don't, and fall through to the colour-keyed `images` map
+// exactly as before — which for that product holds the cheapest tier of
+// each colour, i.e. the tier those surfaces price.
+//
+// Every product without a `variantImages` map behaves exactly as it did.
+function productImageFor(p, color, size) {
+  if (p.variantImages) {
+    var s = size || (p.sizes && p.sizes.length ? p.sizes[0] : null);
+    var hit = p.variantImages[s + '|' + color];
+    if (hit) return hit;
+  }
   if (!p.images) return null;
   return p.images[color] || (p.colors && p.images[p.colors[0]]) || null;
+}
+
+// Every main photo a product can show, de-duplicated — the variantImages
+// pool when there is one, otherwise the colour map. Used only to warm the
+// browser cache (see preloadVariantPhotos); renders nothing.
+function variantPhotoPool(p) {
+  if (!p) return [];
+  var src = p.variantImages || p.images || {};
+  var out = [];
+  Object.keys(src).forEach(function (k) {
+    if (src[k] && out.indexOf(src[k]) === -1) out.push(src[k]);
+  });
+  return out;
+}
+
+// Warms the browser cache with the variant main photos that are NOT on
+// screen, so tapping a colour or a tier swaps slide 1 from disk rather than
+// from the network.
+//
+// This used to happen by accident: renderDetailGallery appends every other
+// colour's main photo as a real (lazy) slide, which puts those URLs in the
+// DOM where the carousel's warm() can promote them. The two products that
+// now set `galleryOmitsOtherVariants` have no such slides, so without this
+// their first variant tap would show an empty box until the fetch landed —
+// the flash the task-149 brief rules out.
+//
+// Deliberately an off-DOM Image(): no layout, no second element that could
+// paint. The fetch is the point and the HTTP cache is where it lands. Run
+// on the idle callback so it never competes with slide 1, the page's LCP.
+function preloadVariantPhotos(p) {
+  var pool = variantPhotoPool(p);
+  if (pool.length < 2 || typeof Image !== 'function') return;
+  var run = function () {
+    pool.forEach(function (url) {
+      var img = new Image();
+      // The same srcset/sizes the real <img> gets, so the browser caches
+      // the SAME candidate the gallery will ask for. Warming the 1254px
+      // master while the gallery then requests the 800px one warms nothing.
+      var srcset = photoSrcset(url);
+      if (srcset) { img.srcset = srcset; img.sizes = PHOTO_SIZES.detail; }
+      img.src = photoSrc(url);
+    });
+  };
+  if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 1200 });
+  else setTimeout(run, 300);
 }
 
 // `opts.eager` (set for the top row of a grid by its caller) keeps the cards
@@ -1592,7 +1827,7 @@ function productCard(p, opts) {
   var defColor = p.colors && p.colors.length ? p.colors[0] : null;
   var imgUrl = productImageFor(p, defColor);
   var imgContent = imgUrl
-    ? `<img ${photoAttrs(imgUrl, 'card', opts)} alt="${p.name}">`
+    ? `<img ${photoAttrs(imgUrl, 'card', opts)} alt="${p.name}"${imgOnErrorToEmoji(p.emoji)}>`
     : p.emoji;
   return `
     <div class="product-card" id="prodcard-${p.id}" onclick="showProduct(${p.id})">
@@ -1615,11 +1850,15 @@ function productCard(p, opts) {
 // gallery data is available via the Storefront API for this catalog) — so
 // the "gallery" is just that one photo, swapped whenever the color changes.
 // No carousel controls are rendered since there's nothing to page between.
-function renderDetailGallery(color) {
+function renderDetailGallery(color, size) {
   var detailImg = document.getElementById('detailImg');
   if (!detailImg || !currentProduct) return;
   var c = color || (currentProduct.colors && currentProduct.colors[0]);
-  var mainUrl = productImageFor(currentProduct, c);
+  // Tier/size reaches the photo only for a product with a variantImages
+  // map; productImageFor ignores it for everything else. Defaulting to
+  // currentSize (not sizes[0]) is what makes a tier tap repaint slide 1.
+  var s = size || currentSize || (currentProduct.sizes && currentProduct.sizes[0]);
+  var mainUrl = productImageFor(currentProduct, c, s);
 
   // Slide order, rebuilt on every colour tap:
   //   1. the selected colour's own photo,
@@ -1640,13 +1879,21 @@ function renderDetailGallery(color) {
   }
   addSlide(mainUrl, c);
   (currentProduct.extraImages || []).forEach(function (u) { addSlide(u, null); });
-  // Read `images` directly rather than through productImageFor(): its
-  // fallback to the default colour would re-add slide 1 under someone
-  // else's name for any colour that has no photo of its own.
-  (currentProduct.colors || []).forEach(function (other) {
-    if (other === c) return;
-    addSlide(currentProduct.images && currentProduct.images[other], other);
-  });
+  // Group 3 is opt-OUT. `galleryOmitsOtherVariants` is set on the two
+  // products whose variants are near-identical silhouettes (the clip) or
+  // differ by body material rather than colour (the bottle): there, another
+  // variant's main photo in this gallery reads as another angle of the
+  // thing you are about to buy, not as a different variant. Those two
+  // galleries are slide 1 plus the shared pool and nothing else.
+  if (!currentProduct.galleryOmitsOtherVariants) {
+    // Read `images` directly rather than through productImageFor(): its
+    // fallback to the default colour would re-add slide 1 under someone
+    // else's name for any colour that has no photo of its own.
+    (currentProduct.colors || []).forEach(function (other) {
+      if (other === c) return;
+      addSlide(currentProduct.images && currentProduct.images[other], other);
+    });
+  }
   var urls = slides.map(function (s) { return s.url; });
 
   if (!urls.length) {
@@ -1672,7 +1919,7 @@ function renderDetailGallery(color) {
     var opts = i === 0 ? { priority: true } : (i === 1 ? { eager: true } : null);
     return '<div class="det-slide"><img ' +
       photoAttrs(s.url, 'detail', opts) +
-      ' alt="' + alt + '"></div>';
+      ' alt="' + alt + '"' + imgOnErrorToEmoji(currentProduct.emoji) + '></div>';
   }).join('');
 
   if (urls.length === 1) {
@@ -1708,7 +1955,6 @@ function showProduct(id, opts) {
   currentQty = 1;
   if (!currentProduct) return;
 
-  renderDetailGallery(currentProduct.colors && currentProduct.colors[0]);
   document.getElementById('detailName').textContent = currentProduct.name;
   // Default to the CHEAPEST size variant (site-wide lowest-price rule); its
   // price drives the initial display and its button starts out selected.
@@ -1722,6 +1968,12 @@ function showProduct(id, opts) {
     currentSize = null;
   }
   currentColor = currentProduct.colors && currentProduct.colors.length ? currentProduct.colors[0] : null;
+  // AFTER currentSize/currentColor are settled, never before. A product with
+  // a variantImages map resolves slide 1 from BOTH axes, so rendering the
+  // gallery first would paint the default tier's photo and swap it for the
+  // cheapest tier's a moment later - a visible flash on every open.
+  renderDetailGallery(currentColor, currentSize);
+  preloadVariantPhotos(currentProduct);
   currentVariantPrice = cheapest.price;
   setDetailPrice(cheapest.price);
   // Generic disclaimer pill under the tagline — "requires 2 AAA batteries
@@ -1810,7 +2062,7 @@ function selectColorOption(btn) {
   selectOption(btn);
   currentColor = btn.textContent.trim();
   updateVariantAvailability();
-  renderDetailGallery(currentColor);
+  renderDetailGallery(currentColor, currentSize);
   renderDetailShopPay();
 }
 
@@ -1841,6 +2093,9 @@ function updateVariantAvailability() {
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[pick] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
   setDetailPrice(currentVariantPrice);
+  // Jumping to a different size here can change the photo as well as the
+  // price, on a product whose photo is keyed to both axes.
+  if (currentProduct.variantImages) renderDetailGallery(currentColor, currentSize);
 }
 
 // Writes the selling price on the detail page (main price block AND the sticky
@@ -1874,6 +2129,12 @@ function selectSize(btn) {
   var variant = currentProduct.sizePrices ? currentProduct.sizePrices[currentSize] : null;
   currentVariantPrice = variant ? variant.price : currentProduct.price;
   setDetailPrice(currentVariantPrice);
+  // A size tap repaints the gallery ONLY where size actually changes the
+  // photograph. For every other product the size buttons are lengths or
+  // capacities of an identically-photographed item, and rebuilding the
+  // carousel would throw away the slide the visitor had paged to for no
+  // visible gain.
+  if (currentProduct.variantImages) renderDetailGallery(currentColor, currentSize);
   renderDetailShopPay();
 }
 
@@ -2122,7 +2383,7 @@ function renderWishlist() {
   }
   container.innerHTML = '<div class="products-grid">' + wishlistItems.map(function(p) {
     var wImgUrl = productImageFor(p, p.colors && p.colors[0]);
-    var imgContent = wImgUrl ? ('<img ' + photoAttrs(wImgUrl, 'card') + ' alt="' + p.name + '">') : p.emoji;
+    var imgContent = wImgUrl ? ('<img ' + photoAttrs(wImgUrl, 'card') + ' alt="' + p.name + '"' + imgOnErrorToEmoji(p.emoji) + '>') : p.emoji;
     var inWish = true;
     return '<div class="product-card" onclick="showProduct(' + p.id + ')">' +
       '<div class="product-img-wrap"><div class="product-img">' + imgContent + '</div>' +
@@ -2178,8 +2439,11 @@ function renderCart() {
     <div class="cart-layout">
       <div class="cart-items">
         ${cart.map((item, idx) => {
-          var imgUrl = productImageFor(item, item.color);
-          var imgContent = imgUrl ? ('<img ' + photoAttrs(imgUrl, 'thumb') + ' alt="' + item.name + '">') : item.emoji;
+          // Cart lines know the exact variant that was added, so they pass
+          // the size too - a Stainless Steel Deluxe Pink line shows the
+          // bow-patterned steel bottle, not the plastic one the card showed.
+          var imgUrl = productImageFor(item, item.color, item.size);
+          var imgContent = imgUrl ? ('<img ' + photoAttrs(imgUrl, 'thumb') + ' alt="' + item.name + '"' + imgOnErrorToEmoji(item.emoji) + '>') : item.emoji;
           // Discontinued colour: say so on the line, price it at nothing, and
           // offer the one action that fixes it (open the product and pick
           // another). Quantity controls are dropped — there is no quantity of
