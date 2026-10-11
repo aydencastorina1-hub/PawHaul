@@ -1011,9 +1011,8 @@ function openSearch() {
   // close it if a visitor opened search while it happened to be up.
   if (offerIsOpen()) dismissOffer();
   if (searchPendingCloseCancel) { searchPendingCloseCancel(); searchPendingCloseCancel = null; }
-  bar.classList.add('open');
-  if (scrim) scrim.classList.add('open');
-  syncOverlayChrome();
+  // task 148: lock first, then show, then focus — the page behind is
+  // already pinned before the overlay is visible or the keyboard exists.
   // task 134-style lock: documentElement, not body — this page's real
   // scrolling element is <html> (confirmed while building the task-134
   // menu lock), so body.style.overflow is a no-op here.
@@ -1039,6 +1038,9 @@ function openSearch() {
     document.body.style.width = '100%';
     searchBodyLocked = true;
   }
+  bar.classList.add('open');
+  if (scrim) scrim.classList.add('open');
+  syncOverlayChrome();
   syncSearchViewportHeight();
   if (!searchHistoryPushed) {
     history.pushState({ searchOpen: true }, '', location.href);
@@ -1081,20 +1083,13 @@ function openSearch() {
   searchDebugStart();
 }
 
-// task 146 TEMPORARY DIAGNOSTIC — not a fix, a trace. Task 146 reports the
-// search content "slowly scrolls itself back up" after the keyboard opens,
-// on the first open of a page load only. A full static read of this file
-// found no code anywhere that ever writes .search-body's scrollTop, and
-// every candidate the task names (scroll-behavior, focus()'s preventScroll,
-// a stale window.scrollTo) is already either absent or already fixed in an
-// earlier task — so whatever is moving it is either something this trace
-// hasn't surfaced yet, or native iOS behavior outside this file's control.
-// Rather than guess at a fix with no device to verify it against (a wrong
-// guess here risks making a live, production overlay worse), this renders
-// a tiny on-screen readout — no Mac/Web Inspector needed — so numbers can
-// be read straight off the phone screen (or a screen recording) during the
-// drift. Only active with ?searchdebug on the URL; inert otherwise. Remove
-// this whole block once task 146 is actually diagnosed and fixed.
+// TEMPORARY DIAGNOSTIC (tasks 146/148) — on-device verification of the
+// task-148 visual-viewport pin. Shows the values task 148 asked to trace,
+// read straight off a phone screen with no Mac/Web Inspector. The line that
+// matters is "header ON SCREEN": 0 means the search bar is exactly at the
+// top of what's visible; its "max" column catches a drift even after it
+// has settled. Only active with ?searchdebug on the URL; inert otherwise.
+// Remove this whole block once the pin is confirmed on a real iPhone/iPad.
 function searchDebugEnabled() {
   try { return /(?:^|[?&])searchdebug(?:&|=|$)/.test(location.search); } catch (e) { return false; }
 }
@@ -1110,21 +1105,39 @@ function searchDebugHud() {
     document.body.appendChild(_searchDebugEl);
   }
   var body = document.getElementById('searchBody');
+  var view = document.getElementById('navSearchBar');
+  var head = view && view.querySelector('.search-bar-row');
   var vv = window.visualViewport;
+  var se = document.scrollingElement || document.documentElement;
+  // task 148: exactly the values that task asks to trace. Rects are in
+  // layout-viewport coords, so "where the bar is on SCREEN" is
+  // headerTop - vv.offsetTop: 0 means pinned, anything else means it moved.
+  var r = function (n) { return Math.round(n * 10) / 10; };
+  var headTop = head ? head.getBoundingClientRect().top : NaN;
+  var vvTop = vv ? vv.offsetTop : 0;
+  var onScreen = headTop - vvTop;
+  _searchDebugMax.onScreen = Math.max(_searchDebugMax.onScreen, Math.abs(onScreen) || 0);
+  _searchDebugMax.vvTop = Math.max(_searchDebugMax.vvTop, vvTop);
+  _searchDebugMax.winY = Math.max(_searchDebugMax.winY, Math.abs(window.scrollY));
   var lines = [
     't=' + (Date.now() - _searchDebugT0) + 'ms',
-    'winScrollY=' + window.scrollY,
-    'vv.offsetTop=' + (vv ? Math.round(vv.offsetTop) : 'n/a'),
-    'vv.height=' + (vv ? Math.round(vv.height) : 'n/a'),
-    'kbInset=' + getComputedStyle(document.documentElement).getPropertyValue('--search-kb-inset'),
-    'bodyScrollTop=' + (body ? body.scrollTop : 'n/a'),
-    'bodyMaxScroll=' + (body ? (body.scrollHeight - body.clientHeight) : 'n/a'),
+    'window.scrollY=' + r(window.scrollY) + '  (max ' + r(_searchDebugMax.winY) + ')',
+    'scrollingEl.scrollTop=' + r(se.scrollTop),
+    'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
+    'header.top=' + r(headTop),
+    'header ON SCREEN=' + r(onScreen) + '  (max ' + r(_searchDebugMax.onScreen) + ')',
+    'content.scrollTop=' + (body ? r(body.scrollTop) : 'n/a'),
+    'vv.offsetTop=' + r(vvTop) + '  (max ' + r(_searchDebugMax.vvTop) + ')',
+    'vv.pageTop=' + (vv ? r(vv.pageTop) : 'n/a'),
+    'vv.height=' + (vv ? r(vv.height) : 'n/a'),
   ];
   _searchDebugEl.textContent = lines.join('\n');
 }
+var _searchDebugMax = { onScreen: 0, vvTop: 0, winY: 0 };
 function searchDebugStart() {
   if (!searchDebugEnabled()) return;
   _searchDebugT0 = Date.now();
+  _searchDebugMax = { onScreen: 0, vvTop: 0, winY: 0 };
   if (_searchDebugTimer) clearInterval(_searchDebugTimer);
   // Sampled on a plain timer, not just on visualViewport/scroll events —
   // the whole point is to see whether the position moves even when nothing
@@ -1154,6 +1167,7 @@ function unlockAfterSearchClose() {
   // next open starts clean rather than inheriting the previous session's
   // bundles-hidden state for a moment.
   document.documentElement.classList.remove('search-kb-open');
+  document.documentElement.style.removeProperty('--search-vv-top');
   if (searchBodyLocked) {
     searchBodyLocked = false;
     document.body.style.position = '';
@@ -1318,7 +1332,19 @@ function clearSearchInput() {
 function syncSearchViewportHeight() {
   if (!window.visualViewport || !searchIsOpen()) return;
   var vv = window.visualViewport;
-  var inset = Math.max(0, document.documentElement.clientHeight - vv.height - vv.offsetTop);
+  // task 148: iOS can pan the visual viewport inside the layout viewport
+  // while the keyboard is up (offsetTop > 0). position:fixed is anchored to
+  // the layout viewport, so the whole overlay — search bar included — moves
+  // on screen with that pan and then drifts back as iOS un-pans it. The
+  // window.scrollY guard below can't see this: with body position:fixed,
+  // scrollY stays 0 the whole time. --search-vv-top feeds a translateY on
+  // .search-view (phone/iPad rule in styles.css) that glues the overlay to
+  // what's actually visible. Transform only, never a height.
+  var vvTop = Math.max(0, vv.offsetTop);
+  document.documentElement.style.setProperty('--search-vv-top', vvTop + 'px');
+  // With the overlay pinned to the visual top, the part hidden under the
+  // keyboard is everything below vv.height — offsetTop no longer subtracts.
+  var inset = Math.max(0, document.documentElement.clientHeight - vv.height);
   document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
   // task 142: html.search-kb-open — NOT used for sizing anything (see
   // .search-body's own comment in styles.css for why letting the keyboard

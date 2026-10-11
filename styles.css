@@ -3267,11 +3267,24 @@ body.overlay-up .offer-side-tab {
        recomputes from plain box geometry on every layout — no dvh unit,
        no JS, nothing to go stale. */
     height: auto;
-    transform: none;
+    /* task 148: glued to the VISUAL viewport. iOS pans the visual viewport
+       inside the layout viewport while the keyboard is up, and a fixed box
+       is anchored to the layout one — so without this the whole overlay,
+       search bar included, slides on screen with the pan. app.js sets
+       --search-vv-top to visualViewport.offsetTop on every visualViewport
+       resize/scroll (0 when nothing is panned, and removed on close).
+       Applies in the closing state too so the fade-out never snaps it. */
+    transform: translate3d(0, var(--search-vv-top, 0px), 0);
+    /* transform deliberately left OUT of both transitions here: the pin has
+       to track the viewport instantly, not ease toward it over 0.55s. */
+    transition: opacity 0.24s var(--ease-exit), visibility 0s linear 0.24s;
     border-radius: 0;
     box-shadow: none;
   }
-  .search-view.open { transform: none; }
+  .search-view.open {
+    transform: translate3d(0, var(--search-vv-top, 0px), 0);
+    transition: opacity 0.55s var(--ease);
+  }
   .search-pc-card { flex-basis: 150px; }
 }
 
