@@ -1131,10 +1131,30 @@ function searchTouchMove(e) {
     var b = document.getElementById('searchBody');
     if (b && getComputedStyle(b).overflowY !== 'hidden') {
       var max = b.scrollHeight - b.clientHeight;
-      can = dir > 0 ? b.scrollTop > 0.5 : b.scrollTop < max - 0.5;
+      // 2px, not 0.5: on-device the content sat at 86 of 87 — iOS rounds
+      // scroll positions, so "1px left" was really "at the edge", and
+      // letting that gesture through is exactly when iOS slid the screen.
+      can = dir > 0 ? b.scrollTop > 2 : b.scrollTop < max - 2;
     }
   }
   if (!can && e.cancelable) e.preventDefault();
+}
+// Backstop: if iOS slid the visible area anyway (e.g. a scroll that ran
+// into the edge mid-gesture, when touchmove is no longer cancelable), put
+// it back the instant the finger lifts instead of letting iOS ease it back.
+function searchTouchEnd(e) {
+  if (e.touches.length) return;
+  _searchTouch = null;
+  searchSnapViewport();
+}
+function searchSnapViewport() {
+  if (!searchBodyLocked || _searchTouch) return;
+  var vv = window.visualViewport;
+  if (window.scrollY === 0 && !(vv && vv.offsetTop > 0)) return;
+  var prevSB = document.documentElement.style.scrollBehavior;
+  document.documentElement.style.scrollBehavior = 'auto';
+  window.scrollTo(0, 0);
+  document.documentElement.style.scrollBehavior = prevSB;
 }
 // Attached only while search is open — a non-passive document touchmove
 // listener would otherwise make every scroll on the site wait on it.
@@ -1142,6 +1162,8 @@ function searchTouchGuard(on) {
   var fn = on ? 'addEventListener' : 'removeEventListener';
   document[fn]('touchstart', searchTouchStart, { passive: true });
   document[fn]('touchmove', searchTouchMove, { passive: false });
+  document[fn]('touchend', searchTouchEnd, { passive: true });
+  document[fn]('touchcancel', searchTouchEnd, { passive: true });
   if (!on) _searchTouch = null;
 }
 
@@ -1188,7 +1210,7 @@ function searchDebugHud() {
   }
   var bodyTop = body ? body.scrollTop : NaN;
   var lines = [
-    'BUILD 148e   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'BUILD 148f   t=' + (Date.now() - _searchDebugT0) + 'ms',
     'window.scrollY=' + r(window.scrollY) + track('winY', window.scrollY),
     'scrollingEl.scrollTop=' + r(se.scrollTop) + track('se', se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
@@ -1405,7 +1427,11 @@ function syncSearchViewportHeight() {
   // tried here and removed — on-device it made things worse: iOS reports
   // offsetTop late and in jumps, so the pin lagged/overshot and pushed the
   // overlay BELOW its place, showing the homepage through above it.
-  var inset = Math.max(0, document.documentElement.clientHeight - vv.height - vv.offsetTop);
+  // Keyboard height only — NOT minus vv.offsetTop. Subtracting it made the
+  // content's scroll room shrink exactly as iOS slid the screen, pinning the
+  // content to its bottom edge (seen on-device: scrollTop stuck at 86..87),
+  // which then handed every further swipe to iOS's slide.
+  var inset = Math.max(0, document.documentElement.clientHeight - vv.height);
   document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
   // task 142: html.search-kb-open — NOT used for sizing anything (see
   // .search-body's own comment in styles.css for why letting the keyboard
@@ -1425,12 +1451,10 @@ function syncSearchViewportHeight() {
   // task 148: instant, never smooth. html has scroll-behavior:smooth, which
   // turned this snap into the slow "drifts back up on its own" glide seen
   // on-device (same reason unlockAfterSearchClose forces 'auto').
-  if (searchBodyLocked && window.scrollY !== 0) {
-    var prevSB = document.documentElement.style.scrollBehavior;
-    document.documentElement.style.scrollBehavior = 'auto';
-    window.scrollTo(0, 0);
-    document.documentElement.style.scrollBehavior = prevSB;
-  }
+  // Also covers visualViewport.offsetTop > 0 (iOS sliding the visible area,
+  // which leaves scrollY at 0) — but never while a finger is down, so it
+  // can't fight a scroll in progress; searchTouchEnd() runs it on lift.
+  searchSnapViewport();
   if (searchDebugEnabled()) searchDebugHud();
 }
 // task 143: coalesced to at most once per animation frame — visualViewport
