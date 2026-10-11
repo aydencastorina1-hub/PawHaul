@@ -2996,6 +2996,20 @@ body.overlay-up .offer-side-tab {
 }
 .search-body::-webkit-scrollbar { display: none; }
 
+/* task 148: always at least 1px taller than the box, so .search-body is a
+   real scroll container from the very first touch. On a phone the default
+   view fits the screen exactly with the keyboard closed, so on first open
+   (before any --search-kb-inset padding exists) a vertical swipe found
+   nothing to scroll here and iOS handed it to the page instead — which,
+   with the keyboard up, can pan by the keyboard's height, dragging the
+   whole overlay. Measured on-device: content scrollTop 0 throughout while
+   window.scrollY / visualViewport.offsetTop went to 148-232. Later opens
+   were fine only because the stale inset padding from the first open made
+   this overflow. The iPad block resets .search-default to min-height:0
+   (its no-scroll fit from tasks 141/142). */
+.search-default,
+.search-results { min-height: calc(100% + 1px); }
+
 .search-section-label {
   font-family: var(--font-body);
   font-weight: 800;

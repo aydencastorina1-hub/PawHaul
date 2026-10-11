@@ -1120,8 +1120,8 @@ function searchDebugHud() {
   _searchDebugMax.vvTop = Math.max(_searchDebugMax.vvTop, vvTop);
   _searchDebugMax.winY = Math.max(_searchDebugMax.winY, Math.abs(window.scrollY));
   var lines = [
-    't=' + (Date.now() - _searchDebugT0) + 'ms',
-    'window.scrollY=' + r(window.scrollY) + '  (max ' + r(_searchDebugMax.winY) + ')',
+    'BUILD 148b   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'window.scrollY='+ r(window.scrollY) + '  (max ' + r(_searchDebugMax.winY) + ')',
     'scrollingEl.scrollTop=' + r(se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
     'header.top=' + r(headTop),
@@ -1361,7 +1361,15 @@ function syncSearchViewportHeight() {
   // position:fixed (see openSearch), so window.scrollY has no business
   // moving at all while search is open — if iOS moves it anyway, put it
   // straight back so the overlay never visibly shifts.
-  if (searchBodyLocked && window.scrollY !== 0) window.scrollTo(0, 0);
+  // task 148: instant, never smooth. html has scroll-behavior:smooth, which
+  // turned this snap into the slow "drifts back up on its own" glide seen
+  // on-device (same reason unlockAfterSearchClose forces 'auto').
+  if (searchBodyLocked && window.scrollY !== 0) {
+    var prevSB = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = prevSB;
+  }
   if (searchDebugEnabled()) searchDebugHud();
 }
 // task 143: coalesced to at most once per animation frame — visualViewport
