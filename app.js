@@ -1127,7 +1127,7 @@ var _searchDebugTimer = null;
 function searchDebugHud() {
   if (!_searchDebugEl) {
     _searchDebugEl = document.createElement('div');
-    _searchDebugEl.style.cssText = 'position:fixed;left:6px;bottom:6px;z-index:999999;' +
+    _searchDebugEl.style.cssText = 'position:fixed;left:6px;top:calc(env(safe-area-inset-top) + 74px);z-index:999999;' +
       'background:rgba(0,0,0,0.78);color:#0f0;font:11px/1.4 monospace;' +
       'padding:6px 8px;border-radius:6px;white-space:pre;pointer-events:none;';
     document.body.appendChild(_searchDebugEl);
@@ -1137,35 +1137,42 @@ function searchDebugHud() {
   var head = view && view.querySelector('.search-bar-row');
   var vv = window.visualViewport;
   var se = document.scrollingElement || document.documentElement;
-  // task 148: exactly the values that task asks to trace. Rects are in
-  // layout-viewport coords, so "where the bar is on SCREEN" is
-  // headerTop - vv.offsetTop: 0 means pinned, anything else means it moved.
+  // task 148: exactly the values that task asks to trace, each with the
+  // lowest/highest value seen since open so one screenshot after the glitch
+  // shows how far things went. Rects are in layout-viewport coords, so
+  // "where the bar is on SCREEN" is headerTop - vv.offsetTop: 0 = in place,
+  // negative = moved up, positive = moved down.
   var r = function (n) { return Math.round(n * 10) / 10; };
   var headTop = head ? head.getBoundingClientRect().top : NaN;
   var vvTop = vv ? vv.offsetTop : 0;
   var onScreen = headTop - vvTop;
-  _searchDebugMax.onScreen = Math.max(_searchDebugMax.onScreen, Math.abs(onScreen) || 0);
-  _searchDebugMax.vvTop = Math.max(_searchDebugMax.vvTop, vvTop);
-  _searchDebugMax.winY = Math.max(_searchDebugMax.winY, Math.abs(window.scrollY));
+  function track(k, v) {
+    if (!isFinite(v)) return '';
+    var m = _searchDebugMax[k] || (_searchDebugMax[k] = { lo: v, hi: v });
+    m.lo = Math.min(m.lo, v); m.hi = Math.max(m.hi, v);
+    return '  [' + r(m.lo) + '..' + r(m.hi) + ']';
+  }
+  var bodyTop = body ? body.scrollTop : NaN;
   var lines = [
-    'BUILD 148c   t=' + (Date.now() - _searchDebugT0) + 'ms',
-    'window.scrollY='+ r(window.scrollY) + '  (max ' + r(_searchDebugMax.winY) + ')',
-    'scrollingEl.scrollTop=' + r(se.scrollTop),
+    'BUILD 148d   t=' + (Date.now() - _searchDebugT0) + 'ms',
+    'window.scrollY=' + r(window.scrollY) + track('winY', window.scrollY),
+    'scrollingEl.scrollTop=' + r(se.scrollTop) + track('se', se.scrollTop),
     'overlay.top=' + (view ? r(view.getBoundingClientRect().top) : 'n/a'),
     'header.top=' + r(headTop),
-    'header ON SCREEN=' + r(onScreen) + '  (max ' + r(_searchDebugMax.onScreen) + ')',
-    'content.scrollTop=' + (body ? r(body.scrollTop) : 'n/a'),
-    'vv.offsetTop=' + r(vvTop) + '  (max ' + r(_searchDebugMax.vvTop) + ')',
-    'vv.pageTop=' + (vv ? r(vv.pageTop) : 'n/a'),
+    'header ON SCREEN=' + r(onScreen) + track('onScreen', onScreen),
+    'content.scrollTop=' + r(bodyTop) + track('body', bodyTop),
+    'vv.offsetTop=' + r(vvTop) + track('vvTop', vvTop),
+    'vv.pageTop=' + (vv ? r(vv.pageTop) : 'n/a') + (vv ? track('pageTop', vv.pageTop) : ''),
     'vv.height=' + (vv ? r(vv.height) : 'n/a'),
+    'body.position=' + (document.body.style.position || '(none)') + '  top=' + (document.body.style.top || '0'),
   ];
   _searchDebugEl.textContent = lines.join('\n');
 }
-var _searchDebugMax = { onScreen: 0, vvTop: 0, winY: 0 };
+var _searchDebugMax = {};
 function searchDebugStart() {
   if (!searchDebugEnabled()) return;
   _searchDebugT0 = Date.now();
-  _searchDebugMax = { onScreen: 0, vvTop: 0, winY: 0 };
+  _searchDebugMax = {};
   if (_searchDebugTimer) clearInterval(_searchDebugTimer);
   // Sampled on a plain timer, not just on visualViewport/scroll events —
   // the whole point is to see whether the position moves even when nothing
@@ -1195,7 +1202,6 @@ function unlockAfterSearchClose() {
   // next open starts clean rather than inheriting the previous session's
   // bundles-hidden state for a moment.
   document.documentElement.classList.remove('search-kb-open');
-  document.documentElement.style.removeProperty('--search-vv-top');
   if (searchBodyLocked) {
     searchBodyLocked = false;
     document.body.style.position = '';
@@ -1360,19 +1366,11 @@ function clearSearchInput() {
 function syncSearchViewportHeight() {
   if (!window.visualViewport || !searchIsOpen()) return;
   var vv = window.visualViewport;
-  // task 148: iOS can pan the visual viewport inside the layout viewport
-  // while the keyboard is up (offsetTop > 0). position:fixed is anchored to
-  // the layout viewport, so the whole overlay — search bar included — moves
-  // on screen with that pan and then drifts back as iOS un-pans it. The
-  // window.scrollY guard below can't see this: with body position:fixed,
-  // scrollY stays 0 the whole time. --search-vv-top feeds a translateY on
-  // .search-view (phone/iPad rule in styles.css) that glues the overlay to
-  // what's actually visible. Transform only, never a height.
-  var vvTop = Math.max(0, vv.offsetTop);
-  document.documentElement.style.setProperty('--search-vv-top', vvTop + 'px');
-  // With the overlay pinned to the visual top, the part hidden under the
-  // keyboard is everything below vv.height — offsetTop no longer subtracts.
-  var inset = Math.max(0, document.documentElement.clientHeight - vv.height);
+  // task 148: a translateY(visualViewport.offsetTop) "pin" on the overlay was
+  // tried here and removed — on-device it made things worse: iOS reports
+  // offsetTop late and in jumps, so the pin lagged/overshot and pushed the
+  // overlay BELOW its place, showing the homepage through above it.
+  var inset = Math.max(0, document.documentElement.clientHeight - vv.height - vv.offsetTop);
   document.documentElement.style.setProperty('--search-kb-inset', inset + 'px');
   // task 142: html.search-kb-open — NOT used for sizing anything (see
   // .search-body's own comment in styles.css for why letting the keyboard
