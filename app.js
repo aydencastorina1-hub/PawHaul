@@ -1105,7 +1105,8 @@ function openSearch() {
 // it falls back to scrollTop; iPad's content never scrolls (task 141).
 var SEARCH_PHONE_MQ = '(max-width: 699px) and (hover: none) and (pointer: coarse)';
 var SEARCH_DECEL = 0.998;      // per ms, iOS UIScrollView "normal"
-var SEARCH_MAX_V = 6;          // px/ms cap on a release fling
+var SEARCH_MAX_V = 10;         // px/ms cap on a release fling
+var SEARCH_SPRING_K = 0.012;   // edge spring stiffness (per ms^2), critically damped
 var _searchTouch = null;
 var _searchAnim = 0;
 var _searchY = 0;              // phone: current content offset (0 = top)
@@ -1162,7 +1163,8 @@ function searchTouchStart(e) {
   }
   _searchTouch = {
     x: t.clientX, y: t.clientY, lastY: t.clientY, lastT: e.timeStamp,
-    axis: null, mode: mode, b: b, v: 0,
+    axis: null, mode: mode, b: b,
+    samples: [{ t: e.timeStamp, y: t.clientY }],
     start: mode === 'transform' ? _searchY : (b ? b.scrollTop : 0),
     max: mode === 'transform' ? searchMaxY() : (b ? b.scrollHeight - b.clientHeight : 0),
     dim: b ? b.clientHeight : 1,
@@ -1182,11 +1184,12 @@ function searchTouchMove(e) {
   if (g.axis !== 'y') return;
   if (e.cancelable) e.preventDefault();
   if (!g.mode) return;
-  var dt = Math.max(1, e.timeStamp - g.lastT);
-  var step = t.clientY - g.lastY;
   g.lastY = t.clientY;
   g.lastT = e.timeStamp;
-  g.v = 0.8 * (step / dt) + 0.2 * g.v;          // px/ms, + = finger down
+  // Release velocity comes from the last ~80ms of the finger's path, the
+  // way iOS measures a fling — not from one noisy event-to-event step.
+  g.samples.push({ t: e.timeStamp, y: t.clientY });
+  while (g.samples.length > 2 && e.timeStamp - g.samples[0].t > 80) g.samples.shift();
   var raw = g.start - dy;                       // where the content "wants" to be
   if (g.mode === 'transform') {
     var y = raw;
@@ -1200,24 +1203,37 @@ function searchTouchMove(e) {
     g.b.scrollTop = g.pos;
   }
 }
-// Ease back from a rubber-banded overshoot to the edge (~300ms, ease-out).
-function searchSpringTo(target) {
-  var from = _searchY, t0 = performance.now(), dur = 320;
+// Critically damped spring to `target` from the current offset with
+// content velocity u (px/ms): the rubber-band snap-back after a drag, and
+// the bounce when a coast runs into an edge — iOS's edge behaviour.
+function searchSpringTo(target, u) {
+  var pos = _searchY, last = performance.now();
+  var k = SEARCH_SPRING_K, c = 2 * Math.sqrt(k);
+  u = u || 0;
   function frame(now) {
-    var k = Math.min(1, (now - t0) / dur);
-    var e = 1 - Math.pow(1 - k, 3);
-    _searchY = from + (target - from) * e;
-    searchApplyY(_searchY);
-    _searchAnim = k < 1 ? requestAnimationFrame(frame) : 0;
+    var dt = Math.min(32, Math.max(1, now - last)); last = now;
+    for (var i = 0; i < dt; i++) {            // 1ms steps: stable at any frame rate
+      u += (-k * (pos - target) - c * u);
+      pos += u;
+    }
+    if (Math.abs(pos - target) < 0.3 && Math.abs(u) < 0.02) pos = target;
+    _searchY = pos;
+    searchApplyY(pos);
+    _searchAnim = pos === target ? 0 : requestAnimationFrame(frame);
   }
   _searchAnim = requestAnimationFrame(frame);
 }
-function searchRelease(g, flung) {
+function searchReleaseVelocity(g, now) {
+  var s = g.samples, a = s[0], z = s[s.length - 1];
+  if (!z || now - z.t > 100 || z.t - a.t < 1) return 0;   // finger had stopped
+  var v = (z.y - a.y) / (z.t - a.t);                      // px/ms, + = finger down
+  return Math.max(-SEARCH_MAX_V, Math.min(SEARCH_MAX_V, v));
+}
+function searchRelease(g, v) {
   if (!g || g.axis !== 'y' || !g.mode) return;
-  var v = flung ? Math.max(-SEARCH_MAX_V, Math.min(SEARCH_MAX_V, g.v)) : 0;
   if (g.mode === 'transform') {
-    if (_searchY < 0) return searchSpringTo(0);
-    if (_searchY > g.max) return searchSpringTo(g.max);
+    if (_searchY < 0) return searchSpringTo(0, -v);
+    if (_searchY > g.max) return searchSpringTo(g.max, -v);
   }
   if (Math.abs(v) < 0.08) return;
   var pos = g.pos, max = g.max, last = performance.now();
@@ -1225,11 +1241,18 @@ function searchRelease(g, flung) {
     var dt = Math.min(32, Math.max(1, now - last)); last = now;
     pos -= v * dt;
     v *= Math.pow(SEARCH_DECEL, dt);
-    var hit = pos <= 0 || pos >= max;
-    pos = Math.max(0, Math.min(max, pos));
+    var hit = pos < 0 ? 0 : pos > max ? max : null;
+    if (hit !== null) {
+      if (g.mode === 'transform') {
+        // ran into an edge still moving: overshoot and bounce, like iOS
+        _searchY = hit; searchApplyY(hit);
+        return searchSpringTo(hit, -v);
+      }
+      g.b.scrollTop = hit; _searchAnim = 0; return;
+    }
     if (g.mode === 'transform') { _searchY = pos; searchApplyY(pos); }
     else g.b.scrollTop = pos;
-    _searchAnim = (hit || Math.abs(v) < 0.01) ? 0 : requestAnimationFrame(frame);
+    _searchAnim = Math.abs(v) < 0.01 ? 0 : requestAnimationFrame(frame);
   }
   _searchAnim = requestAnimationFrame(frame);
 }
@@ -1238,7 +1261,7 @@ function searchTouchEnd(e) {
   var g = _searchTouch;
   _searchTouch = null;
   // No coast if the finger was held still before lifting (or cancelled).
-  if (g) searchRelease(g, e.type === 'touchend' && e.timeStamp - g.lastT <= 100);
+  if (g) searchRelease(g, e.type === 'touchend' && g.samples ? searchReleaseVelocity(g, e.timeStamp) : 0);
   searchSnapViewport();
 }
 // Backstop: if iOS slid the visible area anyway, put it back instantly
