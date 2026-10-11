@@ -2966,7 +2966,12 @@ body.overlay-up .offer-side-tab {
   scroll-behavior: auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
+  /* task 145: -y specifically, not the shorthand (which also sets
+     overscroll-behavior-x) — this box only ever scrolls vertically; the
+     carousels nested inside it own their horizontal overscroll behavior
+     separately (task-88's shared #revCarousel/.det-track/.pc-track
+     contract already sets overscroll-behavior-x:contain on them). */
+  overscroll-behavior-y: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
   /* task 138: --search-kb-inset (the iOS keyboard's own height, set by
@@ -3120,8 +3125,20 @@ body.overlay-up .offer-side-tab {
    above, so it gets the same task-88 swipe+arrow behavior for free rather
    than a new scroll mechanism. Hidden on iPad — see the iPad override
    further down for why. */
-.search-blog-track { gap: 12px; padding: 2px 2px 6px; touch-action: pan-x; }
-.search-blog-wrap { touch-action: pan-x; }
+/* task 147: pan-x pan-y, not plain pan-x — this carousel never got task
+   142's fix for the exact same situation on the product carousel (nested
+   inside .search-body, which is itself pan-y; a descendant that only
+   grants pan-x there is the same incomplete chain task 142 found and
+   fixed, just missed here when this row was added a task later). This is
+   the actual cause of task 147's bug: touch-action is an intersection
+   across the ancestor chain, so a touch starting on an element that only
+   grants pan-x loses .search-body's pan-y for that gesture — the carousel
+   still swipes sideways (pan-x survives), but a vertical drag starting on
+   it never scrolls the page content. Same reasoning as
+   .search-pc-wrap/.search-pc-track: set at every link in the chain down to
+   the actual touch target, not just the track. */
+.search-blog-track { gap: 12px; padding: 2px 2px 6px; touch-action: pan-x pan-y; }
+.search-blog-wrap { touch-action: pan-x pan-y; }
 .search-blog-wrap .pc-arrow { top: 56px; }
 .search-blog-card {
   flex: 0 0 180px;
@@ -3135,7 +3152,10 @@ body.overlay-up .offer-side-tab {
   transition: transform 0.15s var(--ease), border-color 0.15s var(--ease);
   text-decoration: none;
   color: inherit;
-  touch-action: pan-x;
+  /* task 147: pan-x pan-y, same fix as the wrap/track above — the card
+     itself is the actual touch target a swipe or an upward scroll both
+     start on. */
+  touch-action: pan-x pan-y;
 }
 .search-blog-card:active { transform: scale(0.97); }
 .search-blog-media { width: 100%; height: 104px; background: var(--img-placeholder); overflow: hidden; }

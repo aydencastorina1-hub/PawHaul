@@ -1389,8 +1389,16 @@ var searchCarouselCtrl = null;
 // (above) and goToPost (this file) so it's the exact same navigation and
 // escaping every other blog link on the site already uses.
 function searchBlogCardHtml(p) {
+  // task 145: eager, not lazy — this is a 4-card carousel that only ever
+  // exists inside an overlay that's offscreen/invisible (opacity:0,
+  // visibility:hidden, not display:none) until opened; a lazy image's
+  // native intersection check can behave unpredictably against an
+  // ancestor in that state, and there's no real byte-savings case for
+  // deferring 4 small cards the way there is for products.js's full shop
+  // grid. onerror keeps a failed load from ever leaving a blank card,
+  // same pattern as every other photo in this view.
   return '<a class="search-blog-card" href="/blog/' + blogEsc(p.slug) + '" onclick="closeSearch();goToPost(event,\'' + blogEsc(p.slug) + '\')">' +
-    '<div class="search-blog-media"><img src="' + blogEsc(p.image) + '" alt="" loading="lazy" onerror="this.outerHTML=\'📰\'"></div>' +
+    '<div class="search-blog-media"><img src="' + blogEsc(p.image) + '" alt="" loading="eager" onerror="this.outerHTML=\'📰\'"></div>' +
     '<div class="search-blog-title">' + blogEsc(p.title) + '</div>' +
     '<div class="search-blog-meta">' + blogEsc(p.readMins) + ' min read</div>' +
   '</a>';
@@ -1415,11 +1423,24 @@ function renderSearchDefaults() {
   }
   searchCarouselCtrl = initPcCarousel('searchCarTrack', 'searchCarPrev', 'searchCarNext', null);
 
+  // task 145: "arrows but no cards" turned out not to reproduce from this
+  // file's own data/render path (blogPosts is always defined by the time
+  // this runs — blog.js loads before this script; verified directly) but
+  // the fix the task itself asks for is still the right one regardless of
+  // cause — never show an empty carousel shell. Hides BOTH the row and its
+  // label, not just the row, so there's no stray "FROM THE BLOG" heading
+  // sitting over nothing either.
   var blogTrack = document.getElementById('searchBlogTrack');
-  if (blogTrack && typeof blogPosts !== 'undefined') {
-    blogTrack.innerHTML = blogPosts.map(searchBlogCardHtml).join('');
+  var blogWrap = document.querySelector('.search-blog-wrap');
+  var blogLabel = document.querySelector('.search-blog-label');
+  var posts = (typeof blogPosts !== 'undefined') ? blogPosts : [];
+  var hasBlogRow = posts.length > 0;
+  if (blogWrap) blogWrap.hidden = !hasBlogRow;
+  if (blogLabel) blogLabel.hidden = !hasBlogRow;
+  if (hasBlogRow) {
+    if (blogTrack) blogTrack.innerHTML = posts.map(searchBlogCardHtml).join('');
+    searchBlogCarouselCtrl = initPcCarousel('searchBlogTrack', 'searchBlogPrev', 'searchBlogNext', null);
   }
-  searchBlogCarouselCtrl = initPcCarousel('searchBlogTrack', 'searchBlogPrev', 'searchBlogNext', null);
 }
 
 // ---------- active-state content: live results ----------
