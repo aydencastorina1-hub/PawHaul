@@ -1014,7 +1014,11 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
 }
 .dualcarousel-bundle-media { display: flex; gap: 6px; flex: 0 0 auto; }
 .dualcarousel-bundle-media img {
-  width: 56px; height: 56px; object-fit: cover; border-radius: 12px; display: block;
+  /* contain + white, for the same reason as the slides above: these are the
+     two products' square studio shots, and `cover` cropped each 56px tile to
+     a featureless band of colour. */
+  width: 56px; height: 56px; object-fit: contain; border-radius: 12px; display: block;
+  background: #fff; padding: 3px;
 }
 .dualcarousel-bundle-emoji {
   width: 56px; height: 56px; border-radius: 12px; background: var(--light-gray);
@@ -1026,6 +1030,20 @@ nav > .hamburger { order: 5; } /* display:none on desktop anyway */
 
 /* ── PORTABLE BOTTLES SECTION ──────────────────────────────── */
 .pbottles-section { padding: 110px 5%; background: white; }
+
+/* CONTAIN, not the .pc-slide-media default of `cover` (task 152). These two
+   columns are the only product carousels on the page whose slides are square
+   studio shots on a white sweep. `cover` fits a 1254x1254 photo into a
+   220px-tall full-width box by throwing away the top and bottom thirds, which
+   left the bottle as a teal smear and the bowl as a slab of flat pink with the
+   product itself cropped out of frame entirely. Same reasoning as
+   `.det-carousel .det-slide img` in the detail gallery: the box is never the
+   photo's aspect ratio, so the photo is letterboxed rather than cropped, and
+   the white ground makes the gutter invisible because every one of these is
+   shot on white.
+   The placeholder fallback card keeps its own flex centring - it is a <div>,
+   not an <img>, so object-fit never applies to it. */
+.pbottles-section img.pc-slide-media { object-fit: contain; background: #fff; }
 .pbottles-header { text-align: center; margin-bottom: 48px; }
 .pbottles-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 980px; margin: 0 auto; }
 
@@ -6743,6 +6761,14 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
   background: var(--img-placeholder);
 }
 .bundle-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* TWO-UP bundle media (task 152). A bundle whose photo is really two photos
+   — one per product — splits the same 240px band down the middle instead of
+   showing one product and leaving the other to an emoji. `contain` on a white
+   ground, not `cover`: these are studio product shots rather than a lifestyle
+   scene, and cropping a band off a bottle to fill a half-width box is exactly
+   what the detail gallery stopped doing. The divider is the card's own hairline. */
+.bundle-media.bundle-media-split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--light-gray); }
+.bundle-media.bundle-media-split img { object-fit: contain; background: #fff; padding: 10px; }
 .bundle-item-role { font-size: 12.5px; font-weight: 700; color: var(--orange); line-height: 1.35; }
 .bundle-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .bundle-name { font-family: var(--font-display); font-size: 24px; color: var(--black); line-height: 1.2; }

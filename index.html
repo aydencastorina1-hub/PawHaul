@@ -213,6 +213,44 @@ function heroSlideError(img) {
   // bails out in this case too (see its own all-failed guard).
 }
 </script>
+
+<!-- PRODUCT-PHOTO ERROR RECOVERY (task 152) — defined up here with
+     heroSlideError(), before any of the static <img> tags further down can
+     fire, for the same reason: an onerror that resolves to nothing leaves the
+     browser's broken-image icon sitting in the page.
+
+     The product carousels and the bundle tile used to carry emoji
+     PLACEHOLDERS as their real content ("Photo placeholder" cards, two bare
+     emoji in the bundle strip). Those are gone now that both products have
+     real photographs, but the emoji survives as the FALLBACK: if a photo ever
+     404s, the slot falls back to the same card the section used to ship,
+     which keeps the layout exactly the same height instead of collapsing. -->
+<script>
+function pcSlideError(img, emoji) {
+  var label = img.getAttribute('alt') || '';
+  var box = document.createElement('div');
+  box.className = 'pc-slide-media pc-slide-placeholder';
+  box.setAttribute('role', 'img');
+  box.setAttribute('aria-label', label);
+  var e = document.createElement('span');
+  e.className = 'pc-slide-emoji';
+  e.setAttribute('aria-hidden', 'true');
+  e.textContent = emoji || '';
+  var s = document.createElement('span');
+  s.className = 'pc-slide-soon';
+  s.textContent = 'Photo unavailable';
+  box.appendChild(e); box.appendChild(s);
+  if (img.parentNode) img.parentNode.replaceChild(box, img);
+}
+
+function bundleThumbError(img, emoji) {
+  var span = document.createElement('span');
+  span.className = 'dualcarousel-bundle-emoji';
+  span.setAttribute('aria-hidden', 'true');
+  span.textContent = emoji || '';
+  if (img.parentNode) img.parentNode.replaceChild(span, img);
+}
+</script>
 <!-- BRAND FONTS. These used to come from fonts.googleapis.com, which meant
      the browser could not start fetching a font until a stylesheet from a
      third party had arrived — so the fonts were always late and the page
@@ -235,7 +273,7 @@ function heroSlideError(img) {
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=171" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=172" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -244,7 +282,7 @@ function heroSlideError(img) {
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=10">
-  <link rel="preload" as="script" href="/products.js?v=97">
+  <link rel="preload" as="script" href="/products.js?v=98">
   <link rel="preload" as="script" href="/app.js?v=96">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
@@ -647,30 +685,24 @@ function heroSlideError(img) {
           <button class="pc-arrow pc-prev disabled" id="pcBottlePrev" aria-label="Previous slide">&#8249;</button>
           <div class="pc-track" id="pcBottleTrack">
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🍼</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/bottle-deluxe-blue-main.jpg" alt="2-in-1 Portable Dog Water Bottle in blue, bowl folded away"
+                   width="1254" height="1254" loading="lazy" decoding="async" onerror="pcSlideError(this,'🍼')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">What It Is</span>
                 <p class="pc-slide-text">A dedicated water bottle for your dog, not a human bottle repurposed. The cap folds out into a silicone bowl built right in, so the bottle and the bowl are one piece.</p>
               </div>
             </div>
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🍼</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/bottle-lifestyle-1.jpg" alt="A dog drinking from the built-in bowl of the 2-in-1 Portable Dog Water Bottle"
+                   width="1402" height="1402" loading="lazy" decoding="async" onerror="pcSlideError(this,'🍼')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">How It Works</span>
                 <p class="pc-slide-text">Unfold the silicone cap into a bowl shape, pour water from the bottle straight into it, and your dog has a stable spot to drink on the go. No separate bowl to pack or lose.</p>
               </div>
             </div>
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="2-in-1 Portable Dog Water Bottle — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🍼</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/bottle-steel-blue-main.jpg" alt="The stainless steel body of the 2-in-1 Portable Dog Water Bottle"
+                   width="1287" height="1287" loading="lazy" decoding="async" onerror="pcSlideError(this,'🍼')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">Why Buy It</span>
                 <p class="pc-slide-text">Stainless steel body holds up to daily outdoor use and resists rust. Compact enough for a bag or a leash clip — built for walks, hikes, and travel.</p>
@@ -690,30 +722,24 @@ function heroSlideError(img) {
           <button class="pc-arrow pc-prev disabled" id="pcBowlPrev" aria-label="Previous slide">&#8249;</button>
           <div class="pc-track" id="pcBowlTrack">
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="Foldable Dog Water Bowl — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🥤</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/foldbowl-pink-main.jpg" alt="Foldable Dog Water Bowl in pink, folded onto a standard water bottle"
+                   width="1254" height="1254" loading="lazy" decoding="async" onerror="pcSlideError(this,'🥤')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">What It Is</span>
                 <p class="pc-slide-text">A foldable silicone cap, not a bottle. It screws onto a standard water bottle you already carry and turns it into a dog bowl.</p>
               </div>
             </div>
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="Foldable Dog Water Bowl — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🥤</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/foldbowl-detail-1.jpg" alt="The Foldable Dog Water Bowl unfolded into a bowl on top of a water bottle"
+                   width="654" height="1254" loading="lazy" decoding="async" onerror="pcSlideError(this,'🥤')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">How It Works</span>
                 <p class="pc-slide-text">Screw it onto any standard bottle neck, unfold the silicone sides out, and pour. The leak-proof seal keeps the bottle sealed until you're ready.</p>
               </div>
             </div>
             <div class="pc-slide">
-              <div class="pc-slide-media pc-slide-placeholder" role="img" aria-label="Foldable Dog Water Bowl — product photo coming soon">
-                <span class="pc-slide-emoji" aria-hidden="true">🥤</span>
-                <span class="pc-slide-soon">Photo placeholder</span>
-              </div>
+              <img class="pc-slide-media" src="/images/products/foldbowl-lifestyle-1.jpg" alt="A dog drinking from the green Foldable Dog Water Bowl outdoors"
+                   width="1254" height="889" loading="lazy" decoding="async" onerror="pcSlideError(this,'🥤')">
               <div class="pc-slide-body">
                 <span class="pc-slide-eyebrow">Why Buy It</span>
                 <p class="pc-slide-text">No dedicated bottle to carry or lose — it works with a bottle you already have. Folds flat for a pocket or bag, perfect for a walk you didn't plan ahead for.</p>
@@ -730,8 +756,10 @@ function heroSlideError(img) {
     </div>
     <div class="dualcarousel-bundle">
       <div class="dualcarousel-bundle-media">
-        <span class="dualcarousel-bundle-emoji" aria-hidden="true">🍼</span>
-        <span class="dualcarousel-bundle-emoji" aria-hidden="true">🥤</span>
+        <img src="/images/products/bottle-deluxe-blue-main.jpg" alt="2-in-1 Portable Dog Water Bottle"
+             width="1254" height="1254" loading="lazy" decoding="async" onerror="bundleThumbError(this,'🍼')">
+        <img src="/images/products/foldbowl-pink-main.jpg" alt="Foldable Dog Water Bowl"
+             width="1254" height="1254" loading="lazy" decoding="async" onerror="bundleThumbError(this,'🥤')">
       </div>
       <div class="dualcarousel-bundle-info">
         <h3>Want both? Get the bundle</h3>
@@ -1712,7 +1740,7 @@ function heroSlideError(img) {
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=10"></script>
-  <script src="/products.js?v=97"></script>
+  <script src="/products.js?v=98"></script>
   <script src="/app.js?v=96"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above

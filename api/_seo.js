@@ -297,9 +297,9 @@ const PRODUCT_COPY = {
     title: '2-in-1 Portable Dog Water Bottle — Fold-Out Bowl Built In',
     description: 'Stainless steel dog water bottle with a foldable silicone bowl built into the cap — unfold, pour, done. Rust-resistant, compact for walks and travel. From $9.99 with free shipping.'
   },
-  // PLACEHOLDER price in this description ($7.99, matches products.js) —
-  // not sourced yet (task 127: "TBD... confirm once sourced in Shopify").
-  // Update this line when the real price lands.
+  // $7.99 is CONFIRMED against Shopify as of task 152 (product
+  // 10193091232000 sells both colours at 7.99, compare-at 11.99), so this
+  // description's price is real and no longer a placeholder.
   2: {
     title: 'Foldable Dog Water Bowl — Turns Any Bottle Into a Bowl',
     description: 'Foldable silicone cap that turns any standard water bottle into an instant dog bowl. Leak-proof, ultra-packable, no dedicated bottle required. $7.99 with free shipping.'

@@ -131,25 +131,90 @@ var products = [
     whatsInBox: "1× 2-in-1 Portable Dog Water Bottle"
   },
   {
-    // task 127: brand-new product, no prior listing — see the note on id 1
-    // above for why `images`/`extraImages` are empty and `shopifyVariants`
-    // is omitted. PRICING IS A PLACEHOLDER pending real cost data from
-    // Shopify (explicitly "TBD" in the task); update before this goes live.
+    // TASK 152 SOURCED THIS PRODUCT FOR REAL. Task 127 created it as an empty
+    // slot (no photos, no Shopify product, a "TBD" price) and it stayed that
+    // way through 149 and 150 — the only product on the site still falling
+    // back to its emoji on every surface. It now exists in Shopify as product
+    // 10193091232000, published 2026-10-02, and the photos, variant GIDs and
+    // prices below are all read off that listing.
+    //
+    // The price was NOT changed: $7.99 / compare-at $11.99 is what task 127
+    // guessed and it turns out to match Shopify exactly, so the figures stand
+    // and only the "placeholder" note above them is gone.
     id: 2, name: "Foldable Dog Water Bowl", emoji: "🥤", image: "",
     badge: "New", badgeClass: "badge-new",
-    // PLACEHOLDER stats pending a real sourced listing.
+    // STILL A PLACEHOLDER, and now the only one left on this product — 4.9 /
+    // 123 was invented by task 127 and is not read off any real listing. Same
+    // standing problem as product 1's 4.8 / 322. supplierRatingHtml() renders
+    // nothing at all when `supplier` is absent, so deleting it is safe; it is
+    // left here rather than quietly swapped for another made-up number.
     supplier: { rating: 4.9, ratings: 123 },
     desc: "A foldable silicone cap that turns any standard water bottle into an instant dog water bowl. No dedicated bottle needed — just screw it onto a bottle you already have, unfold, and pour. Leak-proof and ultra-packable, perfect for spontaneous walks when you didn't plan ahead.",
     tagline: "Turns any bottle you're already carrying into a dog bowl.",
     sizes: ["Universal — fits standard bottle necks"],
     colors: ["Pink", "Green"],
 
-    images: {},
-    extraImages: [],
+    // THE TWO COLOUR PHOTOS, checked against the pixels and not taken on
+    // trust. This is the first PawHaul product whose Shopify variants DO
+    // carry an image_id (position 1 -> Pink, position 2 -> Green), but the
+    // rule from task 149 still applies and both were opened and looked at:
+    // position 1 really is the pink sleeve and position 2 really is the
+    // green one, so Shopify's own assignment is correct here. Nothing had
+    // to be re-mapped.
+    //
+    // Re-hosted locally, same as every other product: deleting a Shopify
+    // product takes its cdn.shopify.com files with it, which is what broke
+    // the Poop Bag Clip before task 149.
+    images: {
+      "Pink": "/images/products/foldbowl-pink-main.jpg",
+      "Green": "/images/products/foldbowl-green-main.jpg"
+    },
 
-    // PLACEHOLDER price — not sourced yet (task says "TBD... I'll confirm
-    // once sourced in Shopify with real cost data").
+    // Shared gallery slides, shown after the two colour shots: the white
+    // studio pair, the deployed-bowl detail, the dog drinking from the green
+    // bowl, and the two bottles out camping. Positions 4, 5 and 6 of the
+    // Shopify pool all carried a marketing headline baked into the top of
+    // the frame and were CROPPED to remove it, not used as shot.
+    //
+    // REJECTED from the pool, deliberately: position 3 (an infographic
+    // collage — headline, five icon tiles and a callout pill over the photo,
+    // nothing left to crop to) and position 8 (a measurement diagram with
+    // 3.94in / 6.3in callouts). Measurement diagrams have been off these
+    // galleries since task 149; the numbers live in `material` as text.
+    extraImages: [
+      "/images/products/foldbowl-studio-1.jpg",
+      "/images/products/foldbowl-detail-1.jpg",
+      "/images/products/foldbowl-lifestyle-1.jpg",
+      "/images/products/foldbowl-lifestyle-2.jpg"
+    ],
+
+    // Task 150's gallery mode: every usable photo in one stable list, the
+    // selected colour first, and swiping onto a colour's photo selects that
+    // swatch. See detailGallerySlides().
+    galleryShowsAllVariants: true,
+
+    // Confirmed against Shopify, not a guess: $7.99 selling / $11.99
+    // compare-at is exactly what the live listing carries on both variants.
     price: 7.99, was: 11.99,
+
+    // Real Shopify variant GIDs (Storefront API). Both were confirmed with a
+    // live cartCreate against /api/cart, which only succeeds for products
+    // published to the Paw Haul Headless channel — so this product IS
+    // published there.
+    //
+    // NOTE: the cart is real but the CHECKOUT PAGE is not reachable, and
+    // that is a site-wide problem rather than this product's. Shopify issues
+    // its checkout URLs on pawhaulstore.com, Vercel serves that domain, and
+    // /cart/c/... 404s there for every product in the catalogue.
+    // byColor, NOT byVariant: resolveShopifyVariantId() builds a byVariant key
+    // as `size + "|" + colour`, and this product has a size axis (the single
+    // "Universal" option), so a byVariant map keyed on colour alone would miss
+    // on every lookup and silently drop the line from the Shopify cart. Same
+    // shape as the Poop Bag Clip and the wrist strap, which are single-size too.
+    shopifyVariants: { productGid: "gid://shopify/Product/10193091232000", byColor: {
+        "Pink": "gid://shopify/ProductVariant/50499603824896",
+        "Green": "gid://shopify/ProductVariant/50499603857664"
+      } },
 
     features: [
       "Screws onto any standard water bottle",
@@ -1099,10 +1164,9 @@ var BUNDLES = [
     // task 127 paired the two new portable-hydration products and left `img`
     // out, because neither had a real photo yet — which is why this card
     // showed the bottle's baby-bottle emoji where the other bundles show a
-    // lifestyle shot. Task 149 brought in the bottle's real Shopify pool, so
-    // the card now leads with its genuine lifestyle photo. The Foldable Dog
-    // Water Bowl (id 2) still has no photos of its own and still falls back
-    // to its emoji in the item row below.
+    // lifestyle shot. Task 149 brought in the bottle's real Shopify pool and
+    // task 152 the bowl's, so BOTH products in this bundle are photographed
+    // now and no surface of it falls back to an emoji.
     id: 'portable-hydration',
     name: 'Hydration Bundle',
     blurb: "One carries the water, the other turns any spare bottle into a bowl. Bring the 2-in-1 for the walk, keep the Foldable Bowl on hand for whatever bottle you've already got.",
@@ -1110,8 +1174,14 @@ var BUNDLES = [
     ids: [1, 2],
     roles: { 1: 'Your everyday walk bottle, bowl built in', 2: 'A spare bowl for any other bottle' },
     pct: 15,
-    img: '/images/products/bottle-lifestyle-1.jpg',
-    imgAlt: 'A dog drinking from the built-in bowl of the 2-in-1 Portable Dog Water Bottle'
+    // TWO photos, one per product (task 152). This tile used to be a single
+    // lifestyle shot of the BOTTLE, because the Foldable Dog Water Bowl had no
+    // photograph of its own and fell back to an emoji in the item row below.
+    // It has real photos now, so the tile shows both things you are buying.
+    imgs: [
+      { id: 1, url: '/images/products/bottle-deluxe-blue-main.jpg', alt: '2-in-1 Portable Dog Water Bottle in blue' },
+      { id: 2, url: '/images/products/foldbowl-pink-main.jpg', alt: 'Foldable Dog Water Bowl in pink, folded onto a water bottle' }
+    ]
   },
   {
     id: 'visibility',
@@ -1189,9 +1259,25 @@ function bundleOptionSelect(b, p, field, options, current) {
 function bundleCardHtml(b) {
   var items = bundleProducts(b);
   var t = bundleTotals(b);
+  // `imgs` (task 152) is the two-photo form: one real photograph per product
+  // in the bundle, side by side. It takes precedence over the single `img`,
+  // which stays the shape every other bundle uses. Each half carries the same
+  // onerror -> emoji fallback as every other product photo on the site, so a
+  // dead file shows that product's emoji rather than a broken-image icon.
+  var mediaHtml = '';
+  if (b.imgs && b.imgs.length) {
+    mediaHtml = '<div class="bundle-media bundle-media-split">' + b.imgs.map(function (m) {
+      var mp = products.find(function (x) { return x.id === m.id; });
+      return '<img ' + photoAttrs(m.url, 'card') + ' alt="' + esc(m.alt || (mp && mp.name) || '') + '"' +
+        imgOnErrorToEmoji(mp ? mp.emoji : '') + '>';
+    }).join('') + '</div>';
+  } else if (b.img) {
+    mediaHtml = '<div class="bundle-media"><img ' + photoAttrs(b.img, 'card') + ' alt="' + esc(b.imgAlt || b.name) + '"' +
+      (b.imgPos ? ' style="object-position:' + b.imgPos + '"' : '') + '></div>';
+  }
+
   return '<article class="bundle-card" id="bundle-' + b.id + '">' +
-    (b.img ? '<div class="bundle-media"><img ' + photoAttrs(b.img, 'card') + ' alt="' + esc(b.imgAlt || b.name) + '"' +
-      (b.imgPos ? ' style="object-position:' + b.imgPos + '"' : '') + '></div>' : '') +
+    mediaHtml +
     '<div class="bundle-top">' +
       '<h3 class="bundle-name">' + esc(b.name) + '</h3>' +
       '<span class="bundle-pill">Save ' + b.pct + '%</span>' +
@@ -1599,6 +1685,12 @@ var LOCAL_PHOTO_WIDTHS = {
   'collar-pink-main-v2': [400, 800, 1200],
   'collar-red': [400, 800],
   'collar-red-main-v2': [400, 800, 1200],
+  'foldbowl-detail-1': [400, 654],
+  'foldbowl-green-main': [400, 800, 1200, 1254],
+  'foldbowl-lifestyle-1': [400, 800, 1200, 1254],
+  'foldbowl-lifestyle-2': [400, 800, 1200, 1254],
+  'foldbowl-pink-main': [400, 800, 1200, 1254],
+  'foldbowl-studio-1': [400, 800, 1200, 1254],
   'led-leash-green-main': [400, 800, 1200, 1536],
   'led-leash-lifestyle-1': [400, 800, 1200, 1254],
   'led-leash-lifestyle-2': [400, 800, 1200, 1536],
