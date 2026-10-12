@@ -748,6 +748,20 @@ function trackAddToCart(product, price, size, color) {
 // have to be applied AFTER the page-navigation hooks below, so that a
 // page_view is only sent once the hook has finished setting document.title.
 
+// task 144: wishlist hero photo. A direct /wishlist load already set its src
+// (inline script next to the <img>, plus a <head> preload). Everywhere else
+// it's fetched once the page has fully loaded and gone idle, so navigating
+// to the wishlist later finds it cached — and immediately if the visitor
+// gets there first. Never fetched twice: src is only set once.
+function wishlistHeroLoad() {
+  var img = document.getElementById('wlHeroImg');
+  if (img && !img.getAttribute('src')) img.src = img.getAttribute('data-src');
+}
+window.addEventListener('load', function () {
+  var idle = window.requestIdleCallback || function (fn) { setTimeout(fn, 1500); };
+  idle(wishlistHeroLoad);
+});
+
 // ==================== PAGE NAVIGATION HOOKS ====================
 var _origShowPage = showPage;
 // task 140: the very FIRST call to showPage every page load is index.html's
@@ -771,6 +785,7 @@ showPage = function(page, opts) {
     closeSearch();
   }
   _showPageCalledOnce = true;
+  if (page === 'wishlist') wishlistHeroLoad();
   if (SPA_PAGE_TITLES[page]) setSpaTitle(SPA_PAGE_TITLES[page]);
   // Leaving the product page: hide the sticky Add To Cart bar immediately
   // rather than waiting on the next IntersectionObserver callback.

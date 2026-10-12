@@ -2435,6 +2435,69 @@ img.reviewer-av {
   box-shadow: var(--shadow-orange);
 }
 
+/* ==================== WISHLIST HERO (task 144) ====================
+   Full-width landscape photo at the top of the Wishlist page, under the
+   sticky nav. The gradient on .wl-hero itself is the solid fallback: it's
+   what shows before the photo paints, and permanently if the placeholder
+   file is missing (the <img> removes itself on error), so nothing ever
+   flashes white or looks broken. Swap the photo by replacing
+   /images/wishlist-hero.jpg; nudge framing with --wl-hero-pos if the new
+   photo's subject isn't centred. Desktop: wider and shorter. Phone/iPad
+   sizes are in the touch blocks further down (task 132 split). */
+.wl-hero {
+  --wl-hero-pos: center 45%;
+  position: relative;
+  height: clamp(200px, 26vh, 300px);
+  overflow: hidden;
+  background: linear-gradient(120deg, var(--navy) 0%, #2b2547 55%, #8a4a2a 100%);
+}
+.wl-hero-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--wl-hero-pos);
+  display: block;
+}
+.wl-hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(13,13,26,0.82) 0%, rgba(13,13,26,0.45) 45%, rgba(13,13,26,0.12) 100%);
+}
+.wl-hero-text {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1400px;
+  box-sizing: border-box;
+  padding: 0 5% 30px;
+  color: #fff;
+}
+.wl-hero-text h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 3.6vw, 46px);
+  line-height: 1.1;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+}
+.wl-hero-heart { width: 0.72em; height: 0.72em; fill: var(--orange); flex-shrink: 0; }
+.wl-hero-text p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.35);
+}
+.wl-page { padding-top: 28px; }
+.wl-page .empty-cart { padding: 40px 20px 56px; }
+
 .empty-cart { text-align: center; padding: 64px 20px; }
 .empty-cart .empty-icon { font-size: 56px; margin-bottom: 16px; display: block; }
 .empty-cart h2 { font-family: var(--font-display); font-size: 24px; margin-bottom: 8px; }
@@ -7119,4 +7182,24 @@ html.offline-locked, html.offline-locked body { overflow: hidden; }
 .chat-greeting-close:active { background: var(--line-soft); color: var(--black); }
 @media (prefers-reduced-motion: reduce) {
   .chat-greeting.show, .chat-greeting.dismissing { animation: none; }
+}
+
+/* ==================== WISHLIST HERO — PHONE / iPAD (task 144) ====================
+   Same touch+width split as tasks 132-135 (phone layout up to iPad
+   landscape). Phone: ~34% of the visible height so saved items still show
+   without much scrolling; iPad a bit shorter (block below). svh, with a vh
+   fallback, so Safari's collapsing toolbars don't resize it mid-scroll. */
+@media (max-width: 900px), (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .wl-hero { height: clamp(210px, 34vh, 340px); height: clamp(210px, 34svh, 340px); }
+  .wl-hero-text { padding: 0 5% 22px; }
+  .wl-hero-text h1 { font-size: 30px; gap: 8px; margin-bottom: 4px; }
+  .wl-hero-text p { font-size: 14.5px; }
+  .wl-page { padding-top: 18px; }
+  .wl-page .empty-cart { padding: 28px 16px 44px; }
+}
+@media (min-width: 700px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+  .wl-hero { height: clamp(230px, 28vh, 360px); height: clamp(230px, 28svh, 360px); }
+  .wl-hero-text { padding: 0 5% 28px; }
+  .wl-hero-text h1 { font-size: 38px; }
+  .wl-hero-text p { font-size: 16px; }
 }

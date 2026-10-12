@@ -224,6 +224,9 @@ function heroSlideError(img) {
      fonts are fetched in CORS mode, and without it the browser downloads the
      file twice and the preload buys nothing.
      Body font first — it is on far more of the page than the display face. -->
+<!-- task 144: wishlist hero photo — preloaded only when this load IS the
+     wishlist page, so no other page pays for it up front. -->
+<script>(function () { if (!/^\/wishlist\/?$/.test(location.pathname)) return; var l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.href = '/images/wishlist-hero.jpg'; l.fetchPriority = 'high'; document.head.appendChild(l); })();</script>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/nunito-latin-var.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/fonts/fredoka-one-latin.woff2" crossorigin>
   <!-- All asset paths on this page are now root-relative (leading "/") — routing
@@ -232,7 +235,7 @@ function heroSlideError(img) {
        resolve against THAT path (e.g. /shop/styles.css, a 404) instead of the
        site root. Bit this exact way once already; keep new asset refs
        root-relative too. -->
-  <link rel="stylesheet" href="/styles.css?v=170" onload="document.documentElement.classList.remove('no-flash')">
+  <link rel="stylesheet" href="/styles.css?v=171" onload="document.documentElement.classList.remove('no-flash')">
   <!-- These two live at the very bottom of <body> (they need the DOM), but the
        page can't finish rendering until they've run, so start fetching them
        NOW — in parallel with the stylesheet — instead of when the parser
@@ -241,8 +244,8 @@ function heroSlideError(img) {
        character-for-character (version query included) or the browser fetches
        each file twice. -->
   <link rel="preload" as="script" href="/blog.js?v=10">
-  <link rel="preload" as="script" href="/products.js?v=96">
-  <link rel="preload" as="script" href="/app.js?v=95">
+  <link rel="preload" as="script" href="/products.js?v=97">
+  <link rel="preload" as="script" href="/app.js?v=96">
   <script>setTimeout(function(){document.documentElement.classList.remove('no-flash');}, 300);</script>
   <!-- The home page's 10% off box has TWO states and both ship in the markup,
        so the right one is chosen BEFORE first paint rather than by JS after the
@@ -1351,9 +1354,25 @@ function heroSlideError(img) {
 
 <!-- WISHLIST PAGE -->
 <div id="page-wishlist" class="page" style="background:white;">
-  <div class="cart-page">
+  <!-- WISHLIST HERO (task 144). The photo is a TEMPORARY PLACEHOLDER:
+       replace it by dropping a new landscape JPG at /images/wishlist-hero.jpg
+       (same name) — no code change needed. Until a file exists there, the
+       navy/orange gradient behind it shows instead (the img removes itself
+       on error), so the banner never looks broken. Loading: preloaded +
+       fetched eagerly on a direct /wishlist load (head script); on every
+       other page it's fetched at idle after load, so SPA navigation here
+       finds it already cached — see wishlistHeroLoad in app.js. -->
+  <section class="wl-hero" aria-labelledby="wlHeroTitle">
+    <img class="wl-hero-img" id="wlHeroImg" alt="" width="1600" height="900" decoding="async" data-src="/images/wishlist-hero.jpg" onerror="this.remove()">
+    <script>(function () { var i = document.getElementById('wlHeroImg'); if (/^\/wishlist\/?$/.test(location.pathname)) { i.loading = 'eager'; i.fetchPriority = 'high'; i.src = i.getAttribute('data-src'); } })();</script>
+    <div class="wl-hero-shade" aria-hidden="true"></div>
+    <div class="wl-hero-text">
+      <h1 id="wlHeroTitle">Your Wishlist <svg class="wl-hero-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.1 5.3 3.1 1.7-2 3.2-3.1 5.3-3.1 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></h1>
+      <p>Saved with love, ready when you are.</p>
+    </div>
+  </section>
+  <div class="cart-page wl-page">
     <a class="back-btn" href="/shop" onclick="goTo(event,'shop')">← Continue Shopping</a>
-    <h1>My Wishlist <span style="color:var(--orange)">♥</span></h1>
     <div id="wishlistContent"></div>
   </div>
   <footer>
@@ -1693,8 +1712,8 @@ function heroSlideError(img) {
        from products.js so the server-side renderer can read one file for
        posts and one for products — see api/_seo.js. -->
   <script src="/blog.js?v=10"></script>
-  <script src="/products.js?v=96"></script>
-  <script src="/app.js?v=95"></script>
+  <script src="/products.js?v=97"></script>
+  <script src="/app.js?v=96"></script>
   <!-- EmailJS is only needed once someone actually submits the contact form or
        the 10%-off box, so it's deferred and loaded LAST. It used to sit above
        products.js and run synchronously (products.js called emailjs.init() at
