@@ -26,6 +26,11 @@
       },
       "continue": true
     },
+    {
+      "src": "/(?!(?:images|fonts)/|api/(?!render|sitemap|feed)|maintenance\\.html$|favicon|apple-touch-icon\\.png$|robots\\.txt$).*",
+      "dest": "/maintenance.html",
+      "status": 503
+    },
     { "src": "/shop/(.+)", "status": 301, "headers": { "Location": "/shop" } },
     { "src": "/", "dest": "/api/render?path=/" },
     { "src": "/sitemap\\.xml", "dest": "/api/sitemap" },
